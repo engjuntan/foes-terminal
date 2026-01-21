@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "foes-2beca"
-  }
+    "default": "foes-terminal"
+  },
+  "targets": {},
+  "etags": {}
 }

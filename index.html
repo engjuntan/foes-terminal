@@ -18,12 +18,14 @@
           <button id="btn-dashboard" class="nav-btn active">1. DASHBOARD</button>
           <button id="btn-logs" class="nav-btn">2. DATA LOGS</button>
           <button id="btn-map" class="nav-btn">3. GEOGRAPHY</button>
+	  <button id="btn-admin" class="nav-btn hidden" style="border-color: red; color: red;">4. OVERRIDE</button>
           <button id="btn-secret" class="nav-btn hidden">??. CLASSIFIED</button>
         </nav>
         <div class="console-input">
-          <span class="prompt">></span>
-          <input type="text" id="cmdInput" placeholder="ENTER COMMAND..." autocomplete="off">
-        </div>
+  		<span class="prompt">></span>
+  		<input type="text" id="cmdInput" placeholder="ENTER COMMAND..." autocomplete="off">
+  		<button id="cmdBtn" style="background:transparent; border:none; color: lime; font-family: 'VT323'; font-size: 20px;">[SEND]</button>
+	</div>
       </aside>
 
       <main id="main-viewport">
