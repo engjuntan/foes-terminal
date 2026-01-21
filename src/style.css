@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+:root {
+  --pip-green: #33ff33;
+  --pip-dim: #1a801a;
+  --bg-color: #0d120d;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-color);
+  color: var(--pip-green);
+  font-family: 'VT323', monospace;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* SCANLINES */
+.scanlines {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+              linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.app-container {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  border-right: 2px solid var(--pip-green);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+  z-index: 10;
+}
+
+.header-logo {
+  font-size: 24px;
+  border-bottom: 2px solid var(--pip-green);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.nav-btn {
+  background: transparent;
+  border: 1px solid var(--pip-green);
+  color: var(--pip-green);
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  margin-bottom: 10px;
+  width: 100%;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover, .nav-btn.active {
+  background: var(--pip-green);
+  color: black;
+  font-weight: bold;
+}
+
+.nav-btn.hidden { display: none; }
+
+.console-input {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--pip-dim);
+  padding-top: 15px;
+}
+
+.console-input input {
+  background: transparent;
+  border: none;
+  color: var(--pip-green);
+  font-family: 'VT323';
+  font-size: 18px;
+  margin-left: 10px;
+  width: 100%;
+  outline: none;
+  text-transform: uppercase;
+}
+
+/* MAIN CONTENT */
+#main-viewport {
+  padding: 40px;
+  overflow-y: auto;
+}
+
+h1 { border-bottom: 1px solid var(--pip-green); padding-bottom: 10px; }
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+  .app-container { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .sidebar { border-right: none; border-bottom: 2px solid var(--pip-green); padding: 10px; }
+  .nav-btn { display: inline-block; width: auto; margin-right: 5px; font-size: 16px; padding: 8px; }
+  .console-input { display: none; } /* Hide console on mobile to save space, or move it */
+}

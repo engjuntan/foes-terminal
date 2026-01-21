@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ROBCO TERMINAL v2.1</title>
+  </head>
+  <body>
+    <div class="scanlines"></div>
+
+    <div class="app-container">
+      <aside class="sidebar">
+        <div class="header-logo">
+          FOES: EASTERN SHORES
+          <div id="clock" class="clock">00:00:00</div>
+        </div>
+        <nav>
+          <button id="btn-dashboard" class="nav-btn active">1. DASHBOARD</button>
+          <button id="btn-logs" class="nav-btn">2. DATA LOGS</button>
+          <button id="btn-map" class="nav-btn">3. GEOGRAPHY</button>
+          <button id="btn-secret" class="nav-btn hidden">??. CLASSIFIED</button>
+        </nav>
+        <div class="console-input">
+          <span class="prompt">></span>
+          <input type="text" id="cmdInput" placeholder="ENTER COMMAND..." autocomplete="off">
+        </div>
+      </aside>
+
+      <main id="main-viewport">
+        <div class="module-content">
+          <h1>> INITIALIZING...</h1>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
