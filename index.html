@@ -1,40 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ROBCO TERMINAL v2.1</title>
-  </head>
-  <body>
-    <div class="scanlines"></div>
+<body>
+  <div class="scanlines"></div>
 
-    <div class="app-container">
-      <aside class="sidebar">
-        <div class="header-logo">
-          FOES: EASTERN SHORES
-          <div id="clock" class="clock">00:00:00</div>
-        </div>
-        <nav>
-          <button id="btn-dashboard" class="nav-btn active">1. DASHBOARD</button>
-          <button id="btn-logs" class="nav-btn">2. DATA LOGS</button>
-          <button id="btn-map" class="nav-btn">3. GEOGRAPHY</button>
-	  <button id="btn-admin" class="nav-btn hidden" style="border-color: red; color: red;">4. OVERRIDE</button>
-          <button id="btn-secret" class="nav-btn hidden">??. CLASSIFIED</button>
-        </nav>
-        <div class="console-input">
-  		<span class="prompt">></span>
-  		<input type="text" id="cmdInput" placeholder="ENTER COMMAND..." autocomplete="off">
-  		<button id="cmdBtn" style="background:transparent; border:none; color: lime; font-family: 'VT323'; font-size: 20px;">[SEND]</button>
-	</div>
-      </aside>
-
-      <main id="main-viewport">
-        <div class="module-content">
-          <h1>> INITIALIZING...</h1>
-        </div>
-      </main>
+  <div id="login-screen" style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; background:black; z-index:9999; position:absolute; width:100%;">
+    <h1 style="font-size: 40px; margin-bottom:10px;">> TERMINAL LOCKED</h1>
+    <p style="color:var(--pip-dim); margin-bottom:20px;">AUTHORIZATION REQUIRED</p>
+    
+    <div class="console-input" style="width: 300px;">
+       <span class="prompt">></span>
+       <input type="text" id="loginInput" placeholder="ENTER PASSCODE..." autocomplete="off">
+       <button id="loginBtn" style="background:transparent; border:none; color:lime; font-family:'VT323'; font-size:20px; cursor:pointer;">[ENTER]</button>
     </div>
+  </div>
 
-    <script type="module" src="/src/main.js"></script>
-  </body>
-</html>
+  <div id="app-interface" class="app-container hidden">
+    
+    <aside class="sidebar">
+      <div class="logo-area">
+        <div class="logo-box">FOES</div>
+        <div class="status-indicator">ONLINE</div>
+      </div>
+      
+      <nav>
+        <button id="btn-dashboard" class="nav-btn active">1. DASHBOARD</button>
+        <button id="btn-logs" class="nav-btn">2. DATA LOGS</button>
+        <button id="btn-map" class="nav-btn">3. GEOGRAPHY</button>
+        <button id="btn-admin" class="nav-btn hidden" style="border-color: red; color: red;">4. OVERRIDE</button>
+      </nav>
+      
+      <div class="console-input">
+        <span class="prompt">></span>
+        <input type="text" id="cmdInput" placeholder="ENTER COMMAND..." autocomplete="off">
+        <button id="cmdBtn" style="background:transparent; border:none; color:lime; font-family:'VT323'; font-size:20px;">[SEND]</button>
+      </div>
+    </aside>
+
+    <main id="main-viewport">
+      <h1>> INITIALIZING...</h1>
+    </main>
+  </div>
+
+  <div id="wiki-overlay" class="hidden">
+    <div class="wiki-window">
+      <div class="wiki-header">
+        <span>> ARCHIVE_RETRIEVAL_SYSTEM</span>
+        <button onclick="window.closeWiki()" style="background:red; color:white; border:none; cursor:pointer;">[X]</button>
+      </div>
+      <iframe id="wiki-frame" src=""></iframe>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>

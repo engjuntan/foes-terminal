@@ -15,7 +15,7 @@ body {
   overflow: hidden;
 }
 
-/* SCANLINES */
+/* --- 1. CORE VISUALS (SCANLINES & LOGIN) --- */
 .scanlines {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -26,13 +26,45 @@ body {
   z-index: 999;
 }
 
+#login-screen {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: black;
+  z-index: 9999;
+  position: absolute;
+  width: 100%;
+}
+
+.console-input {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--pip-dim);
+  padding-top: 15px;
+  margin-top: auto;
+}
+
+.console-input input {
+  background: transparent;
+  border: none;
+  color: var(--pip-green);
+  font-family: 'VT323';
+  font-size: 18px;
+  margin-left: 10px;
+  width: 100%;
+  outline: none;
+  text-transform: uppercase;
+}
+
+/* --- 2. LAYOUT & NAVIGATION --- */
 .app-container {
   display: grid;
   grid-template-columns: 260px 1fr;
   height: 100vh;
 }
 
-/* SIDEBAR */
 .sidebar {
   border-right: 2px solid var(--pip-green);
   padding: 20px;
@@ -40,13 +72,6 @@ body {
   flex-direction: column;
   background: #000;
   z-index: 10;
-}
-
-.header-logo {
-  font-size: 24px;
-  border-bottom: 2px solid var(--pip-green);
-  padding-bottom: 10px;
-  margin-bottom: 20px;
 }
 
 .nav-btn {
@@ -69,49 +94,9 @@ body {
   color: black;
   font-weight: bold;
 }
+.nav-btn.hidden { display: none !important; }
 
-.nav-btn.hidden { display: none; }
-
-.console-input {
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  border-top: 1px solid var(--pip-dim);
-  padding-top: 15px;
-}
-
-.console-input input {
-  background: transparent;
-  border: none;
-  color: var(--pip-green);
-  font-family: 'VT323';
-  font-size: 18px;
-  margin-left: 10px;
-  width: 100%;
-  outline: none;
-  text-transform: uppercase;
-}
-
-/* MAIN CONTENT */
-#main-viewport {
-  padding: 40px;
-  overflow-y: auto;
-}
-
-h1 { border-bottom: 1px solid var(--pip-green); padding-bottom: 10px; }
-
-/* MOBILE RESPONSIVE */
-@media (max-width: 768px) {
-  .app-container { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-  .sidebar { border-right: none; border-bottom: 2px solid var(--pip-green); padding: 10px; }
-  .nav-btn { display: inline-block; width: auto; margin-right: 5px; font-size: 16px; padding: 8px; }
- .console-input { 
-  display: flex; 
-  margin-top: 10px;
-}
-}
-
-/* GM BUTTON */
+/* GM BUTTON (Restored) */
 .gm-btn {
   background: #300;
   border: 1px solid red;
@@ -122,7 +107,261 @@ h1 { border-bottom: 1px solid var(--pip-green); padding-bottom: 10px; }
   margin: 0 5px;
   padding: 2px 8px;
 }
-.gm-btn:hover {
-  background: red;
+.gm-btn:hover { background: red; color: black; }
+
+/* UTILITY */
+.hidden { display: none !important; }
+
+/* --- 3. DASHBOARD GRID (THE 3 PANELS) --- */
+#main-viewport { padding: 20px; overflow-y: auto; }
+
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 250px 1fr 300px;
+  gap: 20px;
+  height: 100%; /* Fill available space */
+  overflow: hidden;
+}
+
+.panel {
+  border: 2px solid var(--pip-green);
+  background: rgba(0, 20, 0, 0.3);
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel h2 {
+  background: var(--pip-green);
   color: black;
+  margin: -10px -10px 10px -10px;
+  padding: 5px 10px;
+  font-size: 20px;
+  text-align: center;
+}
+
+/* DASHBOARD COMPONENTS */
+.char-portrait {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border: 1px solid var(--pip-dim);
+  margin-bottom: 10px;
+}
+
+.special-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--pip-dim);
+  padding: 5px 0;
+  font-size: 18px;
+}
+
+.combat-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+.combat-table th { text-align: left; color: var(--pip-dim); border-bottom: 1px solid var(--pip-green); }
+.combat-table td { border-bottom: 1px dashed #1a331a; padding: 4px; }
+.combat-table .val { text-align: center; color: white; }
+
+.skill-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+  font-size: 16px;
+  cursor: pointer;
+}
+.skill-item:hover { background: rgba(51, 255, 51, 0.1); }
+.skill-item.tagged { color: yellow; font-weight: bold; }
+
+/* MOBILE RESPONSIVE (Restored) */
+@media (max-width: 768px) {
+  .app-container { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .sidebar { border-right: none; border-bottom: 2px solid var(--pip-green); padding: 10px; }
+  .nav-btn { display: inline-block; width: auto; margin-right: 5px; font-size: 16px; padding: 8px; }
+  .dashboard-container { grid-template-columns: 1fr; overflow-y: auto; height: auto; }
+}
+
+/* --- SCROLLBAR STYLING --- */
+/* Works for Chrome, Safari, Edge, and modern browsers */
+
+/* Width of the scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track (the background of the bar) */
+::-webkit-scrollbar-track {
+  background: #000; /* Black to blend in */
+}
+
+/* Handle (the moving part) */
+::-webkit-scrollbar-thumb {
+  background: var(--pip-dim); /* Dark Green */
+  border: 1px solid var(--pip-green); /* Bright Green outline */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--pip-green);
+}
+
+/* OPTIONAL: To hide it completely but still scroll, use this instead:
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- INVENTORY CARDS --- */
+.inventory-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.inv-card {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--pip-dim);
+  background: rgba(0, 20, 0, 0.5);
+  margin-bottom: 8px;
+  padding: 5px;
+  transition: all 0.2s;
+}
+
+.inv-card:hover {
+  border-color: var(--pip-green);
+  background: rgba(0, 50, 0, 0.5);
+  cursor: pointer;
+}
+
+.inv-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 1px solid var(--pip-dim);
+  margin-right: 10px;
+}
+
+.inv-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.inv-name {
+  color: var(--pip-green);
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.inv-meta {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.inv-stats {
+  font-size: 14px;
+  color: yellow;
+  margin-left: auto; /* Pushes stats to the right */
+  text-align: right;
+}
+
+
+/* --- EQUIPMENT SLOTS --- */
+.equipment-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.slot-box {
+  border: 1px solid var(--pip-dim);
+  padding: 5px;
+  min-height: 50px;
+  background: rgba(0, 20, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.slot-box small {
+  font-size: 10px;
+  color: var(--pip-dim);
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}
+
+.slot-box.occupied {
+  border-color: var(--pip-green);
+  cursor: pointer;
+}
+
+.slot-box.occupied:hover {
+  background: rgba(50, 0, 0, 0.3); /* Red tint on hover to show unequip */
+}
+
+/* --- ACTION BUTTONS --- */
+.inv-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.inv-actions button {
+  background: transparent;
+  border: 1px solid var(--pip-green);
+  color: var(--pip-green);
+  font-family: 'Share Tech Mono', monospace;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+.inv-actions button:hover {
+  background: var(--pip-green);
+  color: black;
+}
+
+/* --- TYRANNY WIKI LINKS --- */
+.wiki-link {
+  color: var(--pip-gold, #ffcc00);
+  font-weight: bold;
+  cursor: help;
+  border-bottom: 1px dotted var(--pip-gold, #ffcc00);
+}
+
+.wiki-link:hover {
+  background: rgba(255, 204, 0, 0.1);
+}
+
+/* THE NEW GLOBAL TOOLTIP CONTAINER */
+#global-tooltip {
+  position: fixed; /* Sits on top of everything relative to the window */
+  z-index: 9999;   /* Highest priority */
+  visibility: hidden;
+  opacity: 0;
+  background-color: #000;
+  color: var(--pip-green);
+  border: 1px solid var(--pip-green);
+  padding: 10px;
+  max-width: 300px;
+  box-shadow: 0px 4px 15px rgba(0,0,0,0.8);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  pointer-events: none; /* Let mouse clicks pass through it */
+  transition: opacity 0.1s;
+  /* Initial positioning off-screen */
+  top: 0;
+  left: 0;
+}
+
+#global-tooltip.active {
+  visibility: visible;
+  opacity: 1;
 }
