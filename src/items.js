@@ -19,7 +19,7 @@ export const itemDatabase = {
     "name": "Kitchen Knife",
     "type": "weapon",
     "slot": "hand",
-    "icon": "https://imgur.com/48WviQB",
+    "icon": "https://i.imgur.com/48WviQB.png",
     "description": "The knife of the willing, the chefs, the housewife under duress and the knife you find under scraps of salvage. Is it sharp? Can it slice? Who cares? It's a knife.",
     "stats": {
       "dmg": "1d6",

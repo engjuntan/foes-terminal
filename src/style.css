@@ -1,3 +1,5 @@
+
+
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
 :root {
@@ -27,15 +29,25 @@ body {
 }
 
 #login-screen {
+  position: fixed;
+  inset: 0; /* Shorthand for top:0; right:0; bottom:0; left:0; */
+  width: 100vw;
   height: 100vh;
+  background-color: #000;
+  display: grid;
+  place-items: center; /* The modern "Dead Center" command */
+  z-index: 10000;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure the inner box doesn't stretch */
+#login-screen > div {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 15px;
   align-items: center;
-  background: black;
-  z-index: 9999;
-  position: absolute;
-  width: 100%;
+  max-width: 300px;
 }
 
 .console-input {
@@ -43,7 +55,7 @@ body {
   align-items: center;
   border-top: 1px solid var(--pip-dim);
   padding-top: 15px;
-  margin-top: auto;
+  margin-top: 40px;
 }
 
 .console-input input {
@@ -115,12 +127,27 @@ body {
 /* --- 3. DASHBOARD GRID (THE 3 PANELS) --- */
 #main-viewport { padding: 20px; overflow-y: auto; }
 
+/* --- DASHBOARD GRID --- */
 .dashboard-container {
   display: grid;
-  grid-template-columns: 250px 1fr 300px;
+  /* STRICT COLUMNS: 250px fixed, the rest, 300px fixed. Won't budge. */
+  grid-template-columns: minmax(250px, 250px) 1fr minmax(300px, 300px); 
   gap: 20px;
-  height: 100%; /* Fill available space */
+  height: 100%;
   overflow: hidden;
+  padding-bottom: 20px; /* Breathing room at bottom */
+  box-sizing: border-box;
+}
+
+.panel {
+  border: 2px solid var(--pip-green);
+  background: rgba(0, 20, 0, 0.3);
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden; /* Crucial: stops content from pushing width out */
+  display: flex;
+  flex-direction: column;
+  height: 100%; 
 }
 
 .panel {
@@ -364,4 +391,58 @@ body {
 #global-tooltip.active {
   visibility: visible;
   opacity: 1;
+}
+
+/* --- GM DASHBOARD --- */
+.gm-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gm-char-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 20, 0, 0.4);
+  border: 1px solid var(--pip-dim);
+  padding: 5px;
+}
+
+.gm-avatar {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border: 1px solid var(--pip-green);
+}
+
+.hp-bar-container {
+  width: 100%;
+  height: 10px;
+  background: #330000;
+  border: 1px solid red;
+  margin-top: 2px;
+}
+
+.hp-fill {
+  height: 100%;
+  background: red;
+  transition: width 0.3s;
+}
+
+/* GM DROPDOWN STYLING */
+select {
+  background-color: #000;
+  color: var(--pip-green);
+  border: 1px solid var(--pip-green);
+  font-family: 'VT323', monospace; /* Or 'Share Tech Mono' if you prefer */
+  font-size: 18px;
+  padding: 5px;
+  outline: none;
+  cursor: pointer;
+}
+
+option {
+  background-color: #000;
+  color: var(--pip-green);
 }
