@@ -1,12 +1,11 @@
 // src/views.js
-import { calculateDerivedStats } from './formulas.js';
+import { calculateDerivedStats, RACE_RULES } from './formulas.js';
 import { getItem, itemDatabase } from './items.js';
 import { getTrait } from './traits.js';
 
 // --- HELPERS ---
 export function renderWikiLink(name, description) {
   if (!description) description = "No data available.";
-  // Sanitizer: Escapes quotes so tooltips don't break
   const safeDesc = description.replace(/"/g, "&quot;").replace(/'/g, "\\'");
   return `<span class="wiki-link" 
           onmouseover="window.showTooltip('${safeDesc}', event)" 
@@ -35,19 +34,122 @@ export function getNavbar(currentTab, currentUser) {
   `;
 }
 
-// --- PLAYER SCREEN ---
+// --- REGISTRATION SCREEN (The G.O.A.T. Exam) ---
+export function getRegistrationView(charId, liveData) {
+  const char = liveData.characters[charId];
+  // Initialize Draft if missing
+  const draft = window.creationDraft || {
+    race: "human",
+    special: { str: 5, per: 5, end: 5, cha: 5, int: 5, agi: 5, luk: 5 },
+    tags: []
+  };
+  window.creationDraft = draft; 
+
+  // Data Prep
+  const TOTAL_POINTS = 40; 
+  const currentSpent = Object.values(draft.special).reduce((a, b) => a + b, 0);
+  const remaining = TOTAL_POINTS - currentSpent;
+  const raceDef = RACE_RULES[draft.race] || RACE_RULES['human'];
+  
+  // Render Special Rows
+  const renderRow = (stat, label) => {
+    const val = draft.special[stat];
+    const min = raceDef.min[stat];
+    const max = raceDef.max[stat];
+    
+    const canMinus = val > min ? '' : 'disabled style="opacity:0.3"';
+    const canPlus = (val < max && remaining > 0) ? '' : 'disabled style="opacity:0.3"';
+
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; border-bottom:1px dashed #333; padding:5px;">
+        <span style="width:50px; font-weight:bold; color:var(--pip-dim);">${label}</span>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button ${canMinus} onclick="window.adjustCreationStat('${stat}', -1)">[-]</button>
+          <span style="color:${val >= 10 ? 'gold' : 'var(--pip-green)'}; width:30px; text-align:center;">${val}</span>
+          <button ${canPlus} onclick="window.adjustCreationStat('${stat}', 1)">[+]</button>
+        </div>
+        <span style="font-size:10px; color:#555; width:60px; text-align:right;">MIN ${min} / MAX ${max}</span>
+      </div>
+    `;
+  };
+
+  // Render Skills
+  const allSkills = ["small_guns", "big_guns", "energy_weapons", "melee_weapons", "unarmed", "throwing", "medicine", "science", "lockpick", "sneak", "speech", "survival"];
+  const skillGrid = allSkills.map(skill => {
+    const isSelected = draft.tags.includes(skill);
+    const style = isSelected ? "border-color:cyan; color:cyan; background:rgba(0,255,255,0.1);" : "border-color:#333; color:#555;";
+    const disabled = (!isSelected && draft.tags.length >= 3) ? "opacity:0.3; pointer-events:none;" : "";
+    return `<div onclick="window.toggleCreationTag('${skill}')" style="border:1px solid; padding:5px; cursor:pointer; text-transform:uppercase; font-size:12px; text-align:center; ${style} ${disabled}">${skill.replace('_', ' ')}</div>`;
+  }).join("");
+
+  return `
+    <div class="dashboard-container" style="display:block; max-width:600px; margin:0 auto; padding-top:20px;">
+      <div class="panel" style="border:2px solid var(--pip-green); box-shadow:0 0 15px rgba(50,255,50,0.1);">
+        <h1 style="text-align:center; background:var(--pip-green); color:black; margin:-10px -10px 20px -10px;">G.O.A.T. REGISTRATION</h1>
+        
+        <div style="display:flex; gap:20px; margin-bottom:20px;">
+          <img src="${char.avatar_url}" style="width:100px; height:100px; border:1px solid var(--pip-green);">
+          <div style="flex-grow:1;">
+            <h2 style="margin:0; color:white;">IDENTITY: ${char.name}</h2>
+            <div style="margin-top:10px;">
+              <label>GENETIC STRAIN (RACE):</label><br>
+              <select onchange="window.setCreationRace(this.value)" style="background:black; color:lime; border:1px solid lime; font-family:'VT323'; font-size:18px; width:100%;">
+                ${Object.keys(RACE_RULES).map(r => `<option value="${r}" ${draft.race === r ? 'selected' : ''}>${RACE_RULES[r].name.toUpperCase()}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(0,50,0,0.2); padding:10px; border:1px solid var(--pip-dim); margin-bottom:20px; font-size:14px; color:#aaa;">
+           ${raceDef.description}
+        </div>
+
+        <div style="background:rgba(0,0,0,0.5); padding:10px; border:1px solid #333; margin-bottom:20px;">
+          <div style="text-align:center; margin-bottom:10px;">
+            POINTS POOL: <span style="font-size:24px; color:${remaining === 0 ? 'lime' : 'yellow'};">${remaining}</span>
+          </div>
+          ${renderRow('str', 'STR')} ${renderRow('per', 'PER')} ${renderRow('end', 'END')}
+          ${renderRow('cha', 'CHA')} ${renderRow('int', 'INT')} ${renderRow('agi', 'AGI')} ${renderRow('luk', 'LUK')}
+        </div>
+
+        <h3 style="border-bottom:1px solid var(--pip-dim);">TAG SKILLS (${draft.tags.length}/3)</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-bottom:20px;">${skillGrid}</div>
+
+        <button onclick="window.finalizeCharacter()" 
+          style="width:100%; padding:15px; font-size:24px; background:${(remaining === 0 && draft.tags.length === 3) ? 'var(--pip-green)' : '#333'}; color:black; font-family:'VT323'; border:none; cursor:pointer;"
+          ${(remaining === 0 && draft.tags.length === 3) ? '' : 'disabled'}>
+          ${(remaining === 0 && draft.tags.length === 3) ? 'PRINT IDENTITY CARD' : 'INCOMPLETE DATA'}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// --- PLAYER SCREEN (The Dashboard) ---
 export function getPlayerView(charId, liveData) {
   const charData = liveData.characters[charId];
   if (!charData) return `<h1>> ERROR: IDENTITY '${charId.toUpperCase()}' NOT FOUND</h1>`;
 
   const equip = charData.equipment || { head: null, body: null, right_hand: null, left_hand: null };
-  const derived = calculateDerivedStats(charData.special, charData.level || 1, charData.traits || [], charData.perks || []);
+  
+  // PASS RACE TO FORMULAS
+  const derived = calculateDerivedStats(
+    charData.special, 
+    charData.level || 1, 
+    charData.traits || [], 
+    charData.perks || [],
+    charData.race || 'human' // Default to human if missing
+  );
 
-  // --- 1. LEVEL UP STATE ---
+  // --- 1. LEVEL UP & PERKS STATE ---
   const availablePoints = charData.skill_points || 0;
   const draft = window.levelUpDraft || { spent: 0, allocation: {} };
   const pointsRemaining = availablePoints - draft.spent;
   const isLeveling = availablePoints > 0;
+  
+  // Perks Calculation
+  const perksOwned = (charData.perks || []).length;
+  const perksAvailable = derived.perksAllowed - perksOwned;
 
   // --- 2. SKILLS GENERATION ---
   const skillCategories = {
@@ -74,10 +176,8 @@ export function getPlayerView(charId, liveData) {
 
   for (const [category, skillKeys] of Object.entries(skillCategories)) {
     skillsHtml += `<h4 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:15px; margin-bottom:5px;">${category}</h4>`;
-    
     skillKeys.forEach(key => {
       if (derived.skills[key] === undefined) return;
-      
       const isTagged = charData.tags ? charData.tags[key] : false;
       const addedSteps = draft.allocation[key] || 0;
       const addedValue = isTagged ? (addedSteps * 2) : addedSteps; 
@@ -89,111 +189,58 @@ export function getPlayerView(charId, liveData) {
       if (isLeveling) {
         const minDisabled = addedSteps <= 0 ? "disabled style='opacity:0.3'" : "style='cursor:pointer; color:red;'";
         const maxDisabled = pointsRemaining <= 0 ? "disabled style='opacity:0.3'" : "style='cursor:pointer; color:lime;'";
-        
-        controls = `
-          <div style="display:flex; gap:5px;">
-            <button ${minDisabled} onclick="window.adjustSkillDraft('${key}', -1)">[-]</button>
-            <button ${maxDisabled} onclick="window.adjustSkillDraft('${key}', 1)">[+]</button>
-          </div>
-        `;
+        controls = `<div style="display:flex; gap:5px;"><button ${minDisabled} onclick="window.adjustSkillDraft('${key}', -1)">[-]</button><button ${maxDisabled} onclick="window.adjustSkillDraft('${key}', 1)">[+]</button></div>`;
       }
       
-      const valDisplay = addedValue > 0 
-        ? `<span style="color:cyan;">${totalVal}% (+${addedValue})</span>` 
-        : `<span>${totalVal}%</span>`;
-
-      skillsHtml += `
-        <div class="skill-item ${isTagged ? 'tagged' : ''}" style="display:flex; justify-content:space-between; align-items:center;">
-          <span>${key.replace(/_/g, ' ').toUpperCase()}</span>
-          <div style="display:flex; gap:10px; align-items:center;">
-            ${controls}
-            ${valDisplay}
-          </div>
-        </div>`;
+      const valDisplay = addedValue > 0 ? `<span style="color:cyan;">${totalVal}% (+${addedValue})</span>` : `<span>${totalVal}%</span>`;
+      skillsHtml += `<div class="skill-item ${isTagged ? 'tagged' : ''}" style="display:flex; justify-content:space-between; align-items:center;"><span>${key.replace(/_/g, ' ').toUpperCase()}</span><div style="display:flex; gap:10px; align-items:center;">${controls}${valDisplay}</div></div>`;
     });
   }
 
-  // --- 3. INVENTORY SPLIT (WALLET vs GEAR) ---
+  // --- 3. INVENTORY & WALLET ---
   let inventoryHtml = "";
   let walletHtml = "";
 
   if (charData.inventory) {
-    // Convert list of IDs to list of Objects {id, def}
     const rawInv = charData.inventory.map(itemEntry => {
        const itemId = (typeof itemEntry === 'string') ? itemEntry : itemEntry.id;
        const itemDef = getItem(itemId);
        return { id: itemId, def: itemDef };
     });
 
-    // A. Generate Wallet HTML (Currency Only)
-    walletHtml = rawInv
-      .filter(i => i.def && i.def.type === 'currency')
-      .map(i => {
-         return `<div style="display:flex; justify-content:space-between; border-bottom:1px dashed #333; padding:2px 0;">
-                   ${renderWikiLink(i.def.name, i.def.description)}
-                   <span style="color:var(--pip-gold);">x1</span> 
-                 </div>`;
-      }).join("");
+    walletHtml = rawInv.filter(i => i.def && i.def.type === 'currency')
+      .map(i => `<div style="display:flex; justify-content:space-between; border-bottom:1px dashed #333; padding:2px 0;">${renderWikiLink(i.def.name, i.def.description)}<span style="color:var(--pip-gold);">x1</span></div>`).join("");
 
-    // B. Generate Gear HTML (Everything Else)
-    inventoryHtml = `<ul class="inventory-list">` + rawInv
-      .filter(i => !i.def || i.def.type !== 'currency')
-      .map(i => {
+    inventoryHtml = `<ul class="inventory-list">` + rawInv.filter(i => !i.def || i.def.type !== 'currency').map(i => {
         const itemDef = i.def;
         const itemId = i.id;
-        
         if (itemDef) {
           const isEquipped = Object.values(equip).includes(itemId);
           const style = isEquipped ? "opacity: 0.5; border-color: #555;" : "";
-          const rawDesc = itemDef.description || "No description available.";
-          const safeDesc = rawDesc.replace(/"/g, "&quot;").replace(/'/g, "\\'");
+          const safeDesc = (itemDef.description || "").replace(/"/g, "&quot;").replace(/'/g, "\\'");
           
           let buttons = "";
           if (!isEquipped) {
-            if (itemDef.slot === "hand") {
-               buttons = `<button onclick="window.equipItem('${itemId}', 'right_hand')">R</button> <button onclick="window.equipItem('${itemId}', 'left_hand')">L</button>`;
-            } else if (itemDef.slot === "body") {
-               buttons = `<button onclick="window.equipItem('${itemId}', 'body')">EQUIP</button>`;
-            } else if (itemDef.slot === "head") {
-               buttons = `<button onclick="window.equipItem('${itemId}', 'head')">EQUIP</button>`;
-            }
-          } else { 
-            buttons = `<span style="color:var(--pip-green); font-size:10px;">[EQUIPPED]</span>`; 
-          }
+            if (itemDef.slot === "hand") buttons = `<button onclick="window.equipItem('${itemId}', 'right_hand')">R</button> <button onclick="window.equipItem('${itemId}', 'left_hand')">L</button>`;
+            else if (itemDef.slot === "body") buttons = `<button onclick="window.equipItem('${itemId}', 'body')">EQUIP</button>`;
+            else if (itemDef.slot === "head") buttons = `<button onclick="window.equipItem('${itemId}', 'head')">EQUIP</button>`;
+          } else { buttons = `<span style="color:var(--pip-green); font-size:10px;">[EQUIPPED]</span>`; }
 
-          return `
-            <li class="inv-card" style="${style}">
-              <img src="${itemDef.icon}" class="inv-icon">
-              <div class="inv-info">
-                <span class="inv-name" 
-                      style="cursor:help; border-bottom:1px dotted var(--pip-green);" 
-                      onmouseover="window.showTooltip('${safeDesc}', event)" 
-                      onmouseout="window.hideTooltip()">
-                  ${itemDef.name}
-                </span>
-                <span class="inv-meta">${itemDef.type.toUpperCase()}</span>
-              </div>
-              <div class="inv-actions">${buttons}</div>
-            </li>`;
-        } else {
-          return `<li>${itemId} (DATA SYNC PENDING)</li>`;
-        }
+          return `<li class="inv-card" style="${style}"><img src="${itemDef.icon}" class="inv-icon"><div class="inv-info"><span class="inv-name" style="cursor:help; border-bottom:1px dotted var(--pip-green);" onmouseover="window.showTooltip('${safeDesc}', event)" onmouseout="window.hideTooltip()">${itemDef.name}</span><span class="inv-meta">${itemDef.type.toUpperCase()}</span></div><div class="inv-actions">${buttons}</div></li>`;
+        } else { return `<li>${itemId} (DATA SYNC PENDING)</li>`; }
     }).join("") + `</ul>`;
   }
 
   const renderSlot = (slotName, slotKey) => {
     const itemId = equip[slotKey];
     const itemDef = getItem(itemId);
-    if (itemDef) {
-      return `<div class="slot-box occupied" onclick="window.unequipItem('${slotKey}')"><small>${slotName}</small><div style="display:flex; align-items:center; gap:5px;"><img src="${itemDef.icon}" style="width:24px; height:24px; border:1px solid var(--pip-green);"><span>${itemDef.name}</span></div></div>`;
-    }
+    if (itemDef) return `<div class="slot-box occupied" onclick="window.unequipItem('${slotKey}')"><small>${slotName}</small><div style="display:flex; align-items:center; gap:5px;"><img src="${itemDef.icon}" style="width:24px; height:24px; border:1px solid var(--pip-green);"><span>${itemDef.name}</span></div></div>`;
     return `<div class="slot-box empty"><small>${slotName}</small><span style="color:#555;">[EMPTY]</span></div>`;
   };
 
-  // --- 4. DAMAGE CALCULATION ---
+  // --- 4. DAMAGE & WEAPONS ---
   const rHandItem = getItem(equip.right_hand);
   const lHandItem = getItem(equip.left_hand);
-  
   let finalMeleeDmg = derived.meleeDamageBase || 0; 
   let finalRangedDmg = "N/A";
 
@@ -202,22 +249,29 @@ export function getPlayerView(charId, liveData) {
     if (item.stats.range <= 1 || !item.stats.range) {
       const bonus = derived.meleeDamageBase || 0;
       finalMeleeDmg = `${item.stats.dmg} + ${bonus}`;
-    } else {
-      finalRangedDmg = item.stats.dmg;
-    }
+    } else { finalRangedDmg = item.stats.dmg; }
   };
-
   checkWeapon(rHandItem);
   checkWeapon(lHandItem);
 
   // --- 5. TRAITS & PERKS ---
   const traitsHtml = (charData.traits || []).map(tID => { const t = getTrait(tID); return `<div style="margin-bottom:5px;">• ${renderWikiLink(t.name, t.description)}</div>`; }).join("");
   const perksHtml = (charData.perks || []).map(pID => { const p = getTrait(pID); return `<div style="margin-bottom:5px;">• ${renderWikiLink(p.name, p.description)}</div>`; }).join("");
+  
+  // Perk Alert
+  const perkAlert = perksAvailable > 0 
+    ? `<div style="color:gold; animation: blink 1s infinite; margin-top:5px;">[!] ${perksAvailable} PERK(S) AVAILABLE</div>` 
+    : "";
 
-  // --- 6. RETURN HTML ---
+  // Radiation Bar (New!)
+  const rads = charData.rads || 0;
+  const radPercent = Math.min(100, (rads / 1000) * 100); // Assume 1000 is death
+  let radColor = "yellow";
+  if (rads > 400) radColor = "orange";
+  if (rads > 800) radColor = "red";
+
   return `
     <div class="dashboard-container">
-      
       <div class="panel">
         <img src="${charData.avatar_url || 'https://placehold.co/200x200/333/white?text=NO+IMG'}" class="char-portrait">
         
@@ -232,6 +286,12 @@ export function getPlayerView(charId, liveData) {
            <div style="text-align:right;">${charData.hp.current} / ${charData.hp.max}</div>
         </div>
 
+        <div style="margin-bottom:15px;">
+           <label>RADIATION</label>
+           <div style="background:#333; height:10px; border:1px solid ${radColor}; margin-top:2px;"><div style="width:${radPercent}%; background:${radColor}; height:100%;"></div></div>
+           <div style="text-align:right; font-size:12px; color:${radColor};">${rads} RADS</div>
+        </div>
+
         <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px dashed var(--pip-dim); padding-bottom:5px;">
            <span>VAULT POINTS</span>
            <span style="color:cyan;">${charData.vault_points || 0}</span>
@@ -239,10 +299,13 @@ export function getPlayerView(charId, liveData) {
 
         <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px;">S.P.E.C.I.A.L.</h3>
         ${Object.entries(charData.special).map(([k, v]) => `<div class="special-row"><span>${k.toUpperCase()}</span><span>${v}</span></div>`).join("")}
+        
         <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px;">TRAITS</h3>
         ${traitsHtml || "> NONE"}
+        
         <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px;">PERKS</h3>
         ${perksHtml || "> NONE"}
+        ${perkAlert}
       </div>
       
       <div class="panel">
@@ -271,9 +334,7 @@ export function getPlayerView(charId, liveData) {
         </div>
 
         <h2 style="margin-top:20px;">WALLET</h2>
-        <div style="margin-bottom:20px;">
-           ${walletHtml || "<small style='color:#555;'>EMPTY</small>"}
-        </div>
+        <div style="margin-bottom:20px;">${walletHtml || "<small style='color:#555;'>EMPTY</small>"}</div>
 
         <h2>INVENTORY</h2>
         <div style="overflow-y:auto; flex-grow:1;">${inventoryHtml}</div>
@@ -328,7 +389,7 @@ export function renderGMScreen(liveData) {
         <h4 style="color:red; border-bottom:1px dashed red;">VITALS</h4>
         <div style="display:flex; gap:10px; margin-bottom:10px;">
          <button class="gm-btn" onclick="window.gmAdjustHP(-1)">-1 HP</button>
-		 <button class="gm-btn" onclick="window.gmAdjustHP(1)">+1 HP</button>
+         <button class="gm-btn" onclick="window.gmAdjustHP(1)">+1 HP</button>
           <button class="gm-btn" onclick="window.gmAdjustHP(999)">FULL HEAL</button>
         </div>
 
@@ -346,6 +407,10 @@ export function renderGMScreen(liveData) {
           </select>
           <button class="gm-btn" style="border-color:lime; color:lime;" onclick="window.gmGrantItem()">GRANT</button>
         </div>
+
+        <h4 style="color:red; border-bottom:1px dashed red; margin-top:20px;">DANGER ZONE</h4>
+        <button class="gm-btn" style="border-color:red; color:white; background:red; width:100%;" onclick="window.gmFactoryReset()">FACTORY RESET CHARACTER</button>
+
       </div>
     </div>
   `;
@@ -376,4 +441,3 @@ export function renderGMScreen(liveData) {
     </div>
   `;
 }
-

@@ -1,5 +1,32 @@
 // AUTOMATICALLY GENERATED FILE. DO NOT EDIT MANUALLY.
 export const itemDatabase = {
+  dinar: {
+    "id": "dinar",
+    "name": "Caliphate Dinar",
+    "type": "currency",
+    "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
+    "description": "A trinitite-infused library token, granting temporary access to the Grand Library. Often treated as spiritual relics or symbols of honor ",
+    "value": 1,
+    "stackable": true
+  },
+  pd: {
+    "id": "pd",
+    "name": "Protectorate Dollar",
+    "type": "currency",
+    "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
+    "description": "A tightly controlled currency distributed by the Protectorate.",
+    "value": 1,
+    "stackable": true
+  },
+  rmr: {
+    "id": "rmr",
+    "name": "Reformed Malayan Ringgit",
+    "type": "currency",
+    "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
+    "description": "Also called RMR, it is the most common currency in the Wastes. It consists of salvaged pre-war Malayan Ringgit that have been stamped and marked for day to day use.",
+    "value": 1,
+    "stackable": true
+  },
   homemade_pistol: {
     "id": "homemade_pistol",
     "name": "Homemade Pistol",

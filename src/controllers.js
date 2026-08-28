@@ -36,13 +36,16 @@ export async function createAccessCode() {
     updatePayload[`characters.${charId}`] = {
       name: charId.toUpperCase(),
       level: 1,
+      race: "human", // Default
+      is_finalized: false, // <--- KEY: Triggers Registration Screen
       avatar_url: "https://placehold.co/200x200/333/white?text=NEW",
-      hp: { current: 20, max: 20 },
+      hp: { current: 15, max: 15 }, // Placeholder HP
       special: { str: 5, per: 5, end: 5, cha: 5, int: 5, agi: 5, luk: 5 },
       inventory: [],
       equipment: {},
       traits: [],
-      perks: []
+      perks: [],
+      tags: {}
     };
   }
   await updateDoc(ref, updatePayload);
@@ -249,4 +252,99 @@ export function cancelLevelUp() {
     window.levelUpDraft = null;
     window.render();
   }
+}
+
+// --- CHARACTER CREATION CONTROLLERS ---
+
+export function adjustCreationStat(stat, amount) {
+  const draft = window.creationDraft; // Assumes draft is initialized in View
+  if (!draft) return;
+  
+  // Calculate current total
+  const total = Object.values(draft.special).reduce((a, b) => a + b, 0);
+  const MAX_POOL = 40;
+  
+  // Rules: Prevent going over 40 total
+  if (amount > 0 && total >= MAX_POOL) return; 
+  
+  // Update Draft
+  draft.special[stat] += amount;
+  window.render(); // Re-render to update UI
+}
+
+export function setCreationRace(raceKey) {
+  if (!window.creationDraft) return;
+  window.creationDraft.race = raceKey;
+  
+  // Reset stats to safe 5s to prevent "stuck" stats when limits change
+  window.creationDraft.special = { str: 5, per: 5, end: 5, cha: 5, int: 5, agi: 5, luk: 5 };
+  
+  window.render();
+}
+
+export function toggleCreationTag(skillKey) {
+  const draft = window.creationDraft;
+  if (!draft) return;
+  
+  if (draft.tags.includes(skillKey)) {
+    // Remove it
+    draft.tags = draft.tags.filter(t => t !== skillKey);
+  } else {
+    // Add it (if less than 3)
+    if (draft.tags.length < 3) {
+      draft.tags.push(skillKey);
+    }
+  }
+  window.render();
+}
+
+export async function finalizeCharacter() {
+  if (!confirm("CONFIRM IDENTITY? Stats will be locked.")) return;
+  
+  const draft = window.creationDraft;
+  const charId = window.currentUser;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  
+  // Prepare Tag Dictionary for the DB (format: { small_guns: true })
+  const tagMap = {};
+  draft.tags.forEach(t => tagMap[t] = true);
+  
+  const updatePayload = {};
+  updatePayload[`characters.${charId}.special`] = draft.special;
+  updatePayload[`characters.${charId}.tags`] = tagMap;
+  updatePayload[`characters.${charId}.race`] = draft.race; 
+  updatePayload[`characters.${charId}.is_finalized`] = true; // LOCK IT
+  
+  try {
+    await updateDoc(charRef, updatePayload);
+    window.creationDraft = null; // Clear local draft
+    // The main.js render loop will now see 'is_finalized: true' and show the dashboard
+  } catch (e) {
+    alert("CREATION FAILED: " + e.message);
+  }
+}
+
+// GM TOOL: Factory Reset
+export async function gmFactoryReset(targetCharId) {
+  // Safety check: Don't reset if no target selected
+  if (!targetCharId) return; 
+  
+  if (!confirm(`FACTORY RESET ${targetCharId.toUpperCase()}? This wipes ALL data.`)) return;
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  
+  // Reset to "Blank Slate"
+  updatePayload[`characters.${targetCharId}.is_finalized`] = false;
+  updatePayload[`characters.${targetCharId}.race`] = "human";
+  updatePayload[`characters.${targetCharId}.special`] = { str: 5, per: 5, end: 5, cha: 5, int: 5, agi: 5, luk: 5 };
+  updatePayload[`characters.${targetCharId}.tags`] = {};
+  updatePayload[`characters.${targetCharId}.inventory`] = []; 
+  updatePayload[`characters.${targetCharId}.equipment`] = { head: null, body: null, right_hand: null, left_hand: null };
+  updatePayload[`characters.${targetCharId}.skill_points`] = 0;
+  updatePayload[`characters.${targetCharId}.level`] = 1;
+  updatePayload[`characters.${targetCharId}.hp`] = { current: 15, max: 15 };
+  
+  await updateDoc(charRef, updatePayload);
+  alert("CHARACTER RESET. NEXT LOGIN WILL TRIGGER CREATION.");
 }

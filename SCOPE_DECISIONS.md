@@ -1,0 +1,128 @@
+# Scope Decisions — Claude Code Session
+
+Running log of decisions made while working with Claude Code, separate from
+`DESIGN_NOTES_FROM_GEMINI.md` (which covers the prior Gemini history). Newest
+at the bottom. Nothing here is implemented yet — this is scope-locking only.
+
+---
+
+## Implants
+- Visible but non-interactive equipment slots — a "coming soon" teaser, not
+  a functional system yet.
+- Reuses the existing equipment slot UI pattern (Head/Body/L-Hand/R-Hand
+  already equip/unequip); implant slots render locked/greyed with a tooltip.
+- Actual implant mechanics: not scoped yet, explicitly deferred (consistent
+  with the Gemini-era decision to defer implants).
+
+## Dual interface (player vs. GM)
+- Already built, not a new feature. Confirmed: `main.js` branches on
+  `userRole === 'gm'` into a separate GM screen; player dashboard is
+  otherwise a completely different render path.
+
+## Messages tab (new subsystem)
+- **Directionality: one-way broadcast.** GM sends to all players or to one
+  individual player. Players can read but cannot reply in-app (Discord/text
+  covers replies for now — may revisit later).
+- Needs: Firestore structure for per-character inbox + broadcast channel,
+  GM compose UI, player-side Messages tab.
+
+## Roster
+- Campaign has **4 PCs total**, not 2. Only **Kong** and **Iron Legs** exist
+  in the app so far.
+- Iron's name is two words — **"Iron Legs"**, not "Iron." Current seed data
+  in `controllers.js` only ever produces the display name "IRON" (derived
+  from the charId via `charId.toUpperCase()`), so this needs an explicit
+  `name` fix once that character object is touched.
+- The other 2 PCs don't exist in Firestore/seed data at all yet. Adding
+  them is mostly an operational step (GM creates an access code, player
+  runs Character Creation) rather than new code — best done once Phase 1
+  (character systems) is solid, so they're not created against math that's
+  about to change.
+
+## Phase 0 — Math & Data Corrections (RESOLVED)
+Manual is source of truth for all game math. The Horse spreadsheet is an
+example character, not ground truth — its numbers reflect that specific
+character's traits/perks/status effects on top of the base formulas, not
+the base formulas themselves.
+
+Final formulas to implement in `formulas.js`:
+- **HP**: `15 + (STR + 2×END)` at creation; `+3 + floor(END/2)` per level
+  (replaces the current flat `15 + level×hpPerLevel`, which silently
+  dropped STR/END from the base).
+- **Melee Weapons**: `STR + AGI` — no `+5`, following the manual exactly
+  even though the manual itself flags this as possibly an oversight
+  (every other combat skill has a `+5`). Revisit if it plays wrong.
+- **Unarmed**: `STR + AGI` — same reasoning as Melee Weapons.
+- **Science**: `5 + INT + INT` (i.e. `5 + 2×INT`).
+- **Engineering**: `5 + 1.5×INT + 0.5×AGI`.
+- **Lockpick**: `5 + PER + AGI` (constant corrected from 10 to 5).
+- **Sneak**: `AGI + AGI` (dropped the code's unexplained `+5` and `×3`).
+- **Ghoul minimum Luck**: 5 (was 1 — this one was a straightforward bug,
+  not a design choice; every other race's caps already matched the manual).
+- **Robot poison/rad resistance**: kept at 100%/100% — explicit design
+  choice (robots take no poison/radiation damage), not manual-derived.
+- **Ghoul resistance stacking**: base formula + flat racial bonus,
+  additive (e.g. Ghoul PR = `EN×5 + 30`). Turns out the current code
+  already does this correctly — no change needed here.
+- **Skill points per level**: `5 + (INT×3)`. `formulas.js` already
+  computes this correctly as `skillPointsPerLevel`, but the level-up
+  granting logic in `controllers.js` (`gmGrantLevel`) uses a different,
+  wrong hardcoded `5 + (INT×2)` and ignores the correct computed value —
+  needs to be fixed to use the real formula.
+- **Perk cadence per race** (resolved by using the race *description*
+  text, not the later contradicting table): Human = every level (was
+  every 2), Ghoul = every 2 levels, Gergasi = every 3 levels, Half Mutant
+  = every 2 levels, Robot = none. Only Human's value actually changes —
+  the rest already matched the description text as coded.
+- **No skill cap**: confirmed — skills (and only skills) can exceed 100%,
+  consistent with classic Fallout. Nothing in code currently caps them;
+  nothing to change.
+
+## Trait/Perk correctness (RESOLVED — genuine bugs, not design choices)
+- `formulas.js` reads `modifiers.melee_dmg_flat`; `traits.js` defines
+  `modifiers.melee_damage_flat`. Different property names — the mismatch
+  means Heavy Handed's bonus silently never applies. Confirmed a real bug
+  to fix, not intentional.
+- Heavy Handed's downside is coded as `crit_chance: -30`; the manual
+  states "−25% critical **damage**" (p. 40) — wrong stat and wrong number.
+  Fix to match the manual.
+
+## Trait/Perk content & display (Phase 1)
+- **Obsidian file structure**: one `.md` file per trait/perk, matching
+  how items already work. Any file anywhere in the vault with a fenced
+  ` ```json ` block and `"type": "trait"` or `"type": "perk"` gets synced
+  automatically — this already works with zero changes to
+  `sync-obsidian.js`.
+- **New JSON field**: add `"effect"` — a hand-written, human-readable
+  summary string (e.g. `"+4 Melee Damage, -25% Critical Damage"`), shown
+  in the tooltip alongside the existing flavor `description`. Keeps
+  `modifiers` purely mechanical/machine-readable while giving players a
+  plain-English readout.
+- **Mobile tooltip gap**: the existing hover tooltip (`renderWikiLink` /
+  `showTooltip`) only fires on `mouseover`, which never fires on
+  touchscreens. Needs a tap-to-show fallback (tap to open, tap elsewhere
+  or a close control to dismiss). Applies to any current wiki-link use,
+  not just traits/perks — genuine existing gap, not a new feature.
+
+## GOAT review screen (Phase 1, new)
+- After character creation, players should be able to come back and see
+  a read-only summary of their G.O.A.T. choices (race, SPECIAL
+  allocation, tag skills) to understand what they picked.
+- Reuses the existing registration view's rendering, just in a
+  non-editable mode gated behind `is_finalized === true` instead of the
+  editable creation flow.
+
+## Data Logs tab (new subsystem — replaces the current "COMING SOON" stub)
+- **Delivery model: access gating.** Logs are hidden/locked by default;
+  players only see logs the GM has explicitly "given" them. Not a shared
+  library — visibility is per-player controlled.
+- **Authoring: Obsidian sync.** New logs (recaps, quest items, newspapers,
+  in-world documents) are written as markdown files in the existing
+  Obsidian wiki vault, same pipeline that currently generates
+  `src/items.js` / `src/traits.js` via `sync-obsidian.js`. No new in-app
+  authoring UI planned for v1.
+- Folder structure in Obsidian becomes the category tree in the UI, e.g.
+  `Bandawang > Bandawang Casino > Baccarat Rules`.
+- Open question (not yet resolved): how "giving" access is actually
+  triggered on the GM side, and whether granting is per-log or per-folder
+  (e.g. grant a whole location at once vs. one document at a time).

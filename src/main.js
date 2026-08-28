@@ -24,6 +24,12 @@ window.gmGrantLevel = () => Controllers.gmGrantLevel(window.selectedCharId);
 window.adjustSkillDraft = Controllers.adjustSkillDraft;
 window.confirmLevelUp = Controllers.confirmLevelUp;
 window.cancelLevelUp = Controllers.cancelLevelUp;
+// Character Creation Actions
+window.adjustCreationStat = Controllers.adjustCreationStat;
+window.setCreationRace = Controllers.setCreationRace;
+window.toggleCreationTag = Controllers.toggleCreationTag;
+window.finalizeCharacter = Controllers.finalizeCharacter;
+window.gmFactoryReset = () => Controllers.gmFactoryReset(window.selectedCharId);
 
 window.openGMModal = (charId) => {
   window.selectedCharId = charId; // Store who we are editing globally
@@ -89,12 +95,23 @@ window.render = function() {
   if (window.userRole === 'gm') {
     viewport.innerHTML = Views.renderGMScreen(window.liveData);
   } else {
-    if (window.currentTab === 'STATUS') {
-      viewport.innerHTML = Views.getPlayerView(window.currentUser, window.liveData);
-    } else if (window.currentTab === 'DATA') {
-      viewport.innerHTML = `<h1>DATA LOGS (COMING SOON)</h1>`;
+    // PLAYER VIEW LOGIC
+    const charData = window.liveData.characters[window.currentUser];
+
+    // CHECK: Is the character finished?
+    // Logic: If 'is_finalized' is missing or false, send them to Registration.
+    if (charData && charData.is_finalized === true) {
+       // --- SHOW DASHBOARD ---
+       if (window.currentTab === 'STATUS') {
+          viewport.innerHTML = Views.getPlayerView(window.currentUser, window.liveData);
+       } else if (window.currentTab === 'DATA') {
+          viewport.innerHTML = `<h1>DATA LOGS (COMING SOON)</h1>`;
+       } else {
+          viewport.innerHTML = `<h1>ARCHIVE OFFLINE</h1>`;
+       }
     } else {
-      viewport.innerHTML = `<h1>ARCHIVE OFFLINE</h1>`;
+       // --- SHOW G.O.A.T. REGISTRATION ---
+       viewport.innerHTML = Views.getRegistrationView(window.currentUser, window.liveData);
     }
   }
 }
