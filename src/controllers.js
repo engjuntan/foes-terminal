@@ -408,6 +408,23 @@ export async function finalizeCharacter() {
   }
 }
 
+// --- PERK SELECTION ---
+export async function choosePerk(perkId) {
+  if (!window.currentUser || !window.liveData) return;
+  const char = window.liveData.characters[window.currentUser];
+  const currentPerks = char.perks || [];
+  if (currentPerks.includes(perkId)) return;
+
+  if (!confirm("TAKE THIS PERK? This is permanent unless your GM reverses it.")) return;
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${window.currentUser}.perks`] = [...currentPerks, perkId];
+
+  try { await updateDoc(charRef, updatePayload); }
+  catch (err) { alert("ERROR: " + err.message); }
+}
+
 // GM TOOL: Factory Reset
 export async function gmFactoryReset(targetCharId) {
   // Safety check: Don't reset if no target selected

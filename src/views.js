@@ -1,7 +1,7 @@
 // src/views.js
 import { calculateDerivedStats, RACE_RULES } from './formulas.js';
 import { getItem, itemDatabase } from './items.js';
-import { getTrait } from './traits.js';
+import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
 
 // --- HELPERS ---
@@ -122,6 +122,52 @@ export function getRegistrationView(charId, liveData) {
           ${(remaining === 0 && draft.tags.length === 3) ? '' : 'disabled'}>
           ${(remaining === 0 && draft.tags.length === 3) ? 'PRINT IDENTITY CARD' : 'INCOMPLETE DATA'}
         </button>
+      </div>
+    </div>
+  `;
+}
+
+// --- G.O.A.T. REVIEW (read-only look back at creation choices) ---
+export function getGoatReviewView(charId, liveData) {
+  const char = liveData.characters[charId];
+  if (!char) return `<h1>> ERROR: IDENTITY '${charId.toUpperCase()}' NOT FOUND</h1>`;
+
+  const raceDef = RACE_RULES[char.race] || RACE_RULES['human'];
+  const tags = Object.keys(char.tags || {});
+
+  const specialRows = Object.entries(char.special || {})
+    .map(([k, v]) => `<div class="special-row"><span>${k.toUpperCase()}</span><span>${v}</span></div>`)
+    .join('');
+
+  const tagsHtml = tags.length > 0
+    ? tags.map(t => `<div style="border:1px solid cyan; color:cyan; padding:5px; text-align:center; text-transform:uppercase; font-size:12px;">${t.replace(/_/g, ' ')}</div>`).join('')
+    : '<span style="color:#555;">NONE RECORDED</span>';
+
+  return `
+    <div class="dashboard-container" style="display:block; max-width:600px; margin:0 auto; padding-top:20px;">
+      <div class="panel" style="border:2px solid var(--pip-green); box-shadow:0 0 15px rgba(50,255,50,0.1);">
+        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--pip-green); margin:-10px -10px 20px -10px; padding:10px;">
+          <h1 style="margin:0; color:black;">IDENTITY CARD</h1>
+          <button onclick="window.switchTab('STATUS')" style="background:black; color:lime; border:1px solid black; cursor:pointer;">BACK</button>
+        </div>
+
+        <div style="display:flex; gap:20px; margin-bottom:20px;">
+          <img src="${char.avatar_url}" style="width:100px; height:100px; border:1px solid var(--pip-green);">
+          <div>
+            <h2 style="margin:0; color:white;">${char.name}</h2>
+            <p style="color:var(--pip-dim); margin:5px 0 0;">${raceDef.name.toUpperCase()}</p>
+          </div>
+        </div>
+
+        <div style="background:rgba(0,50,0,0.2); padding:10px; border:1px solid var(--pip-dim); margin-bottom:20px; font-size:14px; color:#aaa;">
+          ${raceDef.description}
+        </div>
+
+        <h3 style="border-bottom:1px solid var(--pip-dim);">S.P.E.C.I.A.L. AT CREATION</h3>
+        ${specialRows}
+
+        <h3 style="border-bottom:1px solid var(--pip-dim); margin-top:20px;">TAG SKILLS</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px;">${tagsHtml}</div>
       </div>
     </div>
   `;
@@ -263,9 +309,22 @@ export function getPlayerView(charId, liveData) {
   const perksHtml = (charData.perks || []).map(pID => { const p = getTrait(pID); return `<div style="margin-bottom:5px;">• ${renderWikiLink(p.name, p.description)}</div>`; }).join("");
   
   // Perk Alert
-  const perkAlert = perksAvailable > 0 
-    ? `<div style="color:gold; animation: blink 1s infinite; margin-top:5px;">[!] ${perksAvailable} PERK(S) AVAILABLE</div>` 
+  const perkAlert = perksAvailable > 0
+    ? `<div style="color:gold; animation: blink 1s infinite; margin-top:5px;">[!] ${perksAvailable} PERK(S) AVAILABLE</div>`
     : "";
+
+  // Perk Selection — the shell works whether the perk library has 0 entries or 50.
+  const ownedPerkIds = charData.perks || [];
+  const selectablePerks = Object.values(traitDatabase).filter(t => t.type === 'perk' && !ownedPerkIds.includes(t.id));
+  const perkSelectionHtml = perksAvailable > 0
+    ? (selectablePerks.length > 0
+        ? selectablePerks.map(p => `
+            <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid var(--pip-dim); padding:6px 8px; margin-top:6px;">
+              ${renderWikiLink(p.name, p.description)}
+              <button onclick="window.choosePerk('${p.id}')">TAKE</button>
+            </div>`).join('')
+        : `<div style="color:#555; font-size:12px; margin-top:5px;">No perks authored yet — ask your GM to add some in Obsidian.</div>`)
+    : '';
 
   // Radiation Bar (New!)
   const rads = charData.rads || 0;
@@ -282,6 +341,9 @@ export function getPlayerView(charId, liveData) {
         <div style="display:flex; justify-content:space-between; align-items:center; background:var(--pip-green); padding:5px; margin:-10px -10px 10px -10px;">
            <h2 style="margin:0; background:none; color:black;">${charData.name}</h2>
            <span style="color:black; font-weight:bold; font-size:18px;">LVL ${charData.level || 1}</span>
+        </div>
+        <div style="text-align:right; margin-bottom:10px;">
+          <span onclick="window.switchTab('GOAT_REVIEW')" style="cursor:pointer; font-size:11px; color:var(--pip-dim); text-decoration:underline;">[ REVIEW G.O.A.T. RESULTS ]</span>
         </div>
 
         <div style="margin-bottom:15px;">
@@ -318,6 +380,7 @@ export function getPlayerView(charId, liveData) {
         <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px;">PERKS</h3>
         ${perksHtml || "> NONE"}
         ${perkAlert}
+        ${perkSelectionHtml}
       </div>
       
       <div class="panel">

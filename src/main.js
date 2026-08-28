@@ -26,6 +26,7 @@ window.gmRemoveStatusEffect = (instanceId) => Controllers.gmRemoveStatusEffect(w
 window.adjustSkillDraft = Controllers.adjustSkillDraft;
 window.confirmLevelUp = Controllers.confirmLevelUp;
 window.cancelLevelUp = Controllers.cancelLevelUp;
+window.choosePerk = Controllers.choosePerk;
 // Character Creation Actions
 window.adjustCreationStat = Controllers.adjustCreationStat;
 window.setCreationRace = Controllers.setCreationRace;
@@ -120,6 +121,8 @@ window.render = function() {
        // --- SHOW DASHBOARD ---
        if (window.currentTab === 'STATUS') {
           viewport.innerHTML = Views.getPlayerView(window.currentUser, window.liveData);
+       } else if (window.currentTab === 'GOAT_REVIEW') {
+          viewport.innerHTML = Views.getGoatReviewView(window.currentUser, window.liveData);
        } else if (window.currentTab === 'DATA') {
           viewport.innerHTML = `<h1>DATA LOGS (COMING SOON)</h1>`;
        } else {
