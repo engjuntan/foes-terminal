@@ -36,6 +36,10 @@ window.gmFactoryReset = () => Controllers.gmFactoryReset(window.selectedCharId);
 
 window.openGMModal = (charId) => {
   window.selectedCharId = charId; // Store who we are editing globally
+  // Re-render so anything baked into the modal's HTML at render time (e.g.
+  // the active status effects list) reflects the character just selected,
+  // not whoever was selected the last time a render happened.
+  window.render();
   document.getElementById('gm-modal-title').innerText = "MANAGING: " + charId.toUpperCase();
   const modal = document.getElementById('gm-modal');
   modal.classList.remove('hidden');
