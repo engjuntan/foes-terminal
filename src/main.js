@@ -27,6 +27,9 @@ window.adjustSkillDraft = Controllers.adjustSkillDraft;
 window.confirmLevelUp = Controllers.confirmLevelUp;
 window.cancelLevelUp = Controllers.cancelLevelUp;
 window.choosePerk = Controllers.choosePerk;
+window.adjustCombatDraftMonster = Controllers.adjustCombatDraftMonster;
+window.startCombat = Controllers.startCombat;
+window.endCombat = Controllers.endCombat;
 // Character Creation Actions
 window.adjustCreationStat = Controllers.adjustCreationStat;
 window.setCreationRace = Controllers.setCreationRace;
@@ -114,7 +117,9 @@ window.render = function() {
 
   // 4. Render Main Content
   if (window.userRole === 'gm') {
-    viewport.innerHTML = Views.renderGMScreen(window.liveData);
+    viewport.innerHTML = window.currentTab === 'COMBAT'
+      ? Views.getCombatView(window.liveData, 'gm', window.currentUser)
+      : Views.renderGMScreen(window.liveData);
   } else {
     // PLAYER VIEW LOGIC
     const charData = window.liveData.characters[window.currentUser];
@@ -127,6 +132,8 @@ window.render = function() {
           viewport.innerHTML = Views.getPlayerView(window.currentUser, window.liveData);
        } else if (window.currentTab === 'GOAT_REVIEW') {
           viewport.innerHTML = Views.getGoatReviewView(window.currentUser, window.liveData);
+       } else if (window.currentTab === 'COMBAT') {
+          viewport.innerHTML = Views.getCombatView(window.liveData, 'player', window.currentUser);
        } else if (window.currentTab === 'DATA') {
           viewport.innerHTML = `<h1>DATA LOGS (COMING SOON)</h1>`;
        } else {

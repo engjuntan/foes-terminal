@@ -3,6 +3,7 @@ import { calculateDerivedStats, RACE_RULES } from './formulas.js';
 import { getItem, itemDatabase } from './items.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
+import { bestiaryDatabase } from './bestiary.js';
 
 // --- HELPERS ---
 export function renderWikiLink(name, description) {
@@ -169,6 +170,90 @@ export function getGoatReviewView(charId, liveData) {
 
         <h3 style="border-bottom:1px solid var(--pip-dim); margin-top:20px;">TAG SKILLS</h3>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px;">${tagsHtml}</div>
+      </div>
+    </div>
+  `;
+}
+
+// --- COMBAT VIEW ---
+export function getCombatView(liveData, userRole, currentUser) {
+  const combat = liveData.active_combat;
+  if (!combat) return `<h1>> NO COMBAT RECORDED YET</h1>`;
+
+  const isLive = combat.is_active;
+  const currentActor = isLive ? combat.initiative_order[combat.turn_index] : null;
+
+  // GM always sees exact HP; players need the "awareness" perk.
+  let viewerHasAwareness = userRole === 'gm';
+  if (!viewerHasAwareness) {
+    const viewerChar = liveData.characters[currentUser];
+    viewerHasAwareness = ((viewerChar && viewerChar.perks) || []).includes('awareness');
+  }
+
+  // PCs don't carry embedded HP (it stays live-linked to their real
+  // character doc so combat never gets out of sync with the dashboard);
+  // monster instances carry their own HP directly. Resolve either shape here.
+  const resolveHp = (c) => {
+    if (c.ref_type === 'pc') {
+      const liveChar = liveData.characters[c.char_id];
+      return liveChar ? liveChar.hp : { current: 0, max: 1 };
+    }
+    return c.hp;
+  };
+
+  const hpLabel = (c) => {
+    if (c.is_down) return 'DOWN';
+    const hp = resolveHp(c);
+    const pct = (hp.current / hp.max) * 100;
+    if (viewerHasAwareness) return `${hp.current}/${hp.max}`;
+    if (pct >= 100) return 'HEALTHY';
+    if (pct >= 75) return 'BRUISED';
+    if (pct >= 50) return 'WOUNDED';
+    if (pct >= 25) return 'BADLY WOUNDED';
+    if (pct > 0) return 'NEAR DEATH';
+    return 'DOWN';
+  };
+
+  const initiativeHtml = combat.initiative_order.map((c, idx) => {
+    const isCurrent = isLive && idx === combat.turn_index;
+    const hp = resolveHp(c);
+    const pct = c.is_down ? 0 : (hp.current / hp.max) * 100;
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; margin-bottom:4px; border:1px solid ${isCurrent ? 'var(--pip-green)' : '#333'}; background:${isCurrent ? 'rgba(51,255,51,0.1)' : 'transparent'};">
+        <div>
+          <strong style="color:${c.ref_type === 'pc' ? 'cyan' : 'red'};">${isCurrent ? '▶ ' : ''}${c.name}</strong>
+          <div style="font-size:11px; color:#666;">INIT ${c.initiative}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="hp-bar-container" style="width:100px;"><div class="hp-fill" style="width:${pct}%"></div></div>
+          <div style="font-size:12px;">${hpLabel(c)}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  const logHtml = (combat.log || []).slice().reverse().map(entry => `
+      <div style="padding:4px 0; border-bottom:1px dashed #222; font-size:13px;">
+        <span style="color:#555; font-size:10px;">${new Date(entry.timestamp).toLocaleTimeString()}</span>
+        <span style="color:${entry.type === 'system' ? 'gold' : 'var(--pip-green)'};"> ${entry.message}</span>
+      </div>`).join('');
+
+  const headerHtml = isLive
+    ? `<h2 style="color:red;">⚔ COMBAT — ROUND ${combat.round}</h2>
+       <p style="color:var(--pip-dim); font-size:13px;">CURRENT TURN: <strong style="color:var(--pip-green);">${currentActor ? currentActor.name : '—'}</strong></p>`
+    : `<h2 style="color:#888;">⚔ COMBAT ENDED</h2>
+       <p style="color:var(--pip-dim); font-size:13px;">${combat.summary || 'No summary recorded.'}</p>`;
+
+  return `
+    <div class="dashboard-container" style="grid-template-columns: 320px 1fr; justify-content:center;">
+      <div class="panel">
+        ${headerHtml}
+        <div style="margin-top:15px;">${initiativeHtml}</div>
+        ${isLive && userRole === 'gm' ? `<button style="width:100%; margin-top:15px; padding:10px; background:red; color:white; border:none; cursor:pointer;" onclick="window.endCombat()">END COMBAT</button>` : ''}
+        <button style="width:100%; margin-top:10px; padding:8px; background:#333; color:var(--pip-green); border:none; cursor:pointer;" onclick="window.switchTab('STATUS')">BACK TO DASHBOARD</button>
+      </div>
+      <div class="panel">
+        <h2>COMBAT LOG</h2>
+        <div style="max-height:500px; overflow-y:auto;">${logHtml || '<span style="color:#555;">No events yet.</span>'}</div>
       </div>
     </div>
   `;
@@ -346,6 +431,10 @@ export function getPlayerView(charId, liveData) {
         <div style="text-align:right; margin-bottom:10px;">
           <span onclick="window.switchTab('GOAT_REVIEW')" style="cursor:pointer; font-size:11px; color:var(--pip-dim); text-decoration:underline;">[ REVIEW G.O.A.T. RESULTS ]</span>
         </div>
+        ${liveData.active_combat && liveData.active_combat.is_active ? `
+        <div onclick="window.switchTab('COMBAT')" style="cursor:pointer; text-align:center; padding:8px; margin-bottom:15px; background:rgba(200,0,0,0.15); border:1px solid red; color:red; animation: blink 1s infinite;">
+          ⚔ COMBAT IN PROGRESS — TAP TO JOIN
+        </div>` : ''}
 
         <div style="margin-bottom:15px;">
            <label>HP STATUS</label>
@@ -478,6 +567,31 @@ export function renderGMScreen(liveData) {
     return `<div><small style="color:var(--pip-gold);">${code}</small>: ${data.role} (${data.linked_char || '-'})</div>`;
   }).join('');
 
+  // --- COMBAT SETUP ---
+  const combatDraft = window.combatDraft || { monsters: {} };
+  window.combatDraft = combatDraft;
+
+  const bestiaryListHtml = Object.values(bestiaryDatabase)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(m => {
+      const count = combatDraft.monsters[m.id] || 0;
+      return `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 0; border-bottom:1px dashed #222;">
+          <span style="font-size:13px;">${m.name}</span>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button class="gm-btn" style="padding:0 6px;" onclick="window.adjustCombatDraftMonster('${m.id}', -1)">-</button>
+            <span style="width:16px; text-align:center;">${count}</span>
+            <button class="gm-btn" style="padding:0 6px;" onclick="window.adjustCombatDraftMonster('${m.id}', 1)">+</button>
+          </div>
+        </div>`;
+    }).join('') || `<div style="color:#555; font-size:12px;">No bestiary entries yet.</div>`;
+
+  const activeCombat = liveData.active_combat;
+  const combatActionHtml = activeCombat && activeCombat.is_active
+    ? `<div style="color:red; margin-bottom:10px; animation: blink 1s infinite;">⚠ COMBAT IN PROGRESS</div>
+       <button style="width:100%; padding:10px; cursor:pointer; background:red; color:white; font-weight:bold; border:none;" onclick="window.switchTab('COMBAT')">GO TO COMBAT</button>`
+    : `<button style="width:100%; padding:10px; cursor:pointer; background:red; color:white; font-weight:bold; border:none;" onclick="window.startCombat()">START COMBAT</button>`;
+
   const modalHtml = `
     <div id="gm-modal" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:2000; display:flex; justify-content:center; align-items:center;">
       <div class="panel" style="width:400px; border:2px solid red; background:#110000; height:auto; overflow:visible;">
@@ -531,16 +645,16 @@ export function renderGMScreen(liveData) {
   `;
 
   return `
-    <div class="dashboard-container" style="grid-template-columns: 400px 300px; justify-content: center;">
-      ${modalHtml} 
-      
+    <div class="dashboard-container" style="grid-template-columns: 360px 280px 280px; justify-content: center;">
+      ${modalHtml}
+
       <div class="panel">
         <h2 style="color:var(--pip-gold);">>> GAMEMASTER DASHBOARD</h2>
         <h3>SQUAD MONITOR</h3>
         <p style="font-size:12px; color:#666;">(CLICK CARD TO MANAGE)</p>
         <div class="gm-grid">${squadHtml}</div>
       </div>
-      
+
       <div class="panel">
         <h3>ACCESS CONTROL</h3>
         <div style="margin-bottom:10px; border:1px solid #333; padding:10px; background:rgba(0,0,0,0.5);">
@@ -552,6 +666,15 @@ export function renderGMScreen(liveData) {
         </div>
         <div style="height:200px; overflow-y:auto; border-top:1px solid #333; padding-top:10px;">
           ${codesHtml}
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="color:red;">COMBAT</h3>
+        ${combatActionHtml}
+        <p style="font-size:11px; color:#666; margin-top:10px;">Pick enemies for the next encounter:</p>
+        <div style="max-height:260px; overflow-y:auto; border-top:1px solid #333; padding-top:6px;">
+          ${bestiaryListHtml}
         </div>
       </div>
     </div>

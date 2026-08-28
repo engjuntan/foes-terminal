@@ -3,7 +3,9 @@ import { doc, updateDoc, setDoc, getDoc } from "firebase/firestore";
 import { db } from './firebase.js'; // Imports the connection we made in File 1
 import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
-import { RACE_RULES } from './formulas.js';
+import { RACE_RULES, calculateDerivedStats } from './formulas.js';
+import { getMonster } from './bestiary.js';
+import { instantiateMonster, rollInitiative } from './combat.js';
 
 // --- GAME ACTIONS ---
 export async function equipItem(itemId, targetSlot) {
@@ -406,6 +408,113 @@ export async function finalizeCharacter() {
   } catch (e) {
     alert("CREATION FAILED: " + e.message);
   }
+}
+
+// --- COMBAT: START / SETUP ---
+function getCombatDraft() {
+  if (!window.combatDraft) window.combatDraft = { monsters: {} };
+  return window.combatDraft;
+}
+
+export function adjustCombatDraftMonster(monsterId, amount) {
+  const draft = getCombatDraft();
+  const current = draft.monsters[monsterId] || 0;
+  const next = Math.max(0, current + amount);
+  if (next === 0) delete draft.monsters[monsterId];
+  else draft.monsters[monsterId] = next;
+  window.render();
+}
+
+export async function startCombat() {
+  const draft = getCombatDraft();
+  const entries = Object.entries(draft.monsters);
+  if (entries.length === 0) { alert("ADD AT LEAST ONE ENEMY BEFORE STARTING COMBAT"); return; }
+
+  const initiative_order = [];
+
+  // Everyone with a finalized character joins automatically (small, fixed party).
+  const characters = window.liveData.characters || {};
+  Object.entries(characters).forEach(([charId, char]) => {
+    if (!char.is_finalized) return;
+    const derived = calculateDerivedStats(
+      char.special, char.level || 1, char.traits || [], char.perks || [],
+      char.race || 'human', char.status_effects || []
+    );
+    const { roll, total } = rollInitiative(derived.sequenceBonus);
+    initiative_order.push({
+      combatant_id: `pc_${charId}`,
+      ref_type: 'pc',
+      char_id: charId,
+      name: char.name,
+      initiative_roll: roll,
+      initiative: total,
+      is_down: false
+    });
+  });
+
+  // Instantiate requested monsters, numbering duplicates.
+  entries.forEach(([monsterId, count]) => {
+    const template = getMonster(monsterId);
+    if (!template) return;
+    for (let i = 1; i <= count; i++) {
+      const label = count > 1 ? `${template.name} #${i}` : template.name;
+      const instance = instantiateMonster(monsterId, label);
+      const { roll, total } = rollInitiative(instance.sequence);
+      instance.initiative_roll = roll;
+      instance.initiative = total;
+      initiative_order.push(instance);
+    }
+  });
+
+  initiative_order.sort((a, b) => b.initiative - a.initiative);
+
+  const activeCombat = {
+    is_active: true,
+    round: 1,
+    turn_index: 0,
+    initiative_order,
+    log: [{
+      id: `log_${Date.now()}`,
+      type: 'system',
+      message: `Combat started — ${initiative_order.length} combatants. First up: ${initiative_order[0].name}.`,
+      timestamp: Date.now()
+    }]
+  };
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, { active_combat: activeCombat });
+    window.combatDraft = null;
+    window.currentTab = 'COMBAT';
+    window.render();
+  } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// --- COMBAT: END ---
+export async function endCombat() {
+  const combat = window.liveData.active_combat;
+  if (!combat || !combat.is_active) return;
+  if (!confirm("END COMBAT? This closes the encounter — the log stays visible until the next one starts.")) return;
+
+  const downed = combat.initiative_order.filter(c => c.is_down);
+  const survivors = combat.initiative_order.filter(c => !c.is_down);
+  const summary = `Combat ended after ${combat.round} round(s). ${downed.length} combatant(s) went down. ` +
+    `Standing: ${survivors.map(c => c.name).join(', ') || 'none'}.`;
+
+  const finalized = {
+    ...combat,
+    is_active: false,
+    ended_at: Date.now(),
+    summary,
+    log: [...(combat.log || []), { id: `log_${Date.now()}`, type: 'system', message: summary, timestamp: Date.now() }]
+  };
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, { active_combat: finalized });
+    window.currentTab = 'STATUS';
+    window.render();
+  } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // --- PERK SELECTION ---
