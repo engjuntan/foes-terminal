@@ -21,6 +21,8 @@ window.gmGrantItem = () => Controllers.gmGrantItem(window.selectedCharId);
 window.gmAdjustHP = (amt) => Controllers.gmAdjustHP(window.selectedCharId, amt);
 window.gmAdjustVaultPoints = (amt) => Controllers.gmAdjustVaultPoints(window.selectedCharId, amt);
 window.gmGrantLevel = () => Controllers.gmGrantLevel(window.selectedCharId);
+window.gmApplyStatusEffect = () => Controllers.gmApplyStatusEffect(window.selectedCharId);
+window.gmRemoveStatusEffect = (instanceId) => Controllers.gmRemoveStatusEffect(window.selectedCharId, instanceId);
 window.adjustSkillDraft = Controllers.adjustSkillDraft;
 window.confirmLevelUp = Controllers.confirmLevelUp;
 window.cancelLevelUp = Controllers.cancelLevelUp;
@@ -45,6 +47,20 @@ window.showTooltip = (text, evt) => {
   if(el) { el.innerHTML = text; el.classList.add('active'); el.style.top=(evt.clientY+15)+'px'; el.style.left=(evt.clientX+15)+'px'; }
 };
 window.hideTooltip = () => { document.getElementById('global-tooltip').classList.remove('active'); };
+
+// Tap-to-show fallback for touchscreens, which never fire 'mouseover'.
+// Tapping a wiki-link toggles the tooltip; tapping anywhere else closes it.
+window.toggleTooltip = (text, evt) => {
+  evt.stopPropagation();
+  const el = document.getElementById('global-tooltip');
+  const alreadyShowingThis = el.classList.contains('active') && el.innerHTML === text;
+  if (alreadyShowingThis) {
+    window.hideTooltip();
+  } else {
+    window.showTooltip(text, evt);
+  }
+};
+document.addEventListener('click', () => window.hideTooltip());
 
 window.switchTab = (tabName) => {
   window.currentTab = tabName;

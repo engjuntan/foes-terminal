@@ -13,9 +13,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ITEMS_TARGET = path.join(__dirname, 'src', 'items.js');
 const TRAITS_TARGET = path.join(__dirname, 'src', 'traits.js');
+const STATUS_EFFECTS_TARGET = path.join(__dirname, 'src', 'statusEffects.js');
 
 let itemsMap = {};
 let traitsMap = {};
+let statusEffectsMap = {};
 
 // --- HELPER FUNCTIONS ---
 
@@ -39,11 +41,14 @@ function getAllFiles(dirPath, arrayOfFiles) {
 
 // Generate the final JS file content
 function generateFileContent(type, dataMap) {
-  const dbName = type === 'item' ? 'itemDatabase' : 'traitDatabase';
-  
-  const helperFunc = type === 'item' 
-    ? `export function getItem(itemId) { if (!itemId) return null; const cleanId = itemId.toLowerCase().replace(/ /g, "_"); return itemDatabase[cleanId] || null; }`
-    : `export function getTrait(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return traitDatabase[cleanId] || { name: id, description: "Unknown Trait", modifiers: {} }; }`;
+  const dbName = type === 'item' ? 'itemDatabase' : type === 'status_effect' ? 'statusEffectDatabase' : 'traitDatabase';
+
+  const helperFuncs = {
+    item: `export function getItem(itemId) { if (!itemId) return null; const cleanId = itemId.toLowerCase().replace(/ /g, "_"); return itemDatabase[cleanId] || null; }`,
+    trait: `export function getTrait(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return traitDatabase[cleanId] || { name: id, description: "Unknown Trait", modifiers: {} }; }`,
+    status_effect: `export function getStatusEffect(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return statusEffectDatabase[cleanId] || null; }`
+  };
+  const helperFunc = helperFuncs[type] || helperFuncs.trait;
 
   const jsonString = JSON.stringify(dataMap, null, 2);
   // regex to remove quotes from keys: "key": -> key:
@@ -76,6 +81,9 @@ function processFile(filePath) {
         } else if (['trait', 'perk'].includes(data.type)) {
           traitsMap[data.id] = data;
           console.log(`[TRAIT] Loaded: ${data.name}`);
+        } else if (data.type === 'status_effect') {
+          statusEffectsMap[data.id] = data;
+          console.log(`[STATUS EFFECT] Loaded: ${data.name}`);
         }
       } catch (e) {
         // Ignore JSON parse errors (likely incomplete editing)
@@ -91,9 +99,10 @@ function runSync() {
   console.log('--- Scanning Obsidian Vault ---');
   itemsMap = {};
   traitsMap = {};
+  statusEffectsMap = {};
 
   const allFiles = getAllFiles(OBSIDIAN_PATH);
-  
+
   if (allFiles.length === 0) {
     console.error(`[ERROR] No files found in: ${OBSIDIAN_PATH}`);
   }
@@ -103,8 +112,9 @@ function runSync() {
   // Write the output files
   fs.writeFileSync(ITEMS_TARGET, generateFileContent('item', itemsMap));
   fs.writeFileSync(TRAITS_TARGET, generateFileContent('trait', traitsMap));
-  
-  console.log(`[SYNC] Complete. Items: ${Object.keys(itemsMap).length} | Traits: ${Object.keys(traitsMap).length}`);
+  fs.writeFileSync(STATUS_EFFECTS_TARGET, generateFileContent('status_effect', statusEffectsMap));
+
+  console.log(`[SYNC] Complete. Items: ${Object.keys(itemsMap).length} | Traits: ${Object.keys(traitsMap).length} | Status Effects: ${Object.keys(statusEffectsMap).length}`);
 }
 
 // --- WATCHER START ---

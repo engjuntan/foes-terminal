@@ -1,25 +1,34 @@
 // src/formulas.js
 import { getTrait } from './traits.js';
 
-export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [], activePerks = [], race = 'human') {
-  
+// activeStatusEffects: array of instances already living on the character
+// (e.g. charData.status_effects), each shaped { name, modifiers: {...} }.
+// Unlike traits/perks (looked up by id from a database), status effect
+// instances already carry their own resolved modifiers, ad-hoc or from
+// the status-effect library, so they need no lookup step here.
+export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [], activePerks = [], race = 'human', activeStatusEffects = []) {
+
   // --- 0. RACE DATA ---
   const raceDef = RACE_RULES[race] || RACE_RULES['human'];
 
-  // --- 1. PRE-CALCULATION (Traits modifying SPECIAL) ---
+  // --- 1. PRE-CALCULATION (Traits/Perks/Status Effects modifying SPECIAL) ---
   const allModifiers = [...(activeTraits || []), ...(activePerks || [])];
+  // One combined list of resolved modifier objects, regardless of source.
+  const modifierSources = [
+    ...allModifiers.map(id => getTrait(id)),
+    ...(activeStatusEffects || [])
+  ];
   let special = { ...baseSpecial };
 
-  allModifiers.forEach(traitId => {
-    const traitDef = getTrait(traitId);
-    if (traitDef && traitDef.modifiers) {
-      if (traitDef.modifiers.special_str) special.str += traitDef.modifiers.special_str;
-      if (traitDef.modifiers.special_per) special.per += traitDef.modifiers.special_per;
-      if (traitDef.modifiers.special_end) special.end += traitDef.modifiers.special_end;
-      if (traitDef.modifiers.special_cha) special.cha += traitDef.modifiers.special_cha;
-      if (traitDef.modifiers.special_int) special.int += traitDef.modifiers.special_int;
-      if (traitDef.modifiers.special_agi) special.agi += traitDef.modifiers.special_agi;
-      if (traitDef.modifiers.special_luk) special.luk += traitDef.modifiers.special_luk;
+  modifierSources.forEach(source => {
+    if (source && source.modifiers) {
+      if (source.modifiers.special_str) special.str += source.modifiers.special_str;
+      if (source.modifiers.special_per) special.per += source.modifiers.special_per;
+      if (source.modifiers.special_end) special.end += source.modifiers.special_end;
+      if (source.modifiers.special_cha) special.cha += source.modifiers.special_cha;
+      if (source.modifiers.special_int) special.int += source.modifiers.special_int;
+      if (source.modifiers.special_agi) special.agi += source.modifiers.special_agi;
+      if (source.modifiers.special_luk) special.luk += source.modifiers.special_luk;
     }
   });
 
@@ -77,7 +86,11 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   let radRes = (end * 2) + (raceDef.stats?.rad_res || 0);
   let damageRes = raceDef.stats?.damage_res || 0; // Natural Armor (Gergasi/Robot)
 
-  const implantLimit = (race === 'robot') ? 99 : Math.floor(end / 3);
+  // Manual gives no numeric Robot implant limit ("increased resistance... come
+  // naturally" is the only text) — using a modest placeholder bonus over the
+  // standard formula rather than the old hardcoded 99, which would render as
+  // 99 empty implant slots in the UI. Easy to change.
+  const implantLimit = (race === 'robot') ? Math.floor(end / 3) + 3 : Math.floor(end / 3);
   const skillPointsPerLevel = 5 + (int * 3);
 
   // Perks Allowance (For UI display)
@@ -113,18 +126,17 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
     survival:       5 + agi + agi
   };
 
-  // --- 4. POST-CALCULATION MODIFIERS ---
-  allModifiers.forEach(traitId => {
-    const traitDef = getTrait(traitId);
-    if (traitDef && traitDef.modifiers) {
-      if (traitDef.modifiers.ac_bonus) armorClass += traitDef.modifiers.ac_bonus;
-      if (traitDef.modifiers.sequence_bonus) sequenceBonus += traitDef.modifiers.sequence_bonus;
-      if (traitDef.modifiers.melee_dmg_flat) meleeDamageBase += traitDef.modifiers.melee_dmg_flat;
-      
+  // --- 4. POST-CALCULATION MODIFIERS (traits, perks, and status effects alike) ---
+  modifierSources.forEach(source => {
+    if (source && source.modifiers) {
+      if (source.modifiers.ac_bonus) armorClass += source.modifiers.ac_bonus;
+      if (source.modifiers.sequence_bonus) sequenceBonus += source.modifiers.sequence_bonus;
+      if (source.modifiers.melee_dmg_flat) meleeDamageBase += source.modifiers.melee_dmg_flat;
+
       Object.keys(skills).forEach(skillName => {
         const modKey = `skill_${skillName}`;
-        if (traitDef.modifiers[modKey]) {
-          skills[skillName] += traitDef.modifiers[modKey];
+        if (source.modifiers[modKey]) {
+          skills[skillName] += source.modifiers[modKey];
         }
       });
     }

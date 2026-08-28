@@ -1,6 +1,7 @@
 // src/controllers.js
 import { doc, updateDoc, setDoc, getDoc } from "firebase/firestore";
 import { db } from './firebase.js'; // Imports the connection we made in File 1
+import { statusEffectDatabase } from './statusEffects.js';
 
 // --- GAME ACTIONS ---
 export async function equipItem(itemId, targetSlot) {
@@ -24,7 +25,9 @@ export async function unequipItem(targetSlot) {
 export async function createAccessCode() {
   const code = document.getElementById('newCode').value.toUpperCase().trim();
   const charId = document.getElementById('newCharName').value.toLowerCase().trim();
-  
+  const displayNameInput = document.getElementById('newDisplayName').value.trim();
+  const displayName = displayNameInput || charId.toUpperCase(); // fallback to old behavior
+
   if (!code || !charId) { alert("ENTER CODE AND CHAR ID"); return; }
   
   const ref = doc(db, "prisoncampaign", "alpha_team");
@@ -34,7 +37,7 @@ export async function createAccessCode() {
   // Create Skeleton Sheet if missing
   if (!window.liveData.characters || !window.liveData.characters[charId]) {
     updatePayload[`characters.${charId}`] = {
-      name: charId.toUpperCase(),
+      name: displayName,
       level: 1,
       race: "human", // Default
       is_finalized: false, // <--- KEY: Triggers Registration Screen
@@ -166,6 +169,69 @@ export async function gmGrantLevel(targetCharId) {
 
   await updateDoc(charRef, updatePayload);
   alert(`LEVEL UP! Granted ${pointsToAdd} Skill Points.`);
+}
+
+// 5. Apply Status Effect (from the library, or a custom one typed on the spot)
+export async function gmApplyStatusEffect(targetCharId) {
+  const select = document.getElementById('statusEffectSelect');
+  const chosenId = select.value;
+
+  let name, modifiers, sourceId;
+
+  if (chosenId === '__custom__') {
+    name = document.getElementById('statusEffectCustomName').value.trim();
+    const modsRaw = document.getElementById('statusEffectCustomModifiers').value.trim();
+    if (!name) { alert("ENTER A NAME FOR THE CUSTOM EFFECT"); return; }
+
+    modifiers = {};
+    modsRaw.split(',').forEach(pair => {
+      const [key, val] = pair.split(':').map(s => s && s.trim());
+      if (key && val !== undefined && val !== '' && !isNaN(Number(val))) {
+        modifiers[key] = Number(val);
+      }
+    });
+    sourceId = null;
+  } else {
+    if (!chosenId) return;
+    const def = statusEffectDatabase[chosenId];
+    if (!def) { alert("UNKNOWN STATUS EFFECT"); return; }
+    name = def.name;
+    modifiers = def.modifiers || {};
+    sourceId = chosenId;
+  }
+
+  const instance = {
+    id: `${(sourceId || name).toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`,
+    source_id: sourceId,
+    name,
+    modifiers,
+    applied_at: Date.now()
+  };
+
+  const char = window.liveData.characters[targetCharId];
+  const currentEffects = char.status_effects || [];
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.status_effects`] = [...currentEffects, instance];
+
+  try {
+    await updateDoc(charRef, updatePayload);
+  } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// 6. Remove Status Effect
+export async function gmRemoveStatusEffect(targetCharId, instanceId) {
+  const char = window.liveData.characters[targetCharId];
+  const currentEffects = char.status_effects || [];
+  const updated = currentEffects.filter(fx => fx.id !== instanceId);
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.status_effects`] = updated;
+
+  try {
+    await updateDoc(charRef, updatePayload);
+  } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // ... (Existing code above) ...

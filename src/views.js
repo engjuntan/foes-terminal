@@ -2,14 +2,16 @@
 import { calculateDerivedStats, RACE_RULES } from './formulas.js';
 import { getItem, itemDatabase } from './items.js';
 import { getTrait } from './traits.js';
+import { statusEffectDatabase } from './statusEffects.js';
 
 // --- HELPERS ---
 export function renderWikiLink(name, description) {
   if (!description) description = "No data available.";
   const safeDesc = description.replace(/"/g, "&quot;").replace(/'/g, "\\'");
-  return `<span class="wiki-link" 
-          onmouseover="window.showTooltip('${safeDesc}', event)" 
-          onmouseout="window.hideTooltip()">
+  return `<span class="wiki-link"
+          onmouseover="window.showTooltip('${safeDesc}', event)"
+          onmouseout="window.hideTooltip()"
+          onclick="window.toggleTooltip('${safeDesc}', event)">
       ${name}
     </span>`;
 }
@@ -131,14 +133,16 @@ export function getPlayerView(charId, liveData) {
   if (!charData) return `<h1>> ERROR: IDENTITY '${charId.toUpperCase()}' NOT FOUND</h1>`;
 
   const equip = charData.equipment || { head: null, body: null, right_hand: null, left_hand: null };
-  
-  // PASS RACE TO FORMULAS
+  const activeStatusEffects = charData.status_effects || [];
+
+  // PASS RACE + STATUS EFFECTS TO FORMULAS
   const derived = calculateDerivedStats(
-    charData.special, 
-    charData.level || 1, 
-    charData.traits || [], 
+    charData.special,
+    charData.level || 1,
+    charData.traits || [],
     charData.perks || [],
-    charData.race || 'human' // Default to human if missing
+    charData.race || 'human', // Default to human if missing
+    activeStatusEffects
   );
 
   // --- 1. LEVEL UP & PERKS STATE ---
@@ -297,6 +301,14 @@ export function getPlayerView(charId, liveData) {
            <span style="color:cyan;">${charData.vault_points || 0}</span>
         </div>
 
+        ${activeStatusEffects.length > 0 ? `
+        <h3 style="color:orange; border-bottom:1px solid orange; margin-top:20px;">ACTIVE EFFECTS</h3>
+        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
+          ${activeStatusEffects.map(fx => renderWikiLink(fx.name.toUpperCase(),
+              Object.entries(fx.modifiers || {}).map(([k,v]) => `${k}: ${v > 0 ? '+' : ''}${v}`).join(', ') || 'No numeric effect.'
+            )).join('')}
+        </div>` : ''}
+
         <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px;">S.P.E.C.I.A.L.</h3>
         ${Object.entries(charData.special).map(([k, v]) => `<div class="special-row"><span>${k.toUpperCase()}</span><span>${v}</span></div>`).join("")}
         
@@ -353,6 +365,21 @@ export function renderGMScreen(liveData) {
     .map(item => `<option value="${item.id}">${item.name} (${item.type})</option>`)
     .join('');
 
+  const statusEffectOptions = Object.values(statusEffectDatabase)
+    .sort((a,b) => a.name.localeCompare(b.name))
+    .map(fx => `<option value="${fx.id}">${fx.name}</option>`)
+    .join('');
+
+  // Active status effects on the currently-selected GM target, for the modal.
+  const targetChar = window.selectedCharId ? chars[window.selectedCharId] : null;
+  const activeEffectsHtml = targetChar && (targetChar.status_effects || []).length > 0
+    ? targetChar.status_effects.map(fx => `
+        <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #333; padding:4px 8px; margin-bottom:4px;">
+          <span>${fx.name}</span>
+          <button class="gm-btn" style="border-color:red; color:red; padding:0 6px;" onclick="window.gmRemoveStatusEffect('${fx.id}')">X</button>
+        </div>`).join('')
+    : `<div style="color:#555; font-size:12px;">No active effects.</div>`;
+
   const squadHtml = Object.entries(chars).map(([id, char]) => {
     const hpPercent = (char.hp.current / char.hp.max) * 100;
     const vp = char.vault_points || 0;
@@ -400,6 +427,21 @@ export function renderGMScreen(liveData) {
           <button class="gm-btn" style="border-color:gold; color:gold;" onclick="window.gmGrantLevel()">GRANT LEVEL UP</button>
         </div>
 
+        <h4 style="color:orange; border-bottom:1px dashed orange;">STATUS EFFECTS</h4>
+        <div style="margin-bottom:6px;">${activeEffectsHtml}</div>
+        <div style="display:flex; gap:5px; margin-bottom:6px;">
+          <select id="statusEffectSelect" style="flex-grow:1; background:black; color:orange; border:1px solid orange; font-family:'VT323';"
+            onchange="document.getElementById('customEffectFields').style.display = this.value === '__custom__' ? 'flex' : 'none';">
+            ${statusEffectOptions}
+            <option value="__custom__">— CUSTOM (type your own) —</option>
+          </select>
+          <button class="gm-btn" style="border-color:orange; color:orange;" onclick="window.gmApplyStatusEffect()">APPLY</button>
+        </div>
+        <div id="customEffectFields" style="display:${statusEffectOptions ? 'none' : 'flex'}; gap:5px; margin-bottom:10px;">
+          <input type="text" id="statusEffectCustomName" placeholder="NAME (e.g. Bleeding)" style="width:40%; background:black; color:orange; border:1px solid #333;">
+          <input type="text" id="statusEffectCustomModifiers" placeholder="MODIFIERS e.g. special_end:-2, skill_sneak:-10" style="flex-grow:1; background:black; color:orange; border:1px solid #333;">
+        </div>
+
         <h4 style="color:lime; border-bottom:1px dashed lime;">INVENTORY</h4>
         <div style="display:flex; gap:5px;">
           <select id="gmItemSelect" style="flex-grow:1; background:black; color:lime; border:1px solid lime; font-family:'VT323';">
@@ -431,7 +473,8 @@ export function renderGMScreen(liveData) {
         <div style="margin-bottom:10px; border:1px solid #333; padding:10px; background:rgba(0,0,0,0.5);">
           <small>GRANT NEW ACCESS</small>
           <input type="text" id="newCode" placeholder="CODE" style="width:100%; margin-bottom:5px; background:black; color:lime; border:1px solid #333;">
-          <input type="text" id="newCharName" placeholder="CHAR ID" style="width:100%; margin-bottom:5px; background:black; color:lime; border:1px solid #333;">
+          <input type="text" id="newCharName" placeholder="CHAR ID (e.g. iron_legs)" style="width:100%; margin-bottom:5px; background:black; color:lime; border:1px solid #333;">
+          <input type="text" id="newDisplayName" placeholder="DISPLAY NAME (e.g. Iron Legs) — optional" style="width:100%; margin-bottom:5px; background:black; color:lime; border:1px solid #333;">
           <button style="width:100%; cursor:pointer; background:var(--pip-green); color:black; font-weight:bold;" onclick="window.createAccessCode()">AUTHORIZE</button>
         </div>
         <div style="height:200px; overflow-y:auto; border-top:1px solid #333; padding-top:10px;">
