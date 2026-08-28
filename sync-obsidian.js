@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 
 // --- CONFIGURATION ---
 // ⚠️ REPLACE THIS WITH YOUR EXACT PATH
-const OBSIDIAN_PATH = '/Users/edge/Library/CloudStorage/GoogleDrive-eng.jun.tan@gmail.com/My Drive/FOES Wiki/FALLOUT_MASTER_ZIPv3'; 
+const OBSIDIAN_PATH = '/Users/edge/Library/CloudStorage/GoogleDrive-fallouteasternshores@gmail.com/My Drive/FOES Wiki/FALLOUT_MASTER_ZIPv3';
 
 // --- SETUP ---
 const __filename = fileURLToPath(import.meta.url);

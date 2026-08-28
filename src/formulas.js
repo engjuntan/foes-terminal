@@ -66,10 +66,11 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   const baseHpPerLevel = 3 + Math.floor(end * 0.5);
   const hpBonus = raceDef.stats?.hp_bonus_per_level || 0;
   const hpPerLevel = baseHpPerLevel + hpBonus;
-  
-  // Total Max HP (Rough retroactive calculation)
-  // Base 15 + (Level * hpPerLevel)
-  const maxHpCalculated = 15 + (level * hpPerLevel);
+
+  // Total Max HP — manual formula (p.31): 15 + (STR + 2*END) at creation,
+  // then +hpPerLevel for each level gained after level 1.
+  const baseHp = 15 + str + (2 * end);
+  const maxHpCalculated = baseHp + ((level - 1) * hpPerLevel);
 
   // Resistances
   let poisonRes = (end * 5) + (raceDef.stats?.poison_res || 0);
@@ -89,20 +90,20 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
     small_guns:     5 + per + per,
     big_guns:       str + per + agi,
     energy_weapons: 5 + per + int,
-    melee_weapons:  20 + (2 * (agi + str)),
+    melee_weapons:  str + agi,
     throwing:       Math.floor((1.5 * str) + (0.5 * agi)),
-    unarmed:        30 + (2 * (agi + str)),
+    unarmed:        str + agi,
 
     // Stealth
-    sneak:          5 + (3 * agi),
+    sneak:          agi + agi,
     steal:          5 + agi + agi,
-    lockpick:       10 + per + agi,
+    lockpick:       5 + per + agi,
     traps:          per + agi + int,
 
     // Science
     medicine:       int + per,
-    science:        5 + (4 * int),
-    engineering:    5 + (int * 2) + (agi * 0.5),
+    science:        5 + int + int,
+    engineering:    5 + (int * 1.5) + (agi * 0.5),
     robotics:       int + int,
     gunsmith:       per + agi + int,
 
@@ -157,7 +158,7 @@ export const RACE_RULES = {
     min: { str: 1, per: 1, end: 1, cha: 1, int: 1, agi: 1, luk: 1 },
     max: { str: 10, per: 10, end: 10, cha: 10, int: 10, agi: 10, luk: 10 },
     stats: {
-      levels_per_perk: 2
+      levels_per_perk: 1
     },
     flags: {
       can_use_stimpaks: true,
@@ -169,7 +170,7 @@ export const RACE_RULES = {
     id: "ghoul",
     name: "Ghoul",
     description: "Ghouls are unfortunate humans, born from overexposure to radiation. Feral and sometimes lacking in mental faculties, the ‘lucky’ ones are the only ones people don’t shoot on sight. Haunted by their own bodies decaying, flaking flesh, these ghouls were born en masse after the war lacking radioactive protection. Ghouls above the age of 100 gain an extra tag skill and must embellish a background story that reflects pre-war knowledge. They innately have 30% Poison Resistance (PR) and 80% Radiation Resistance (RR). If ghouls go above HIGH radiation levels (this means we should conceptualise a radiation level visual for the character dashboard) they must roll IN every 30 minutes or they lose control and become feral. At VERY HIGH Radiation they become feral.",
-    min: { str: 1, per: 4, end: 1, cha: 1, int: 2, agi: 1, luk: 1 },
+    min: { str: 1, per: 4, end: 1, cha: 1, int: 2, agi: 1, luk: 5 },
     max: { str: 8, per: 13, end: 10, cha: 10, int: 10, agi: 6, luk: 12 },
     stats: {
       poison_res: 30,

@@ -154,10 +154,9 @@ export async function gmGrantLevel(targetCharId) {
   const currentLevel = char.level || 1;
   const currentSkillPoints = char.skill_points || 0;
   
-  // Calculate Skill Points (5 + INT*3) roughly, or just give flat amount
-  // We can grab INT from special.int
+  // Skill Points per level, per the manual (p.35): 5 + (INT * 3)
   const intStat = char.special.int || 5;
-  const pointsToAdd = 5 + (intStat * 2); // Fallout formula approximation
+  const pointsToAdd = 5 + (intStat * 3);
 
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
