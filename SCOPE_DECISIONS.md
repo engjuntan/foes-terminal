@@ -61,6 +61,25 @@ at the bottom. Nothing here is implemented yet — this is scope-locking only.
   possible without a Blaze billing account attached. This applies
   regardless of which security option above is chosen.
 
+## Firestore reconnected + Iron Legs created (RESOLVED)
+- Reconnected using the non-expiring scoped rule (see Security section
+  above). Confirmed live: real data flows, no `permission-denied`.
+- Live data at reconnect time: access codes `KONG_ACCESS`, `IRON_ACCESS`,
+  `GM_OVERRIDE`, `TEST_ACCESS`; characters `kong`, `test_dummy`.
+  `test_dummy`/`TEST_ACCESS` are leftover test data — left alone
+  deliberately, not a priority to clean up.
+- Found and fixed a real crash: `IRON_ACCESS` pointed to a `linked_char`
+  ("iron") that didn't exist as a character yet, and `getRegistrationView`
+  had no guard for a missing character (unlike `getPlayerView`, which
+  already handled this) — logging in with that code crashed the app
+  outright. Fixed to show a graceful in-app error instead.
+- Created Iron Legs live via the app's real GM tools (Grant New Access,
+  Code `IRON_ACCESS` / Char ID `iron` / Display Name `Iron Legs`) —
+  confirmed via `characters.iron.name === "Iron Legs"` and an end-to-end
+  login showing "IDENTITY: Iron Legs" on the G.O.A.T. Registration
+  screen. Iron Legs and "Iron" are the same character — just the display
+  name was wrong before.
+
 ## Roster
 - Campaign has **4 PCs total**, not 2. Only **Kong** and **Iron Legs** exist
   in the app so far.

@@ -14,10 +14,12 @@ const __dirname = path.dirname(__filename);
 const ITEMS_TARGET = path.join(__dirname, 'src', 'items.js');
 const TRAITS_TARGET = path.join(__dirname, 'src', 'traits.js');
 const STATUS_EFFECTS_TARGET = path.join(__dirname, 'src', 'statusEffects.js');
+const BESTIARY_TARGET = path.join(__dirname, 'src', 'bestiary.js');
 
 let itemsMap = {};
 let traitsMap = {};
 let statusEffectsMap = {};
+let bestiaryMap = {};
 
 // --- HELPER FUNCTIONS ---
 
@@ -41,12 +43,14 @@ function getAllFiles(dirPath, arrayOfFiles) {
 
 // Generate the final JS file content
 function generateFileContent(type, dataMap) {
-  const dbName = type === 'item' ? 'itemDatabase' : type === 'status_effect' ? 'statusEffectDatabase' : 'traitDatabase';
+  const dbNames = { item: 'itemDatabase', status_effect: 'statusEffectDatabase', monster: 'bestiaryDatabase', trait: 'traitDatabase' };
+  const dbName = dbNames[type] || dbNames.trait;
 
   const helperFuncs = {
     item: `export function getItem(itemId) { if (!itemId) return null; const cleanId = itemId.toLowerCase().replace(/ /g, "_"); return itemDatabase[cleanId] || null; }`,
     trait: `export function getTrait(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return traitDatabase[cleanId] || { name: id, description: "Unknown Trait", modifiers: {} }; }`,
-    status_effect: `export function getStatusEffect(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return statusEffectDatabase[cleanId] || null; }`
+    status_effect: `export function getStatusEffect(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return statusEffectDatabase[cleanId] || null; }`,
+    monster: `export function getMonster(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return bestiaryDatabase[cleanId] || null; }`
   };
   const helperFunc = helperFuncs[type] || helperFuncs.trait;
 
@@ -84,6 +88,9 @@ function processFile(filePath) {
         } else if (data.type === 'status_effect') {
           statusEffectsMap[data.id] = data;
           console.log(`[STATUS EFFECT] Loaded: ${data.name}`);
+        } else if (data.type === 'monster') {
+          bestiaryMap[data.id] = data;
+          console.log(`[BESTIARY] Loaded: ${data.name}`);
         }
       } catch (e) {
         // Ignore JSON parse errors (likely incomplete editing)
@@ -100,6 +107,7 @@ function runSync() {
   itemsMap = {};
   traitsMap = {};
   statusEffectsMap = {};
+  bestiaryMap = {};
 
   const allFiles = getAllFiles(OBSIDIAN_PATH);
 
@@ -113,8 +121,9 @@ function runSync() {
   fs.writeFileSync(ITEMS_TARGET, generateFileContent('item', itemsMap));
   fs.writeFileSync(TRAITS_TARGET, generateFileContent('trait', traitsMap));
   fs.writeFileSync(STATUS_EFFECTS_TARGET, generateFileContent('status_effect', statusEffectsMap));
+  fs.writeFileSync(BESTIARY_TARGET, generateFileContent('monster', bestiaryMap));
 
-  console.log(`[SYNC] Complete. Items: ${Object.keys(itemsMap).length} | Traits: ${Object.keys(traitsMap).length} | Status Effects: ${Object.keys(statusEffectsMap).length}`);
+  console.log(`[SYNC] Complete. Items: ${Object.keys(itemsMap).length} | Traits: ${Object.keys(traitsMap).length} | Status Effects: ${Object.keys(statusEffectsMap).length} | Bestiary: ${Object.keys(bestiaryMap).length}`);
 }
 
 // --- WATCHER START ---
