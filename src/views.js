@@ -333,7 +333,16 @@ export function getPlayerView(charId, liveData) {
       <div class="panel">
         <h2>EQUIPPED GEAR</h2>
         <div class="equipment-grid">${renderSlot("HEAD", "head")}${renderSlot("BODY", "body")}${renderSlot("R. HAND", "right_hand")}${renderSlot("L. HAND", "left_hand")}</div>
-        
+
+        <h4 style="color:#555; border-bottom:1px dashed #333; margin-top:15px; margin-bottom:5px;">IMPLANTS <span style="font-size:11px;">(COMING SOON)</span></h4>
+        <div class="equipment-grid">
+          ${Array.from({ length: derived.implantLimit || 0 }).map(() =>
+            `<div class="slot-box empty" style="opacity:0.4; cursor:not-allowed;" title="Implants aren't installable yet — this slot is reserved for you.">
+               <small>LOCKED</small><span style="color:#555;">[IMPLANT]</span>
+             </div>`
+          ).join('')}
+        </div>
+
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; border-top:1px solid #333; padding-top:10px;">
           <div style="text-align:center;">
              <small style="color:#aaa;">MELEE DMG</small><br>

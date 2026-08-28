@@ -2,15 +2,34 @@
 import { doc, updateDoc, setDoc, getDoc } from "firebase/firestore";
 import { db } from './firebase.js'; // Imports the connection we made in File 1
 import { statusEffectDatabase } from './statusEffects.js';
+import { getItem } from './items.js';
+import { RACE_RULES } from './formulas.js';
 
 // --- GAME ACTIONS ---
 export async function equipItem(itemId, targetSlot) {
   if (!window.currentUser || !window.liveData) return;
+
+  // Race-based size gating (e.g. Gergasi/Robot can't use human-sized gear).
+  const char = window.liveData.characters[window.currentUser];
+  const item = getItem(itemId);
+  const raceDef = RACE_RULES[char.race || 'human'] || RACE_RULES.human;
+
+  if (item && item.size === 'small') {
+    if (item.type === 'weapon' && raceDef.flags?.can_use_small_weapons === false) {
+      alert(`${(char.name || 'THIS CHARACTER').toUpperCase()} CANNOT USE SMALL WEAPONS.`);
+      return;
+    }
+    if (item.type === 'armor' && raceDef.flags?.can_wear_small_armor === false) {
+      alert(`${(char.name || 'THIS CHARACTER').toUpperCase()} CANNOT WEAR SMALL ARMOR.`);
+      return;
+    }
+  }
+
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const charPath = `characters.${window.currentUser}`;
   const updatePayload = {};
   updatePayload[`${charPath}.equipment.${targetSlot}`] = itemId;
-  try { await updateDoc(charRef, updatePayload); } 
+  try { await updateDoc(charRef, updatePayload); }
   catch (err) { alert("ERROR: " + err.message); }
 }
 

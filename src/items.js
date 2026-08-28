@@ -32,6 +32,8 @@ export const itemDatabase = {
     "name": "Homemade Pistol",
     "type": "weapon",
     "slot": "hand",
+    "size": "small",
+    "two_handed": false,
     "icon": "https://i.imgur.com/ejIIJM5.png",
     "description": "The Homemade Pistol is a weapon of the enterprising survivor. Cobbled out of junk and stuck together on nothing but willpower and faith, the Homemade Pistol is certainly a weapon of sorts. Some use gunpowder, some use pressure, but all of them have one thing in common: injecting lead into whatever target it finds.",
     "stats": {
@@ -46,6 +48,8 @@ export const itemDatabase = {
     "name": "Kitchen Knife",
     "type": "weapon",
     "slot": "hand",
+    "size": "small",
+    "two_handed": false,
     "icon": "https://i.imgur.com/48WviQB.png",
     "description": "The knife of the willing, the chefs, the housewife under duress and the knife you find under scraps of salvage. Is it sharp? Can it slice? Who cares? It's a knife.",
     "stats": {
