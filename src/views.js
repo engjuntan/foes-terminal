@@ -39,6 +39,7 @@ export function getNavbar(currentTab, currentUser) {
 // --- REGISTRATION SCREEN (The G.O.A.T. Exam) ---
 export function getRegistrationView(charId, liveData) {
   const char = liveData.characters[charId];
+  if (!char) return `<h1>> ERROR: IDENTITY '${charId.toUpperCase()}' NOT FOUND — ASK YOUR GM TO SET UP THIS ACCESS CODE</h1>`;
   // Initialize Draft if missing
   const draft = window.creationDraft || {
     race: "human",

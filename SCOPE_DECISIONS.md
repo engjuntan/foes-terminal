@@ -26,6 +26,41 @@ at the bottom. Nothing here is implemented yet — this is scope-locking only.
 - Needs: Firestore structure for per-character inbox + broadcast channel,
   GM compose UI, player-side Messages tab.
 
+## Firestore Security (RESOLVED — two-step plan)
+- **Immediate**: reconnect using a non-expiring rule scoped to the single
+  document this app uses, replacing the expired test-mode timestamp rule:
+  ```
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /prisoncampaign/alpha_team {
+        allow read, write: if true;
+      }
+    }
+  }
+  ```
+  This is explicitly **not** real security — it's obscurity (private URL,
+  not indexed) — chosen to unblock building/testing now.
+- **Before the campaign is publicized (the planned YouTube video)**: add
+  **Firebase Anonymous Authentication** + UID-scoped Firestore rules as
+  its own scoped phase. Each login silently gets a real (if anonymous)
+  Firebase UID; claiming a passcode tags that character/GM role with the
+  claiming UID; rules require `request.auth.uid` to match before allowing
+  a write. Keeps the existing passcode UX unchanged, stays on the free
+  Spark plan (no billing account needed), closes the real hole (anyone
+  bypassing the UI via dev tools to write Firestore directly).
+- **Considered, not chosen now**: Firebase App Check (good complementary
+  layer against automated/bot abuse, doesn't stop a human using the real
+  app's dev tools — worth adding after Anonymous Auth, not instead of it);
+  routing writes through a Cloud Functions backend (the most robust
+  option, but requires the Blaze billing plan and real backend code —
+  scoped as a separate, later effort if the project ever needs it, not
+  part of the current roadmap).
+- **Cost note**: on the free Spark plan, abuse just gets denied once the
+  daily quota is hit (app breaks temporarily) — no surprise bill is
+  possible without a Blaze billing account attached. This applies
+  regardless of which security option above is chosen.
+
 ## Roster
 - Campaign has **4 PCs total**, not 2. Only **Kong** and **Iron Legs** exist
   in the app so far.
