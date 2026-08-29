@@ -5,7 +5,7 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
 import { RACE_RULES, calculateDerivedStats } from './formulas.js';
 import { getMonster } from './bestiary.js';
-import { instantiateMonster, rollInitiative } from './combat.js';
+import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction } from './combat.js';
 
 // --- GAME ACTIONS ---
 export async function equipItem(itemId, targetSlot) {
@@ -480,6 +480,7 @@ export async function startCombat() {
     is_active: true,
     round: 1,
     turn_index: 0,
+    turn_acted: false,
     initiative_order,
     log: [{
       id: `log_${Date.now()}`,
@@ -496,6 +497,177 @@ export async function startCombat() {
     window.currentTab = 'COMBAT';
     window.render();
   } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// --- COMBAT: TURN ACTIONS ---
+function getCombatActionDraft() {
+  if (!window.combatActionDraft) window.combatActionDraft = { targetId: null, attackKey: null, roll: '' };
+  return window.combatActionDraft;
+}
+
+export function setCombatActionField(field, value) {
+  const draft = getCombatActionDraft();
+  draft[field] = value;
+  window.render();
+}
+
+export function rollForMe() {
+  const draft = getCombatActionDraft();
+  draft.roll = rollPercentile();
+  window.render();
+}
+
+export async function resolveAttack() {
+  const combat = window.liveData.active_combat;
+  if (!combat || !combat.is_active || combat.turn_acted) return;
+  const draft = getCombatActionDraft();
+  const attacker = combat.initiative_order[combat.turn_index];
+  const target = combat.initiative_order.find(c => c.combatant_id === draft.targetId);
+  if (!target) { alert("PICK A TARGET"); return; }
+  if (draft.roll === '' || draft.roll === null || draft.roll === undefined) { alert("ENTER OR ROLL A DICE VALUE"); return; }
+  const roll = Number(draft.roll);
+  if (isNaN(roll) || roll < 1 || roll > 100) { alert("ROLL MUST BE 1-100"); return; }
+
+  // --- Attacker's skill/hit% + attack definition ---
+  let attackDef, attackerValue;
+  if (attacker.ref_type === 'monster') {
+    attackDef = (attacker.attacks || []).find(a => a.name === draft.attackKey);
+    if (!attackDef) { alert("PICK AN ATTACK"); return; }
+    attackerValue = attackDef.hit_percent;
+  } else {
+    const char = window.liveData.characters[attacker.char_id];
+    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || []);
+    if (!draft.attackKey || draft.attackKey === 'unarmed') {
+      attackDef = { name: 'Unarmed', damage: derived.unarmedDamageFull, damageType: 'normal' };
+      attackerValue = derived.skills.unarmed;
+    } else {
+      const weaponItem = getItem(draft.attackKey);
+      if (!weaponItem) { alert("PICK A WEAPON"); return; }
+      const isMelee = !weaponItem.stats || (weaponItem.stats.range || 0) <= 1;
+      const skillKey = weaponItem.skill || (isMelee ? 'melee_weapons' : 'small_guns');
+      attackerValue = derived.skills[skillKey] ?? 0;
+      const dmgDice = (weaponItem.stats && weaponItem.stats.dmg) || '1d4';
+      attackDef = {
+        name: weaponItem.name,
+        damage: isMelee ? `${dmgDice}+${derived.meleeDamageBase}` : dmgDice,
+        damageType: (weaponItem.stats && weaponItem.stats.dmgType) || 'normal'
+      };
+    }
+  }
+
+  // --- Target's AC + damage mitigation ---
+  let targetAC, targetDtdr, targetName;
+  if (target.ref_type === 'monster') {
+    targetAC = target.ac;
+    targetDtdr = target.dtdr || {};
+    targetName = target.name;
+  } else {
+    const targetChar = window.liveData.characters[target.char_id];
+    const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || []);
+    targetAC = targetDerived.armorClass;
+    const armorItem = getItem((targetChar.equipment || {}).body);
+    targetDtdr = (armorItem && armorItem.dtdr) || {}; // no armor authored yet -> defaults to no mitigation
+    targetName = targetChar.name;
+  }
+
+  const { effectiveChance, isHit } = resolveHit(attackerValue, targetAC, roll);
+
+  let finalDamage = 0;
+  const newInitiativeOrder = combat.initiative_order.map(c => ({ ...c }));
+  const charUpdates = {};
+
+  if (isHit) {
+    const rawDamage = rollDamage(attackDef.damage);
+    finalDamage = applyDamageReduction(rawDamage, targetDtdr, attackDef.damageType || 'normal');
+    const idx = newInitiativeOrder.findIndex(c => c.combatant_id === target.combatant_id);
+    if (target.ref_type === 'monster') {
+      const newCurrent = Math.max(0, target.hp.current - finalDamage);
+      newInitiativeOrder[idx] = { ...target, hp: { ...target.hp, current: newCurrent }, is_down: newCurrent <= 0 };
+    } else {
+      const targetChar = window.liveData.characters[target.char_id];
+      const newCurrent = Math.max(0, targetChar.hp.current - finalDamage);
+      newInitiativeOrder[idx] = { ...target, is_down: newCurrent <= 0 };
+      charUpdates[`characters.${target.char_id}.hp.current`] = newCurrent;
+    }
+  }
+
+  const message = isHit
+    ? `${attacker.name} attacks ${targetName} with ${attackDef.name} — HIT for ${finalDamage} damage (rolled ${roll} vs ${effectiveChance}%).`
+    : `${attacker.name} attacks ${targetName} with ${attackDef.name} — MISS (rolled ${roll} vs ${effectiveChance}%).`;
+
+  const updatedCombat = {
+    ...combat,
+    turn_acted: true,
+    initiative_order: newInitiativeOrder,
+    log: [...combat.log, { id: `log_${Date.now()}`, type: 'action', message, timestamp: Date.now() }]
+  };
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, { active_combat: updatedCombat, ...charUpdates });
+    window.combatActionDraft = null;
+  } catch (err) { alert("ERROR: " + err.message); }
+}
+
+export async function passTurn() {
+  const combat = window.liveData.active_combat;
+  if (!combat || !combat.is_active || combat.turn_acted) return;
+  const attacker = combat.initiative_order[combat.turn_index];
+  const updatedCombat = {
+    ...combat,
+    turn_acted: true,
+    log: [...combat.log, { id: `log_${Date.now()}`, type: 'action', message: `${attacker.name} passes.`, timestamp: Date.now() }]
+  };
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, { active_combat: updatedCombat }); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+export async function endTurn() {
+  const combat = window.liveData.active_combat;
+  if (!combat || !combat.is_active) return;
+
+  const n = combat.initiative_order.length;
+  let nextIndex = combat.turn_index;
+  let nextRound = combat.round;
+  let looped = false;
+  for (let i = 0; i < n; i++) {
+    nextIndex = (nextIndex + 1) % n;
+    if (nextIndex === 0) { nextRound += 1; looped = true; }
+    if (!combat.initiative_order[nextIndex].is_down) break;
+  }
+
+  const log = [...combat.log];
+  if (looped) log.push({ id: `log_${Date.now()}_r`, type: 'system', message: `— Round ${nextRound} begins —`, timestamp: Date.now() });
+
+  const updatedCombat = { ...combat, turn_index: nextIndex, round: nextRound, turn_acted: false, log };
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  window.combatActionDraft = null;
+  try { await updateDoc(charRef, { active_combat: updatedCombat }); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// GM-only: add a fresh monster to an in-progress fight. Appended to the
+// end of the current order (not re-sorted) so it doesn't disturb whose
+// turn it currently is — it gets its place in the rotation from next round on.
+export async function addCombatantMidFight(monsterId) {
+  const combat = window.liveData.active_combat;
+  if (!combat || !combat.is_active || !monsterId) return;
+
+  const sameSpecies = combat.initiative_order.filter(c => c.source_id === monsterId).length;
+  const template = getMonster(monsterId);
+  if (!template) return;
+  const label = sameSpecies > 0 ? `${template.name} #${sameSpecies + 1}` : template.name;
+  const instance = instantiateMonster(monsterId, label);
+  const { roll, total } = rollInitiative(instance.sequence);
+  instance.initiative_roll = roll;
+  instance.initiative = total;
+
+  const updatedCombat = {
+    ...combat,
+    initiative_order: [...combat.initiative_order, instance],
+    log: [...combat.log, { id: `log_${Date.now()}`, type: 'system', message: `${instance.name} joins the fight!`, timestamp: Date.now() }]
+  };
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, { active_combat: updatedCombat }); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // --- COMBAT: END ---

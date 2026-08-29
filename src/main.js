@@ -30,6 +30,12 @@ window.choosePerk = Controllers.choosePerk;
 window.adjustCombatDraftMonster = Controllers.adjustCombatDraftMonster;
 window.startCombat = Controllers.startCombat;
 window.endCombat = Controllers.endCombat;
+window.setCombatActionField = Controllers.setCombatActionField;
+window.rollForMe = Controllers.rollForMe;
+window.resolveAttack = Controllers.resolveAttack;
+window.passTurn = Controllers.passTurn;
+window.endTurn = Controllers.endTurn;
+window.addCombatantMidFight = Controllers.addCombatantMidFight;
 // Character Creation Actions
 window.adjustCreationStat = Controllers.adjustCreationStat;
 window.setCreationRace = Controllers.setCreationRace;
@@ -144,6 +150,45 @@ window.render = function() {
        viewport.innerHTML = Views.getRegistrationView(window.currentUser, window.liveData);
     }
   }
+
+  maybeAnnounceTurn();
+}
+
+// --- TURN ANNOUNCEMENT (5s, all clients react to the same Firestore state) ---
+window.lastAnnouncedTurnKey = null;
+function maybeAnnounceTurn() {
+  const combat = window.liveData && window.liveData.active_combat;
+  if (!combat || !combat.is_active) return;
+  const currentActor = combat.initiative_order[combat.turn_index];
+  if (!currentActor) return;
+  const key = `${combat.round}_${combat.turn_index}_${currentActor.combatant_id}`;
+  if (window.lastAnnouncedTurnKey === key) return;
+  window.lastAnnouncedTurnKey = key;
+  showTurnAnnouncement(currentActor.name);
+}
+
+function showTurnAnnouncement(name) {
+  let el = document.getElementById('turn-announcement');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'turn-announcement';
+    el.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:5000; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; color:var(--pip-green); font-family:VT323, monospace; cursor:pointer;';
+    el.onclick = () => { el.style.display = 'none'; };
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `<div style="font-size:48px; text-shadow:0 0 10px rgba(51,255,51,0.6);">${name}'S TURN</div><div id="turn-announcement-countdown" style="font-size:18px; color:#888;">closing in 5...</div>`;
+  el.style.display = 'flex';
+
+  let secondsLeft = 5;
+  const timer = setInterval(() => {
+    secondsLeft -= 1;
+    const countdownEl = document.getElementById('turn-announcement-countdown');
+    if (countdownEl) countdownEl.innerText = secondsLeft > 0 ? `closing in ${secondsLeft}...` : 'closing...';
+    if (secondsLeft <= 0) {
+      clearInterval(timer);
+      if (el) el.style.display = 'none';
+    }
+  }, 1000);
 }
 
 // --- LOGIN CONTROLLER ---

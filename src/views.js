@@ -243,13 +243,94 @@ export function getCombatView(liveData, userRole, currentUser) {
     : `<h2 style="color:#888;">⚔ COMBAT ENDED</h2>
        <p style="color:var(--pip-dim); font-size:13px;">${combat.summary || 'No summary recorded.'}</p>`;
 
+  // --- Whose turn can THIS viewer act for? GM can always act; a player
+  // only during their own PC's turn. One action per turn (no AP economy) —
+  // once turn_acted is set, the action panel disappears until End Turn.
+  const canActThisTurn = isLive && currentActor && !combat.turn_acted && (
+    userRole === 'gm' || (currentActor.ref_type === 'pc' && currentActor.char_id === currentUser)
+  );
+  const isMyIdleTurn = isLive && currentActor && combat.turn_acted && (
+    userRole === 'gm' || (currentActor.ref_type === 'pc' && currentActor.char_id === currentUser)
+  );
+  const canEndTurn = isLive && (userRole === 'gm' || canActThisTurn || isMyIdleTurn);
+
+  let actionPanelHtml = '';
+  if (canActThisTurn) {
+    const draft = window.combatActionDraft || {};
+    const opposingSide = currentActor.ref_type === 'pc' ? 'monster' : 'pc';
+    const targetOptions = combat.initiative_order
+      .filter(c => c.ref_type === opposingSide && !c.is_down)
+      .map(c => `<option value="${c.combatant_id}" ${draft.targetId === c.combatant_id ? 'selected' : ''}>${c.name}</option>`).join('');
+
+    let attackOptions = '';
+    if (currentActor.ref_type === 'monster') {
+      attackOptions = (currentActor.attacks || [])
+        .map(a => `<option value="${a.name}" ${draft.attackKey === a.name ? 'selected' : ''}>${a.name} (${a.hit_percent}% · ${a.damage})</option>`).join('');
+    } else {
+      const char = liveData.characters[currentActor.char_id];
+      const equip = (char && char.equipment) || {};
+      const seen = new Set();
+      const weaponOpts = [equip.right_hand, equip.left_hand].filter(Boolean).map(itemId => {
+        if (seen.has(itemId)) return '';
+        seen.add(itemId);
+        const item = getItem(itemId);
+        return item ? `<option value="${itemId}" ${draft.attackKey === itemId ? 'selected' : ''}>${item.name}</option>` : '';
+      }).join('');
+      attackOptions = `<option value="unarmed" ${!draft.attackKey || draft.attackKey === 'unarmed' ? 'selected' : ''}>Unarmed</option>${weaponOpts}`;
+    }
+
+    actionPanelHtml = `
+      <div class="panel" style="margin-bottom:15px;">
+        <h3 style="color:var(--pip-green); margin-top:0;">${currentActor.name}'S TURN</h3>
+        <label style="font-size:11px; color:#666;">TARGET</label>
+        <select onchange="window.setCombatActionField('targetId', this.value)" style="width:100%; background:black; color:lime; border:1px solid #333; margin-bottom:8px;">
+          <option value="">— choose —</option>${targetOptions}
+        </select>
+        <label style="font-size:11px; color:#666;">ATTACK</label>
+        <select onchange="window.setCombatActionField('attackKey', this.value)" style="width:100%; background:black; color:lime; border:1px solid #333; margin-bottom:8px;">
+          <option value="">— choose —</option>${attackOptions}
+        </select>
+        <label style="font-size:11px; color:#666;">ROLL (1-100)</label>
+        <div style="display:flex; gap:6px; margin-bottom:10px;">
+          <input type="number" min="1" max="100" value="${draft.roll ?? ''}" oninput="window.setCombatActionField('roll', this.value)" style="flex-grow:1; background:black; color:lime; border:1px solid #333;">
+          ${currentActor.ref_type === 'pc' ? `<button class="gm-btn" onclick="window.rollForMe()">🎲 ROLL</button>` : ''}
+        </div>
+        <button style="width:100%; padding:10px; background:var(--pip-green); color:black; font-weight:bold; border:none; cursor:pointer; margin-bottom:6px;" onclick="window.resolveAttack()">RESOLVE ATTACK</button>
+        <button style="width:100%; padding:6px; background:#333; color:#aaa; border:none; cursor:pointer;" onclick="window.passTurn()">PASS</button>
+      </div>`;
+  } else if (isMyIdleTurn) {
+    actionPanelHtml = `
+      <div class="panel" style="margin-bottom:15px;">
+        <h3 style="color:var(--pip-dim); margin-top:0;">${currentActor.name}'S TURN</h3>
+        <p style="color:#888; font-size:13px;">Action taken this turn. Click END TURN when ready to move on.</p>
+      </div>`;
+  }
+
+  const bestiaryQuickOptions = Object.values(bestiaryDatabase)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  const addCombatantHtml = isLive && userRole === 'gm' ? `
+    <div class="panel" style="margin-bottom:15px;">
+      <h4 style="color:orange; margin-top:0;">ADD COMBATANT</h4>
+      <div style="display:flex; gap:6px;">
+        <select id="midFightMonsterSelect" style="flex-grow:1; background:black; color:orange; border:1px solid orange;">${bestiaryQuickOptions}</select>
+        <button class="gm-btn" style="border-color:orange; color:orange;" onclick="window.addCombatantMidFight(document.getElementById('midFightMonsterSelect').value)">ADD</button>
+      </div>
+    </div>` : '';
+
   return `
-    <div class="dashboard-container" style="grid-template-columns: 320px 1fr; justify-content:center;">
+    <div class="dashboard-container" style="grid-template-columns: 320px 320px 1fr; justify-content:center;">
       <div class="panel">
         ${headerHtml}
         <div style="margin-top:15px;">${initiativeHtml}</div>
-        ${isLive && userRole === 'gm' ? `<button style="width:100%; margin-top:15px; padding:10px; background:red; color:white; border:none; cursor:pointer;" onclick="window.endCombat()">END COMBAT</button>` : ''}
-        <button style="width:100%; margin-top:10px; padding:8px; background:#333; color:var(--pip-green); border:none; cursor:pointer;" onclick="window.switchTab('STATUS')">BACK TO DASHBOARD</button>
+        ${canEndTurn ? `<button style="width:100%; margin-top:15px; padding:10px; background:var(--pip-dim); color:black; font-weight:bold; border:none; cursor:pointer;" onclick="window.endTurn()">END TURN</button>` : ''}
+        ${isLive && userRole === 'gm' ? `<button style="width:100%; margin-top:8px; padding:10px; background:red; color:white; border:none; cursor:pointer;" onclick="window.endCombat()">END COMBAT</button>` : ''}
+        <button style="width:100%; margin-top:8px; padding:8px; background:#333; color:var(--pip-green); border:none; cursor:pointer;" onclick="window.switchTab('STATUS')">BACK TO DASHBOARD</button>
+      </div>
+      <div>
+        ${actionPanelHtml}
+        ${addCombatantHtml}
+        ${!actionPanelHtml && !addCombatantHtml ? `<div class="panel" style="color:#555; font-size:13px;">${isLive ? "Waiting on this combatant's turn." : 'Combat has ended.'}</div>` : ''}
       </div>
       <div class="panel">
         <h2>COMBAT LOG</h2>
