@@ -36,6 +36,7 @@ window.resolveAttack = Controllers.resolveAttack;
 window.passTurn = Controllers.passTurn;
 window.endTurn = Controllers.endTurn;
 window.addCombatantMidFight = Controllers.addCombatantMidFight;
+window.gmApplyStatusEffectInCombat = Controllers.gmApplyStatusEffectInCombat;
 // Character Creation Actions
 window.adjustCreationStat = Controllers.adjustCreationStat;
 window.setCreationRace = Controllers.setCreationRace;
@@ -154,41 +155,63 @@ window.render = function() {
   maybeAnnounceTurn();
 }
 
-// --- TURN ANNOUNCEMENT (5s, all clients react to the same Firestore state) ---
+// --- BIG ANNOUNCEMENTS (turn changes + status-effect procs) ---
+// Every connected client watches the same active_combat state and reacts
+// independently — there's no "everyone's screen closes together" signal,
+// each viewer's overlay is local to their own browser, driven off the
+// same shared event data. That's why a dismiss only affects the person
+// who clicked it: there's nothing to broadcast, everyone already saw
+// (or is seeing) the same underlying announcement from the same write.
 window.lastAnnouncedTurnKey = null;
 function maybeAnnounceTurn() {
   const combat = window.liveData && window.liveData.active_combat;
   if (!combat || !combat.is_active) return;
   const currentActor = combat.initiative_order[combat.turn_index];
   if (!currentActor) return;
-  const key = `${combat.round}_${combat.turn_index}_${currentActor.combatant_id}`;
+  const key = combat.last_turn_key || `${combat.round}_${combat.turn_index}_${currentActor.combatant_id}`;
   if (window.lastAnnouncedTurnKey === key) return;
   window.lastAnnouncedTurnKey = key;
-  showTurnAnnouncement(currentActor.name);
+  showBigAnnouncement(`${currentActor.name}'S TURN`, combat.last_turn_events || []);
 }
 
-function showTurnAnnouncement(name) {
+function showBigAnnouncement(headline, sublines) {
   let el = document.getElementById('turn-announcement');
   if (!el) {
     el = document.createElement('div');
     el.id = 'turn-announcement';
-    el.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:5000; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; color:var(--pip-green); font-family:VT323, monospace; cursor:pointer;';
-    el.onclick = () => { el.style.display = 'none'; };
+    el.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:5000; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; color:var(--pip-green); font-family:VT323, monospace;';
     document.body.appendChild(el);
   }
-  el.innerHTML = `<div style="font-size:48px; text-shadow:0 0 10px rgba(51,255,51,0.6);">${name}'S TURN</div><div id="turn-announcement-countdown" style="font-size:18px; color:#888;">closing in 5...</div>`;
+
+  const sublinesHtml = (sublines || [])
+    .map(line => `<div style="font-size:16px; color:#ff5555; text-align:center;">${line}</div>`)
+    .join('');
+
+  el.innerHTML = `
+    <div style="font-size:48px; text-align:center; text-shadow:0 0 10px rgba(51,255,51,0.6); max-width:80vw;">${headline}</div>
+    ${sublinesHtml ? `<div style="display:flex; flex-direction:column; gap:4px; max-width:70vw;">${sublinesHtml}</div>` : ''}
+    <button id="turn-announcement-dismiss" style="position:relative; overflow:hidden; padding:10px 34px; background:#111; border:1px solid var(--pip-green); color:var(--pip-green); font-family:'VT323', monospace; font-size:18px; cursor:pointer;">
+      <span id="turn-announcement-fill" style="position:absolute; inset:0; width:0%; background:rgba(51,255,51,0.35); z-index:0;"></span>
+      <span style="position:relative; z-index:1;">DISMISS</span>
+    </button>
+  `;
   el.style.display = 'flex';
 
-  let secondsLeft = 5;
-  const timer = setInterval(() => {
-    secondsLeft -= 1;
-    const countdownEl = document.getElementById('turn-announcement-countdown');
-    if (countdownEl) countdownEl.innerText = secondsLeft > 0 ? `closing in ${secondsLeft}...` : 'closing...';
-    if (secondsLeft <= 0) {
-      clearInterval(timer);
-      if (el) el.style.display = 'none';
+  let closed = false;
+  const close = () => { if (closed) return; closed = true; el.style.display = 'none'; clearTimeout(autoTimer); };
+  document.getElementById('turn-announcement-dismiss').onclick = close;
+
+  // Fill the button over 5s via a CSS transition (starts after a paint
+  // so the browser actually animates from 0, rather than snapping to 100%).
+  const fillEl = document.getElementById('turn-announcement-fill');
+  requestAnimationFrame(() => {
+    if (fillEl) {
+      fillEl.style.transition = 'width 5s linear';
+      fillEl.style.width = '100%';
     }
-  }, 1000);
+  });
+
+  const autoTimer = setTimeout(close, 5000);
 }
 
 // --- LOGIN CONTROLLER ---

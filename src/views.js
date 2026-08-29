@@ -214,6 +214,17 @@ export function getCombatView(liveData, userRole, currentUser) {
     return 'DOWN';
   };
 
+  // PC affliction tags — always visible in red, regardless of Awareness
+  // (knowing *something* is wrong with someone is different from knowing
+  // their exact HP, which stays gated).
+  const afflictionTags = (c) => {
+    if (c.ref_type !== 'pc') return '';
+    const char = liveData.characters[c.char_id];
+    const effects = (char && char.status_effects) || [];
+    if (effects.length === 0) return '';
+    return `<div style="margin-top:3px;">${effects.map(fx => `<span style="color:#ff5555; font-size:11px; border:1px solid #5a2020; padding:1px 5px; margin-right:4px; display:inline-block;">${fx.name.toUpperCase()}</span>`).join('')}</div>`;
+  };
+
   const initiativeHtml = combat.initiative_order.map((c, idx) => {
     const isCurrent = isLive && idx === combat.turn_index;
     const hp = resolveHp(c);
@@ -223,6 +234,7 @@ export function getCombatView(liveData, userRole, currentUser) {
         <div>
           <strong style="color:${c.ref_type === 'pc' ? 'cyan' : 'red'};">${isCurrent ? '▶ ' : ''}${c.name}</strong>
           <div style="font-size:11px; color:#666;">INIT ${c.initiative}</div>
+          ${afflictionTags(c)}
         </div>
         <div style="text-align:right;">
           <div class="hp-bar-container" style="width:100px;"><div class="hp-fill" style="width:${pct}%"></div></div>
@@ -318,6 +330,30 @@ export function getCombatView(liveData, userRole, currentUser) {
       </div>
     </div>` : '';
 
+  const pcTargetOptions = combat.initiative_order
+    .filter(c => c.ref_type === 'pc')
+    .map(c => `<option value="${c.char_id}">${c.name}</option>`).join('');
+  const combatEffectOptions = Object.values(statusEffectDatabase)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(fx => `<option value="${fx.id}">${fx.name}</option>`).join('');
+  const afflictPcHtml = isLive && userRole === 'gm' ? `
+    <div class="panel" style="margin-bottom:15px;">
+      <h4 style="color:#ff5555; margin-top:0;">AFFLICT PC</h4>
+      <select id="combatEffectTargetSelect" style="width:100%; background:black; color:#ff5555; border:1px solid #ff5555; margin-bottom:6px;">
+        <option value="">— choose PC —</option>${pcTargetOptions}
+      </select>
+      <select id="combatEffectSelect" style="width:100%; background:black; color:#ff5555; border:1px solid #ff5555; margin-bottom:6px;"
+        onchange="document.getElementById('combatEffectCustomFields').style.display = this.value === '__custom__' ? 'flex' : 'none';">
+        ${combatEffectOptions}
+        <option value="__custom__">— CUSTOM (type your own) —</option>
+      </select>
+      <div id="combatEffectCustomFields" style="display:${combatEffectOptions ? 'none' : 'flex'}; flex-direction:column; gap:6px; margin-bottom:6px;">
+        <input type="text" id="combatEffectCustomName" placeholder="NAME (e.g. Bleeding)" style="background:black; color:#ff5555; border:1px solid #333;">
+        <input type="text" id="combatEffectCustomModifiers" placeholder="MODIFIERS e.g. special_end:-2" style="background:black; color:#ff5555; border:1px solid #333;">
+      </div>
+      <button class="gm-btn" style="width:100%; border-color:#ff5555; color:#ff5555;" onclick="window.gmApplyStatusEffectInCombat()">APPLY</button>
+    </div>` : '';
+
   return `
     <div class="dashboard-container" style="grid-template-columns: 320px 320px 1fr; justify-content:center;">
       <div class="panel">
@@ -329,8 +365,9 @@ export function getCombatView(liveData, userRole, currentUser) {
       </div>
       <div>
         ${actionPanelHtml}
+        ${afflictPcHtml}
         ${addCombatantHtml}
-        ${!actionPanelHtml && !addCombatantHtml ? `<div class="panel" style="color:#555; font-size:13px;">${isLive ? "Waiting on this combatant's turn." : 'Combat has ended.'}</div>` : ''}
+        ${!actionPanelHtml && !afflictPcHtml && !addCombatantHtml ? `<div class="panel" style="color:#555; font-size:13px;">${isLive ? "Waiting on this combatant's turn." : 'Combat has ended.'}</div>` : ''}
       </div>
       <div class="panel">
         <h2>COMBAT LOG</h2>

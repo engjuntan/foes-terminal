@@ -193,16 +193,19 @@ export async function gmGrantLevel(targetCharId) {
 }
 
 // 5. Apply Status Effect (from the library, or a custom one typed on the spot)
-export async function gmApplyStatusEffect(targetCharId) {
-  const select = document.getElementById('statusEffectSelect');
+// Shared by the GM-modal apply form and the in-combat apply form — reads
+// whichever trio of select/custom-name/custom-modifiers elements is
+// passed in, so the same logic works from either UI.
+function buildStatusEffectInstance(selectElId, customNameElId, customModsElId) {
+  const select = document.getElementById(selectElId);
   const chosenId = select.value;
 
   let name, modifiers, sourceId;
 
   if (chosenId === '__custom__') {
-    name = document.getElementById('statusEffectCustomName').value.trim();
-    const modsRaw = document.getElementById('statusEffectCustomModifiers').value.trim();
-    if (!name) { alert("ENTER A NAME FOR THE CUSTOM EFFECT"); return; }
+    name = document.getElementById(customNameElId).value.trim();
+    const modsRaw = document.getElementById(customModsElId).value.trim();
+    if (!name) { alert("ENTER A NAME FOR THE CUSTOM EFFECT"); return null; }
 
     modifiers = {};
     modsRaw.split(',').forEach(pair => {
@@ -213,31 +216,47 @@ export async function gmApplyStatusEffect(targetCharId) {
     });
     sourceId = null;
   } else {
-    if (!chosenId) return;
+    if (!chosenId) return null;
     const def = statusEffectDatabase[chosenId];
-    if (!def) { alert("UNKNOWN STATUS EFFECT"); return; }
+    if (!def) { alert("UNKNOWN STATUS EFFECT"); return null; }
     name = def.name;
     modifiers = def.modifiers || {};
     sourceId = chosenId;
   }
 
-  const instance = {
+  return {
     id: `${(sourceId || name).toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`,
     source_id: sourceId,
     name,
     modifiers,
     applied_at: Date.now()
   };
+}
 
+async function writeStatusEffectToChar(targetCharId, instance) {
   const char = window.liveData.characters[targetCharId];
-  const currentEffects = char.status_effects || [];
+  const currentEffects = (char && char.status_effects) || [];
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
   updatePayload[`characters.${targetCharId}.status_effects`] = [...currentEffects, instance];
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
 
-  try {
-    await updateDoc(charRef, updatePayload);
-  } catch (err) { alert("ERROR: " + err.message); }
+export async function gmApplyStatusEffect(targetCharId) {
+  const instance = buildStatusEffectInstance('statusEffectSelect', 'statusEffectCustomName', 'statusEffectCustomModifiers');
+  if (!instance) return;
+  await writeStatusEffectToChar(targetCharId, instance);
+}
+
+// In-combat variant: the target isn't implicit (no "selected character"
+// like the GM modal has) — it's read from its own dropdown instead.
+export async function gmApplyStatusEffectInCombat() {
+  const targetSelect = document.getElementById('combatEffectTargetSelect');
+  const targetCharId = targetSelect && targetSelect.value;
+  if (!targetCharId) { alert("PICK A TARGET"); return; }
+  const instance = buildStatusEffectInstance('combatEffectSelect', 'combatEffectCustomName', 'combatEffectCustomModifiers');
+  if (!instance) return;
+  await writeStatusEffectToChar(targetCharId, instance);
 }
 
 // 6. Remove Status Effect
@@ -622,27 +641,92 @@ export async function passTurn() {
   try { await updateDoc(charRef, { active_combat: updatedCombat }); } catch (err) { alert("ERROR: " + err.message); }
 }
 
+// Advances initiative, applying each newly-current PC's status effects
+// (skip_turn / damage_per_turn) before settling on who actually goes —
+// a skip_turn effect causes another advance, a lethal damage_per_turn
+// effect marks them down and does the same. turnEvents collects every
+// message generated so the client can build one shared announcement,
+// same idea as the plain turn announcement but richer.
 export async function endTurn() {
   const combat = window.liveData.active_combat;
   if (!combat || !combat.is_active) return;
 
   const n = combat.initiative_order.length;
+  const newInitiativeOrder = combat.initiative_order.map(c => ({ ...c }));
+  const charUpdates = {};
+  const log = [...combat.log];
+  const turnEvents = [];
+
   let nextIndex = combat.turn_index;
   let nextRound = combat.round;
-  let looped = false;
-  for (let i = 0; i < n; i++) {
+  let settled = false;
+  let safety = 0;
+
+  while (!settled && safety < n * 2 + 2) {
+    safety++;
     nextIndex = (nextIndex + 1) % n;
-    if (nextIndex === 0) { nextRound += 1; looped = true; }
-    if (!combat.initiative_order[nextIndex].is_down) break;
+    if (nextIndex === 0) {
+      nextRound += 1;
+      log.push({ id: `log_${Date.now()}_r${safety}`, type: 'system', message: `— Round ${nextRound} begins —`, timestamp: Date.now() });
+    }
+
+    const candidate = newInitiativeOrder[nextIndex];
+    if (candidate.is_down) continue;
+
+    let skip = false;
+    if (candidate.ref_type === 'pc') {
+      const char = window.liveData.characters[candidate.char_id];
+      const effects = (char && char.status_effects) || [];
+
+      const skipEffects = effects.filter(fx => fx.modifiers && fx.modifiers.skip_turn);
+      if (skipEffects.length > 0) {
+        skipEffects.forEach(fx => {
+          const msg = `${candidate.name} is afflicted by ${fx.name} and skips their turn!`;
+          log.push({ id: `log_${Date.now()}_sk${safety}_${fx.id}`, type: 'status', message: msg, timestamp: Date.now() });
+          turnEvents.push(msg);
+        });
+        skip = true;
+      } else {
+        const dotEffects = effects.filter(fx => fx.modifiers && fx.modifiers.damage_per_turn);
+        if (dotEffects.length > 0) {
+          const hpKey = `characters.${candidate.char_id}.hp.current`;
+          let runningHp = charUpdates[hpKey] !== undefined ? charUpdates[hpKey] : char.hp.current;
+          dotEffects.forEach(fx => {
+            const dmg = rollDamage(fx.modifiers.damage_per_turn);
+            runningHp = Math.max(0, runningHp - dmg);
+            const msg = `${candidate.name} takes ${dmg} damage from ${fx.name}!`;
+            log.push({ id: `log_${Date.now()}_dot${safety}_${fx.id}`, type: 'status', message: msg, timestamp: Date.now() });
+            turnEvents.push(msg);
+          });
+          charUpdates[hpKey] = runningHp;
+          if (runningHp <= 0) {
+            newInitiativeOrder[nextIndex] = { ...candidate, is_down: true };
+            const msg = `${candidate.name} goes down!`;
+            log.push({ id: `log_${Date.now()}_down${safety}`, type: 'status', message: msg, timestamp: Date.now() });
+            turnEvents.push(msg);
+            skip = true;
+          }
+        }
+      }
+    }
+
+    if (skip) continue;
+    settled = true;
   }
 
-  const log = [...combat.log];
-  if (looped) log.push({ id: `log_${Date.now()}_r`, type: 'system', message: `— Round ${nextRound} begins —`, timestamp: Date.now() });
-
-  const updatedCombat = { ...combat, turn_index: nextIndex, round: nextRound, turn_acted: false, log };
+  const updatedCombat = {
+    ...combat,
+    turn_index: nextIndex,
+    round: nextRound,
+    turn_acted: false,
+    initiative_order: newInitiativeOrder,
+    log,
+    last_turn_events: turnEvents,
+    last_turn_key: `${nextRound}_${nextIndex}_${Date.now()}`
+  };
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   window.combatActionDraft = null;
-  try { await updateDoc(charRef, { active_combat: updatedCombat }); } catch (err) { alert("ERROR: " + err.message); }
+  try { await updateDoc(charRef, { active_combat: updatedCombat, ...charUpdates }); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // GM-only: add a fresh monster to an in-progress fight. Appended to the
