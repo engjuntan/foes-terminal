@@ -43,6 +43,16 @@ export async function unequipItem(targetSlot) {
   await updateDoc(charRef, updatePayload);
 }
 
+// GM tool: unequip any player's item at will (e.g. they lost/traded it,
+// a disarm happened narratively, correcting a mistake).
+export async function gmUnequipItem(targetCharId, targetSlot) {
+  if (!targetCharId) return;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.equipment.${targetSlot}`] = null;
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
 export async function createAccessCode() {
   const code = document.getElementById('newCode').value.toUpperCase().trim();
   const charId = document.getElementById('newCharName').value.toLowerCase().trim();
@@ -527,10 +537,17 @@ function getCombatActionDraft() {
   return window.combatActionDraft;
 }
 
+// Deliberately does NOT call window.render(). This backs live-typed/
+// selected action-panel fields (target, attack, roll) — re-rendering on
+// every keystroke replaces the whole screen's HTML, which kills focus on
+// whatever you're mid-typing (found via testing: the roll field became
+// unusable for anything past one digit). The browser already reflects
+// input/select changes on its own without our help; only the buttons
+// that actually consume the draft (Resolve Attack, Roll For Me, etc.)
+// need to trigger a render.
 export function setCombatActionField(field, value) {
   const draft = getCombatActionDraft();
   draft[field] = value;
-  window.render();
 }
 
 export function rollForMe() {

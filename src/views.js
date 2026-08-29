@@ -272,9 +272,14 @@ export function getCombatView(liveData, userRole, currentUser) {
   let actionPanelHtml = '';
   if (canActThisTurn) {
     const draft = window.combatActionDraft || {};
+    // PC turns target the opposing side only (a player attacking a
+    // teammate should go through the GM, not be a default option).
+    // Monster/NPC turns can target anyone else — chaos, mind control,
+    // an animal turning on an ally, etc.
     const opposingSide = currentActor.ref_type === 'pc' ? 'monster' : 'pc';
     const targetOptions = combat.initiative_order
-      .filter(c => c.ref_type === opposingSide && !c.is_down)
+      .filter(c => c.combatant_id !== currentActor.combatant_id && !c.is_down &&
+        (currentActor.ref_type === 'monster' || c.ref_type === opposingSide))
       .map(c => `<option value="${c.combatant_id}" ${draft.targetId === c.combatant_id ? 'selected' : ''}>${c.name}</option>`).join('');
 
     let attackOptions = '';
@@ -751,11 +756,22 @@ export function renderGMScreen(liveData) {
         </div>
 
         <h4 style="color:lime; border-bottom:1px dashed lime;">INVENTORY</h4>
-        <div style="display:flex; gap:5px;">
+        <div style="display:flex; gap:5px; margin-bottom:10px;">
           <select id="gmItemSelect" style="flex-grow:1; background:black; color:lime; border:1px solid lime; font-family:'VT323';">
             ${itemOptions}
           </select>
           <button class="gm-btn" style="border-color:lime; color:lime;" onclick="window.gmGrantItem()">GRANT</button>
+        </div>
+        <div>
+          ${['head', 'body', 'right_hand', 'left_hand'].map(slot => {
+            const equippedId = targetChar && targetChar.equipment ? targetChar.equipment[slot] : null;
+            const equippedItem = getItem(equippedId);
+            if (!equippedItem) return '';
+            return `<div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #333; padding:3px 8px; margin-bottom:4px; font-size:13px;">
+              <span>${slot.replace('_', ' ').toUpperCase()}: ${equippedItem.name}</span>
+              <button class="gm-btn" style="border-color:lime; color:lime; padding:0 8px;" onclick="window.gmUnequipItem('${slot}')">UNEQUIP</button>
+            </div>`;
+          }).join('') || `<div style="color:#555; font-size:12px;">Nothing equipped.</div>`}
         </div>
 
         <h4 style="color:red; border-bottom:1px dashed red; margin-top:20px;">DANGER ZONE</h4>

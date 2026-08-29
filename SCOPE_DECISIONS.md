@@ -80,6 +80,26 @@ at the bottom. Nothing here is implemented yet — this is scope-locking only.
   screen. Iron Legs and "Iron" are the same character — just the display
   name was wrong before.
 
+## Combat polish round (RESOLVED, from live playtesting feedback)
+- **Monster/NPC targeting expanded**: a monster's turn can now target any
+  other combatant, including other monsters — chaos, mind control, an
+  animal turning on an ally, etc. PC turns still target the opposing
+  side only (a player targeting a teammate should go through the GM,
+  not be a default UI option). Revisit if PC-on-PC targeting is wanted too.
+- **Roll input focus bug (real bug, fixed)**: `setCombatActionField`
+  called `window.render()` on every keystroke, which replaces the whole
+  screen's HTML and kills focus on whatever's mid-typed — made the roll
+  field unusable past one digit. Fixed by not re-rendering for
+  live-typed/selected action-panel fields; only explicit actions
+  (Resolve Attack, Roll For Me, etc.) trigger a render now.
+- **GM unequip**: added to the character's GM modal (Squad Monitor →
+  click a card), not combat-specific — equipment is persistent character
+  state. A mid-combat "disarm" action would be a different, bigger
+  feature if ever wanted.
+- **Parked**: randomized flavor text for the combat log (e.g. varied
+  hit/miss/damage phrasing instead of the same template every time).
+  Explicitly deferred by the user — revisit later, not blocking anything.
+
 ## Roster
 - Campaign has **4 PCs total**, not 2. Only **Kong** and **Iron Legs** exist
   in the app so far.

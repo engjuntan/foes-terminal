@@ -18,6 +18,7 @@ window.unequipItem = Controllers.unequipItem;
 window.createAccessCode = Controllers.createAccessCode;
 window.forceReset = Controllers.forceReset;
 window.gmGrantItem = () => Controllers.gmGrantItem(window.selectedCharId);
+window.gmUnequipItem = (slot) => Controllers.gmUnequipItem(window.selectedCharId, slot);
 window.gmAdjustHP = (amt) => Controllers.gmAdjustHP(window.selectedCharId, amt);
 window.gmAdjustVaultPoints = (amt) => Controllers.gmAdjustVaultPoints(window.selectedCharId, amt);
 window.gmGrantLevel = () => Controllers.gmGrantLevel(window.selectedCharId);
