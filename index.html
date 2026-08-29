@@ -21,10 +21,11 @@
       </div>
       
       <nav>
-        <button id="btn-dashboard" class="nav-btn active">1. DASHBOARD</button>
-        <button id="btn-logs" class="nav-btn">2. DATA LOGS</button>
-        <button id="btn-map" class="nav-btn">3. GEOGRAPHY</button>
-        <button id="btn-admin" class="nav-btn hidden" style="border-color: red; color: red;">4. OVERRIDE</button>
+        <button id="btn-dashboard" class="nav-btn active" onclick="window.switchTab('STATUS')">1. DASHBOARD</button>
+        <button id="btn-logs" class="nav-btn" onclick="window.switchTab('DATA_LOGS')">2. DATA LOGS</button>
+        <button id="btn-messages" class="nav-btn" onclick="window.switchTab('MESSAGES')">3. MESSAGES</button>
+        <button id="btn-map" class="nav-btn" onclick="window.switchTab('MAPS')">4. MAPS</button>
+        <button id="btn-admin" class="nav-btn hidden" style="border-color: red; color: red;">5. OVERRIDE</button>
       </nav>
       
       <div class="console-input">

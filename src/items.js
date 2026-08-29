@@ -1,5 +1,14 @@
 // AUTOMATICALLY GENERATED FILE. DO NOT EDIT MANUALLY.
 export const itemDatabase = {
+  glasses: {
+    "id": "glasses",
+    "name": "Glasses",
+    "type": "accessory",
+    "slot": "head",
+    "icon": "",
+    "description": "A pair of corrective lenses, scavenged and re-fitted. Not armor, not a weapon — just enough to see straight.",
+    "value": 10
+  },
   dinar: {
     "id": "dinar",
     "name": "Caliphate Dinar",

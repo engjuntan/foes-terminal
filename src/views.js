@@ -4,12 +4,58 @@ import { getItem, itemDatabase } from './items.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
+import { dataLogDatabase } from './dataLogs.js';
+import { mapDatabase } from './maps.js';
 
 // --- HELPERS ---
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// Builds a nested tree from a flat list of entries carrying a
+// category_path array (e.g. Data Logs, folder-derived).
+function buildCategoryTree(entries) {
+  const root = { children: {}, items: [] };
+  entries.forEach(entry => {
+    let node = root;
+    (entry.category_path || []).forEach(segment => {
+      if (!node.children[segment]) node.children[segment] = { children: {}, items: [] };
+      node = node.children[segment];
+    });
+    node.items.push(entry);
+  });
+  return root;
+}
+
+function renderCategoryTree(node, renderItem, depth = 0) {
+  let html = '';
+  Object.entries(node.children).sort(([a], [b]) => a.localeCompare(b)).forEach(([name, child]) => {
+    html += `<div style="margin-left:${depth * 16}px; margin-top:8px;">
+      <div style="color:var(--pip-dim); font-weight:bold; text-transform:uppercase; font-size:13px; border-bottom:1px dashed var(--pip-dim); padding-bottom:2px;">${name}</div>
+      ${renderCategoryTree(child, renderItem, depth + 1)}
+    </div>`;
+  });
+  node.items.forEach(item => {
+    html += `<div style="margin-left:${(depth + 1) * 16}px;">${renderItem(item)}</div>`;
+  });
+  return html;
+}
+
+// Builds a nested tree from a flat list of entries carrying a parent_id
+// (e.g. Maps, since image files sit flat in one folder and can't derive
+// hierarchy from their location the way Data Logs can).
+function buildParentTree(entries) {
+  const byId = {};
+  entries.forEach(e => { byId[e.id] = { entry: e, children: [] }; });
+  const roots = [];
+  entries.forEach(e => {
+    const node = byId[e.id];
+    if (e.parent_id && byId[e.parent_id]) byId[e.parent_id].children.push(node);
+    else roots.push(node);
+  });
+  return roots;
 }
 
 export function renderWikiLink(name, description) {
@@ -397,6 +443,190 @@ export function getCombatView(liveData, userRole, currentUser) {
       </div>
     </div>
   `;
+}
+
+// --- DATA LOGS ---
+export function getDataLogsView(liveData, userRole, currentUser) {
+  const allLogs = Object.values(dataLogDatabase);
+  const players = Object.entries(liveData.characters || {}).filter(([, c]) => c.is_finalized);
+
+  if (userRole === 'gm') {
+    const renderLog = (log) => `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #222; padding:5px 0;">
+        <span>${log.name}</span>
+        <div style="display:flex; gap:4px;">
+          <select id="grantLogTarget_${log.id}" style="background:black; color:lime; border:1px solid #333; font-size:11px;">
+            <option value="all">ALL PLAYERS</option>
+            ${players.map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('')}
+          </select>
+          <button class="gm-btn" style="padding:0 8px; font-size:11px;" onclick="window.gmGrantDataLog('${log.id}', document.getElementById('grantLogTarget_${log.id}').value)">GRANT</button>
+        </div>
+      </div>`;
+    return `
+      <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto; padding-top:10px;">
+        <div class="panel">
+          <h2>DATA LOGS — GM VIEW</h2>
+          <p style="font-size:12px; color:#666;">You see everything unconditionally. Grant a log to a player (or everyone) to unlock it for them.</p>
+          ${allLogs.length > 0 ? renderCategoryTree(buildCategoryTree(allLogs), renderLog) : '<p style="color:#555;">No data logs authored yet.</p>'}
+        </div>
+      </div>`;
+  }
+
+  const char = liveData.characters[currentUser];
+  const unlocked = new Set(char.unlocked_logs || []);
+  const readSet = new Set(char.read_logs || []);
+  const visibleLogs = allLogs.filter(l => unlocked.has(l.id));
+  const openId = window.openLogId;
+
+  const renderLog = (log) => {
+    const isUnread = !readSet.has(log.id);
+    const isOpen = openId === log.id;
+    return `
+      <div>
+        <div onclick="window.openDataLog('${log.id}')" style="cursor:pointer; padding:6px 0; border-bottom:1px dashed #222; ${isUnread ? 'font-weight:bold; color:var(--pip-green);' : 'color:#888;'}">
+          ${isUnread ? '<span style="color:red;">●</span> ' : ''}${log.name}
+        </div>
+        ${isOpen ? `<div style="background:rgba(0,50,0,0.2); border:1px solid var(--pip-dim); padding:10px; margin:6px 0; font-size:13px; color:#ccc; white-space:pre-wrap;">${escapeHtml(log.body || '')}</div>` : ''}
+      </div>`;
+  };
+
+  return `
+    <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto; padding-top:10px;">
+      <div class="panel">
+        <h2>DATA LOGS</h2>
+        ${visibleLogs.length === 0 ? '<p style="color:#555; font-size:13px;">Nothing unlocked yet — your GM will grant you access as the story unfolds.</p>' : renderCategoryTree(buildCategoryTree(visibleLogs), renderLog)}
+      </div>
+    </div>`;
+}
+
+// --- MAPS ---
+export function getMapsView(liveData, userRole, currentUser) {
+  const allMaps = Object.values(mapDatabase);
+  const players = Object.entries(liveData.characters || {}).filter(([, c]) => c.is_finalized);
+  const openId = window.openMapId;
+
+  if (userRole === 'gm') {
+    const renderMap = (node) => {
+      const map = node.entry;
+      return `
+        <div style="border-bottom:1px dashed #222; padding:5px 0;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span onclick="window.openMap('${map.id}')" style="cursor:pointer;">${map.name}</span>
+            <div style="display:flex; gap:4px;">
+              <select id="grantMapTarget_${map.id}" style="background:black; color:lime; border:1px solid #333; font-size:11px;">
+                <option value="all">ALL PLAYERS</option>
+                ${players.map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('')}
+              </select>
+              <button class="gm-btn" style="padding:0 8px; font-size:11px;" onclick="window.gmGrantMap('${map.id}', document.getElementById('grantMapTarget_${map.id}').value)">GRANT</button>
+            </div>
+          </div>
+          ${openId === map.id ? `<img src="${map.image_url}" style="max-width:100%; border:1px solid var(--pip-dim); margin-top:6px;">` : ''}
+          ${node.children.length > 0 ? `<div style="margin-left:16px;">${node.children.map(renderMap).join('')}</div>` : ''}
+        </div>`;
+    };
+    const roots = buildParentTree(allMaps);
+    return `
+      <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto; padding-top:10px;">
+        <div class="panel">
+          <h2>MAPS — GM VIEW</h2>
+          <p style="font-size:12px; color:#666;">Click a name to preview it. Grant unlocks it for a player (or everyone).</p>
+          ${roots.length > 0 ? roots.map(renderMap).join('') : '<p style="color:#555;">No maps authored yet.</p>'}
+        </div>
+      </div>`;
+  }
+
+  const char = liveData.characters[currentUser];
+  const unlocked = new Set(char.unlocked_maps || []);
+  const visibleMaps = allMaps.filter(m => unlocked.has(m.id));
+
+  const renderMap = (node) => {
+    const map = node.entry;
+    const visibleChildren = node.children.filter(c => unlocked.has(c.entry.id));
+    return `
+      <div style="border-bottom:1px dashed #222; padding:5px 0;">
+        <div onclick="window.openMap('${map.id}')" style="cursor:pointer; color:var(--pip-green);">${map.name}</div>
+        ${openId === map.id ? `<img src="${map.image_url}" style="max-width:100%; border:1px solid var(--pip-dim); margin-top:6px;">` : ''}
+        ${visibleChildren.length > 0 ? `<div style="margin-left:16px;">${visibleChildren.map(renderMap).join('')}</div>` : ''}
+      </div>`;
+  };
+  // Only walk from roots the player can actually see; an unlocked child
+  // under a not-yet-unlocked parent still shows at its own top level
+  // rather than disappearing.
+  const allRoots = buildParentTree(allMaps);
+  const visibleRoots = allRoots.filter(n => unlocked.has(n.entry.id));
+  const orphanedVisibleChildren = [];
+  (function findOrphans(nodes, parentVisible) {
+    nodes.forEach(n => {
+      const isVisible = unlocked.has(n.entry.id);
+      if (isVisible && !parentVisible) orphanedVisibleChildren.push(n);
+      findOrphans(n.children, isVisible || parentVisible);
+    });
+  })(allRoots, false);
+
+  return `
+    <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto; padding-top:10px;">
+      <div class="panel">
+        <h2>MAPS</h2>
+        ${visibleMaps.length === 0 ? '<p style="color:#555; font-size:13px;">No maps unlocked yet.</p>' :
+          [...visibleRoots, ...orphanedVisibleChildren].map(renderMap).join('')}
+      </div>
+    </div>`;
+}
+
+// --- MESSAGES ---
+export function getMessagesView(liveData, userRole, currentUser) {
+  const messages = liveData.messages || [];
+  const players = Object.entries(liveData.characters || {}).filter(([, c]) => c.is_finalized);
+  const openId = window.openMessageId;
+
+  if (userRole === 'gm') {
+    const targetOptions = `<option value="all">ALL PLAYERS</option>${players.map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('')}`;
+    const historyHtml = messages.slice().reverse().map(m => `
+      <div style="border-bottom:1px dashed #222; padding:6px 0; font-size:13px;">
+        <span style="color:#555; font-size:11px;">${new Date(m.timestamp).toLocaleString()}</span>
+        <span style="color:cyan;"> → ${m.target === 'all' ? 'ALL' : (liveData.characters[m.target]?.name || m.target)}</span>
+        <div style="color:#ccc; margin-top:2px;">${escapeHtml(m.body)}</div>
+      </div>`).join('');
+    return `
+      <div class="dashboard-container" style="grid-template-columns: 340px 1fr; justify-content:center;">
+        <div class="panel">
+          <h2 style="color:cyan;">SEND MESSAGE</h2>
+          <label style="font-size:11px; color:#666;">TO</label>
+          <select id="messageTarget" style="width:100%; background:black; color:cyan; border:1px solid #333; margin-bottom:8px;">${targetOptions}</select>
+          <label style="font-size:11px; color:#666;">MESSAGE</label>
+          <textarea id="messageBody" rows="5" style="width:100%; background:black; color:cyan; border:1px solid #333; font-family:'IBM Plex Mono', monospace; margin-bottom:8px;"></textarea>
+          <button class="gm-btn" style="width:100%; border-color:cyan; color:cyan;" onclick="window.sendMessage()">SEND</button>
+        </div>
+        <div class="panel">
+          <h2>HISTORY</h2>
+          <div style="max-height:500px; overflow-y:auto;">${historyHtml || '<span style="color:#555;">No messages sent yet.</span>'}</div>
+        </div>
+      </div>`;
+  }
+
+  const char = liveData.characters[currentUser];
+  const readSet = new Set(char.read_messages || []);
+  const myMessages = messages.filter(m => m.target === 'all' || m.target === currentUser);
+
+  const rowsHtml = myMessages.slice().reverse().map(m => {
+    const isUnread = !readSet.has(m.id);
+    const isOpen = openId === m.id;
+    return `
+      <div>
+        <div onclick="window.openMessage('${m.id}')" style="cursor:pointer; padding:6px 0; border-bottom:1px dashed #222; ${isUnread ? 'font-weight:bold; color:var(--pip-green);' : 'color:#888;'}">
+          ${isUnread ? '<span style="color:red;">●</span> ' : ''}${m.target === 'all' ? '[ALL] ' : '[YOU] '}${new Date(m.timestamp).toLocaleDateString()}
+        </div>
+        ${isOpen ? `<div style="background:rgba(0,50,0,0.2); border:1px solid var(--pip-dim); padding:10px; margin:6px 0; font-size:13px; color:#ccc; white-space:pre-wrap;">${escapeHtml(m.body)}</div>` : ''}
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto; padding-top:10px;">
+      <div class="panel">
+        <h2>MESSAGES</h2>
+        ${myMessages.length === 0 ? '<p style="color:#555; font-size:13px;">No messages yet.</p>' : rowsHtml}
+      </div>
+    </div>`;
 }
 
 // --- PLAYER SCREEN (The Dashboard) ---

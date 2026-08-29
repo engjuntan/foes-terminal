@@ -10,6 +10,17 @@ export const traitDatabase = {
       "melee_dmg_flat": 4,
       "crit_damage_pct": -25
     }
+  },
+  short_sighted: {
+    "id": "short_sighted",
+    "name": "Short-Sighted",
+    "type": "trait",
+    "description": "Your eyes aren't what they used to be — or maybe never were. Without corrective lenses, the world blurs at any real distance.",
+    "effect": "-1 Perception, unless wearing Glasses",
+    "requires_item": "glasses",
+    "modifiers": {
+      "special_per": -1
+    }
   }
 };
 

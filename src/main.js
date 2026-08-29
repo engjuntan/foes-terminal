@@ -20,6 +20,12 @@ window.forceReset = Controllers.forceReset;
 window.gmGrantItem = () => Controllers.gmGrantItem(window.selectedCharId);
 window.gmUnequipItem = (slot) => Controllers.gmUnequipItem(window.selectedCharId, slot);
 window.gmSaveBiography = () => Controllers.gmSaveBiography(window.selectedCharId);
+window.gmGrantDataLog = Controllers.gmGrantDataLog;
+window.openDataLog = Controllers.openDataLog;
+window.gmGrantMap = Controllers.gmGrantMap;
+window.openMap = Controllers.openMap;
+window.sendMessage = Controllers.sendMessage;
+window.openMessage = Controllers.openMessage;
 window.gmAdjustHP = (amt) => Controllers.gmAdjustHP(window.selectedCharId, amt);
 window.gmAdjustVaultPoints = (amt) => Controllers.gmAdjustVaultPoints(window.selectedCharId, amt);
 window.gmGrantLevel = () => Controllers.gmGrantLevel(window.selectedCharId);
@@ -124,15 +130,42 @@ window.render = function() {
   if (loginScreen) loginScreen.style.display = 'none';
   if (appInterface) appInterface.classList.remove('hidden');
 
-  // 3. Render Navbar (Optional, for future)
-  // const navHtml = Views.getNavbar(window.currentTab, window.currentUser); 
-  // (We are currently using the sidebar in HTML, so we skip nav rendering for now)
+  // 3. Sync sidebar active state to the current tab, plus unread badges
+  const navMap = { STATUS: 'btn-dashboard', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map' };
+  Object.entries(navMap).forEach(([tab, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('active', window.currentTab === tab);
+  });
+
+  if (window.userRole === 'player' && window.liveData.characters[window.currentUser]) {
+    const char = window.liveData.characters[window.currentUser];
+    const readLogs = new Set(char.read_logs || []);
+    const unreadLogCount = (char.unlocked_logs || []).filter(id => !readLogs.has(id)).length;
+
+    const readMessages = new Set(char.read_messages || []);
+    const unreadMsgCount = (window.liveData.messages || [])
+      .filter(m => m.target === 'all' || m.target === window.currentUser)
+      .filter(m => !readMessages.has(m.id)).length;
+
+    const logsBtn = document.getElementById('btn-logs');
+    if (logsBtn) logsBtn.innerHTML = `2. DATA LOGS${unreadLogCount > 0 ? ` <span style="color:red;">(${unreadLogCount})</span>` : ''}`;
+    const msgBtn = document.getElementById('btn-messages');
+    if (msgBtn) msgBtn.innerHTML = `3. MESSAGES${unreadMsgCount > 0 ? ` <span style="color:red;">(${unreadMsgCount})</span>` : ''}`;
+  }
 
   // 4. Render Main Content
   if (window.userRole === 'gm') {
-    viewport.innerHTML = window.currentTab === 'COMBAT'
-      ? Views.getCombatView(window.liveData, 'gm', window.currentUser)
-      : Views.renderGMScreen(window.liveData);
+    if (window.currentTab === 'COMBAT') {
+      viewport.innerHTML = Views.getCombatView(window.liveData, 'gm', window.currentUser);
+    } else if (window.currentTab === 'DATA_LOGS') {
+      viewport.innerHTML = Views.getDataLogsView(window.liveData, 'gm', window.currentUser);
+    } else if (window.currentTab === 'MESSAGES') {
+      viewport.innerHTML = Views.getMessagesView(window.liveData, 'gm', window.currentUser);
+    } else if (window.currentTab === 'MAPS') {
+      viewport.innerHTML = Views.getMapsView(window.liveData, 'gm', window.currentUser);
+    } else {
+      viewport.innerHTML = Views.renderGMScreen(window.liveData);
+    }
   } else {
     // PLAYER VIEW LOGIC
     const charData = window.liveData.characters[window.currentUser];
@@ -147,10 +180,14 @@ window.render = function() {
           viewport.innerHTML = Views.getGoatReviewView(window.currentUser, window.liveData);
        } else if (window.currentTab === 'COMBAT') {
           viewport.innerHTML = Views.getCombatView(window.liveData, 'player', window.currentUser);
-       } else if (window.currentTab === 'DATA') {
-          viewport.innerHTML = `<h1>DATA LOGS (COMING SOON)</h1>`;
+       } else if (window.currentTab === 'DATA_LOGS') {
+          viewport.innerHTML = Views.getDataLogsView(window.liveData, 'player', window.currentUser);
+       } else if (window.currentTab === 'MESSAGES') {
+          viewport.innerHTML = Views.getMessagesView(window.liveData, 'player', window.currentUser);
+       } else if (window.currentTab === 'MAPS') {
+          viewport.innerHTML = Views.getMapsView(window.liveData, 'player', window.currentUser);
        } else {
-          viewport.innerHTML = `<h1>ARCHIVE OFFLINE</h1>`;
+          viewport.innerHTML = Views.getPlayerView(window.currentUser, window.liveData);
        }
     } else {
        // --- SHOW G.O.A.T. REGISTRATION ---

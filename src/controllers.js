@@ -6,6 +6,8 @@ import { getItem } from './items.js';
 import { RACE_RULES, calculateDerivedStats } from './formulas.js';
 import { getMonster } from './bestiary.js';
 import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction } from './combat.js';
+import { dataLogDatabase } from './dataLogs.js';
+import { mapDatabase } from './maps.js';
 
 // --- GAME ACTIONS ---
 export async function equipItem(itemId, targetSlot) {
@@ -130,6 +132,82 @@ export async function gmSaveBiography(targetCharId) {
   updatePayload[`characters.${targetCharId}.biography`] = biography;
   updatePayload[`characters.${targetCharId}.gm_notes`] = gmNotes;
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// --- DATA LOGS ---
+export async function gmGrantDataLog(logId, target) {
+  const characters = window.liveData.characters || {};
+  const targets = target === 'all' ? Object.keys(characters).filter(id => characters[id].is_finalized) : [target];
+  const updatePayload = {};
+  targets.forEach(charId => {
+    const current = characters[charId].unlocked_logs || [];
+    if (!current.includes(logId)) updatePayload[`characters.${charId}.unlocked_logs`] = [...current, logId];
+  });
+  if (Object.keys(updatePayload).length === 0) return;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Toggles the expand/collapse locally (no write needed for that), and
+// auto-marks read the first time — matches "auto-mark on open," decided earlier.
+export async function openDataLog(logId) {
+  window.openLogId = window.openLogId === logId ? null : logId;
+  window.render();
+  const char = window.liveData.characters[window.currentUser];
+  const readLogs = char.read_logs || [];
+  if (!readLogs.includes(logId)) {
+    const charRef = doc(db, "prisoncampaign", "alpha_team");
+    const updatePayload = {};
+    updatePayload[`characters.${window.currentUser}.read_logs`] = [...readLogs, logId];
+    try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+  }
+}
+
+// --- MAPS ---
+export async function gmGrantMap(mapId, target) {
+  const characters = window.liveData.characters || {};
+  const targets = target === 'all' ? Object.keys(characters).filter(id => characters[id].is_finalized) : [target];
+  const updatePayload = {};
+  targets.forEach(charId => {
+    const current = characters[charId].unlocked_maps || [];
+    if (!current.includes(mapId)) updatePayload[`characters.${charId}.unlocked_maps`] = [...current, mapId];
+  });
+  if (Object.keys(updatePayload).length === 0) return;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Pure local toggle — no read-tracking for maps, just image preview.
+export function openMap(mapId) {
+  window.openMapId = window.openMapId === mapId ? null : mapId;
+  window.render();
+}
+
+// --- MESSAGES ---
+export async function sendMessage() {
+  const target = document.getElementById('messageTarget').value;
+  const body = document.getElementById('messageBody').value.trim();
+  if (!body) { alert("ENTER A MESSAGE"); return; }
+  const current = window.liveData.messages || [];
+  const message = { id: `msg_${Date.now()}`, from: 'GM', target, body, timestamp: Date.now() };
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, { messages: [...current, message] });
+    document.getElementById('messageBody').value = '';
+  } catch (err) { alert("ERROR: " + err.message); }
+}
+
+export async function openMessage(messageId) {
+  window.openMessageId = window.openMessageId === messageId ? null : messageId;
+  window.render();
+  const char = window.liveData.characters[window.currentUser];
+  const readMessages = char.read_messages || [];
+  if (!readMessages.includes(messageId)) {
+    const charRef = doc(db, "prisoncampaign", "alpha_team");
+    const updatePayload = {};
+    updatePayload[`characters.${window.currentUser}.read_messages`] = [...readMessages, messageId];
+    try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+  }
 }
 
 // 1. Give Item (Updated to allow duplicates)
