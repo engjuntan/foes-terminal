@@ -17,13 +17,13 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   // --- 1. PRE-CALCULATION (Traits/Perks/Status Effects modifying SPECIAL) ---
   const allModifiers = [...(activeTraits || []), ...(activePerks || [])];
   // One combined list of resolved modifier objects, regardless of source.
-  // A source with "requires_item" only actually applies while that item
-  // is equipped (e.g. Short-Sighted's -1 PER is suppressed while wearing
-  // Glasses) — filtered out here so neither pass below has to know about it.
+  // A source with "suppressed_by_item" is a downside negated by wearing
+  // something (e.g. Short-Sighted's -1 PER goes away while Glasses are
+  // equipped) — filtered out here so neither pass below has to know about it.
   const modifierSources = [
     ...allModifiers.map(id => getTrait(id)),
     ...(activeStatusEffects || [])
-  ].filter(source => !source || !source.requires_item || isItemEquipped(source.requires_item));
+  ].filter(source => !source || !source.suppressed_by_item || !isItemEquipped(source.suppressed_by_item));
   let special = { ...baseSpecial };
 
   modifierSources.forEach(source => {

@@ -17,7 +17,7 @@ export const traitDatabase = {
     "type": "trait",
     "description": "Your eyes aren't what they used to be — or maybe never were. Without corrective lenses, the world blurs at any real distance.",
     "effect": "-1 Perception, unless wearing Glasses",
-    "requires_item": "glasses",
+    "suppressed_by_item": "glasses",
     "modifiers": {
       "special_per": -1
     }
