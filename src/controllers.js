@@ -118,6 +118,20 @@ export async function forceReset() {
 
 // --- GM GOD POWERS ---
 
+// GM tool: save a character's biography + GM-only notes. Both fields are
+// visible only to that character's own player (and the GM) — not the
+// rest of the party — per how they're used narratively.
+export async function gmSaveBiography(targetCharId) {
+  if (!targetCharId) return;
+  const biography = document.getElementById('bioTextarea').value;
+  const gmNotes = document.getElementById('gmNotesTextarea').value;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.biography`] = biography;
+  updatePayload[`characters.${targetCharId}.gm_notes`] = gmNotes;
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
 // 1. Give Item (Updated to allow duplicates)
 export async function gmGrantItem(targetCharId) {
   const select = document.getElementById('gmItemSelect');
@@ -478,7 +492,7 @@ export async function startCombat() {
     if (!char.is_finalized) return;
     const derived = calculateDerivedStats(
       char.special, char.level || 1, char.traits || [], char.perks || [],
-      char.race || 'human', char.status_effects || []
+      char.race || 'human', char.status_effects || [], char.equipment || {}
     );
     const { roll, total } = rollInitiative(derived.sequenceBonus);
     initiative_order.push({
@@ -575,7 +589,7 @@ export async function resolveAttack() {
     attackerValue = attackDef.hit_percent;
   } else {
     const char = window.liveData.characters[attacker.char_id];
-    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || []);
+    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {});
     if (!draft.attackKey || draft.attackKey === 'unarmed') {
       attackDef = { name: 'Unarmed', damage: derived.unarmedDamageFull, damageType: 'normal' };
       attackerValue = derived.skills.unarmed;
@@ -602,7 +616,7 @@ export async function resolveAttack() {
     targetName = target.name;
   } else {
     const targetChar = window.liveData.characters[target.char_id];
-    const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || []);
+    const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {});
     targetAC = targetDerived.armorClass;
     const armorItem = getItem((targetChar.equipment || {}).body);
     targetDtdr = (armorItem && armorItem.dtdr) || {}; // no armor authored yet -> defaults to no mitigation

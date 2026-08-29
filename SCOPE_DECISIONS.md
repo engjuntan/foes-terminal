@@ -100,6 +100,52 @@ at the bottom. Nothing here is implemented yet — this is scope-locking only.
   hit/miss/damage phrasing instead of the same template every time).
   Explicitly deferred by the user — revisit later, not blocking anything.
 
+## Firestore scaling — considerations for later (RESOLVED for now: no action needed)
+- **Current scale is fine.** Confirmed via real math: the whole campaign
+  lives in one Firestore document, so every action (attack, equip, grant
+  item, etc.) is exactly one write regardless of party size or content
+  volume — verified by checking every function in `controllers.js` (22
+  Firestore operations across 23 functions, none inside a loop). A large
+  20-character combat generates roughly 300-400 writes and ~7,000 reads
+  at most — comfortably under Spark's 20K write / 50K read daily caps.
+  Normal gear-experimentation by players is negligible (~250 reads for a
+  whole session of trying things on); it would take ~2,500 individual
+  equip clicks *per player in a single day* to meaningfully dent the cap.
+- **The general principle to design future features against**: browsing/
+  reading static content (items, bestiary, traits, and — once built —
+  Data Logs) costs nothing, since that content is bundled into the app,
+  not fetched from Firestore. Only *saved state changes* (equip, grant,
+  apply an effect, unlock a log) cost a write, and that write's read cost
+  multiplies by however many clients are currently connected and
+  watching. Party size and content volume aren't the risk; **concurrent
+  connections** are — this matters specifically if live spectator viewing
+  (e.g. for the planned YouTube content) ever becomes a real feature,
+  since every viewer becomes another listener paying for every write
+  anyone makes.
+- **Data Logs (not yet built) already fits this model correctly** as
+  scoped: log content syncs from Obsidian like items (free to browse,
+  however many hundreds there are); only the per-player "which logs
+  they've been granted" flag list lives in Firestore, written only when
+  the GM grants access — a deliberate, infrequent action, not something
+  that scales with players clicking through logs.
+- **Decided (superseding the note above): Mark as Read is wanted.**
+  Opening a granted log writes a per-player "read" flag for that log —
+  a deliberate, known write-per-view cost, not an accidental one. Given
+  the numbers already worked out above (a single player would need
+  thousands of actions in one day to matter), this is fine at current
+  scale. Design questions for when Phase 3 is actually built: does
+  opening a log auto-mark it read, or is there an explicit "mark read"
+  action; does the GM see who's read what; is there an unread-count
+  badge in the nav.
+- **The lever if this ever does become a real concern**: split the one
+  shared document into smaller pieces (e.g. one Firestore document per
+  character instead of one document for the whole campaign), so a
+  listener only pays in reads for what they're actually watching instead
+  of every connected client paying for every change anywhere in the
+  campaign. Real architectural work, not warranted at current scale —
+  noted here so it's not forgotten if the campaign (or spectator viewing)
+  grows enough to matter.
+
 ## Roster
 - Campaign has **4 PCs total**, not 2. Only **Kong** and **Iron Legs** exist
   in the app so far.

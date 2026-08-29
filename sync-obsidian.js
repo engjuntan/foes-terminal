@@ -79,7 +79,7 @@ function processFile(filePath) {
         const data = JSON.parse(match[1].trim());
         if (!data.id || !data.type) return;
 
-        if (['weapon', 'armor', 'consumable', 'currency'].includes(data.type)) {
+        if (['weapon', 'armor', 'consumable', 'currency', 'accessory'].includes(data.type)) {
           itemsMap[data.id] = data;
           console.log(`[ITEM] Loaded: ${data.name}`);
         } else if (['trait', 'perk'].includes(data.type)) {

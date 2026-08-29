@@ -6,6 +6,12 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
 
 // --- HELPERS ---
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 export function renderWikiLink(name, description) {
   if (!description) description = "No data available.";
   const safeDesc = description.replace(/"/g, "&quot;").replace(/'/g, "\\'");
@@ -170,6 +176,14 @@ export function getGoatReviewView(charId, liveData) {
 
         <h3 style="border-bottom:1px solid var(--pip-dim); margin-top:20px;">TAG SKILLS</h3>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px;">${tagsHtml}</div>
+
+        ${char.biography ? `
+        <h3 style="border-bottom:1px solid var(--pip-dim); margin-top:20px;">BIOGRAPHY</h3>
+        <div style="font-size:14px; color:#ccc; line-height:1.5; white-space:pre-wrap;">${escapeHtml(char.biography)}</div>` : ''}
+
+        ${char.gm_notes ? `
+        <h3 style="border-bottom:1px solid gold; color:gold; margin-top:20px;">NOTES FROM YOUR GM</h3>
+        <div style="font-size:14px; color:#ccc; line-height:1.5; white-space:pre-wrap;">${escapeHtml(char.gm_notes)}</div>` : ''}
       </div>
     </div>
   `;
@@ -393,14 +407,15 @@ export function getPlayerView(charId, liveData) {
   const equip = charData.equipment || { head: null, body: null, right_hand: null, left_hand: null };
   const activeStatusEffects = charData.status_effects || [];
 
-  // PASS RACE + STATUS EFFECTS TO FORMULAS
+  // PASS RACE + STATUS EFFECTS + EQUIPMENT TO FORMULAS
   const derived = calculateDerivedStats(
     charData.special,
     charData.level || 1,
     charData.traits || [],
     charData.perks || [],
     charData.race || 'human', // Default to human if missing
-    activeStatusEffects
+    activeStatusEffects,
+    equip
   );
 
   // --- 1. LEVEL UP & PERKS STATE ---
@@ -773,6 +788,14 @@ export function renderGMScreen(liveData) {
             </div>`;
           }).join('') || `<div style="color:#555; font-size:12px;">Nothing equipped.</div>`}
         </div>
+
+        <h4 style="color:cyan; border-bottom:1px dashed cyan; margin-top:20px;">BIOGRAPHY &amp; GM NOTES</h4>
+        <p style="font-size:11px; color:#666; margin:0 0 4px;">Visible only to this player (and you) — not the rest of the party.</p>
+        <label style="font-size:11px; color:#666;">BIOGRAPHY</label>
+        <textarea id="bioTextarea" rows="6" style="width:100%; background:black; color:cyan; border:1px solid #333; font-family:'IBM Plex Mono', monospace; font-size:12px; margin-bottom:8px;">${(targetChar && targetChar.biography) || ''}</textarea>
+        <label style="font-size:11px; color:#666;">GM NOTES</label>
+        <textarea id="gmNotesTextarea" rows="6" style="width:100%; background:black; color:cyan; border:1px solid #333; font-family:'IBM Plex Mono', monospace; font-size:12px; margin-bottom:8px;">${(targetChar && targetChar.gm_notes) || ''}</textarea>
+        <button class="gm-btn" style="width:100%; border-color:cyan; color:cyan;" onclick="window.gmSaveBiography()">SAVE</button>
 
         <h4 style="color:red; border-bottom:1px dashed red; margin-top:20px;">DANGER ZONE</h4>
         <button class="gm-btn" style="border-color:red; color:white; background:red; width:100%;" onclick="window.gmFactoryReset()">FACTORY RESET CHARACTER</button>
