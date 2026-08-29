@@ -44,6 +44,7 @@ window.resolveAttack = Controllers.resolveAttack;
 window.passTurn = Controllers.passTurn;
 window.endTurn = Controllers.endTurn;
 window.addCombatantMidFight = Controllers.addCombatantMidFight;
+window.gmAdjustCombatantHP = Controllers.gmAdjustCombatantHP;
 window.gmApplyStatusEffectInCombat = Controllers.gmApplyStatusEffectInCombat;
 // Direct (charId, instanceId) form — for removing an effect from a
 // context (like the Combat view) that isn't scoped to a "selected

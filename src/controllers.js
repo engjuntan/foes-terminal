@@ -623,6 +623,51 @@ export async function startCombat() {
   } catch (err) { alert("ERROR: " + err.message); }
 }
 
+// GM-only, works on any combatant (PC or monster), any time — not gated
+// to whose turn it is. Covers both "use an item on someone" (the item
+// name just becomes part of the logged reason; there's no automated
+// item-effect system yet, so this is honest about being a logging tool,
+// not real item-effect automation) and a free HP adjustment with a
+// reason, so the combat log reads like something happened, not just a number.
+export async function gmAdjustCombatantHP(combatantId, delta, reason) {
+  const combat = window.liveData.active_combat;
+  if (!combat || !combat.is_active) return;
+  const target = combat.initiative_order.find(c => c.combatant_id === combatantId);
+  if (!target) { alert("PICK A COMBATANT"); return; }
+  if (!delta || isNaN(delta)) { alert("ENTER AN HP AMOUNT (+ OR -)"); return; }
+
+  const newInitiativeOrder = combat.initiative_order.map(c => ({ ...c }));
+  const idx = newInitiativeOrder.findIndex(c => c.combatant_id === combatantId);
+  const charUpdates = {};
+  let newCurrent, max;
+
+  if (target.ref_type === 'monster') {
+    max = target.hp.max;
+    newCurrent = Math.max(0, Math.min(max, target.hp.current + delta));
+    newInitiativeOrder[idx] = { ...target, hp: { ...target.hp, current: newCurrent }, is_down: newCurrent <= 0 };
+  } else {
+    const char = window.liveData.characters[target.char_id];
+    max = char.hp.max;
+    newCurrent = Math.max(0, Math.min(max, char.hp.current + delta));
+    charUpdates[`characters.${target.char_id}.hp.current`] = newCurrent;
+    newInitiativeOrder[idx] = { ...target, is_down: newCurrent <= 0 };
+  }
+
+  const sign = delta > 0 ? '+' : '';
+  const message = reason
+    ? `${target.name}: ${reason} (${sign}${delta} HP, now ${newCurrent}/${max})`
+    : `${target.name}: ${sign}${delta} HP (now ${newCurrent}/${max})`;
+
+  const updatedCombat = {
+    ...combat,
+    initiative_order: newInitiativeOrder,
+    log: [...combat.log, { id: `log_${Date.now()}`, type: 'action', message, timestamp: Date.now() }]
+  };
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, { active_combat: updatedCombat, ...charUpdates }); } catch (err) { alert("ERROR: " + err.message); }
+}
+
 // --- COMBAT: TURN ACTIONS ---
 function getCombatActionDraft() {
   if (!window.combatActionDraft) window.combatActionDraft = { targetId: null, attackKey: null, roll: '' };

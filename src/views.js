@@ -398,6 +398,26 @@ export function getCombatView(liveData, userRole, currentUser) {
       </div>
     </div>` : '';
 
+  const hpTargetOptions = isLive ? combat.initiative_order
+    .map(c => `<option value="${c.combatant_id}">${c.name}${c.is_down ? ' (DOWN)' : ''}</option>`).join('') : '';
+  const itemPickOptions = `<option value="">— none, just typing a reason —</option>${Object.values(itemDatabase)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(item => `<option value="${item.name}">${item.name}</option>`).join('')}`;
+  const adjustHpHtml = isLive && userRole === 'gm' ? `
+    <div class="panel" style="margin-bottom:15px;">
+      <h4 style="color:lime; margin-top:0;">ADJUST HP / USE ITEM</h4>
+      <label style="font-size:11px; color:#666;">ON</label>
+      <select id="hpAdjustTarget" style="width:100%; background:black; color:lime; border:1px solid #333; margin-bottom:6px;">${hpTargetOptions}</select>
+      <label style="font-size:11px; color:#666;">ITEM USED (optional, fills reason)</label>
+      <select id="hpAdjustItem" style="width:100%; background:black; color:lime; border:1px solid #333; margin-bottom:6px;"
+        onchange="if (this.value) document.getElementById('hpAdjustReason').value = 'Used ' + this.value;">${itemPickOptions}</select>
+      <label style="font-size:11px; color:#666;">REASON (for the combat log)</label>
+      <input type="text" id="hpAdjustReason" placeholder="e.g. Used Stimpak" style="width:100%; background:black; color:lime; border:1px solid #333; margin-bottom:6px;">
+      <label style="font-size:11px; color:#666;">HP CHANGE (+ or -)</label>
+      <input type="number" id="hpAdjustDelta" placeholder="-5 or 10" style="width:100%; background:black; color:lime; border:1px solid #333; margin-bottom:8px;">
+      <button class="gm-btn" style="width:100%; border-color:lime; color:lime;" onclick="window.gmAdjustCombatantHP(document.getElementById('hpAdjustTarget').value, Number(document.getElementById('hpAdjustDelta').value), document.getElementById('hpAdjustReason').value)">APPLY</button>
+    </div>` : '';
+
   const pcTargetOptions = combat.initiative_order
     .filter(c => c.ref_type === 'pc')
     .map(c => `<option value="${c.char_id}">${c.name}</option>`).join('');
@@ -434,8 +454,9 @@ export function getCombatView(liveData, userRole, currentUser) {
       <div>
         ${actionPanelHtml}
         ${afflictPcHtml}
+        ${adjustHpHtml}
         ${addCombatantHtml}
-        ${!actionPanelHtml && !afflictPcHtml && !addCombatantHtml ? `<div class="panel" style="color:#555; font-size:13px;">${isLive ? "Waiting on this combatant's turn." : 'Combat has ended.'}</div>` : ''}
+        ${!actionPanelHtml && !afflictPcHtml && !adjustHpHtml && !addCombatantHtml ? `<div class="panel" style="color:#555; font-size:13px;">${isLive ? "Waiting on this combatant's turn." : 'Combat has ended.'}</div>` : ''}
       </div>
       <div class="panel">
         <h2>COMBAT LOG</h2>
