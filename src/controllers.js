@@ -200,7 +200,7 @@ function buildStatusEffectInstance(selectElId, customNameElId, customModsElId) {
   const select = document.getElementById(selectElId);
   const chosenId = select.value;
 
-  let name, modifiers, sourceId;
+  let name, modifiers, sourceId, ticking;
 
   if (chosenId === '__custom__') {
     name = document.getElementById(customNameElId).value.trim();
@@ -215,6 +215,7 @@ function buildStatusEffectInstance(selectElId, customNameElId, customModsElId) {
       }
     });
     sourceId = null;
+    ticking = true; // no UI to toggle this for a typed-on-the-spot effect
   } else {
     if (!chosenId) return null;
     const def = statusEffectDatabase[chosenId];
@@ -222,6 +223,7 @@ function buildStatusEffectInstance(selectElId, customNameElId, customModsElId) {
     name = def.name;
     modifiers = def.modifiers || {};
     sourceId = chosenId;
+    ticking = def.ticking !== false; // authored in Obsidian; defaults true
   }
 
   return {
@@ -229,6 +231,7 @@ function buildStatusEffectInstance(selectElId, customNameElId, customModsElId) {
     source_id: sourceId,
     name,
     modifiers,
+    ticking,
     applied_at: Date.now()
   };
 }
@@ -677,36 +680,40 @@ export async function endTurn() {
     if (candidate.ref_type === 'pc') {
       const char = window.liveData.characters[candidate.char_id];
       const effects = (char && char.status_effects) || [];
+      // "ticking" defaults to true if unset, so nothing authored before
+      // this field existed silently stops working — false is opt-out.
+      const tickingEffects = effects.filter(fx => fx.ticking !== false && fx.modifiers);
 
-      const skipEffects = effects.filter(fx => fx.modifiers && fx.modifiers.skip_turn);
-      if (skipEffects.length > 0) {
-        skipEffects.forEach(fx => {
+      const hpKey = `characters.${candidate.char_id}.hp.current`;
+      let runningHp = charUpdates[hpKey] !== undefined ? charUpdates[hpKey] : char.hp.current;
+
+      // Every ticking effect resolves independently — e.g. Stunned skipping
+      // the turn does NOT stop Poison from still dealing its damage.
+      tickingEffects.forEach(fx => {
+        if (fx.modifiers.skip_turn) {
           const msg = `${candidate.name} is afflicted by ${fx.name} and skips their turn!`;
           log.push({ id: `log_${Date.now()}_sk${safety}_${fx.id}`, type: 'status', message: msg, timestamp: Date.now() });
           turnEvents.push(msg);
-        });
-        skip = true;
-      } else {
-        const dotEffects = effects.filter(fx => fx.modifiers && fx.modifiers.damage_per_turn);
-        if (dotEffects.length > 0) {
-          const hpKey = `characters.${candidate.char_id}.hp.current`;
-          let runningHp = charUpdates[hpKey] !== undefined ? charUpdates[hpKey] : char.hp.current;
-          dotEffects.forEach(fx => {
-            const dmg = rollDamage(fx.modifiers.damage_per_turn);
-            runningHp = Math.max(0, runningHp - dmg);
-            const msg = `${candidate.name} takes ${dmg} damage from ${fx.name}!`;
-            log.push({ id: `log_${Date.now()}_dot${safety}_${fx.id}`, type: 'status', message: msg, timestamp: Date.now() });
-            turnEvents.push(msg);
-          });
-          charUpdates[hpKey] = runningHp;
-          if (runningHp <= 0) {
-            newInitiativeOrder[nextIndex] = { ...candidate, is_down: true };
-            const msg = `${candidate.name} goes down!`;
-            log.push({ id: `log_${Date.now()}_down${safety}`, type: 'status', message: msg, timestamp: Date.now() });
-            turnEvents.push(msg);
-            skip = true;
-          }
+          skip = true;
         }
+        if (fx.modifiers.damage_per_turn) {
+          const dmg = rollDamage(fx.modifiers.damage_per_turn);
+          runningHp = Math.max(0, runningHp - dmg);
+          const msg = `${candidate.name} takes ${dmg} damage from ${fx.name}!`;
+          log.push({ id: `log_${Date.now()}_dot${safety}_${fx.id}`, type: 'status', message: msg, timestamp: Date.now() });
+          turnEvents.push(msg);
+        }
+      });
+
+      if (runningHp !== char.hp.current || charUpdates[hpKey] !== undefined) {
+        charUpdates[hpKey] = runningHp;
+      }
+      if (runningHp <= 0) {
+        newInitiativeOrder[nextIndex] = { ...candidate, is_down: true };
+        const msg = `${candidate.name} goes down!`;
+        log.push({ id: `log_${Date.now()}_down${safety}`, type: 'status', message: msg, timestamp: Date.now() });
+        turnEvents.push(msg);
+        skip = true;
       }
     }
 

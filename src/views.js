@@ -222,7 +222,10 @@ export function getCombatView(liveData, userRole, currentUser) {
     const char = liveData.characters[c.char_id];
     const effects = (char && char.status_effects) || [];
     if (effects.length === 0) return '';
-    return `<div style="margin-top:3px;">${effects.map(fx => `<span style="color:#ff5555; font-size:11px; border:1px solid #5a2020; padding:1px 5px; margin-right:4px; display:inline-block;">${fx.name.toUpperCase()}</span>`).join('')}</div>`;
+    return `<div style="margin-top:3px;">${effects.map(fx => `
+      <span style="color:#ff5555; font-size:11px; border:1px solid #5a2020; padding:1px 5px; margin-right:4px; display:inline-block;">
+        ${fx.name.toUpperCase()}${userRole === 'gm' ? `<span onclick="event.stopPropagation(); window.gmRemoveStatusEffectDirect('${c.char_id}', '${fx.id}')" style="cursor:pointer; margin-left:5px; font-weight:bold;" title="Resolve / remove">✕</span>` : ''}
+      </span>`).join('')}</div>`;
   };
 
   const initiativeHtml = combat.initiative_order.map((c, idx) => {

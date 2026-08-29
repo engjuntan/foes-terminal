@@ -37,6 +37,10 @@ window.passTurn = Controllers.passTurn;
 window.endTurn = Controllers.endTurn;
 window.addCombatantMidFight = Controllers.addCombatantMidFight;
 window.gmApplyStatusEffectInCombat = Controllers.gmApplyStatusEffectInCombat;
+// Direct (charId, instanceId) form — for removing an effect from a
+// context (like the Combat view) that isn't scoped to a "selected
+// character" the way the GM modal is.
+window.gmRemoveStatusEffectDirect = Controllers.gmRemoveStatusEffect;
 // Character Creation Actions
 window.adjustCreationStat = Controllers.adjustCreationStat;
 window.setCreationRace = Controllers.setCreationRace;
