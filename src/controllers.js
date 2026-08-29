@@ -395,12 +395,20 @@ export async function finalizeCharacter() {
   const tagMap = {};
   draft.tags.forEach(t => tagMap[t] = true);
   
+  // Grant the character's first level's worth of skill points immediately,
+  // rather than leaving them at 0 until their first level-up — without
+  // this, a level-1 character's skills sit at the bare formula value with
+  // nothing trained on top, which the math shows is unplayably weak even
+  // against the single weakest bestiary creature.
+  const derived = calculateDerivedStats(draft.special, 1, [], [], draft.race, []);
+
   const updatePayload = {};
   updatePayload[`characters.${charId}.special`] = draft.special;
   updatePayload[`characters.${charId}.tags`] = tagMap;
-  updatePayload[`characters.${charId}.race`] = draft.race; 
+  updatePayload[`characters.${charId}.race`] = draft.race;
   updatePayload[`characters.${charId}.is_finalized`] = true; // LOCK IT
-  
+  updatePayload[`characters.${charId}.skill_points`] = derived.skillPointsPerLevel;
+
   try {
     await updateDoc(charRef, updatePayload);
     window.creationDraft = null; // Clear local draft
