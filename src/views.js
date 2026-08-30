@@ -1,5 +1,5 @@
 // src/views.js
-import { calculateDerivedStats, RACE_RULES } from './formulas.js';
+import { calculateDerivedStats, RACE_RULES, getRadiationTier, RAD_THRESHOLDS } from './formulas.js';
 import { getItem, itemDatabase } from './items.js';
 import { normalizeInventory, getInventoryQuantity } from './inventory.js';
 import { SPECIAL_INFO, SKILL_INFO } from './goatContent.js';
@@ -7,7 +7,7 @@ import { DIFFICULTY_TIERS } from './checks.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
-import { BODY_PARTS, BURST_HIT_PENALTY } from './combat.js';
+import { BODY_PARTS, BURST_HIT_PENALTY, STANCES } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { mapDatabase } from './maps.js';
 
@@ -295,6 +295,21 @@ export function getCombatView(liveData, userRole, currentUser) {
       </span>`).join('')}</div>`;
   };
 
+  // Stance is prominent right next to the name — free-form change, any
+  // time, not gated to turn order (the GM governs that verbally). A
+  // player can only change their own PC's; the GM can change anyone's,
+  // PC or monster.
+  const stanceHtml = (c) => {
+    const current = (c.ref_type === 'pc' ? (liveData.characters[c.char_id] || {}).stance : c.stance) || 'standing';
+    const canEdit = userRole === 'gm' || (c.ref_type === 'pc' && c.char_id === currentUser);
+    const colors = { standing: '#666', crouching: 'cyan', prone: 'orange', knocked_down: 'red' };
+    if (!canEdit) {
+      return `<span style="font-size:11px; color:${colors[current]}; border:1px solid ${colors[current]}; padding:0 5px;">${STANCES[current].label.toUpperCase()}</span>`;
+    }
+    const options = Object.entries(STANCES).map(([key, s]) => `<option value="${key}" ${current === key ? 'selected' : ''}>${s.label}</option>`).join('');
+    return `<select onclick="event.stopPropagation();" onchange="event.stopPropagation(); window.setStance('${c.combatant_id}', this.value)" style="font-size:11px; background:black; color:${colors[current]}; border:1px solid ${colors[current]}; padding:0 2px;">${options}</select>`;
+  };
+
   const initiativeHtml = combat.initiative_order.map((c, idx) => {
     const isCurrent = isLive && idx === combat.turn_index;
     const hp = resolveHp(c);
@@ -303,6 +318,7 @@ export function getCombatView(liveData, userRole, currentUser) {
       <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; margin-bottom:4px; border:1px solid ${isCurrent ? 'var(--pip-green)' : '#333'}; background:${isCurrent ? 'rgba(51,255,51,0.1)' : 'transparent'};">
         <div>
           <strong style="color:${c.ref_type === 'pc' ? 'cyan' : 'red'};">${isCurrent ? '▶ ' : ''}${c.name}</strong>
+          ${stanceHtml(c)}
           <div style="font-size:11px; color:#666;">INIT ${c.initiative}</div>
           ${afflictionTags(c)}
         </div>
@@ -431,7 +447,7 @@ export function getCombatView(liveData, userRole, currentUser) {
           if (attackDef) attackerValue = attackDef.hit_percent;
         } else {
           const char = liveData.characters[currentActor.char_id];
-          const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {});
+          const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0);
           if (!draft.attackKey || draft.attackKey === 'unarmed') {
             attackerValue = derived.skills.unarmed;
           } else {
@@ -448,7 +464,7 @@ export function getCombatView(liveData, userRole, currentUser) {
           targetAC = target.ac;
         } else {
           const targetChar = liveData.characters[target.char_id];
-          const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {});
+          const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0);
           targetAC = targetDerived.armorClass;
         }
         if (attackerValue !== null && targetAC !== null) {
@@ -910,7 +926,8 @@ export function getPlayerView(charId, liveData) {
     charData.perks || [],
     charData.race || 'human', // Default to human if missing
     activeStatusEffects,
-    equip
+    equip,
+    charData.rads || 0
   );
 
   // --- 1. LEVEL UP & PERKS STATE ---
@@ -1001,6 +1018,7 @@ export function getPlayerView(charId, liveData) {
             if (itemDef.slot === "hand") buttons = `<button onclick="window.equipItem('${itemId}', 'right_hand')">R</button> <button onclick="window.equipItem('${itemId}', 'left_hand')">L</button>`;
             else if (itemDef.slot === "body") buttons = `<button onclick="window.equipItem('${itemId}', 'body')">EQUIP</button>`;
             else if (itemDef.slot === "head") buttons = `<button onclick="window.equipItem('${itemId}', 'head')">EQUIP</button>`;
+            else if (itemDef.type === "consumable") buttons = `<button onclick="window.useItem('${charId}', '${itemId}')">USE</button>`;
           } else { buttons = `<span style="color:var(--pip-green); font-size:10px;">[EQUIPPED]</span>`; }
 
           return `<li class="inv-card" style="${style}"><img src="${itemDef.icon}" class="inv-icon"><div class="inv-info"><span class="inv-name" style="cursor:help; border-bottom:1px dotted var(--pip-green);" onmouseover="window.showTooltip('${safeDesc}', event)" onmouseout="window.hideTooltip()">${itemDef.name}</span>${qtyTag}<span class="inv-meta">${itemDef.type.toUpperCase()}</span></div><div class="inv-actions">${buttons}</div></li>`;
@@ -1053,12 +1071,19 @@ export function getPlayerView(charId, liveData) {
         : `<div style="color:#555; font-size:12px; margin-top:5px;">No perks authored yet — ask your GM to add some in Obsidian.</div>`)
     : '';
 
-  // Radiation Bar (New!)
+  // Radiation — two-phase per the manual's threshold table. This view is
+  // always the player's OWN dashboard (never rendered for the GM looking
+  // at someone else), so it deliberately never shows the exact number —
+  // only the vague in-character symptom text for their current tier.
+  // The GM sees the real count elsewhere (the Squad Monitor character
+  // modal), and sets it directly at will rather than it accruing on its own.
   const rads = charData.rads || 0;
-  const radPercent = Math.min(100, (rads / 1000) * 100); // Assume 1000 is death
+  const radTierIndex = RAD_THRESHOLDS.findIndex(t => t.rads === getRadiationTier(rads).rads);
+  const radPercent = (radTierIndex / (RAD_THRESHOLDS.length - 1)) * 100; // tier-based, not exact rads — stays vague
   let radColor = "yellow";
   if (rads > 400) radColor = "orange";
   if (rads > 800) radColor = "red";
+  if (rads === 0) radColor = "var(--pip-green)";
 
   return `
     <div class="dashboard-container">
@@ -1086,7 +1111,7 @@ export function getPlayerView(charId, liveData) {
         <div style="margin-bottom:15px;">
            <label>RADIATION</label>
            <div style="background:#333; height:10px; border:1px solid ${radColor}; margin-top:2px;"><div style="width:${radPercent}%; background:${radColor}; height:100%;"></div></div>
-           <div style="text-align:right; font-size:12px; color:${radColor};">${rads} RADS</div>
+           <div style="font-size:12px; color:${radColor}; margin-top:4px; font-style:italic;">${getRadiationTier(rads).description}</div>
         </div>
 
         <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px dashed var(--pip-dim); padding-bottom:5px;">
@@ -1249,6 +1274,16 @@ export function renderGMScreen(liveData) {
          <button class="gm-btn" onclick="window.gmAdjustHP(-1)">-1 HP</button>
          <button class="gm-btn" onclick="window.gmAdjustHP(1)">+1 HP</button>
           <button class="gm-btn" onclick="window.gmAdjustHP(999)">FULL HEAL</button>
+        </div>
+
+        <h4 style="color:yellow; border-bottom:1px dashed yellow;">RADIATION</h4>
+        <div style="font-size:12px; color:#aaa; margin-bottom:6px;">
+          Exact count (only you see this): <span style="color:yellow; font-weight:bold;">${(targetChar && targetChar.rads) || 0} rads</span>
+          — <span style="font-style:italic;">${getRadiationTier((targetChar && targetChar.rads) || 0).description}</span>
+        </div>
+        <div style="display:flex; gap:6px; margin-bottom:10px;">
+          <input type="number" id="gmRadInput" min="0" max="1000" placeholder="SET RADS" style="flex-grow:1; background:black; color:yellow; border:1px solid yellow;">
+          <button class="gm-btn" style="border-color:yellow; color:yellow;" onclick="window.gmSetRadiation(Number(document.getElementById('gmRadInput').value))">SET</button>
         </div>
 
         <h4 style="color:cyan; border-bottom:1px dashed cyan;">REWARDS</h4>

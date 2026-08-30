@@ -5,7 +5,7 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
 import { RACE_RULES, calculateDerivedStats } from './formulas.js';
 import { getMonster } from './bestiary.js';
-import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry } from './combat.js';
+import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { mapDatabase } from './maps.js';
 import { normalizeInventory, getInventoryQuantity, addToInventory, removeFromInventory } from './inventory.js';
@@ -356,8 +356,55 @@ export async function gmAdjustHP(targetCharId, amount) {
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
   updatePayload[`characters.${targetCharId}.hp.current`] = newCurrent;
-  
+
   await updateDoc(charRef, updatePayload);
+}
+
+// GM sets a PC's radiation directly, at will — not an automatic
+// accrual system, purely GM discretion on how much exposure they judge
+// a character to have taken. Clamped to the manual's 0-1000 scale
+// (1000 = death).
+export async function gmSetRadiation(targetCharId, amount) {
+  const char = window.liveData.characters[targetCharId];
+  if (!char) return;
+  const clamped = Math.max(0, Math.min(1000, Math.round(amount)));
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.rads`] = clamped;
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Consumes one copy of an item from inventory and applies whatever
+// mechanical effect it's authored with — right now just rad_removed/
+// rad_added (RadAway and anything like it), the concrete case the user
+// asked for. Callable by the character themselves or the GM on their
+// behalf, same permission shape as everything else here.
+export async function useItem(targetCharId, itemId) {
+  const char = window.liveData.characters[targetCharId];
+  if (!char) return;
+  const owned = getInventoryQuantity(char.inventory, itemId);
+  if (owned < 1) { alert(`${(char.name || 'THIS CHARACTER').toUpperCase()} DOESN'T HAVE THAT ITEM`); return; }
+  const item = getItem(itemId);
+  if (!item) return;
+
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.inventory`] = removeFromInventory(char.inventory, itemId, 1);
+
+  const radRemoved = (item.stats && Number(item.stats.rad_removed)) || 0;
+  const radAdded = (item.stats && Number(item.stats.rad_added)) || 0;
+  let usedMsg = `Used ${item.name}.`;
+  if (radRemoved || radAdded) {
+    const currentRads = char.rads || 0;
+    const newRads = Math.max(0, Math.min(1000, currentRads - radRemoved + radAdded));
+    updatePayload[`characters.${targetCharId}.rads`] = newRads;
+    usedMsg = `Used ${item.name} — radiation ${newRads > currentRads ? 'increased' : 'decreased'} to ${newRads} rads.`;
+  }
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, updatePayload);
+    alert(usedMsg);
+  } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // 3. Vault Points
@@ -673,7 +720,7 @@ export async function startCombat() {
     if (!char.is_finalized) return;
     const derived = calculateDerivedStats(
       char.special, char.level || 1, char.traits || [], char.perks || [],
-      char.race || 'human', char.status_effects || [], char.equipment || {}
+      char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0
     );
     const { roll, total } = rollInitiative(derived.sequenceBonus);
     initiative_order.push({
@@ -822,6 +869,12 @@ export async function resolveAttack() {
   const bodyPartKey = draft.bodyPart || 'torso';
   const bodyPart = BODY_PARTS[bodyPartKey] || BODY_PARTS.torso;
 
+  // --- Stance (free-form — the user governs the action economy at the
+  // table, so no small-action cost is enforced here) ---
+  const attackerStance = STANCES[
+    attacker.ref_type === 'pc' ? ((window.liveData.characters[attacker.char_id] || {}).stance || 'standing') : (attacker.stance || 'standing')
+  ] || STANCES.standing;
+
   // --- Attacker's skill/hit% + attack definition ---
   // Ammo/burst state (only meaningful for a PC firing an equipped gun with
   // a clip_size — melee, unarmed, and monster attacks never touch this).
@@ -834,7 +887,12 @@ export async function resolveAttack() {
     attackerValue = attackDef.hit_percent;
   } else {
     const char = window.liveData.characters[attacker.char_id];
-    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {});
+    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0);
+    const wantsMelee = !draft.attackKey || draft.attackKey === 'unarmed' || (() => {
+      const wi = getItem(draft.attackKey);
+      return !wi || !wi.stats || (wi.stats.range || 0) <= 1;
+    })();
+    if (attackerStance.blocksMelee && wantsMelee) { alert("CAN'T MAKE MELEE ATTACKS WHILE PRONE"); return; }
     if (!draft.attackKey || draft.attackKey === 'unarmed') {
       attackDef = { name: 'Unarmed', damage: derived.unarmedDamageFull, damageType: 'normal' };
       attackerValue = derived.skills.unarmed;
@@ -879,8 +937,15 @@ export async function resolveAttack() {
     targetName = target.name;
   } else {
     const targetChar = window.liveData.characters[target.char_id];
-    const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {});
+    const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0);
     targetAC = targetDerived.armorClass;
+    // Crouching/prone/knocked-down caps how much of AC comes from AGI —
+    // only meaningful for a PC, since AC's AGI component is what's being
+    // capped and a monster's flat `ac` isn't decomposed that way.
+    const targetStanceDef = STANCES[targetChar.stance || 'standing'] || STANCES.standing;
+    if (targetStanceDef.agiCap !== null && targetStanceDef.agiCap !== undefined) {
+      targetAC = targetAC - targetDerived.special.agi + Math.min(targetDerived.special.agi, targetStanceDef.agiCap);
+    }
     const armorItem = getItem((targetChar.equipment || {}).body);
     targetDtdr = (armorItem && armorItem.dtdr) || {}; // no armor authored yet -> defaults to no mitigation
     targetName = targetChar.name;
@@ -907,7 +972,7 @@ export async function resolveAttack() {
     .filter(fx => fx.modifiers && fx.modifiers.hit_chance_pct)
     .reduce((sum, fx) => sum + fx.modifiers.hit_chance_pct, 0);
 
-  const { effectiveChance, isHit: normalHit } = resolveHit(attackerValue - bodyPart.penalty - burstPenalty + hitChancePenalty, targetAC, roll);
+  const { effectiveChance, isHit: normalHit } = resolveHit(attackerValue - bodyPart.penalty - burstPenalty + hitChancePenalty + attackerStance.hitBonus, targetAC, roll);
   const critResult = resolveCrit(roll, critChance, luckStat, attackerIsPc); // 'success' | 'fail' | null
   // A crit success always hits, even overriding a miss; a crit failure
   // always fumbles, even overriding what would've been a hit — a fumble
@@ -948,11 +1013,16 @@ export async function resolveAttack() {
       const idx = newInitiativeOrder.findIndex(c => c.combatant_id === combatantRef.combatant_id);
       const current = newInitiativeOrder[idx].status_effects || [];
       newInitiativeOrder[idx] = { ...newInitiativeOrder[idx], status_effects: [...current, instance] };
+      // Knocked Down is also a real stance (0 AC), not just a skipped
+      // turn — endTurn() reverts it back to standing when this same
+      // status effect expires.
+      if (effectId === 'knocked_down') newInitiativeOrder[idx] = { ...newInitiativeOrder[idx], stance: 'knocked_down' };
     } else {
       const path = `characters.${combatantRef.char_id}.status_effects`;
       const char = window.liveData.characters[combatantRef.char_id];
       const current = charUpdates[path] || char.status_effects || [];
       charUpdates[path] = [...current, instance];
+      if (effectId === 'knocked_down') charUpdates[`characters.${combatantRef.char_id}.stance`] = 'knocked_down';
     }
     return name;
   };
@@ -1214,6 +1284,7 @@ export async function endTurn() {
       : candidate.hp.current;
 
     let skip = false;
+    let standUp = false; // Knocked Down expiring also reverts the stance, not just the status effect
     // Duration countdown happens alongside the same tick — an effect
     // with duration_turns hits 0 and cures itself right after firing one
     // last time, no separate pass needed. Effects with no duration_turns
@@ -1239,6 +1310,7 @@ export async function endTurn() {
         else {
           const msg = `${candidate.name} is no longer afflicted by ${fx.name}.`;
           log.push({ id: `log_${Date.now()}_exp${safety}_${fx.id}`, type: 'status', message: msg, timestamp: Date.now() });
+          if (fx.source_id === 'knocked_down') standUp = true;
         }
       } else {
         remainingEffects.push(fx); // no duration — persists until manually removed
@@ -1256,6 +1328,7 @@ export async function endTurn() {
         charUpdates[hpKey] = runningHp;
       }
       if (effectsChanged) charUpdates[`characters.${candidate.char_id}.status_effects`] = nextEffects;
+      if (standUp) charUpdates[`characters.${candidate.char_id}.stance`] = 'standing';
       if (runningHp <= 0) {
         newInitiativeOrder[nextIndex] = { ...candidate, is_down: true };
         const msg = `${candidate.name} goes down!`;
@@ -1269,6 +1342,7 @@ export async function endTurn() {
         ...candidate,
         hp: { ...candidate.hp, current: runningHp },
         status_effects: nextEffects,
+        stance: standUp ? 'standing' : candidate.stance,
         is_down: downed || candidate.is_down
       };
       if (downed) {
@@ -1296,6 +1370,28 @@ export async function endTurn() {
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   window.combatActionDraft = null;
   try { await updateDoc(charRef, { active_combat: updatedCombat, ...charUpdates }); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Changes a combatant's stance — free-form, any time, not gated to whose
+// turn it is or tied to the small-action cost the manual describes (the
+// user governs that at the table themselves). A player can only change
+// their own PC's stance; the GM can change anyone's, PC or monster.
+export async function setStance(combatantId, stance) {
+  const combat = window.liveData.active_combat;
+  if (!combat || !combat.is_active) return;
+  const combatant = combat.initiative_order.find(c => c.combatant_id === combatantId);
+  if (!combatant) return;
+  if (window.userRole !== 'gm' && !(combatant.ref_type === 'pc' && combatant.char_id === window.currentUser)) return;
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  if (combatant.ref_type === 'pc') {
+    updatePayload[`characters.${combatant.char_id}.stance`] = stance;
+  } else {
+    const newInitiativeOrder = combat.initiative_order.map(c => c.combatant_id === combatantId ? { ...c, stance } : c);
+    updatePayload['active_combat.initiative_order'] = newInitiativeOrder;
+  }
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // GM-only: add a fresh monster to an in-progress fight. Appended to the
@@ -1436,7 +1532,7 @@ export async function resolvePlayerCheck() {
   if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
 
   const char = window.liveData.characters[window.currentUser];
-  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {});
+  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0);
   const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
   const result = draft.kind === 'special' ? resolveSpecialCheck(value, draft.tier, roll, draft.useD20) : resolveSkillCheck(value, draft.tier, roll);
 
@@ -1526,7 +1622,7 @@ export async function resolveGmCheck() {
     // PC — that'd be a lot of typing for the GM).
     Object.entries(window.liveData.characters || {}).forEach(([charId, char]) => {
       if (!char.is_finalized) return;
-      const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {});
+      const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0);
       const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
       const roll = draft.kind === 'special' ? (draft.useD20 ? rollD20() : rollD10()) : rollPercentile();
       const result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
@@ -1552,7 +1648,7 @@ export async function resolveGmCheck() {
     const roll = Number(draft.roll);
     const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
     if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
-    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {});
+    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0);
     const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
     const result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
     results.push({ char_id: draft.targetCharId, name: char.name, roll, threshold: result.threshold, success: result.success, critType: result.critType || null });

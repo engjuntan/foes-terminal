@@ -6,7 +6,7 @@ import { getTrait } from './traits.js';
 // Unlike traits/perks (looked up by id from a database), status effect
 // instances already carry their own resolved modifiers, ad-hoc or from
 // the status-effect library, so they need no lookup step here.
-export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [], activePerks = [], race = 'human', activeStatusEffects = [], equipment = {}) {
+export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [], activePerks = [], race = 'human', activeStatusEffects = [], equipment = {}, rads = 0) {
 
   // --- 0. RACE DATA ---
   const raceDef = RACE_RULES[race] || RACE_RULES['human'];
@@ -16,13 +16,23 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
 
   // --- 1. PRE-CALCULATION (Traits/Perks/Status Effects modifying SPECIAL) ---
   const allModifiers = [...(activeTraits || []), ...(activePerks || [])];
+  // Radiation sickness is a pure function of the current rads count, not
+  // a discrete applied/removed effect — recomputed fresh every time so
+  // using RadAway (or anything else that changes rads) immediately
+  // changes the debuff too, with nothing left over to manually cure.
+  const radTier = getRadiationTier(rads);
+  const radModifiers = { ...radTier.modifiers };
+  if (radModifiers.max_hp_flat && radTier.maxHpExemptRaces && radTier.maxHpExemptRaces.includes(race)) {
+    delete radModifiers.max_hp_flat; // manual: "No effect on Mutants" at the 400-rad tier
+  }
   // One combined list of resolved modifier objects, regardless of source.
   // A source with "suppressed_by_item" is a downside negated by wearing
   // something (e.g. Short-Sighted's -1 PER goes away while Glasses are
   // equipped) — filtered out here so neither pass below has to know about it.
   const modifierSources = [
     ...allModifiers.map(id => getTrait(id)),
-    ...(activeStatusEffects || [])
+    ...(activeStatusEffects || []),
+    { modifiers: radModifiers }
   ].filter(source => !source || !source.suppressed_by_item || !isItemEquipped(source.suppressed_by_item));
   let special = { ...baseSpecial };
 
@@ -85,7 +95,8 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   // Total Max HP — manual formula (p.31): 15 + (STR + 2*END) at creation,
   // then +hpPerLevel for each level gained after level 1.
   const baseHp = 15 + str + (2 * end);
-  const maxHpCalculated = baseHp + ((level - 1) * hpPerLevel);
+  let maxHpCalculated = baseHp + ((level - 1) * hpPerLevel);
+  if (radModifiers.max_hp_flat) maxHpCalculated = Math.max(1, maxHpCalculated + radModifiers.max_hp_flat);
 
   // Resistances
   let poisonRes = (end * 5) + (raceDef.stats?.poison_res || 0);
@@ -165,6 +176,29 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
     skills,
     raceDef // Export rules so View can check flags (like 'can_wear_small_armor')
   };
+}
+
+// --- RADIATION (manual's threshold table) ---
+// Each tier's `description` is deliberately the vague, in-character
+// symptom text — this is what a player sees by default (no number),
+// matching "only a Geiger Counter tells you the real count." The GM
+// (and eventually a player with the right item/permission) sees the
+// exact rads number instead. `modifiers` folds into the same
+// trait/perk/status-effect pass calculateDerivedStats already runs.
+export const RAD_THRESHOLDS = [
+  { rads: 0, description: "No detectable radiation sickness.", modifiers: {} },
+  { rads: 100, description: "You feel tired for some reason.", modifiers: { special_end: -1 } },
+  { rads: 200, description: "You feel weak. Your bones ache and your skin itches — sunburn-like rashes are starting to show.", modifiers: { special_end: -2 } },
+  { rads: 400, description: "You feel a lot weaker. Your joints hurt and feel sluggish, your skin itches, and small open sores are developing. Your hair is starting to fall out.", modifiers: { special_str: -1, special_end: -2, special_agi: -1, max_hp_flat: -10 }, maxHpExemptRaces: ['gergasi', 'half_mutant'] },
+  { rads: 600, description: "You're vomiting and have diarrhea. Everything hurts, and your hair is falling out in clumps. At night, you start to glow.", modifiers: { special_str: -2, special_end: -2, special_cha: -1, special_agi: -2, max_hp_flat: -20 } },
+  { rads: 800, description: "You're vomiting blood and bloody diarrhea. Your hair is completely gone, and your skin is starting to hang as the cellular damage sets in. Untreated, you have 72 hours.", modifiers: { special_str: -5, special_end: -5, special_cha: -3, special_agi: -4, max_hp_flat: -30 } },
+  { rads: 1000, description: "Fatal radiation exposure.", modifiers: {} }
+];
+
+export function getRadiationTier(rads) {
+  let tier = RAD_THRESHOLDS[0];
+  for (const t of RAD_THRESHOLDS) { if ((rads || 0) >= t.rads) tier = t; }
+  return tier;
 }
 
 // --- RACE DEFINITIONS ---

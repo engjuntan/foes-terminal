@@ -410,12 +410,12 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "IV-drip rad cure. Highest value for non-Ghoul races given the Ghoul race's innate 80% RR. Sized against the manual's rad scale (600 = feral-check threshold, 1000 = full feral).",
-    "effect": "TBA",
+    "effect": "Removes 300 rads",
     "stats": {
-      "rad_removed": "TBA"
+      "rad_removed": 300
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 50
   },
   sains_untuk_semua: {
     "id": "sains_untuk_semua",

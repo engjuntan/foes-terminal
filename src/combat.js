@@ -42,6 +42,7 @@ export function instantiateMonster(monsterId, label) {
     attacks: template.attacks || [],
     is_boss: template.stats.is_boss || false, // "one shot one kill" crit takes 20 true damage instead
     status_effects: [], // same shape as a PC's — carries crit/aimed-shot afflictions inline
+    stance: 'standing',
     is_down: false
   };
 }
@@ -51,6 +52,20 @@ export function rollInitiative(sequenceBonus) {
   const d20 = Math.floor(Math.random() * 20) + 1;
   return { roll: d20, total: d20 + (sequenceBonus || 0) };
 }
+
+// --- STANCE (manual's Stances table) ---
+// Change is free-form here — the user governs the action economy at the
+// table themselves rather than the app enforcing a small-action cost.
+// `agiCap` limits how much of AC's AGI component still applies (only
+// meaningful for a PC, since a monster's AC isn't AGI-derived); null
+// means no cap (full AC). Knocked Down is the one stance nobody picks
+// for themselves — it's what the crit system's knockdown effects set.
+export const STANCES = {
+  standing: { label: 'Standing', hitBonus: 0, agiCap: null, blocksMelee: false },
+  crouching: { label: 'Crouching', hitBonus: 10, agiCap: 3, blocksMelee: false },
+  prone: { label: 'Prone', hitBonus: 25, agiCap: 1, blocksMelee: true },
+  knocked_down: { label: 'Knocked Down', hitBonus: 0, agiCap: 0, blocksMelee: false }
+};
 
 // --- AIMED SHOTS (new — not from the manual, numbers agreed with the user) ---
 // Torso is just the default/normal attack (0 penalty, no special effect).
