@@ -2,6 +2,7 @@
 import { calculateDerivedStats, RACE_RULES } from './formulas.js';
 import { getItem, itemDatabase } from './items.js';
 import { normalizeInventory, getInventoryQuantity } from './inventory.js';
+import { SPECIAL_INFO, SKILL_INFO } from './goatContent.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
@@ -120,7 +121,7 @@ export function getRegistrationView(charId, liveData) {
 
     return `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; border-bottom:1px dashed #333; padding:5px;">
-        <span style="width:50px; font-weight:bold; color:var(--pip-dim);">${label}</span>
+        <span style="width:50px; font-weight:bold; color:var(--pip-dim);">${renderWikiLink(label, SPECIAL_INFO[stat])}</span>
         <div style="display:flex; align-items:center; gap:10px;">
           <button ${canMinus} onclick="window.adjustCreationStat('${stat}', -1)">[-]</button>
           <span style="color:${val >= 10 ? 'gold' : 'var(--pip-green)'}; width:30px; text-align:center;">${val}</span>
@@ -137,7 +138,14 @@ export function getRegistrationView(charId, liveData) {
     const isSelected = draft.tags.includes(skill);
     const style = isSelected ? "border-color:cyan; color:cyan; background:rgba(0,255,255,0.1);" : "border-color:#333; color:#555;";
     const disabled = (!isSelected && draft.tags.length >= 3) ? "opacity:0.3; pointer-events:none;" : "";
-    return `<div onclick="window.toggleCreationTag('${skill}')" style="border:1px solid; padding:5px; cursor:pointer; text-transform:uppercase; font-size:12px; text-align:center; ${style} ${disabled}">${skill.replace('_', ' ')}</div>`;
+    // Hover-only tooltip (not renderWikiLink's onclick variant) — the
+    // whole tile's own onclick already toggles the tag, and stacking a
+    // second onclick on the text would stopPropagation and silently
+    // break tapping to select on mobile. Desktop hover still explains
+    // the skill; touch users just don't get a tap-tooltip here, same
+    // as before this feature existed.
+    const safeDesc = (SKILL_INFO[skill] || '').replace(/"/g, "&quot;").replace(/'/g, "\\'");
+    return `<div onclick="window.toggleCreationTag('${skill}')" onmouseover="window.showTooltip('${safeDesc}', event)" onmouseout="window.hideTooltip()" style="border:1px solid; padding:5px; cursor:pointer; text-transform:uppercase; font-size:12px; text-align:center; ${style} ${disabled}">${skill.replace('_', ' ')}</div>`;
   }).join("");
 
   return `
@@ -192,11 +200,11 @@ export function getGoatReviewView(charId, liveData) {
   const tags = Object.keys(char.tags || {});
 
   const specialRows = Object.entries(char.special || {})
-    .map(([k, v]) => `<div class="special-row"><span>${k.toUpperCase()}</span><span>${v}</span></div>`)
+    .map(([k, v]) => `<div class="special-row"><span>${renderWikiLink(k.toUpperCase(), SPECIAL_INFO[k])}</span><span>${v}</span></div>`)
     .join('');
 
   const tagsHtml = tags.length > 0
-    ? tags.map(t => `<div style="border:1px solid cyan; color:cyan; padding:5px; text-align:center; text-transform:uppercase; font-size:12px;">${t.replace(/_/g, ' ')}</div>`).join('')
+    ? tags.map(t => `<div style="border:1px solid cyan; color:cyan; padding:5px; text-align:center; text-transform:uppercase; font-size:12px;">${renderWikiLink(t.replace(/_/g, ' '), SKILL_INFO[t])}</div>`).join('')
     : '<span style="color:#555;">NONE RECORDED</span>';
 
   return `
@@ -825,7 +833,7 @@ export function getPlayerView(charId, liveData) {
       }
       
       const valDisplay = addedValue > 0 ? `<span style="color:cyan;">${totalVal}% (+${addedValue})</span>` : `<span>${totalVal}%</span>`;
-      skillsHtml += `<div class="skill-item ${isTagged ? 'tagged' : ''}" style="display:flex; justify-content:space-between; align-items:center;"><span>${key.replace(/_/g, ' ').toUpperCase()}</span><div style="display:flex; gap:10px; align-items:center;">${controls}${valDisplay}</div></div>`;
+      skillsHtml += `<div class="skill-item ${isTagged ? 'tagged' : ''}" style="display:flex; justify-content:space-between; align-items:center;"><span>${renderWikiLink(key.replace(/_/g, ' ').toUpperCase(), SKILL_INFO[key])}</span><div style="display:flex; gap:10px; align-items:center;">${controls}${valDisplay}</div></div>`;
     });
   }
 
@@ -963,7 +971,7 @@ export function getPlayerView(charId, liveData) {
         </div>` : ''}
 
         <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px;">S.P.E.C.I.A.L.</h3>
-        ${Object.entries(charData.special).map(([k, v]) => `<div class="special-row"><span>${k.toUpperCase()}</span><span>${v}</span></div>`).join("")}
+        ${Object.entries(charData.special).map(([k, v]) => `<div class="special-row"><span>${renderWikiLink(k.toUpperCase(), SPECIAL_INFO[k])}</span><span>${v}</span></div>`).join("")}
         
         <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px;">TRAITS</h3>
         ${traitsHtml || "> NONE"}
