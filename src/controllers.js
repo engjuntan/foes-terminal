@@ -30,10 +30,25 @@ export async function equipItem(itemId, targetSlot) {
     }
   }
 
+  const previousId = (char.equipment || {})[targetSlot];
+  if (previousId === itemId) return; // already equipped here — nothing to do
+
+  // Weapons/armor/accessories aren't consumed like ammo or Stimpaks, but
+  // they do move: equipping takes one copy out of the pack and onto the
+  // body, so you can't equip something you don't actually own.
+  const owned = getInventoryQuantity(char.inventory, itemId);
+  if (owned < 1) { alert(`YOU DON'T HAVE ${(item && item.name) || itemId.toUpperCase()} IN YOUR INVENTORY`); return; }
+
+  let newInv = removeFromInventory(char.inventory, itemId, 1);
+  // Whatever was already in that slot comes back to the pack — swapping
+  // gear doesn't erase what you were wearing.
+  if (previousId) newInv = addToInventory(newInv, previousId, 1);
+
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const charPath = `characters.${window.currentUser}`;
   const updatePayload = {};
   updatePayload[`${charPath}.equipment.${targetSlot}`] = itemId;
+  updatePayload[`${charPath}.inventory`] = newInv;
   // Ammo tracking lives per equipped slot, not per item instance (the app
   // doesn't track individual item copies anywhere). Equipping a weapon
   // with a clip_size always assumes a fresh, full magazine; a weapon with
@@ -44,22 +59,31 @@ export async function equipItem(itemId, targetSlot) {
 }
 
 export async function unequipItem(targetSlot) {
-  if (!window.currentUser) return;
+  if (!window.currentUser || !window.liveData) return;
+  const char = window.liveData.characters[window.currentUser];
+  if (!char) return;
+  const itemId = (char.equipment || {})[targetSlot];
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
   updatePayload[`characters.${window.currentUser}.equipment.${targetSlot}`] = null;
   updatePayload[`characters.${window.currentUser}.ammo.${targetSlot}`] = null;
+  // Unequipping returns the item to the pack — it doesn't vanish.
+  if (itemId) updatePayload[`characters.${window.currentUser}.inventory`] = addToInventory(char.inventory, itemId, 1);
   await updateDoc(charRef, updatePayload);
 }
 
 // GM tool: unequip any player's item at will (e.g. they lost/traded it,
 // a disarm happened narratively, correcting a mistake).
 export async function gmUnequipItem(targetCharId, targetSlot) {
-  if (!targetCharId) return;
+  if (!targetCharId || !window.liveData) return;
+  const char = window.liveData.characters[targetCharId];
+  if (!char) return;
+  const itemId = (char.equipment || {})[targetSlot];
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
   updatePayload[`characters.${targetCharId}.equipment.${targetSlot}`] = null;
   updatePayload[`characters.${targetCharId}.ammo.${targetSlot}`] = null;
+  if (itemId) updatePayload[`characters.${targetCharId}.inventory`] = addToInventory(char.inventory, itemId, 1);
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
