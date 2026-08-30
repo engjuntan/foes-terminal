@@ -3,6 +3,7 @@ import { calculateDerivedStats, RACE_RULES } from './formulas.js';
 import { getItem, itemDatabase } from './items.js';
 import { normalizeInventory, getInventoryQuantity } from './inventory.js';
 import { SPECIAL_INFO, SKILL_INFO } from './goatContent.js';
+import { DIFFICULTY_TIERS } from './checks.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
@@ -569,6 +570,141 @@ export function getCombatView(liveData, userRole, currentUser) {
       <div class="panel">
         <h2>COMBAT LOG</h2>
         <div style="max-height:500px; overflow-y:auto;">${logHtml || '<span style="color:#555;">No events yet.</span>'}</div>
+      </div>
+    </div>
+  `;
+}
+
+// --- DIFFICULTY CHECKS ---
+const SPECIAL_KEYS = ['str', 'per', 'end', 'cha', 'int', 'agi', 'luk'];
+const SKILL_KEYS = Object.keys(SKILL_INFO);
+
+function buildWhatOptions(selectedKind, selectedKey) {
+  const specialOpts = SPECIAL_KEYS.map(k => `<option value="special:${k}" ${selectedKind === 'special' && selectedKey === k ? 'selected' : ''}>${k.toUpperCase()}</option>`).join('');
+  const skillOpts = SKILL_KEYS.map(k => `<option value="skill:${k}" ${selectedKind === 'skill' && selectedKey === k ? 'selected' : ''}>${k.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
+  return `<optgroup label="SPECIAL">${specialOpts}</optgroup><optgroup label="SKILLS">${skillOpts}</optgroup>`;
+}
+
+function buildTierOptions(selectedTier) {
+  return Object.entries(DIFFICULTY_TIERS).map(([key, tier]) =>
+    `<option value="${key}" ${selectedTier === key ? 'selected' : ''}>${tier.label}${tier.skillMod ? ` (${tier.specialMod}/${tier.skillMod})` : ''}</option>`
+  ).join('');
+}
+
+function formatCheckResultLine(r) {
+  const critTag = r.critType === 'success' ? ' <span style="color:gold;">CRITICAL!</span>' : r.critType === 'fail' ? ' <span style="color:red;">CRITICAL FAIL!</span>' : '';
+  return `<span style="color:${r.success ? 'var(--pip-green)' : '#d4574a'};">${r.success ? 'SUCCESS' : 'FAILURE'}</span>${critTag} <span style="color:#666; font-size:11px;">(rolled ${r.roll} vs ${r.threshold})</span>`;
+}
+
+export function getChecksView(liveData, userRole, currentUser) {
+  const checks = liveData.checks || [];
+  const chars = liveData.characters || {};
+
+  let playerPanelHtml = '';
+  if (userRole === 'player') {
+    const draft = window.playerCheckDraft || { kind: 'special', key: 'str', tier: 'normal', useD20: false, roll: '' };
+    window.playerCheckDraft = draft;
+    const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
+    playerPanelHtml = `
+      <div class="panel" style="margin-bottom:15px;">
+        <h3 style="color:var(--pip-green); margin-top:0;">ROLL A CHECK</h3>
+        <label style="font-size:11px; color:#666;">WHAT</label>
+        <select onchange="window.setPlayerCheckWhat(this.value)" style="width:100%; background:black; color:lime; border:1px solid #333; margin-bottom:8px;">
+          ${buildWhatOptions(draft.kind, draft.key)}
+        </select>
+        <label style="font-size:11px; color:#666;">DIFFICULTY (as called by your GM)</label>
+        <select onchange="window.setPlayerCheckField('tier', this.value)" style="width:100%; background:black; color:lime; border:1px solid #333; margin-bottom:8px;">
+          ${buildTierOptions(draft.tier)}
+        </select>
+        ${draft.kind === 'special' ? `
+        <label style="font-size:11px; color:#666; display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+          <input type="checkbox" ${draft.useD20 ? 'checked' : ''} onchange="window.setPlayerCheckField('useD20', this.checked)">
+          Especially difficult task — roll 1d20 instead of 1d10
+        </label>` : ''}
+        <label style="font-size:11px; color:#666;">ROLL (1-${maxRoll})</label>
+        <div style="display:flex; gap:6px; margin-bottom:10px;">
+          <input type="number" min="1" max="${maxRoll}" value="${draft.roll ?? ''}" oninput="window.setPlayerCheckField('roll', this.value)" style="flex-grow:1; background:black; color:lime; border:1px solid #333;">
+          <button class="gm-btn" onclick="window.rollForPlayerCheck()">🎲 ROLL</button>
+        </div>
+        <button style="width:100%; padding:10px; background:var(--pip-green); color:black; font-weight:bold; border:none; cursor:pointer;" onclick="window.resolvePlayerCheck()">RESOLVE CHECK</button>
+      </div>`;
+  }
+
+  let gmPanelHtml = '';
+  if (userRole === 'gm') {
+    const draft = window.gmCheckDraft || { scope: 'single', targetCharId: '', kind: 'special', key: 'str', tier: 'normal', useD20: false, reveal: true, customName: '', customValue: '', roll: '' };
+    window.gmCheckDraft = draft;
+    const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
+    const charOptions = Object.entries(chars).filter(([, c]) => c.is_finalized)
+      .map(([id, c]) => `<option value="${id}" ${draft.targetCharId === id ? 'selected' : ''}>${c.name}</option>`).join('');
+
+    gmPanelHtml = `
+      <div class="panel" style="margin-bottom:15px;">
+        <h3 style="color:orange; margin-top:0;">GM: ROLL A CHECK</h3>
+        <label style="font-size:11px; color:#666;">TARGET</label>
+        <select onchange="window.setGmCheckField('scope', this.value)" style="width:100%; background:black; color:orange; border:1px solid orange; margin-bottom:8px;">
+          <option value="single" ${draft.scope === 'single' ? 'selected' : ''}>SINGLE CHARACTER</option>
+          <option value="party" ${draft.scope === 'party' ? 'selected' : ''}>WHOLE PARTY (each rolls their own)</option>
+          <option value="custom" ${draft.scope === 'custom' ? 'selected' : ''}>CUSTOM / NPC</option>
+        </select>
+        ${draft.scope === 'single' ? `
+        <select onchange="window.setGmCheckField('targetCharId', this.value)" style="width:100%; background:black; color:orange; border:1px solid orange; margin-bottom:8px;">
+          <option value="">— choose —</option>${charOptions}
+        </select>` : ''}
+        ${draft.scope === 'custom' ? `
+        <input type="text" placeholder="NAME (e.g. Raider Lookout)" value="${draft.customName || ''}" oninput="window.setGmCheckField('customName', this.value)" style="width:100%; background:black; color:orange; border:1px solid orange; margin-bottom:6px;">
+        <input type="number" placeholder="CHECK VALUE (stat or skill %)" value="${draft.customValue ?? ''}" oninput="window.setGmCheckField('customValue', this.value)" style="width:100%; background:black; color:orange; border:1px solid orange; margin-bottom:8px;">` : ''}
+        <label style="font-size:11px; color:#666;">WHAT ${draft.scope === 'custom' ? '(picks which modifier column applies)' : ''}</label>
+        <select onchange="window.setGmCheckWhat(this.value)" style="width:100%; background:black; color:orange; border:1px solid orange; margin-bottom:8px;">
+          ${buildWhatOptions(draft.kind, draft.key)}
+        </select>
+        <label style="font-size:11px; color:#666;">DIFFICULTY</label>
+        <select onchange="window.setGmCheckField('tier', this.value)" style="width:100%; background:black; color:orange; border:1px solid orange; margin-bottom:8px;">
+          ${buildTierOptions(draft.tier)}
+        </select>
+        ${draft.kind === 'special' ? `
+        <label style="font-size:11px; color:#666; display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+          <input type="checkbox" ${draft.useD20 ? 'checked' : ''} onchange="window.setGmCheckField('useD20', this.checked)">
+          Especially difficult task — roll 1d20 instead of 1d10
+        </label>` : ''}
+        ${draft.scope !== 'party' ? `
+        <label style="font-size:11px; color:#666;">ROLL (1-${maxRoll})</label>
+        <div style="display:flex; gap:6px; margin-bottom:8px;">
+          <input type="number" min="1" max="${maxRoll}" value="${draft.roll ?? ''}" oninput="window.setGmCheckField('roll', this.value)" style="flex-grow:1; background:black; color:orange; border:1px solid orange;">
+          <button class="gm-btn" style="border-color:orange; color:orange;" onclick="window.rollForGmCheck()">🎲 ROLL</button>
+        </div>` : `<p style="font-size:11px; color:#666; margin-bottom:8px;">Each party member auto-rolls their own dice when resolved.</p>`}
+        <label style="font-size:11px; color:#666; display:flex; align-items:center; gap:6px; margin-bottom:10px;">
+          <input type="checkbox" ${draft.reveal ? 'checked' : ''} onchange="window.setGmCheckField('reveal', this.checked)">
+          Reveal result to all players immediately (a message gets sent)
+        </label>
+        <button style="width:100%; padding:10px; background:orange; color:black; font-weight:bold; border:none; cursor:pointer;" onclick="window.resolveGmCheck()">RESOLVE CHECK</button>
+      </div>`;
+  }
+
+  const visibleChecks = checks.filter(c => userRole === 'gm' || !c.hidden);
+  const checkLogHtml = visibleChecks.slice().reverse().map(entry => {
+    const tierLabel = (DIFFICULTY_TIERS[entry.tier] || {}).label || entry.tier;
+    const whatLabel = entry.key ? entry.key.replace(/_/g, ' ').toUpperCase() : (entry.kind === 'special' ? 'SPECIAL' : 'SKILL');
+    const hiddenTag = entry.hidden ? `<span style="color:red; font-size:10px; border:1px solid red; padding:1px 4px; margin-left:6px;">HIDDEN — NOT REVEALED</span>` : '';
+    const revealBtn = (userRole === 'gm' && entry.hidden) ? `<button class="gm-btn" style="margin-top:4px; padding:2px 8px; font-size:10px;" onclick="window.revealCheck('${entry.id}')">REVEAL TO PLAYERS</button>` : '';
+    const resultsHtml = entry.results.map(r => `<div style="padding-left:8px;">${r.name}: ${formatCheckResultLine(r)}</div>`).join('');
+    return `
+      <div style="padding:6px 0; border-bottom:1px dashed #222; font-size:13px;">
+        <span style="color:#555; font-size:10px;">${new Date(entry.timestamp).toLocaleTimeString()}</span>
+        <span style="color:#888;"> ${whatLabel} — ${tierLabel}</span>${hiddenTag}
+        ${resultsHtml}
+        ${revealBtn}
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto;">
+      <h2 style="color:var(--pip-green);">🎲 DIFFICULTY CHECKS</h2>
+      ${playerPanelHtml}
+      ${gmPanelHtml}
+      <div class="panel">
+        <h2>CHECK LOG</h2>
+        <div style="max-height:500px; overflow-y:auto;">${checkLogHtml || '<span style="color:#555;">No checks rolled yet.</span>'}</div>
       </div>
     </div>
   `;

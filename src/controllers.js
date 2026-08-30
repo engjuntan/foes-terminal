@@ -9,6 +9,7 @@ import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDam
 import { dataLogDatabase } from './dataLogs.js';
 import { mapDatabase } from './maps.js';
 import { normalizeInventory, getInventoryQuantity, addToInventory, removeFromInventory } from './inventory.js';
+import { DIFFICULTY_TIERS, rollD10, rollD20, resolveSpecialCheck, resolveSkillCheck } from './checks.js';
 
 // --- GAME ACTIONS ---
 export async function equipItem(itemId, targetSlot) {
@@ -1154,4 +1155,209 @@ export async function gmFactoryReset(targetCharId) {
   
   await updateDoc(charRef, updatePayload);
   alert("CHARACTER RESET. NEXT LOGIN WILL TRIGGER CREATION.");
+}
+
+// --- DIFFICULTY CHECKS (manual's DC section) ---
+// Two independent draft objects: a player rolling for themselves, and
+// the GM's tool (covers both "roll for a PC/party and choose whether to
+// reveal" and "roll for an NPC" — the same tool with a different
+// target, per the design discussion).
+
+function getPlayerCheckDraft() {
+  if (!window.playerCheckDraft) window.playerCheckDraft = { kind: 'special', key: 'str', tier: 'normal', useD20: false, roll: '' };
+  return window.playerCheckDraft;
+}
+// Same reasoning as setCombatActionField: don't re-render on every
+// keystroke in the roll field, or it loses focus mid-typing.
+export function setPlayerCheckField(field, value) {
+  const draft = getPlayerCheckDraft();
+  draft[field] = value;
+  if (field !== 'roll') window.render();
+}
+export function rollForPlayerCheck() {
+  const draft = getPlayerCheckDraft();
+  draft.roll = draft.kind === 'special' ? (draft.useD20 ? rollD20() : rollD10()) : rollPercentile();
+  window.render();
+}
+// The "WHAT" dropdown packs kind+key into one value ("special:str" /
+// "skill:sneak") so picking a new stat/skill is a single select, not two.
+export function setPlayerCheckWhat(value) {
+  const [kind, key] = value.split(':');
+  const draft = getPlayerCheckDraft();
+  draft.kind = kind; draft.key = key;
+  window.render();
+}
+
+export async function resolvePlayerCheck() {
+  if (!window.currentUser || !window.liveData) return;
+  const draft = getPlayerCheckDraft();
+  if (draft.roll === '' || draft.roll === null || draft.roll === undefined) { alert("ENTER OR ROLL A DICE VALUE"); return; }
+  const roll = Number(draft.roll);
+  const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
+  if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
+
+  const char = window.liveData.characters[window.currentUser];
+  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {});
+  const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
+  const result = draft.kind === 'special' ? resolveSpecialCheck(value, draft.tier, roll, draft.useD20) : resolveSkillCheck(value, draft.tier, roll);
+
+  const entry = {
+    id: `check_${Date.now()}`,
+    mode: 'player',
+    scope: 'single',
+    tier: draft.tier,
+    kind: draft.kind,
+    key: draft.key,
+    useD20: draft.useD20,
+    hidden: false, // a player rolling for themselves is never a secret roll
+    results: [{ char_id: window.currentUser, name: char.name, roll, threshold: result.threshold, success: result.success, critType: result.critType || null }],
+    timestamp: Date.now()
+  };
+
+  const current = window.liveData.checks || [];
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, { checks: [...current, entry] });
+    window.playerCheckDraft = null;
+    window.render();
+  } catch (err) { alert("ERROR: " + err.message); }
+}
+
+function getGmCheckDraft() {
+  if (!window.gmCheckDraft) window.gmCheckDraft = {
+    scope: 'single', // 'single' | 'party' | 'custom'
+    targetCharId: '',
+    kind: 'special', // 'special' | 'skill'
+    key: 'str',
+    tier: 'normal',
+    useD20: false,
+    reveal: true, // reveal to players immediately vs hold it back
+    customName: '',
+    customValue: '',
+    roll: ''
+  };
+  return window.gmCheckDraft;
+}
+export function setGmCheckField(field, value) {
+  const draft = getGmCheckDraft();
+  draft[field] = value;
+  // Text fields that get typed into (roll, custom name/value) skip the
+  // re-render for the same focus-loss reason as everywhere else in this
+  // file; selects/checkboxes/radios re-render so the form reflects them.
+  if (field !== 'roll' && field !== 'customValue' && field !== 'customName') window.render();
+}
+export function rollForGmCheck() {
+  const draft = getGmCheckDraft();
+  draft.roll = draft.kind === 'special' ? (draft.useD20 ? rollD20() : rollD10()) : rollPercentile();
+  window.render();
+}
+export function setGmCheckWhat(value) {
+  const [kind, key] = value.split(':');
+  const draft = getGmCheckDraft();
+  draft.kind = kind; draft.key = key;
+  window.render();
+}
+
+// "Just success/failure" wording — deliberately doesn't leak the actual
+// roll or target number, per the design discussion (keeps some mystery
+// about how close a revealed roll actually was).
+function buildCheckRevealMessage(entry) {
+  const label = (r) => `${r.success ? 'SUCCESS' : 'FAILURE'}${r.critType === 'success' ? ' (CRITICAL!)' : r.critType === 'fail' ? ' (CRITICAL FAILURE!)' : ''}`;
+  if (entry.results.length === 1) {
+    const r = entry.results[0];
+    return `${r.name}'s check: ${label(r)}.`;
+  }
+  return `Party check results:\n${entry.results.map(r => `${r.name}: ${label(r)}`).join('\n')}`;
+}
+
+export async function resolveGmCheck() {
+  if (!window.liveData) return;
+  const draft = getGmCheckDraft();
+  const tier = draft.tier;
+  const results = [];
+
+  if (draft.scope === 'party') {
+    // Each PC rolls individually against their own stat/skill — a
+    // secret party Perception check isn't one shared roll, some notice
+    // and some don't. Auto-rolled per character (no manual entry per
+    // PC — that'd be a lot of typing for the GM).
+    Object.entries(window.liveData.characters || {}).forEach(([charId, char]) => {
+      if (!char.is_finalized) return;
+      const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {});
+      const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
+      const roll = draft.kind === 'special' ? (draft.useD20 ? rollD20() : rollD10()) : rollPercentile();
+      const result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
+      results.push({ char_id: charId, name: char.name, roll, threshold: result.threshold, success: result.success, critType: result.critType || null });
+    });
+    if (results.length === 0) { alert("NO FINALIZED CHARACTERS TO ROLL FOR"); return; }
+  } else if (draft.scope === 'custom') {
+    const name = (draft.customName || '').trim();
+    const value = Number(draft.customValue);
+    if (!name) { alert("ENTER A NAME"); return; }
+    if (draft.customValue === '' || isNaN(value)) { alert("ENTER A CHECK VALUE"); return; }
+    if (draft.roll === '' || draft.roll === null || draft.roll === undefined) { alert("ENTER OR ROLL A DICE VALUE"); return; }
+    const roll = Number(draft.roll);
+    const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
+    if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
+    const result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
+    results.push({ char_id: null, name, roll, threshold: result.threshold, success: result.success, critType: result.critType || null });
+  } else {
+    if (!draft.targetCharId) { alert("PICK A TARGET"); return; }
+    const char = window.liveData.characters[draft.targetCharId];
+    if (!char) { alert("TARGET NOT FOUND"); return; }
+    if (draft.roll === '' || draft.roll === null || draft.roll === undefined) { alert("ENTER OR ROLL A DICE VALUE"); return; }
+    const roll = Number(draft.roll);
+    const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
+    if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
+    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {});
+    const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
+    const result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
+    results.push({ char_id: draft.targetCharId, name: char.name, roll, threshold: result.threshold, success: result.success, critType: result.critType || null });
+  }
+
+  const entry = {
+    id: `check_${Date.now()}`,
+    mode: 'gm',
+    scope: draft.scope,
+    tier,
+    kind: draft.kind,
+    key: draft.scope === 'custom' ? null : draft.key,
+    useD20: draft.useD20,
+    hidden: !draft.reveal,
+    results,
+    timestamp: Date.now()
+  };
+
+  const updatePayload = { checks: [...(window.liveData.checks || []), entry] };
+  if (draft.reveal) {
+    const currentMessages = window.liveData.messages || [];
+    updatePayload.messages = [...currentMessages, { id: `msg_${Date.now()}`, from: 'GM', target: 'all', body: buildCheckRevealMessage(entry), timestamp: Date.now() }];
+  }
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, updatePayload);
+    window.gmCheckDraft = null;
+    window.render();
+  } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// GM chooses to reveal a previously-hidden check after the fact —
+// same "just success/failure" message, sent whenever the GM decides to.
+export async function revealCheck(checkId) {
+  const checks = window.liveData.checks || [];
+  const idx = checks.findIndex(c => c.id === checkId);
+  if (idx === -1) return;
+  const entry = { ...checks[idx], hidden: false };
+  const newChecks = [...checks];
+  newChecks[idx] = entry;
+
+  const currentMessages = window.liveData.messages || [];
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, {
+      checks: newChecks,
+      messages: [...currentMessages, { id: `msg_${Date.now()}`, from: 'GM', target: 'all', body: buildCheckRevealMessage(entry), timestamp: Date.now() }]
+    });
+  } catch (err) { alert("ERROR: " + err.message); }
 }

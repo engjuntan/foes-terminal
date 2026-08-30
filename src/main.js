@@ -62,6 +62,15 @@ window.endCombat = Controllers.endCombat;
 window.setCombatActionField = Controllers.setCombatActionField;
 window.rollForMe = Controllers.rollForMe;
 window.resolveAttack = Controllers.resolveAttack;
+window.setPlayerCheckField = Controllers.setPlayerCheckField;
+window.setPlayerCheckWhat = Controllers.setPlayerCheckWhat;
+window.rollForPlayerCheck = Controllers.rollForPlayerCheck;
+window.resolvePlayerCheck = Controllers.resolvePlayerCheck;
+window.setGmCheckField = Controllers.setGmCheckField;
+window.setGmCheckWhat = Controllers.setGmCheckWhat;
+window.rollForGmCheck = Controllers.rollForGmCheck;
+window.resolveGmCheck = Controllers.resolveGmCheck;
+window.revealCheck = Controllers.revealCheck;
 window.passTurn = Controllers.passTurn;
 window.endTurn = Controllers.endTurn;
 window.addCombatantMidFight = Controllers.addCombatantMidFight;
@@ -153,7 +162,7 @@ window.render = function() {
   if (appInterface) appInterface.classList.remove('hidden');
 
   // 3. Sync sidebar active state to the current tab, plus unread badges
-  const navMap = { STATUS: 'btn-dashboard', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map' };
+  const navMap = { STATUS: 'btn-dashboard', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks' };
   Object.entries(navMap).forEach(([tab, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', window.currentTab === tab);
@@ -185,6 +194,8 @@ window.render = function() {
       viewport.innerHTML = Views.getMessagesView(window.liveData, 'gm', window.currentUser);
     } else if (window.currentTab === 'MAPS') {
       viewport.innerHTML = Views.getMapsView(window.liveData, 'gm', window.currentUser);
+    } else if (window.currentTab === 'CHECKS') {
+      viewport.innerHTML = Views.getChecksView(window.liveData, 'gm', window.currentUser);
     } else {
       viewport.innerHTML = Views.renderGMScreen(window.liveData);
     }
@@ -208,6 +219,8 @@ window.render = function() {
           viewport.innerHTML = Views.getMessagesView(window.liveData, 'player', window.currentUser);
        } else if (window.currentTab === 'MAPS') {
           viewport.innerHTML = Views.getMapsView(window.liveData, 'player', window.currentUser);
+       } else if (window.currentTab === 'CHECKS') {
+          viewport.innerHTML = Views.getChecksView(window.liveData, 'player', window.currentUser);
        } else {
           viewport.innerHTML = Views.getPlayerView(window.currentUser, window.liveData);
        }
