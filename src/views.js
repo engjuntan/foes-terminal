@@ -4,6 +4,7 @@ import { getItem, itemDatabase } from './items.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
+import { BODY_PARTS } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { mapDatabase } from './maps.js';
 
@@ -359,6 +360,66 @@ export function getCombatView(liveData, userRole, currentUser) {
       attackOptions = `<option value="unarmed" ${!draft.attackKey || draft.attackKey === 'unarmed' ? 'selected' : ''}>Unarmed</option>${weaponOpts}`;
     }
 
+    // Aimed shots (VATS-style targeted shot) — attacker-agnostic, same as
+    // resolveAttack(): torso is just the normal attack, always available,
+    // 0 penalty. Works for a PC's turn OR a GM-controlled monster's turn
+    // (a called shot works the same regardless of who's pulling the
+    // trigger — this is also what makes the Blinded/Crippled effects
+    // reachable at all, since PCs can only target monsters and monsters
+    // don't carry status effects).
+    let bodyPartHtml = '';
+    {
+      const selectedPart = draft.bodyPart || 'torso';
+      const bodyPartOptions = Object.entries(BODY_PARTS)
+        .map(([key, part]) => `<option value="${key}" ${selectedPart === key ? 'selected' : ''}>${part.label}${part.penalty ? ` (-${part.penalty}%)` : ''}</option>`).join('');
+
+      // Live hit% preview — replicates the same effectiveChance math used
+      // in resolveAttack() (combat.js resolveHit: max(0, skill - penalty - AC)),
+      // recomputed here at render time so it updates as target/attack/part change.
+      let previewHtml = '';
+      const target = combat.initiative_order.find(c => c.combatant_id === draft.targetId);
+      if (target) {
+        let attackerValue = null;
+        if (currentActor.ref_type === 'monster') {
+          const attackDef = (currentActor.attacks || []).find(a => a.name === draft.attackKey);
+          if (attackDef) attackerValue = attackDef.hit_percent;
+        } else {
+          const char = liveData.characters[currentActor.char_id];
+          const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {});
+          if (!draft.attackKey || draft.attackKey === 'unarmed') {
+            attackerValue = derived.skills.unarmed;
+          } else {
+            const weaponItem = getItem(draft.attackKey);
+            if (weaponItem) {
+              const isMelee = !weaponItem.stats || (weaponItem.stats.range || 0) <= 1;
+              const skillKey = weaponItem.skill || (isMelee ? 'melee_weapons' : 'small_guns');
+              attackerValue = derived.skills[skillKey] ?? 0;
+            }
+          }
+        }
+        let targetAC = null;
+        if (target.ref_type === 'monster') {
+          targetAC = target.ac;
+        } else {
+          const targetChar = liveData.characters[target.char_id];
+          const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {});
+          targetAC = targetDerived.armorClass;
+        }
+        if (attackerValue !== null && targetAC !== null) {
+          const part = BODY_PARTS[selectedPart] || BODY_PARTS.torso;
+          const chance = Math.max(0, attackerValue - part.penalty - targetAC);
+          previewHtml = `<div style="font-size:11px; color:#888; margin-bottom:6px;">Hit chance vs ${target.name}: <span style="color:var(--pip-green); font-weight:bold;">${chance}%</span></div>`;
+        }
+      }
+
+      bodyPartHtml = `
+        <label style="font-size:11px; color:#666;">AIMED SHOT (optional — defaults to Torso)</label>
+        <select onchange="window.setCombatActionField('bodyPart', this.value)" style="width:100%; background:black; color:lime; border:1px solid #333; margin-bottom:6px;">
+          ${bodyPartOptions}
+        </select>
+        ${previewHtml}`;
+    }
+
     actionPanelHtml = `
       <div class="panel" style="margin-bottom:15px;">
         <h3 style="color:var(--pip-green); margin-top:0;">${currentActor.name}'S TURN</h3>
@@ -370,6 +431,7 @@ export function getCombatView(liveData, userRole, currentUser) {
         <select onchange="window.setCombatActionField('attackKey', this.value)" style="width:100%; background:black; color:lime; border:1px solid #333; margin-bottom:8px;">
           <option value="">— choose —</option>${attackOptions}
         </select>
+        ${bodyPartHtml}
         <label style="font-size:11px; color:#666;">ROLL (1-100)</label>
         <div style="display:flex; gap:6px; margin-bottom:10px;">
           <input type="number" min="1" max="100" value="${draft.roll ?? ''}" oninput="window.setCombatActionField('roll', this.value)" style="flex-grow:1; background:black; color:lime; border:1px solid #333;">

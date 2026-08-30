@@ -5,7 +5,7 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
 import { RACE_RULES, calculateDerivedStats } from './formulas.js';
 import { getMonster } from './bestiary.js';
-import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction } from './combat.js';
+import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, BODY_PARTS } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { mapDatabase } from './maps.js';
 
@@ -685,6 +685,12 @@ function getCombatActionDraft() {
 export function setCombatActionField(field, value) {
   const draft = getCombatActionDraft();
   draft[field] = value;
+  // Re-render for select fields (target/attack/bodyPart) so the live hit%
+  // preview updates — safe here since onchange only fires after the browser
+  // has already committed the selection. Skipped for 'roll' specifically:
+  // that's a text input fired on every keystroke, and re-rendering there
+  // kills focus mid-typing (see rollForMe/getCombatActionDraft comment).
+  if (field !== 'roll') window.render();
 }
 
 export function rollForMe() {
@@ -703,6 +709,12 @@ export async function resolveAttack() {
   if (draft.roll === '' || draft.roll === null || draft.roll === undefined) { alert("ENTER OR ROLL A DICE VALUE"); return; }
   const roll = Number(draft.roll);
   if (isNaN(roll) || roll < 1 || roll > 100) { alert("ROLL MUST BE 1-100"); return; }
+
+  // Aimed shots are attacker-agnostic — a called shot works the same
+  // whether a PC targets a monster or a monster (GM-controlled) targets a
+  // PC. Torso is just the default normal attack, unchanged either way.
+  const bodyPartKey = draft.bodyPart || 'torso';
+  const bodyPart = BODY_PARTS[bodyPartKey] || BODY_PARTS.torso;
 
   // --- Attacker's skill/hit% + attack definition ---
   let attackDef, attackerValue;
@@ -746,30 +758,52 @@ export async function resolveAttack() {
     targetName = targetChar.name;
   }
 
-  const { effectiveChance, isHit } = resolveHit(attackerValue, targetAC, roll);
+  const { effectiveChance, isHit } = resolveHit(attackerValue - bodyPart.penalty, targetAC, roll);
 
   let finalDamage = 0;
+  let effectAppliedMsg = '';
   const newInitiativeOrder = combat.initiative_order.map(c => ({ ...c }));
   const charUpdates = {};
 
   if (isHit) {
-    const rawDamage = rollDamage(attackDef.damage);
+    const rawDamage = Math.round(rollDamage(attackDef.damage) * (bodyPart.damageMultiplier || 1));
     finalDamage = applyDamageReduction(rawDamage, targetDtdr, attackDef.damageType || 'normal');
     const idx = newInitiativeOrder.findIndex(c => c.combatant_id === target.combatant_id);
+    let newCurrent;
     if (target.ref_type === 'monster') {
-      const newCurrent = Math.max(0, target.hp.current - finalDamage);
+      newCurrent = Math.max(0, target.hp.current - finalDamage);
       newInitiativeOrder[idx] = { ...target, hp: { ...target.hp, current: newCurrent }, is_down: newCurrent <= 0 };
     } else {
       const targetChar = window.liveData.characters[target.char_id];
-      const newCurrent = Math.max(0, targetChar.hp.current - finalDamage);
+      newCurrent = Math.max(0, targetChar.hp.current - finalDamage);
       newInitiativeOrder[idx] = { ...target, is_down: newCurrent <= 0 };
       charUpdates[`characters.${target.char_id}.hp.current`] = newCurrent;
+
+      // Aimed-shot effects only mechanically apply to PC targets right
+      // now — monsters don't carry a status_effects array.
+      if (bodyPart.effectId && newCurrent > 0) {
+        const effectDef = statusEffectDatabase[bodyPart.effectId];
+        if (effectDef) {
+          const currentEffects = targetChar.status_effects || [];
+          const instance = {
+            id: `${bodyPart.effectId}_${Date.now()}`,
+            source_id: bodyPart.effectId,
+            name: effectDef.name,
+            modifiers: effectDef.modifiers || {},
+            ticking: effectDef.ticking !== false,
+            applied_at: Date.now()
+          };
+          charUpdates[`characters.${target.char_id}.status_effects`] = [...currentEffects, instance];
+          effectAppliedMsg = ` ${targetChar.name} is afflicted by ${effectDef.name}!`;
+        }
+      }
     }
   }
 
+  const partTag = bodyPartKey !== 'torso' ? ` (aimed at ${bodyPart.label})` : '';
   const message = isHit
-    ? `${attacker.name} attacks ${targetName} with ${attackDef.name} — HIT for ${finalDamage} damage (rolled ${roll} vs ${effectiveChance}%).`
-    : `${attacker.name} attacks ${targetName} with ${attackDef.name} — MISS (rolled ${roll} vs ${effectiveChance}%).`;
+    ? `${attacker.name} attacks ${targetName}${partTag} with ${attackDef.name} — HIT for ${finalDamage} damage (rolled ${roll} vs ${effectiveChance}%).${effectAppliedMsg}`
+    : `${attacker.name} attacks ${targetName}${partTag} with ${attackDef.name} — MISS (rolled ${roll} vs ${effectiveChance}%).`;
 
   const updatedCombat = {
     ...combat,

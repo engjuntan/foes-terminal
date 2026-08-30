@@ -50,6 +50,23 @@ export function rollInitiative(sequenceBonus) {
   return { roll: d20, total: d20 + (sequenceBonus || 0) };
 }
 
+// --- AIMED SHOTS (new — not from the manual, numbers agreed with the user) ---
+// Torso is just the default/normal attack (0 penalty, no special effect).
+// Picking anything else is a genuinely optional second choice, not a
+// replacement for the normal attack — matches Fallout 1/2's targeted-shot
+// convention. effectId (if present) only mechanically applies to PC
+// targets right now, since monsters don't carry a status_effects array.
+export const BODY_PARTS = {
+  torso: { label: 'Torso', penalty: 0 },
+  head: { label: 'Head', penalty: 20, damageMultiplier: 1.5 },
+  eyes: { label: 'Eyes', penalty: 40, effectId: 'blinded' },
+  left_arm: { label: 'Left Arm', penalty: 20, effectId: 'crippled_arm' },
+  right_arm: { label: 'Right Arm', penalty: 20, effectId: 'crippled_arm' },
+  left_leg: { label: 'Left Leg', penalty: 15, effectId: 'crippled_leg' },
+  right_leg: { label: 'Right Leg', penalty: 15, effectId: 'crippled_leg' },
+  groin: { label: 'Groin', penalty: 20, effectId: 'stunned' }
+};
+
 // --- ATTACK RESOLUTION (manual p.81) ---
 // Hit chance is rolled as a percentile: 2d10 read as a tens digit and a
 // ones digit (matching the manual's worked example — Ahmad "rolls 2d10

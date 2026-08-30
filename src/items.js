@@ -6,7 +6,7 @@ export const itemDatabase = {
     "type": "accessory",
     "slot": "head",
     "icon": "",
-    "description": "A pair of corrective lenses, scavenged and re-fitted. Not armor, not a weapon — just enough to see straight.",
+    "description": "A pair of corrective lenses, scavenged and re-fitted. It takes real skill to make these things. Hope you don't drop them. ",
     "value": 10
   },
   dinar: {
@@ -45,7 +45,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "https://i.imgur.com/ejIIJM5.png",
-    "description": "The Homemade Pistol is a weapon of the enterprising survivor. Cobbled out of junk and stuck together on nothing but willpower and faith, the Homemade Pistol is certainly a weapon of sorts. Some use gunpowder, some use pressure, but all of them have one thing in common: injecting lead into whatever target it finds.",
+    "description": "The Homemade Pistol is a weapon of the enterprising survivor. Cobbled out of junk and stuck together on nothing but willpower and faith, the Homemade Pistol is certainly a weapon of sorts. Some use gunpowder, some use pressure, but all of them have one thing in common: injecting lead into whatever it's pointed at.",
     "stats": {
       "dmg": "1d6",
       "dmgType": "normal",
