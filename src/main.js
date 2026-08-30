@@ -6,10 +6,30 @@ import * as Controllers from './controllers.js'; // All Actions
 import './style.css';
 
 // --- GLOBAL STATE ---
-window.liveData = null; 
-window.currentUser = null; 
-window.userRole = null; 
-window.currentTab = 'STATUS'; 
+window.liveData = null;
+window.currentUser = null;
+window.userRole = null;
+window.currentTab = 'STATUS';
+
+// --- TEXT SIZE (per-device preference, not synced — CSS uses fixed px
+// everywhere, so rather than rewrite ~450 lines to rem units, this scales
+// the whole rendered page uniformly via `zoom`, same effect as a
+// browser's own page zoom, just persisted and controlled in-app) ---
+const FONT_SCALE_KEY = 'foes_font_scale';
+const FONT_SCALE_MIN = 0.8;
+const FONT_SCALE_MAX = 1.6;
+window.getFontScale = () => Number(localStorage.getItem(FONT_SCALE_KEY)) || 1;
+window.setFontScale = (scale) => {
+  const clamped = Math.round(Math.max(FONT_SCALE_MIN, Math.min(FONT_SCALE_MAX, scale)) * 100) / 100;
+  localStorage.setItem(FONT_SCALE_KEY, clamped);
+  document.documentElement.style.zoom = clamped;
+  const display = document.getElementById('fontScaleDisplay');
+  if (display) display.textContent = Math.round(clamped * 100) + '%';
+};
+window.adjustFontScale = (delta) => window.setFontScale(window.getFontScale() + delta);
+document.documentElement.style.zoom = window.getFontScale();
+const fontScaleDisplayInit = document.getElementById('fontScaleDisplay');
+if (fontScaleDisplayInit) fontScaleDisplayInit.textContent = Math.round(window.getFontScale() * 100) + '%';
 
 // --- EXPOSE ACTIONS TO HTML ---
 // We must attach these to 'window' so onclick="window.equipItem()" works

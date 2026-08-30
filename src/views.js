@@ -233,10 +233,6 @@ export function getGoatReviewView(charId, liveData) {
         <h3 style="border-bottom:1px solid var(--pip-dim); margin-top:20px;">TAG SKILLS</h3>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px;">${tagsHtml}</div>
 
-        ${char.biography ? `
-        <h3 style="border-bottom:1px solid var(--pip-dim); margin-top:20px;">BIOGRAPHY</h3>
-        <div style="font-size:14px; color:#ccc; line-height:1.5; white-space:pre-wrap;">${escapeHtml(char.biography)}</div>` : ''}
-
         ${char.gm_notes ? `
         <h3 style="border-bottom:1px solid gold; color:gold; margin-top:20px;">NOTES FROM YOUR GM</h3>
         <div style="font-size:14px; color:#ccc; line-height:1.5; white-space:pre-wrap;">${escapeHtml(char.gm_notes)}</div>` : ''}
@@ -989,9 +985,14 @@ export function getPlayerView(charId, liveData) {
           <div style="border:1px solid #333; padding:5px; text-align:center;"><small>SEQ</small><br><strong style="font-size:24px;">${derived.sequenceBonus}</strong></div>
         </div>
         <h2>SKILLS</h2>
-        <div style="flex-grow:1; overflow-y:scroll;">${skillsHtml}</div>
+        <div style="flex-grow:1; overflow-y:auto;">
+          ${skillsHtml}
+          ${charData.biography ? `
+          <h3 style="border-bottom:1px solid var(--pip-dim); margin-top:20px;">BIOGRAPHY</h3>
+          <div style="font-size:14px; color:#ccc; line-height:1.5; white-space:pre-wrap;">${escapeHtml(charData.biography)}</div>` : ''}
+        </div>
       </div>
-      
+
       <div class="panel">
         <h2>EQUIPPED GEAR</h2>
         <div class="equipment-grid">${renderSlot("HEAD", "head")}${renderSlot("BODY", "body")}${renderSlot("R. HAND", "right_hand")}${renderSlot("L. HAND", "left_hand")}</div>

@@ -130,8 +130,10 @@ body {
 /* --- DASHBOARD GRID --- */
 .dashboard-container {
   display: grid;
-  /* STRICT COLUMNS: 250px fixed, the rest, 300px fixed. Won't budge. */
-  grid-template-columns: minmax(250px, 250px) 1fr minmax(300px, 300px); 
+  /* STRICT COLUMNS: 250px fixed, the rest, 420px fixed. Won't budge.
+     Rightmost column (equipped gear/wallet/inventory) widened from 300px
+     so item names and stack counts have more room to breathe. */
+  grid-template-columns: minmax(250px, 250px) 1fr minmax(420px, 420px);
   gap: 20px;
   height: 100%;
   overflow: hidden;
