@@ -376,3 +376,53 @@ Final formulas to implement in `formulas.js`:
   hover-only by design; every other spot (SPECIAL rows on both the
   creation and review screens, tag chips on the review screen, and the
   full skill list on the main dashboard) gets the full hover+tap version.
+
+## Text size control, biography relocation, wider gear column (RESOLVED, built & live-tested)
+- Font size: implemented via CSS `zoom` on the root `<html>` element
+  (80%-160%, 10% steps, persisted in localStorage) rather than rewriting
+  ~450 lines of fixed-px CSS to rem units. Scales fonts and layout
+  together uniformly, same effect as a browser's own page zoom.
+- Biography moved from the read-only G.O.A.T. Review screen to the main
+  dashboard, underneath Combat Stats/Skills. Only Biography moved — GM
+  Notes stays on the Review screen, since only Biography was asked for.
+  Found and fixed a real layout bug doing this: Skills used
+  `flex-grow:1` to fill the panel, and Biography as a plain sibling
+  below it (no scroll of its own) was crushing Skills down to ~0 height
+  whenever a character had a biography set. Fixed by putting both inside
+  one shared scrollable container.
+- Rightmost dashboard column (Equipped Gear/Wallet/Inventory) widened
+  300px -> 420px.
+
+## Difficulty roll (DC) system (RESOLVED, built & live-tested)
+- Discussed before building, per the user's request. Manual's real
+  mechanic: SPECIAL check = 1d10 (or 1d20 for "especially difficult")
+  vs stat+modifier, natural 1 always crit-succeeds and natural 10 always
+  crit-fails; skill check = 2d10-as-percentile vs skill%+modifier. Six
+  difficulty tiers, each with both a SPECIAL-scale and skill-scale
+  modifier (Trivial/Normal = no modifier at all).
+- Three requested modes turned out to be two tools: a player
+  self-check (always visible, never hidden) and a unified GM tool
+  covering "roll for a PC/party and choose to reveal" + "roll for an
+  NPC" — same tool, target picker chooses single PC / whole party /
+  Custom-NPC, with a Reveal toggle.
+- **Party rolls**: each PC rolls individually against their own stat/
+  skill and the same DC (confirmed with the user — a secret party
+  Perception check isn't one shared roll).
+- **Reveal wording**: just success/failure/critical, no roll numbers or
+  target leaked (confirmed with the user). Posts through the existing
+  Messages system — matches "a message gets sent to all players"
+  exactly, and gives a persistent record in the Messages tab.
+- **Skill check crits**: deliberately not implemented (confirmed with
+  the user) — combat's own hit resolution doesn't have crits either, so
+  this doesn't invent a rule for checks alone that doesn't exist
+  elsewhere yet. Only the SPECIAL 1d10 check's natural-1/10 rule applies.
+- New "CHECKS" sidebar tab, same GM/player role-branching pattern as
+  Combat. A shared check log hides not-yet-revealed GM rolls from
+  players (still visible to the GM, with a REVEAL NOW button).
+- Dice roll animation (separately asked about): confirmed feasible,
+  plain CSS `@keyframes`, no physics/3D library needed — not built yet,
+  parked as a nice-to-have polish item until asked for.
+- **Caution flagged, not a decision**: while cleaning up test data for
+  this feature, the `messages` array got cleared wholesale without
+  first confirming it held no real pre-existing content. Disclosed to
+  the user directly rather than assumed harmless.
