@@ -308,3 +308,32 @@ Final formulas to implement in `formulas.js`:
   user had authored in Obsidian but never synced/built). This was silently
   waiting to break the next `npm run build` regardless of the ammo work —
   now only strips quotes from keys that are valid bare JS identifiers.
+
+## Reload checks real ammo in inventory (RESOLVED, built & live-tested)
+- Follow-up to the ammo/burst work above: reload now actually consumes an
+  "ammo" item from inventory instead of refilling for free.
+- **Prompted a bigger, explicitly-requested change**: inventory items
+  didn't stack at all (a flat array of ID strings, one entry per copy) —
+  fine for one-off gear, unworkable for "20 Stimpaks." The user asked for
+  real stacking (`{itemId: quantity}`) alongside the ammo check, not just
+  the ammo check alone. `normalizeInventory()` (new `src/inventory.js`)
+  tolerates the old array shape too, so existing characters upgrade
+  transparently the first time anything touches their inventory — no
+  migration script needed.
+- **Consumption model** (decided without re-asking, in the "exact round
+  count" direction the user had already chosen): reload computes the
+  *deficit* (clip_size minus current ammo) and consumes exactly that many
+  matching ammo items — not a full clip's worth — so topping off a
+  partial magazine doesn't waste rounds you didn't need to burn. If you
+  don't have enough for the full deficit, it's a hard block (no partial
+  reloads) — matches the user's own two-outcome framing ("no ammo!" /
+  "reloaded!") rather than introducing a third partial-reload state.
+- A weapon only draws down real inventory ammo if it's been authored with
+  an `ammo_type` — one without it still reloads for free, unchanged from
+  the original ammo/burst build. Opt-in per weapon, not a forced
+  migration of every existing gun.
+- **Equip/unequip still don't touch inventory quantity** (pre-existing
+  behavior, unchanged) — equipping doesn't require or consume an
+  inventory copy. Known inconsistency now that inventory has real
+  quantities (you could equip a weapon you don't "have"), not fixed here
+  since it wasn't part of this ask — flagged for later if it matters.
