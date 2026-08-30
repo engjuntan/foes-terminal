@@ -448,3 +448,13 @@ option {
   background-color: #000;
   color: var(--pip-green);
 }
+
+/* --- DICE ROLL ANIMATION --- */
+@keyframes dice-pulse {
+  0%, 100% { box-shadow: 0 0 4px var(--pip-green); border-color: var(--pip-green); }
+  50% { box-shadow: 0 0 14px var(--pip-green); border-color: #fff; }
+}
+.dice-rolling {
+  animation: dice-pulse 0.3s ease-in-out infinite;
+  color: #fff !important;
+}

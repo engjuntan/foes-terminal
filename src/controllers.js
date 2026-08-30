@@ -798,8 +798,11 @@ export function setCombatActionField(field, value) {
 
 export function rollForMe() {
   const draft = getCombatActionDraft();
-  draft.roll = rollPercentile();
-  window.render();
+  const finalValue = rollPercentile(); // the real roll — already decided, just not shown yet
+  window.animateDiceRoll('combatRollInput', finalValue, 100, () => {
+    draft.roll = finalValue;
+    window.render();
+  });
 }
 
 export async function resolveAttack() {
@@ -1176,8 +1179,12 @@ export function setPlayerCheckField(field, value) {
 }
 export function rollForPlayerCheck() {
   const draft = getPlayerCheckDraft();
-  draft.roll = draft.kind === 'special' ? (draft.useD20 ? rollD20() : rollD10()) : rollPercentile();
-  window.render();
+  const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
+  const finalValue = draft.kind === 'special' ? (draft.useD20 ? rollD20() : rollD10()) : rollPercentile();
+  window.animateDiceRoll('playerCheckRollInput', finalValue, maxRoll, () => {
+    draft.roll = finalValue;
+    window.render();
+  });
 }
 // The "WHAT" dropdown packs kind+key into one value ("special:str" /
 // "skill:sneak") so picking a new stat/skill is a single select, not two.
@@ -1248,8 +1255,12 @@ export function setGmCheckField(field, value) {
 }
 export function rollForGmCheck() {
   const draft = getGmCheckDraft();
-  draft.roll = draft.kind === 'special' ? (draft.useD20 ? rollD20() : rollD10()) : rollPercentile();
-  window.render();
+  const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
+  const finalValue = draft.kind === 'special' ? (draft.useD20 ? rollD20() : rollD10()) : rollPercentile();
+  window.animateDiceRoll('gmCheckRollInput', finalValue, maxRoll, () => {
+    draft.roll = finalValue;
+    window.render();
+  });
 }
 export function setGmCheckWhat(value) {
   const [kind, key] = value.split(':');

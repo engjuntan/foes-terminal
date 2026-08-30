@@ -481,7 +481,7 @@ export function getCombatView(liveData, userRole, currentUser) {
         ${bodyPartHtml}
         <label style="font-size:11px; color:#666;">ROLL (1-100)</label>
         <div style="display:flex; gap:6px; margin-bottom:10px;">
-          <input type="number" min="1" max="100" value="${draft.roll ?? ''}" oninput="window.setCombatActionField('roll', this.value)" style="flex-grow:1; background:black; color:lime; border:1px solid #333;">
+          <input type="number" id="combatRollInput" min="1" max="100" value="${draft.roll ?? ''}" oninput="window.setCombatActionField('roll', this.value)" style="flex-grow:1; background:black; color:lime; border:1px solid #333;">
           ${currentActor.ref_type === 'pc' ? `<button class="gm-btn" onclick="window.rollForMe()">🎲 ROLL</button>` : ''}
         </div>
         <button style="width:100%; padding:10px; background:var(--pip-green); color:black; font-weight:bold; border:none; cursor:pointer; margin-bottom:6px;" onclick="window.resolveAttack()">RESOLVE ATTACK</button>
@@ -623,7 +623,7 @@ export function getChecksView(liveData, userRole, currentUser) {
         </label>` : ''}
         <label style="font-size:11px; color:#666;">ROLL (1-${maxRoll})</label>
         <div style="display:flex; gap:6px; margin-bottom:10px;">
-          <input type="number" min="1" max="${maxRoll}" value="${draft.roll ?? ''}" oninput="window.setPlayerCheckField('roll', this.value)" style="flex-grow:1; background:black; color:lime; border:1px solid #333;">
+          <input type="number" id="playerCheckRollInput" min="1" max="${maxRoll}" value="${draft.roll ?? ''}" oninput="window.setPlayerCheckField('roll', this.value)" style="flex-grow:1; background:black; color:lime; border:1px solid #333;">
           <button class="gm-btn" onclick="window.rollForPlayerCheck()">🎲 ROLL</button>
         </div>
         <button style="width:100%; padding:10px; background:var(--pip-green); color:black; font-weight:bold; border:none; cursor:pointer;" onclick="window.resolvePlayerCheck()">RESOLVE CHECK</button>
@@ -670,7 +670,7 @@ export function getChecksView(liveData, userRole, currentUser) {
         ${draft.scope !== 'party' ? `
         <label style="font-size:11px; color:#666;">ROLL (1-${maxRoll})</label>
         <div style="display:flex; gap:6px; margin-bottom:8px;">
-          <input type="number" min="1" max="${maxRoll}" value="${draft.roll ?? ''}" oninput="window.setGmCheckField('roll', this.value)" style="flex-grow:1; background:black; color:orange; border:1px solid orange;">
+          <input type="number" id="gmCheckRollInput" min="1" max="${maxRoll}" value="${draft.roll ?? ''}" oninput="window.setGmCheckField('roll', this.value)" style="flex-grow:1; background:black; color:orange; border:1px solid orange;">
           <button class="gm-btn" style="border-color:orange; color:orange;" onclick="window.rollForGmCheck()">🎲 ROLL</button>
         </div>` : `<p style="font-size:11px; color:#666; margin-bottom:8px;">Each party member auto-rolls their own dice when resolved.</p>`}
         <label style="font-size:11px; color:#666; display:flex; align-items:center; gap:6px; margin-bottom:10px;">
@@ -1115,18 +1115,16 @@ export function getPlayerView(charId, liveData) {
       </div>
       
       <div class="panel">
+        ${charData.biography ? `
+        <h2>BIOGRAPHY</h2>
+        <div style="max-height:180px; overflow-y:auto; margin-bottom:20px; font-size:14px; color:#ccc; line-height:1.5; white-space:pre-wrap;">${escapeHtml(charData.biography)}</div>` : ''}
         <h2>COMBAT STATS</h2>
          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
           <div style="border:1px solid #333; padding:5px; text-align:center;"><small>AC</small><br><strong style="font-size:24px;">${derived.armorClass}</strong></div>
           <div style="border:1px solid #333; padding:5px; text-align:center;"><small>SEQ</small><br><strong style="font-size:24px;">${derived.sequenceBonus}</strong></div>
         </div>
         <h2>SKILLS</h2>
-        <div style="flex-grow:1; overflow-y:auto;">
-          ${skillsHtml}
-          ${charData.biography ? `
-          <h3 style="border-bottom:1px solid var(--pip-dim); margin-top:20px;">BIOGRAPHY</h3>
-          <div style="font-size:14px; color:#ccc; line-height:1.5; white-space:pre-wrap;">${escapeHtml(charData.biography)}</div>` : ''}
-        </div>
+        <div style="flex-grow:1; overflow-y:auto;">${skillsHtml}</div>
       </div>
 
       <div class="panel">

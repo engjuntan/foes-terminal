@@ -120,6 +120,45 @@ window.toggleTooltip = (text, evt) => {
 };
 document.addEventListener('click', () => window.hideTooltip());
 
+// --- DICE ROLL ANIMATION ---
+// Purely cosmetic — the real roll value is already determined the
+// instant this is called (rollForMe/rollForPlayerCheck/rollForGmCheck
+// compute it up front); this just delays *revealing* it, cycling random
+// numbers into the roll input starting fast and easing down to a stop,
+// landing on the true value. Total duration is randomized 1-3s each
+// time for a bit of suspense. `onDone` is where the draft's real roll
+// field actually gets set — the input's value during the animation is
+// pure visual noise, not app state.
+window.animateDiceRoll = (inputId, finalValue, maxValue, onDone) => {
+  const el = document.getElementById(inputId);
+  if (!el) { if (onDone) onDone(); return; } // nothing to animate, just resolve
+  el.classList.add('dice-rolling');
+  const duration = 1000 + Math.random() * 2000; // 1-3s
+  const start = Date.now();
+
+  // Plain setTimeout chaining, deliberately not requestAnimationFrame —
+  // rAF pauses/throttles hard the moment a tab isn't the visibly active
+  // one (backgrounded, or driven by some automation contexts), which
+  // would leave the roll stuck mid-animation. setTimeout keeps ticking
+  // regardless.
+  function tick() {
+    const live = document.getElementById(inputId);
+    if (!live) { if (onDone) onDone(); return; } // view re-rendered mid-animation, bail quietly
+    const elapsed = Date.now() - start;
+    if (elapsed >= duration) {
+      live.value = finalValue;
+      live.classList.remove('dice-rolling');
+      if (onDone) onDone();
+      return;
+    }
+    live.value = 1 + Math.floor(Math.random() * maxValue);
+    const progress = elapsed / duration; // 0 -> 1, eases the tick rate down
+    const nextDelay = 30 + Math.pow(progress, 2) * 220; // ~30ms -> ~250ms between ticks
+    setTimeout(tick, nextDelay);
+  }
+  tick();
+};
+
 window.switchTab = (tabName) => {
   window.currentTab = tabName;
   window.render();
