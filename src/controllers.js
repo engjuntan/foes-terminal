@@ -5,7 +5,7 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
 import { RACE_RULES, calculateDerivedStats } from './formulas.js';
 import { getMonster } from './bestiary.js';
-import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS } from './combat.js';
+import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { mapDatabase } from './maps.js';
 import { normalizeInventory, getInventoryQuantity, addToInventory, removeFromInventory } from './inventory.js';
@@ -938,9 +938,10 @@ export async function resolveAttack() {
 
   const partTag = bodyPartKey !== 'torso' ? ` (aimed at ${bodyPart.label})` : '';
   const burstTag = isBurstShot ? ` [BURST FIRE, ${ammoAfterShot}/${getItem(draft.attackKey).clip_size} ammo left]` : '';
-  const message = isHit
-    ? `${attacker.name} attacks ${targetName}${partTag} with ${attackDef.name}${burstTag} — HIT for ${finalDamage} damage (rolled ${roll} vs ${effectiveChance}%).${effectAppliedMsg}`
-    : `${attacker.name} attacks ${targetName}${partTag} with ${attackDef.name}${burstTag} — MISS (rolled ${roll} vs ${effectiveChance}%).`;
+  const message = buildAttackLogMessage({
+    isHit, attackerName: attacker.name, targetName, weaponName: attackDef.name,
+    partTag, burstTag, damage: finalDamage, roll, chance: effectiveChance, effectAppliedMsg
+  });
 
   const updatedCombat = {
     ...combat,

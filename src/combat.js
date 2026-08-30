@@ -130,3 +130,45 @@ export function applyDamageReduction(rawDamage, dtdrBlock, damageType) {
   const afterDr = afterDt * (1 - (entry.dr || 0) / 100);
   return Math.max(0, Math.round(afterDr));
 }
+
+// --- RANDOMIZED COMBAT LOG FLAVOR TEXT ---
+// Purely cosmetic — every variant still carries the same mechanical
+// numbers (roll, chance, damage, part/burst tags, effect applied), just
+// phrased differently each time so the log doesn't read as the same
+// template over and over. Kept weapon-agnostic on purpose (no "fires" /
+// "shoots"-only verbs) since the same attack could be a gun, a blade, or
+// a bare fist.
+const HIT_TEMPLATES = [
+  ({ attacker, target, weapon, part }) => `${attacker} connects with ${weapon}${part} — ${target} takes DMG damage.`,
+  ({ attacker, target, weapon, part }) => `${attacker}'s ${weapon} finds its mark${part}. ${target} takes DMG damage.`,
+  ({ attacker, target, weapon, part }) => `Clean hit: ${attacker} tags ${target}${part} with ${weapon} for DMG damage.`,
+  ({ attacker, target, weapon, part }) => `${attacker} strikes true${part} with ${weapon} — DMG damage to ${target}.`,
+  ({ attacker, target, weapon, part }) => `${target} takes DMG damage as ${attacker}'s ${weapon} lands${part}.`,
+  ({ attacker, target, weapon, part }) => `Solid hit — ${attacker} catches ${target}${part} with ${weapon} for DMG damage.`,
+  ({ attacker, target, weapon, part }) => `${attacker} doesn't miss${part} — ${weapon} deals DMG damage to ${target}.`,
+  ({ attacker, target, weapon, part }) => `${weapon} bites deep${part}. ${attacker} deals DMG damage to ${target}.`
+];
+const MISS_TEMPLATES = [
+  ({ attacker, target, weapon, part }) => `${attacker} swings ${weapon}${part} at ${target} and misses completely.`,
+  ({ attacker, target, weapon, part }) => `${target} ducks out of the way — ${attacker}'s ${weapon} finds nothing but air${part}.`,
+  ({ attacker, target, weapon, part }) => `${attacker}'s ${weapon} misses ${target}${part} by a hair.`,
+  ({ attacker, target, weapon, part }) => `Close, but no — ${attacker}'s ${weapon} misses ${target}${part}.`,
+  ({ attacker, target, weapon, part }) => `${attacker} whiffs${part} with ${weapon}. ${target} is unscathed.`,
+  ({ attacker, target, weapon, part }) => `${target} shrugs off ${attacker}'s attempt${part} with ${weapon} — no damage.`,
+  ({ attacker, target, weapon, part }) => `${attacker} can't find an opening${part}. ${weapon} does nothing.`,
+  ({ attacker, target, weapon, part }) => `Bad luck for ${attacker} — ${weapon} misses ${target}${part} entirely.`
+];
+
+// Builds the full combat log line: a randomly-picked flavor sentence plus
+// the mechanical numbers, which are always present regardless of which
+// flavor variant got picked. `partTag`/`burstTag`/`effectAppliedMsg` are
+// the same pre-formatted strings resolveAttack() already builds
+// (e.g. " (aimed at Head)", " [BURST FIRE, 21/24 ammo left]").
+export function buildAttackLogMessage({ isHit, attackerName, targetName, weaponName, partTag, burstTag, damage, roll, chance, effectAppliedMsg }) {
+  const templates = isHit ? HIT_TEMPLATES : MISS_TEMPLATES;
+  const template = templates[Math.floor(Math.random() * templates.length)];
+  let sentence = template({ attacker: attackerName, target: targetName, weapon: weaponName, part: partTag || '' });
+  if (isHit) sentence = sentence.replace('DMG', damage);
+  const suffix = `${burstTag || ''} (rolled ${roll} vs ${chance}%)${isHit ? (effectAppliedMsg || '') : ''}`;
+  return sentence + suffix;
+}
