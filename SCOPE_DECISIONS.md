@@ -337,3 +337,42 @@ Final formulas to implement in `formulas.js`:
   inventory copy. Known inconsistency now that inventory has real
   quantities (you could equip a weapon you don't "have"), not fixed here
   since it wasn't part of this ask — flagged for later if it matters.
+  **Superseded by the next entry** — fixed the very next request.
+
+## Equip/unequip require and move real inventory copies (RESOLVED, built & live-tested)
+- Direct follow-up flagged at the end of the ammo work above, actioned
+  immediately: "a weapon is a weapon... equip/unequip only, similar to
+  armor or accessories" — not consumed like ammo/Stimpaks, but not free
+  to summon out of nowhere either.
+- Equipping now requires owning a copy in inventory (blocks with an
+  alert naming the item otherwise) and moves it out of inventory onto
+  the body. Unequipping (player and GM paths both) returns it. Swapping
+  gear into an occupied slot correctly returns whatever was there before
+  instead of silently discarding it — a real gap that existed the moment
+  inventory started tracking real quantities. Re-equipping the same item
+  already in that slot is a no-op, not a double-consume.
+
+## Randomized combat log flavor text (RESOLVED, built & live-tested)
+- Was sitting in the parking lot from the Combat Module round: "varied
+  hit/miss/damage phrasing instead of the same template every time."
+  8 hit + 8 miss phrasing templates, randomly picked per attack,
+  deliberately weapon-agnostic (no gun-only verbs, since the same attack
+  could be a blade or a fist). The mechanical numbers a GM needs
+  (roll/chance, damage, burst tag, effect-applied message) are identical
+  regardless of which flavor line got picked — only the sentence around
+  them varies.
+
+## G.O.A.T. Exam hover tooltips for SPECIAL/skills (RESOLVED, built & live-tested)
+- Was parked back in Phase 1 alongside the mobile tap-to-show tooltip
+  fix, waiting for actual tooltip *content* to exist for SPECIAL/skills.
+  Content condensed from the manual's own SPECIAL and Skills sections,
+  covering all 7 SPECIAL stats and all 18 skills (not just the 12
+  taggable at character creation).
+- Reuses the existing renderWikiLink/showTooltip pattern (same one
+  traits/perks use) everywhere except the creation screen's skill-tag
+  grid, where each tile already has its own onclick to toggle the tag —
+  stacking renderWikiLink's onclick (which calls stopPropagation) there
+  would silently break tap-to-select on mobile. That one spot is
+  hover-only by design; every other spot (SPECIAL rows on both the
+  creation and review screens, tag chips on the review screen, and the
+  full skill list on the main dashboard) gets the full hover+tap version.
