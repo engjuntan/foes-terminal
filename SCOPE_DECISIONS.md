@@ -425,4 +425,61 @@ Final formulas to implement in `formulas.js`:
 - **Caution flagged, not a decision**: while cleaning up test data for
   this feature, the `messages` array got cleared wholesale without
   first confirming it held no real pre-existing content. Disclosed to
-  the user directly rather than assumed harmless.
+  the user directly rather than assumed harmless. User confirmed nothing
+  critical was in there.
+
+## Biography placement, take 2 (RESOLVED)
+- Moved again per feedback: now at the very top of the Combat Stats
+  column, above Combat Stats itself, with its own `<h2>` (matching
+  Combat Stats/Skills' header treatment) and a bounded
+  max-height:180px scrollable box of its own — the real fix for the
+  earlier flex-crush bug, since Biography can no longer grow unbounded
+  regardless of where it sits in the column.
+
+## Dice roll animation (RESOLVED, built & live-tested)
+- Cycles random numbers starting fast (~30ms/tick) and easing to a stop
+  (~250ms/tick), landing on the real already-determined roll value,
+  total duration randomized 1-3s for suspense — matches the user's spec
+  exactly. One shared `window.animateDiceRoll()` helper wired into all
+  three existing roll buttons (combat, player check, GM check).
+- Built on plain `setTimeout` chaining, not `requestAnimationFrame` —
+  found during testing that rAF throttles hard the instant a tab isn't
+  considered visibly active (this bit the live-test itself, stuck mid-
+  roll in the automated browser tab), which would risk a real player's
+  roll getting stuck if they alt-tab mid-animation. setTimeout keeps
+  ticking regardless of tab visibility.
+
+## Critical hit system for combat (DISCUSSED, not yet built)
+- User asked how tricky this would be, before deciding whether to build.
+- The chance/detection side is simple and mirrors the difficulty-check
+  work already done: crit chance = LK stat (as raw percentage points) +
+  perk/trait/targeting bonuses, capped at 50%; a roll within that range
+  is a critical success *even if it would have otherwise missed*; a
+  natural 91-99 needs a secondary LK sub-check to avoid becoming a
+  critical failure, and a natural 100 is always a critical failure.
+- The genuinely bigger lift is the two 10-entry effect tables (crit
+  success: extra damage, cripple leg/arm, bleed, stun, ignore DT/DR,
+  blind, knockdown, instant kill w/ boss exception; crit failure:
+  misfire, weapon explodes, hit self, hit a different target, weapon
+  condition damage, lose turn, drop weapon). Several entries reference
+  mechanics that don't exist anywhere yet: weapon condition/durability
+  marks, a "boss" flag on monsters, redirecting an attack to a different
+  target. Not scoped or built — waiting on the user's call on whether to
+  do a simplified subset now (reusing what already exists: Blinded/
+  Crippled Arm/Crippled Leg/Stunned status effects, extra damage,
+  ignore-DT/DR) versus the full table including the new subsystems.
+
+## Obsidian wiki search via the command bar (DISCUSSED, not built)
+- User asked purely as a feasibility discussion, not a build request.
+- See conversation for the full answer — short version: feasible, but
+  the wiki content currently only exists as already-parsed JS databases
+  (items/traits/bestiary/etc.) plus the raw Obsidian .md files on disk,
+  which the deployed app has no access to at runtime. A real
+  implementation would need either (a) a search index built at sync
+  time from the same content sync-obsidian.js already parses, bundled
+  into the app like everything else, or (b) full-text search across
+  flavor text/descriptions the sync step doesn't currently capture in
+  full (e.g. long-form lore prose in files that aren't items/traits/etc).
+  Scoping question for later: search just the structured game data
+  (quick, reuses existing sync), or actual free-text wiki prose search
+  (bigger, needs a new sync step to extract and index page bodies).
