@@ -469,6 +469,33 @@ Final formulas to implement in `formulas.js`:
   Crippled Arm/Crippled Leg/Stunned status effects, extra damage,
   ignore-DT/DR) versus the full table including the new subsystems.
 
+## Critical hit system for combat (RESOLVED, built & live-tested)
+- Amended per the user before building: Blinded (crit-success #8) now
+  means -50% hit chance instead of -1 PER; Weapon Backfire (crit-fail
+  #2) cripples the attacker's arm and destroys the weapon (not returned
+  to inventory) instead of 2d10 self-damage; failure-table #5/#6/#7
+  (built on the cut weapon-condition system) are blank "just a miss"
+  slots rather than renumbered.
+- Applies to NPCs now too, per the user — this required generalizing
+  monster combat instances to carry their own status_effects array
+  (same shape as a PC's) and generalizing endTurn()'s ticking logic to
+  handle either. Also added duration_turns (auto-expiring effects,
+  needed for "stunned 1d4 turns" etc.) — effects without it still
+  persist until manually removed, same as before.
+- New bestiary field `is_boss` (default false) for the "One Shot One
+  Kill" exception (20 true damage instead of instant death).
+- Found and fixed two real bugs during this build: a redirect/self-hit
+  damage helper was using the original target's armor instead of
+  whoever was actually taking the damage; and critical-failure flavor
+  text (backfire, hit-self, etc.) was being silently dropped from the
+  log entirely because the message builder only showed effect text on
+  a hit.
+
+## Stance/prone/crouch indicator (SCOPED, not yet built)
+## Radiation tracker, two-phase (SCOPED, not yet built)
+- See conversation for the manual's extracted rules and the proposed
+  implementation for both — user asked to scope only, not build yet.
+
 ## Obsidian wiki search via the command bar (DISCUSSED, not built)
 - User asked purely as a feasibility discussion, not a build request.
 - See conversation for the full answer — short version: feasible, but
