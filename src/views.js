@@ -1,6 +1,7 @@
 // src/views.js
 import { calculateDerivedStats, RACE_RULES } from './formulas.js';
 import { getItem, itemDatabase } from './items.js';
+import { normalizeInventory, getInventoryQuantity } from './inventory.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
@@ -385,9 +386,15 @@ export function getCombatView(liveData, userRole, currentUser) {
             <input type="checkbox" ${burstSelected ? 'checked' : ''} onchange="window.setCombatActionField('burst', this.checked)">
             🔥 BURST FIRE (-${BURST_HIT_PENALTY}% hit, ~2x damage, uses ${equippedWeaponItem.burst_shots} ammo)
           </label>` : '';
+        // Spare-rounds count only applies to weapons authored with an
+        // ammo_type — a weapon without one reloads for free (no real
+        // inventory ammo item to track), same as before this feature.
+        const spareTag = equippedWeaponItem.ammo_type
+          ? ` <span style="color:#666;">(spare: ${Object.keys(normalizeInventory(char.inventory)).filter(id => { const d = getItem(id); return d && d.type === 'ammo' && d.ammo_type === equippedWeaponItem.ammo_type; }).reduce((sum, id) => sum + getInventoryQuantity(char.inventory, id), 0)})</span>`
+          : '';
         ammoHtml = `
           <div style="display:flex; align-items:center; justify-content:space-between; font-size:11px; color:#888; margin-bottom:6px;">
-            <span>Ammo: <span style="color:var(--pip-green);">${currentAmmo}/${equippedWeaponItem.clip_size}</span></span>
+            <span>Ammo: <span style="color:var(--pip-green);">${currentAmmo}/${equippedWeaponItem.clip_size}</span>${spareTag}</span>
             <button class="gm-btn" style="padding:2px 8px; font-size:10px;" onclick="window.reloadWeapon('${currentActor.char_id}', '${equippedWeaponSlot}')">RELOAD</button>
           </div>
           ${burstOption}`;
@@ -823,18 +830,22 @@ export function getPlayerView(charId, liveData) {
   }
 
   // --- 3. INVENTORY & WALLET ---
+  // Inventory is a stacked { itemId: quantity } map — normalizeInventory
+  // also transparently upgrades a character still on the old flat-array
+  // shape from before stacking existed, purely for display (nothing gets
+  // written back just from viewing).
   let inventoryHtml = "";
   let walletHtml = "";
 
   if (charData.inventory) {
-    const rawInv = charData.inventory.map(itemEntry => {
-       const itemId = (typeof itemEntry === 'string') ? itemEntry : itemEntry.id;
+    const invMap = normalizeInventory(charData.inventory);
+    const rawInv = Object.entries(invMap).map(([itemId, qty]) => {
        const itemDef = getItem(itemId);
-       return { id: itemId, def: itemDef };
+       return { id: itemId, qty, def: itemDef };
     });
 
     walletHtml = rawInv.filter(i => i.def && i.def.type === 'currency')
-      .map(i => `<div style="display:flex; justify-content:space-between; border-bottom:1px dashed #333; padding:2px 0;">${renderWikiLink(i.def.name, i.def.description)}<span style="color:var(--pip-gold);">x1</span></div>`).join("");
+      .map(i => `<div style="display:flex; justify-content:space-between; border-bottom:1px dashed #333; padding:2px 0;">${renderWikiLink(i.def.name, i.def.description)}<span style="color:var(--pip-gold);">x${i.qty}</span></div>`).join("");
 
     inventoryHtml = `<ul class="inventory-list">` + rawInv.filter(i => !i.def || i.def.type !== 'currency').map(i => {
         const itemDef = i.def;
@@ -843,7 +854,8 @@ export function getPlayerView(charId, liveData) {
           const isEquipped = Object.values(equip).includes(itemId);
           const style = isEquipped ? "opacity: 0.5; border-color: #555;" : "";
           const safeDesc = (itemDef.description || "").replace(/"/g, "&quot;").replace(/'/g, "\\'");
-          
+          const qtyTag = i.qty > 1 ? ` <span style="color:var(--pip-green);">x${i.qty}</span>` : '';
+
           let buttons = "";
           if (!isEquipped) {
             if (itemDef.slot === "hand") buttons = `<button onclick="window.equipItem('${itemId}', 'right_hand')">R</button> <button onclick="window.equipItem('${itemId}', 'left_hand')">L</button>`;
@@ -851,7 +863,7 @@ export function getPlayerView(charId, liveData) {
             else if (itemDef.slot === "head") buttons = `<button onclick="window.equipItem('${itemId}', 'head')">EQUIP</button>`;
           } else { buttons = `<span style="color:var(--pip-green); font-size:10px;">[EQUIPPED]</span>`; }
 
-          return `<li class="inv-card" style="${style}"><img src="${itemDef.icon}" class="inv-icon"><div class="inv-info"><span class="inv-name" style="cursor:help; border-bottom:1px dotted var(--pip-green);" onmouseover="window.showTooltip('${safeDesc}', event)" onmouseout="window.hideTooltip()">${itemDef.name}</span><span class="inv-meta">${itemDef.type.toUpperCase()}</span></div><div class="inv-actions">${buttons}</div></li>`;
+          return `<li class="inv-card" style="${style}"><img src="${itemDef.icon}" class="inv-icon"><div class="inv-info"><span class="inv-name" style="cursor:help; border-bottom:1px dotted var(--pip-green);" onmouseover="window.showTooltip('${safeDesc}', event)" onmouseout="window.hideTooltip()">${itemDef.name}</span>${qtyTag}<span class="inv-meta">${itemDef.type.toUpperCase()}</span></div><div class="inv-actions">${buttons}</div></li>`;
         } else { return `<li>${itemId} (DATA SYNC PENDING)</li>`; }
     }).join("") + `</ul>`;
   }

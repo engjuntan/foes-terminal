@@ -8,6 +8,7 @@ import { getMonster } from './bestiary.js';
 import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { mapDatabase } from './maps.js';
+import { normalizeInventory, getInventoryQuantity, addToInventory, removeFromInventory } from './inventory.js';
 
 // --- GAME ACTIONS ---
 export async function equipItem(itemId, targetSlot) {
@@ -76,9 +77,45 @@ export async function reloadWeapon(targetCharId, slot) {
   const item = equippedId && getItem(equippedId);
   if (!item || !item.clip_size) { alert("NO AMMO-USING WEAPON EQUIPPED IN THAT SLOT"); return; }
 
-  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const currentAmmo = (char.ammo || {})[slot] ?? item.clip_size;
+  const deficit = item.clip_size - currentAmmo;
+  if (deficit <= 0) { alert("ALREADY FULLY LOADED"); return; }
+
   const updatePayload = {};
+
+  // A weapon only draws down real inventory ammo if it's been authored
+  // with an ammo_type (e.g. "9mm") — a weapon with clip_size but no
+  // ammo_type just refills for free, same as before this feature. Tops
+  // up exactly the deficit (not a full clip's worth) so topping off a
+  // partially-spent magazine doesn't waste rounds you didn't need to burn.
+  if (item.ammo_type) {
+    const inv = normalizeInventory(char.inventory);
+    const matchingAmmoIds = Object.keys(inv).filter(id => {
+      const def = getItem(id);
+      return def && def.type === 'ammo' && def.ammo_type === item.ammo_type;
+    });
+    const totalHeld = matchingAmmoIds.reduce((sum, id) => sum + inv[id], 0);
+    if (totalHeld < deficit) {
+      alert(`NO AMMO! (need ${deficit} more ${item.ammo_type}, have ${totalHeld})`);
+      return;
+    }
+    // Drain the needed rounds across whichever matching ammo stack(s)
+    // are on hand, in whatever order they're found — there's normally
+    // just one canonical ammo item per ammo_type.
+    let remaining = deficit;
+    let newInv = inv;
+    for (const id of matchingAmmoIds) {
+      if (remaining <= 0) break;
+      const take = Math.min(remaining, newInv[id]);
+      newInv = removeFromInventory(newInv, id, take);
+      remaining -= take;
+    }
+    updatePayload[`characters.${targetCharId}.inventory`] = newInv;
+  }
+
   updatePayload[`characters.${targetCharId}.ammo.${slot}`] = item.clip_size;
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
 
   // If this happens mid-combat, log it so the table can see it happened —
   // matches how every other combat action gets logged.
@@ -90,7 +127,10 @@ export async function reloadWeapon(targetCharId, slot) {
     };
   }
 
-  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+  try {
+    await updateDoc(charRef, updatePayload);
+    alert("RELOADED!");
+  } catch (err) { alert("ERROR: " + err.message); }
 }
 
 export async function createAccessCode() {
@@ -260,19 +300,19 @@ export async function gmGrantItem(targetCharId) {
     // READ current data first
     const charSnap = await getDoc(charRef);
     if (!charSnap.exists()) return;
-    
-    // Get current inventory array (or empty array if none)
-    const currentInv = charSnap.data().characters[targetCharId].inventory || [];
-    
-    // Add the new item to the local array
-    currentInv.push(itemId);
-    
-    // WRITE the entire updated array back
+
+    // Inventory is a stacked { itemId: quantity } map now — normalizes
+    // and upgrades transparently even if this character still has the
+    // old flat-array shape from before stacking existed.
+    const currentInv = charSnap.data().characters[targetCharId].inventory;
+    const newInv = addToInventory(currentInv, itemId, 1);
+
+    // WRITE the entire updated map back
     const charPath = `characters.${targetCharId}`;
     const updatePayload = {};
-    updatePayload[`${charPath}.inventory`] = currentInv;
-    
-    await updateDoc(charRef, updatePayload); 
+    updatePayload[`${charPath}.inventory`] = newInv;
+
+    await updateDoc(charRef, updatePayload);
     alert(`GRANTED ${itemId.toUpperCase()} TO ${targetCharId.toUpperCase()}`);
   } catch (err) { alert(err.message); }
 }
@@ -1081,7 +1121,7 @@ export async function gmFactoryReset(targetCharId) {
   updatePayload[`characters.${targetCharId}.race`] = "human";
   updatePayload[`characters.${targetCharId}.special`] = { str: 5, per: 5, end: 5, cha: 5, int: 5, agi: 5, luk: 5 };
   updatePayload[`characters.${targetCharId}.tags`] = {};
-  updatePayload[`characters.${targetCharId}.inventory`] = []; 
+  updatePayload[`characters.${targetCharId}.inventory`] = {};
   updatePayload[`characters.${targetCharId}.equipment`] = { head: null, body: null, right_hand: null, left_hand: null };
   updatePayload[`characters.${targetCharId}.skill_points`] = 0;
   updatePayload[`characters.${targetCharId}.level`] = 1;

@@ -9,6 +9,15 @@ export const itemDatabase = {
     "description": "A pair of corrective lenses, scavenged and re-fitted. It takes real skill to make these things. Hope you don't drop them. ",
     "value": 10
   },
+  makeshift_rounds: {
+    "id": "makeshift_rounds",
+    "name": "Makeshift Rounds",
+    "type": "ammo",
+    "ammo_type": "makeshift_rounds",
+    "icon": "",
+    "description": "Hand-loaded rounds, packed by whoever had the patience for it. Not pretty, but they go bang more often than not.",
+    "value": 2
+  },
   "1414_windbreaker": {
     "id": "1414_windbreaker",
     "name": "1414 Windbreaker",
@@ -544,6 +553,7 @@ export const itemDatabase = {
       "range": 15
     },
     "clip_size": 6,
+    "ammo_type": "makeshift_rounds",
     "value": 50
   },
   kitchen_knife: {
