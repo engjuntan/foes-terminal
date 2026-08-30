@@ -40,6 +40,8 @@ export function instantiateMonster(monsterId, label) {
     dtdr: template.stats.dtdr,
     resistances: template.stats.resistances,
     attacks: template.attacks || [],
+    is_boss: template.stats.is_boss || false, // "one shot one kill" crit takes 20 true damage instead
+    status_effects: [], // same shape as a PC's — carries crit/aimed-shot afflictions inline
     is_down: false
   };
 }
@@ -54,8 +56,9 @@ export function rollInitiative(sequenceBonus) {
 // Torso is just the default/normal attack (0 penalty, no special effect).
 // Picking anything else is a genuinely optional second choice, not a
 // replacement for the normal attack — matches Fallout 1/2's targeted-shot
-// convention. effectId (if present) only mechanically applies to PC
-// targets right now, since monsters don't carry a status_effects array.
+// convention. effectId now applies to PC and monster targets alike —
+// monster combat instances carry their own status_effects array too,
+// same shape as a PC's (see the critical hit section below).
 export const BODY_PARTS = {
   torso: { label: 'Torso', penalty: 0 },
   head: { label: 'Head', penalty: 20, damageMultiplier: 1.5 },
@@ -79,6 +82,74 @@ export const BODY_PARTS = {
 // actual spray/partial-hit spread.
 export const BURST_HIT_PENALTY = 15;
 export const BURST_DAMAGE_ROLLS = 2; // weapon's damage dice rolled this many times and summed
+
+// --- CRITICAL HITS (manual p.~1286-1345, amended with the user) ---
+// Crit chance: LK stat used directly as percentage points for PCs
+// (perk/trait bonuses can layer on top later through the same modifier
+// system if any get authored), capped at 50% per the manual. Monsters
+// use their own authored bestiary `crit_chance` directly — same cap.
+export function getCritChance(rawValue) {
+  return Math.min(50, Math.max(0, rawValue || 0));
+}
+
+// Resolves crit status for the SAME roll already made for the hit check
+// — not a separate roll. A roll within crit chance is always a critical
+// success, even overriding what would've otherwise been a miss. A
+// natural 100 is always a critical failure. A natural 91-99 is a
+// PC-only fumble save (the manual's own rule): roll 1d10, and failing
+// to roll <= your LK turns it into a critical failure too. Monsters
+// don't have a Luck stat, so they skip that 91-99 save — only a natural
+// 100 can fumble them; a deliberate simplification rather than
+// inventing a proxy formula for something the bestiary doesn't track.
+export function resolveCrit(roll, critChance, luckStat, isPc) {
+  if (roll <= critChance) return 'success';
+  if (roll === 100) return 'fail';
+  if (isPc && roll >= 91 && roll <= 99) {
+    const saveRoll = rollD10();
+    if (saveRoll > luckStat) return 'fail';
+  }
+  return null;
+}
+
+function rollD10() { return Math.floor(Math.random() * 10) + 1; }
+
+// Rolls which table entry applies — a separate 1d10 from the attack
+// roll itself, matching the tables' own "Roll: Effect" framing.
+export function rollCritTableEntry(isSuccess) {
+  const table = isSuccess ? CRIT_SUCCESS_TABLE : CRIT_FAIL_TABLE;
+  const roll = rollD10();
+  return { roll, ...table[roll] };
+}
+
+// `effect` is a tag resolveAttack() switches on to apply the mechanical
+// consequence — see controllers.js. Entries 5/6/7 on the failure table
+// were the ones built on weapon condition marks (cut — no durability
+// system exists), so they're blank ("no special effect beyond the
+// miss") rather than renumbered, keeping the original 1-10 odds intact.
+export const CRIT_SUCCESS_TABLE = {
+  1: { label: 'Nothing extra — a clean hit', effect: 'none' },
+  2: { label: 'Cripples their leg', effect: 'cripple_leg' },
+  3: { label: 'Cripples their arm', effect: 'cripple_arm' },
+  4: { label: '+300% damage', effect: 'bonus_damage' },
+  5: { label: 'Hits a major artery — 20 true damage, then bleeding', effect: 'artery' },
+  6: { label: 'Stuns them for 1d4 turns', effect: 'stun' },
+  7: { label: 'Chink in the armor — ignores DT/DR', effect: 'ignore_mitigation' },
+  8: { label: 'Blinded — 50% hit chance reduction', effect: 'blind' },
+  9: { label: 'Knockdown', effect: 'knockdown' },
+  10: { label: 'One Shot One Kill (bosses take 20 true damage instead)', effect: 'instant_kill' }
+};
+export const CRIT_FAIL_TABLE = {
+  1: { label: 'Misfire — jammed, loses their next turn', effect: 'jammed' },
+  2: { label: 'Weapon backfires — cripples their own arm, weapon destroyed', effect: 'backfire' },
+  3: { label: 'Hits themselves for half their weapon\'s damage', effect: 'hit_self' },
+  4: { label: 'Hits someone else nearby instead', effect: 'hit_other' },
+  5: { label: 'Nothing extra — just a miss', effect: 'none' },
+  6: { label: 'Nothing extra — just a miss', effect: 'none' },
+  7: { label: 'Nothing extra — just a miss', effect: 'none' },
+  8: { label: 'Distracted — loses their next turn', effect: 'distracted' },
+  9: { label: 'Knocked down — loses their next turn', effect: 'knockdown_fail' },
+  10: { label: 'Drops their weapon — attack misses', effect: 'drop_weapon' }
+};
 
 // --- ATTACK RESOLUTION (manual p.81) ---
 // Hit chance is rolled as a percentile: 2d10 read as a tens digit and a
@@ -169,6 +240,11 @@ export function buildAttackLogMessage({ isHit, attackerName, targetName, weaponN
   const template = templates[Math.floor(Math.random() * templates.length)];
   let sentence = template({ attacker: attackerName, target: targetName, weapon: weaponName, part: partTag || '' });
   if (isHit) sentence = sentence.replace('DMG', damage);
-  const suffix = `${burstTag || ''} (rolled ${roll} vs ${chance}%)${isHit ? (effectAppliedMsg || '') : ''}`;
+  // effectAppliedMsg used to only ever get set on a hit (aimed-shot
+  // afflictions), so gating it behind isHit was safe — but a critical
+  // failure now carries its own effectAppliedMsg too (backfire,
+  // hit-self, hit-someone-else, jammed, etc.), so it has to show
+  // regardless of whether the original target actually got hit.
+  const suffix = `${burstTag || ''} (rolled ${roll} vs ${chance}%)${effectAppliedMsg || ''}`;
   return sentence + suffix;
 }

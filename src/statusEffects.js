@@ -1,14 +1,26 @@
 // AUTOMATICALLY GENERATED FILE. DO NOT EDIT MANUALLY.
 export const statusEffectDatabase = {
+  bleeding: {
+    "id": "bleeding",
+    "name": "Bleeding",
+    "type": "status_effect",
+    "description": "A major artery, opened. It won't stop on its own.",
+    "effect": "1d6 damage per turn, until cauterized",
+    "ticking": true,
+    "modifiers": {
+      "damage_per_turn": "1d6"
+    }
+  },
   blinded: {
     "id": "blinded",
     "name": "Blinded",
     "type": "status_effect",
     "description": "Something's wrong with your eyes — dust, blood, a solid hit.",
-    "effect": "-3 Perception, until cured",
+    "effect": "-3 Perception and -50% hit chance, until cured",
     "ticking": false,
     "modifiers": {
-      "special_per": -3
+      "special_per": -3,
+      "hit_chance_pct": -50
     }
   },
   crippled_arm: {
@@ -36,6 +48,39 @@ export const statusEffectDatabase = {
     "ticking": false,
     "modifiers": {
       "special_agi": -2
+    }
+  },
+  distracted: {
+    "id": "distracted",
+    "name": "Distracted",
+    "type": "status_effect",
+    "description": "Lost in thought about something cringey. Focus is gone for a moment.",
+    "effect": "Lose your next turn",
+    "ticking": true,
+    "modifiers": {
+      "skip_turn": true
+    }
+  },
+  jammed: {
+    "id": "jammed",
+    "name": "Jammed",
+    "type": "status_effect",
+    "description": "The gun doesn't fire. Melee attacks spin out of control instead.",
+    "effect": "Lose your next turn clearing it",
+    "ticking": true,
+    "modifiers": {
+      "skip_turn": true
+    }
+  },
+  knocked_down: {
+    "id": "knocked_down",
+    "name": "Knocked Down",
+    "type": "status_effect",
+    "description": "Flat on the ground. Getting back up takes a moment.",
+    "effect": "Lose your next turn",
+    "ticking": true,
+    "modifiers": {
+      "skip_turn": true
     }
   },
   poison: {

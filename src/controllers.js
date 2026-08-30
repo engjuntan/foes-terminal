@@ -5,7 +5,7 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
 import { RACE_RULES, calculateDerivedStats } from './formulas.js';
 import { getMonster } from './bestiary.js';
-import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage } from './combat.js';
+import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { mapDatabase } from './maps.js';
 import { normalizeInventory, getInventoryQuantity, addToInventory, removeFromInventory } from './inventory.js';
@@ -886,10 +886,37 @@ export async function resolveAttack() {
     targetName = targetChar.name;
   }
 
-  const { effectiveChance, isHit } = resolveHit(attackerValue - bodyPart.penalty - burstPenalty, targetAC, roll);
+  // --- Crit chance/luck (manual p.~1286, amended with the user) ---
+  // Same roll already made for the hit check — not a separate roll.
+  const attackerIsPc = attacker.ref_type === 'pc';
+  let luckStat = 0;
+  if (attackerIsPc) {
+    const attackerChar = window.liveData.characters[attacker.char_id];
+    luckStat = (attackerChar.special && attackerChar.special.luk) || 0;
+  }
+  const critChance = getCritChance(attackerIsPc ? luckStat : (attacker.crit_chance || 0));
+
+  // Blinded (from a crit or an aimed eye shot) hits the attacker's own
+  // accuracy directly — a flat hit-chance penalty, separate from the
+  // PER-based skill penalty it also carries. Checked against whichever
+  // status_effects array is actually the attacker's own.
+  const attackerEffects = attackerIsPc
+    ? ((window.liveData.characters[attacker.char_id].status_effects) || [])
+    : (attacker.status_effects || []);
+  const hitChancePenalty = attackerEffects
+    .filter(fx => fx.modifiers && fx.modifiers.hit_chance_pct)
+    .reduce((sum, fx) => sum + fx.modifiers.hit_chance_pct, 0);
+
+  const { effectiveChance, isHit: normalHit } = resolveHit(attackerValue - bodyPart.penalty - burstPenalty + hitChancePenalty, targetAC, roll);
+  const critResult = resolveCrit(roll, critChance, luckStat, attackerIsPc); // 'success' | 'fail' | null
+  // A crit success always hits, even overriding a miss; a crit failure
+  // always fumbles, even overriding what would've been a hit — a fumble
+  // is worse than a plain miss, not just a miss with extra steps.
+  const isHit = critResult === 'fail' ? false : (critResult === 'success' ? true : normalHit);
 
   let finalDamage = 0;
   let effectAppliedMsg = '';
+  let critTag = '';
   const newInitiativeOrder = combat.initiative_order.map(c => ({ ...c }));
   const charUpdates = {};
 
@@ -900,43 +927,207 @@ export async function resolveAttack() {
     charUpdates[`characters.${ammoCharId}.ammo.${ammoSlot}`] = ammoAfterShot;
   }
 
+  // Applies a named status effect to whoever — PC (via charUpdates,
+  // merging with anything already queued this same resolution) or
+  // monster (mutated directly on their inline initiative_order entry,
+  // same shape as a PC's status_effects now). durationTurns is optional;
+  // omit for an effect that persists until cured, same as aimed shots.
+  const grantEffect = (combatantRef, effectId, durationTurns) => {
+    const effectDef = statusEffectDatabase[effectId];
+    const name = (effectDef && effectDef.name) || effectId;
+    const instance = {
+      id: `${effectId}_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      source_id: effectId,
+      name,
+      modifiers: (effectDef && effectDef.modifiers) || {},
+      ticking: effectDef ? effectDef.ticking !== false : true,
+      applied_at: Date.now(),
+      ...(durationTurns ? { duration_turns: durationTurns } : {})
+    };
+    if (combatantRef.ref_type === 'monster') {
+      const idx = newInitiativeOrder.findIndex(c => c.combatant_id === combatantRef.combatant_id);
+      const current = newInitiativeOrder[idx].status_effects || [];
+      newInitiativeOrder[idx] = { ...newInitiativeOrder[idx], status_effects: [...current, instance] };
+    } else {
+      const path = `characters.${combatantRef.char_id}.status_effects`;
+      const char = window.liveData.characters[combatantRef.char_id];
+      const current = charUpdates[path] || char.status_effects || [];
+      charUpdates[path] = [...current, instance];
+    }
+    return name;
+  };
+
+  const applyHpDamage = (combatantRef, dmg, bypassMitigation) => {
+    const idx = newInitiativeOrder.findIndex(c => c.combatant_id === combatantRef.combatant_id);
+    // Mitigation belongs to whoever's actually taking the damage — the
+    // pre-computed targetDtdr only applies when combatantRef is the
+    // original target; a redirected ("hit someone else") or self-hit
+    // combatant needs their own armor looked up fresh.
+    let dtdrForThis;
+    if (combatantRef.ref_type === 'monster') {
+      dtdrForThis = combatantRef.dtdr || {};
+    } else if (combatantRef.combatant_id === target.combatant_id) {
+      dtdrForThis = targetDtdr;
+    } else {
+      const otherChar = window.liveData.characters[combatantRef.char_id];
+      const armorItem = getItem((otherChar.equipment || {}).body);
+      dtdrForThis = (armorItem && armorItem.dtdr) || {};
+    }
+    const mitigated = bypassMitigation ? dmg : applyDamageReduction(dmg, dtdrForThis, attackDef.damageType || 'normal');
+    let newCurrent;
+    if (combatantRef.ref_type === 'monster') {
+      newCurrent = Math.max(0, combatantRef.hp.current - mitigated);
+      newInitiativeOrder[idx] = { ...newInitiativeOrder[idx], hp: { ...combatantRef.hp, current: newCurrent }, is_down: newCurrent <= 0 };
+    } else {
+      const char = window.liveData.characters[combatantRef.char_id];
+      const hpPath = `characters.${combatantRef.char_id}.hp.current`;
+      const currentHp = charUpdates[hpPath] !== undefined ? charUpdates[hpPath] : char.hp.current;
+      newCurrent = Math.max(0, currentHp - mitigated);
+      newInitiativeOrder[idx] = { ...newInitiativeOrder[idx], is_down: newCurrent <= 0 };
+      charUpdates[hpPath] = newCurrent;
+    }
+    return { mitigated, newCurrent };
+  };
+
+  // A weapon that's destroyed/dropped only meaningfully applies to a PC
+  // firing a real equipped gun/melee weapon — monsters don't have
+  // trackable equipment, and unarmed has nothing to destroy or drop.
+  const destroyOrDropAttackerWeapon = (returnToInventory) => {
+    if (!attackerIsPc || !draft.attackKey || draft.attackKey === 'unarmed') return null;
+    const char = window.liveData.characters[attacker.char_id];
+    const equip = char.equipment || {};
+    const slot = equip.right_hand === draft.attackKey ? 'right_hand' : equip.left_hand === draft.attackKey ? 'left_hand' : null;
+    if (!slot) return null;
+    charUpdates[`characters.${attacker.char_id}.equipment.${slot}`] = null;
+    charUpdates[`characters.${attacker.char_id}.ammo.${slot}`] = null;
+    if (returnToInventory) {
+      charUpdates[`characters.${attacker.char_id}.inventory`] = addToInventory(char.inventory, draft.attackKey, 1);
+    }
+    return attackDef.name;
+  };
+
+  // Crit-fail's "hit someone else nearby" — any other living combatant,
+  // excluding the attacker and the original target. None available (a
+  // 1-on-1 fight) just falls back to a plain miss.
+  const pickRedirectTarget = () => {
+    const candidates = newInitiativeOrder.filter(c =>
+      c.combatant_id !== attacker.combatant_id && c.combatant_id !== target.combatant_id && !c.is_down);
+    if (candidates.length === 0) return null;
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  };
+
   if (isHit) {
     // A simplified stand-in for "several rounds landing" on a burst —
     // not the manual's per-round spray, just the damage dice rolled an
     // extra time and summed (see combat.js BURST_DAMAGE_ROLLS comment).
     let rolledDamage = rollDamage(attackDef.damage);
     if (isBurstShot) for (let i = 1; i < BURST_DAMAGE_ROLLS; i++) rolledDamage += rollDamage(attackDef.damage);
-    const rawDamage = Math.round(rolledDamage * (bodyPart.damageMultiplier || 1));
-    finalDamage = applyDamageReduction(rawDamage, targetDtdr, attackDef.damageType || 'normal');
-    const idx = newInitiativeOrder.findIndex(c => c.combatant_id === target.combatant_id);
-    let newCurrent;
-    if (target.ref_type === 'monster') {
-      newCurrent = Math.max(0, target.hp.current - finalDamage);
-      newInitiativeOrder[idx] = { ...target, hp: { ...target.hp, current: newCurrent }, is_down: newCurrent <= 0 };
-    } else {
-      const targetChar = window.liveData.characters[target.char_id];
-      newCurrent = Math.max(0, targetChar.hp.current - finalDamage);
-      newInitiativeOrder[idx] = { ...target, is_down: newCurrent <= 0 };
-      charUpdates[`characters.${target.char_id}.hp.current`] = newCurrent;
+    let damageMultiplier = bodyPart.damageMultiplier || 1;
+    let bypassMitigation = false;
+    let damageAlreadyApplied = false; // artery/instant-kill deal their own fixed damage instead of the normal roll
+    let killedOutright = false;
 
-      // Aimed-shot effects only mechanically apply to PC targets right
-      // now — monsters don't carry a status_effects array.
-      if (bodyPart.effectId && newCurrent > 0) {
-        const effectDef = statusEffectDatabase[bodyPart.effectId];
-        if (effectDef) {
-          const currentEffects = targetChar.status_effects || [];
-          const instance = {
-            id: `${bodyPart.effectId}_${Date.now()}`,
-            source_id: bodyPart.effectId,
-            name: effectDef.name,
-            modifiers: effectDef.modifiers || {},
-            ticking: effectDef.ticking !== false,
-            applied_at: Date.now()
-          };
-          charUpdates[`characters.${target.char_id}.status_effects`] = [...currentEffects, instance];
-          effectAppliedMsg = ` ${targetChar.name} is afflicted by ${effectDef.name}!`;
+    // --- Critical success effect (manual's table, amended with the user) ---
+    if (critResult === 'success') {
+      const entry = rollCritTableEntry(true);
+      critTag = ` [CRITICAL SUCCESS: ${entry.label}]`;
+      switch (entry.effect) {
+        case 'cripple_leg': effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'crippled_leg')}!`; break;
+        case 'cripple_arm': effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'crippled_arm')}!`; break;
+        case 'bonus_damage': damageMultiplier = Math.max(damageMultiplier, 4); break; // +300% = 4x total, capped here per "cumulative bonuses cannot go higher"
+        case 'artery': {
+          const { newCurrent } = applyHpDamage(target, 20, true);
+          finalDamage = 20;
+          damageAlreadyApplied = true;
+          effectAppliedMsg += ` Hit a major artery for 20 true damage!`;
+          if (newCurrent > 0) effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'bleeding')}!`;
+          break;
         }
+        case 'stun': effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'stunned', 1 + Math.floor(Math.random() * 4))}!`; break;
+        case 'ignore_mitigation': bypassMitigation = true; break;
+        case 'blind': effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'blinded', 1 + Math.floor(Math.random() * 4))}!`; break;
+        case 'knockdown': effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'knocked_down', 1)}!`; break;
+        case 'instant_kill': {
+          // Bosses shrug off "one shot one kill" — needs an is_boss flag
+          // authored on the bestiary entry; defaults to false (not a
+          // boss) for anything that doesn't have one yet.
+          if (target.ref_type === 'monster' && target.is_boss) {
+            applyHpDamage(target, 20, true);
+            finalDamage = 20;
+            effectAppliedMsg += ` ${targetName} shrugs off the killing blow (boss) but takes 20 true damage!`;
+          } else {
+            const idx = newInitiativeOrder.findIndex(c => c.combatant_id === target.combatant_id);
+            if (target.ref_type === 'monster') {
+              finalDamage = target.hp.current;
+              newInitiativeOrder[idx] = { ...newInitiativeOrder[idx], hp: { ...target.hp, current: 0 }, is_down: true };
+            } else {
+              const targetChar = window.liveData.characters[target.char_id];
+              finalDamage = targetChar.hp.current;
+              charUpdates[`characters.${target.char_id}.hp.current`] = 0;
+              newInitiativeOrder[idx] = { ...newInitiativeOrder[idx], is_down: true };
+            }
+            effectAppliedMsg += ` ONE SHOT, ONE KILL!`;
+            killedOutright = true;
+          }
+          damageAlreadyApplied = true;
+          break;
+        }
+        default: break; // 'none' — a clean hit, nothing extra
       }
+    }
+
+    if (!damageAlreadyApplied) {
+      const rawDamage = Math.round(rolledDamage * damageMultiplier);
+      const { mitigated } = applyHpDamage(target, rawDamage, bypassMitigation);
+      finalDamage = mitigated;
+    }
+
+    // Aimed-shot effects apply on any hit that leaves the target
+    // standing (nothing left to afflict if they're downed or outright
+    // killed) — works for PC or monster targets now that both carry a
+    // status_effects array.
+    const idxCheck = newInitiativeOrder.findIndex(c => c.combatant_id === target.combatant_id);
+    const stillUp = !newInitiativeOrder[idxCheck].is_down;
+    if (bodyPart.effectId && stillUp && !killedOutright) {
+      effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, bodyPart.effectId)}!`;
+    }
+  }
+
+  // --- Critical failure effect (manual's table, amended with the user) ---
+  if (critResult === 'fail') {
+    const entry = rollCritTableEntry(false);
+    critTag = ` [CRITICAL FAILURE: ${entry.label}]`;
+    switch (entry.effect) {
+      case 'jammed': effectAppliedMsg += ` ${attacker.name} is afflicted by ${grantEffect(attacker, 'jammed', 1)}!`; break;
+      case 'backfire': {
+        effectAppliedMsg += ` ${attacker.name} is afflicted by ${grantEffect(attacker, 'crippled_arm')}!`;
+        const destroyed = destroyOrDropAttackerWeapon(false);
+        if (destroyed) effectAppliedMsg += ` ${destroyed} is destroyed — reduced to scrap!`;
+        break;
+      }
+      case 'hit_self': {
+        const selfDmg = Math.round(rollDamage(attackDef.damage) / 2);
+        applyHpDamage(attacker, selfDmg, true);
+        effectAppliedMsg += ` ${attacker.name} hits themselves for ${selfDmg} damage!`;
+        break;
+      }
+      case 'hit_other': {
+        const redirected = pickRedirectTarget();
+        if (redirected) {
+          const dmg = rollDamage(attackDef.damage);
+          const { mitigated } = applyHpDamage(redirected, dmg, false);
+          effectAppliedMsg += ` The shot goes wide and hits ${redirected.name} instead for ${mitigated} damage!`;
+        }
+        break;
+      }
+      case 'distracted': effectAppliedMsg += ` ${attacker.name} is afflicted by ${grantEffect(attacker, 'distracted', 1)}!`; break;
+      case 'knockdown_fail': effectAppliedMsg += ` ${attacker.name} is afflicted by ${grantEffect(attacker, 'knocked_down', 1)}!`; break;
+      case 'drop_weapon': {
+        const dropped = destroyOrDropAttackerWeapon(true);
+        if (dropped) effectAppliedMsg += ` ${attacker.name} drops ${dropped}!`;
+        break;
+      }
+      default: break; // 'none' — just a miss
     }
   }
 
@@ -944,7 +1135,7 @@ export async function resolveAttack() {
   const burstTag = isBurstShot ? ` [BURST FIRE, ${ammoAfterShot}/${getItem(draft.attackKey).clip_size} ammo left]` : '';
   const message = buildAttackLogMessage({
     isHit, attackerName: attacker.name, targetName, weaponName: attackDef.name,
-    partTag, burstTag, damage: finalDamage, roll, chance: effectiveChance, effectAppliedMsg
+    partTag, burstTag: burstTag + critTag, damage: finalDamage, roll, chance: effectiveChance, effectAppliedMsg
   });
 
   const updatedCombat = {
@@ -1006,40 +1197,81 @@ export async function endTurn() {
     const candidate = newInitiativeOrder[nextIndex];
     if (candidate.is_down) continue;
 
+    // Ticking works the same for a PC or a monster now — the only
+    // difference is where the effects array and HP actually live: a PC's
+    // are in characters.<id>, a monster's are inline on its own
+    // initiative_order entry (it's a self-contained instance already).
+    const isPcCombatant = candidate.ref_type === 'pc';
+    const char = isPcCombatant ? window.liveData.characters[candidate.char_id] : null;
+    const effects = isPcCombatant ? ((char && char.status_effects) || []) : (candidate.status_effects || []);
+    // "ticking" defaults to true if unset, so nothing authored before
+    // this field existed silently stops working — false is opt-out.
+    const tickingEffects = effects.filter(fx => fx.ticking !== false && fx.modifiers);
+
+    const hpKey = `characters.${candidate.char_id}.hp.current`;
+    let runningHp = isPcCombatant
+      ? (charUpdates[hpKey] !== undefined ? charUpdates[hpKey] : char.hp.current)
+      : candidate.hp.current;
+
     let skip = false;
-    if (candidate.ref_type === 'pc') {
-      const char = window.liveData.characters[candidate.char_id];
-      const effects = (char && char.status_effects) || [];
-      // "ticking" defaults to true if unset, so nothing authored before
-      // this field existed silently stops working — false is opt-out.
-      const tickingEffects = effects.filter(fx => fx.ticking !== false && fx.modifiers);
-
-      const hpKey = `characters.${candidate.char_id}.hp.current`;
-      let runningHp = charUpdates[hpKey] !== undefined ? charUpdates[hpKey] : char.hp.current;
-
-      // Every ticking effect resolves independently — e.g. Stunned skipping
-      // the turn does NOT stop Poison from still dealing its damage.
-      tickingEffects.forEach(fx => {
-        if (fx.modifiers.skip_turn) {
-          const msg = `${candidate.name} is afflicted by ${fx.name} and skips their turn!`;
-          log.push({ id: `log_${Date.now()}_sk${safety}_${fx.id}`, type: 'status', message: msg, timestamp: Date.now() });
-          turnEvents.push(msg);
-          skip = true;
+    // Duration countdown happens alongside the same tick — an effect
+    // with duration_turns hits 0 and cures itself right after firing one
+    // last time, no separate pass needed. Effects with no duration_turns
+    // at all persist until a GM removes them, unchanged from before.
+    const remainingEffects = [];
+    tickingEffects.forEach(fx => {
+      if (fx.modifiers.skip_turn) {
+        const msg = `${candidate.name} is afflicted by ${fx.name} and skips their turn!`;
+        log.push({ id: `log_${Date.now()}_sk${safety}_${fx.id}`, type: 'status', message: msg, timestamp: Date.now() });
+        turnEvents.push(msg);
+        skip = true;
+      }
+      if (fx.modifiers.damage_per_turn) {
+        const dmg = rollDamage(fx.modifiers.damage_per_turn);
+        runningHp = Math.max(0, runningHp - dmg);
+        const msg = `${candidate.name} takes ${dmg} damage from ${fx.name}!`;
+        log.push({ id: `log_${Date.now()}_dot${safety}_${fx.id}`, type: 'status', message: msg, timestamp: Date.now() });
+        turnEvents.push(msg);
+      }
+      if (fx.duration_turns !== undefined) {
+        const left = fx.duration_turns - 1;
+        if (left > 0) remainingEffects.push({ ...fx, duration_turns: left });
+        else {
+          const msg = `${candidate.name} is no longer afflicted by ${fx.name}.`;
+          log.push({ id: `log_${Date.now()}_exp${safety}_${fx.id}`, type: 'status', message: msg, timestamp: Date.now() });
         }
-        if (fx.modifiers.damage_per_turn) {
-          const dmg = rollDamage(fx.modifiers.damage_per_turn);
-          runningHp = Math.max(0, runningHp - dmg);
-          const msg = `${candidate.name} takes ${dmg} damage from ${fx.name}!`;
-          log.push({ id: `log_${Date.now()}_dot${safety}_${fx.id}`, type: 'status', message: msg, timestamp: Date.now() });
-          turnEvents.push(msg);
-        }
-      });
+      } else {
+        remainingEffects.push(fx); // no duration — persists until manually removed
+      }
+    });
+    // Non-ticking effects (permanent passive modifiers like Crippled Arm)
+    // were filtered out of tickingEffects above — carry them through
+    // untouched rather than losing them.
+    const untouchedEffects = effects.filter(fx => fx.ticking === false || !fx.modifiers);
+    const nextEffects = [...remainingEffects, ...untouchedEffects];
+    const effectsChanged = nextEffects.length !== effects.length;
 
+    if (isPcCombatant) {
       if (runningHp !== char.hp.current || charUpdates[hpKey] !== undefined) {
         charUpdates[hpKey] = runningHp;
       }
+      if (effectsChanged) charUpdates[`characters.${candidate.char_id}.status_effects`] = nextEffects;
       if (runningHp <= 0) {
         newInitiativeOrder[nextIndex] = { ...candidate, is_down: true };
+        const msg = `${candidate.name} goes down!`;
+        log.push({ id: `log_${Date.now()}_down${safety}`, type: 'status', message: msg, timestamp: Date.now() });
+        turnEvents.push(msg);
+        skip = true;
+      }
+    } else {
+      const downed = runningHp <= 0;
+      newInitiativeOrder[nextIndex] = {
+        ...candidate,
+        hp: { ...candidate.hp, current: runningHp },
+        status_effects: nextEffects,
+        is_down: downed || candidate.is_down
+      };
+      if (downed) {
         const msg = `${candidate.name} goes down!`;
         log.push({ id: `log_${Date.now()}_down${safety}`, type: 'status', message: msg, timestamp: Date.now() });
         turnEvents.push(msg);
