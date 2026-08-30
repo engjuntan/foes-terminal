@@ -246,3 +246,65 @@ Final formulas to implement in `formulas.js`:
 - Open question (not yet resolved): how "giving" access is actually
   triggered on the GM side, and whether granting is per-log or per-folder
   (e.g. grant a whole location at once vs. one document at a time).
+
+## Aimed shots / targeted shots (RESOLVED, built & live-tested)
+- **Not from the manual** — numbers agreed with the user, following
+  Fallout 1/2's targeted-shot convention: Torso is the default normal
+  attack (0 penalty), always available; picking another body part is a
+  genuinely optional *second* choice, not a restriction or replacement.
+- 8 zones: Torso (0), Head (-20%, 1.5x damage), Eyes (-40%, Blinded),
+  Left/Right Arm (-20%, Crippled Arm), Left/Right Leg (-15%, Crippled
+  Leg), Groin (-20%, Stunned).
+- **Attacker-agnostic** (a real design correction made mid-build): the
+  body-part dropdown and its effects work the same whether it's a PC's
+  turn or a GM-controlled monster's turn. Without this, the status-effect
+  half of the mechanic would have been unreachable — PCs can only target
+  monsters (opposing-side-only targeting, an earlier decision), and
+  monsters don't carry a status_effects array, so a PC's called shot could
+  never actually land Blinded/Crippled/Stunned on anyone. Letting monsters
+  (GM-controlled) also aim at PCs is what makes the effect real, and
+  matches "a called shot works the same regardless of who's pulling the
+  trigger."
+- Live hit% preview in the action panel, recomputed as target/attack/body
+  part change (mirrors the same math `resolveAttack()` uses).
+- New status effects authored in Obsidian: Blinded (-3 PER), Crippled Arm
+  (-10 all combat skills), Crippled Leg (-2 AGI) — all non-ticking, pure
+  passive modifiers.
+
+## Ammo tracking + burst fire (RESOLVED, built & live-tested)
+- **Simplified by design, not the manual's system.** The manual's real
+  burst mechanic is a multi-roll-until-a-natural-100 sequence; classic
+  Fallout 1/2's is a single hit roll followed by a randomized partial-hit
+  spray (with stray rounds able to hit bystanders). Both are meaningfully
+  bigger builds. Presented both to the user; they chose a third, simpler
+  option: one roll at a flat hit% penalty (-15%) with damage dice rolled
+  twice and summed, in the interest of it being "a simple addition."
+- **Schema**: weapon items gain two optional fields — `clip_size` (max
+  ammo) and `burst_shots` (rounds a burst costs; omit = no burst
+  capability). Homemade Pistol authored with `clip_size: 6` as the first
+  real example.
+- **Ammo lives per equipped slot on the character**
+  (`characters.<id>.ammo.right_hand` / `.left_hand`), not per item
+  instance — the app has no per-item-instance state anywhere (inventory
+  is just an array of item ID strings), so the slot is the natural unit.
+  Equipping a `clip_size` weapon always assumes a full magazine;
+  unequipping clears that slot's ammo.
+- **Reload is a small action** — matches the manual's Movement/Action/
+  Small-action split (reloading is explicitly listed as a small action,
+  p.~1221). Deliberately does *not* consume the turn's one main action,
+  so it can happen alongside an actual attack. Callable by the weapon's
+  owner or the GM; logs to the combat log when used mid-fight.
+- Firing without enough ammo blocks the attack with an alert and does
+  *not* spend the turn — lets a player realize they're dry and reload
+  instead without being punished for trying.
+- **NPCs/monsters don't use this system** — bestiary attacks stay
+  hand-authored with fixed hit%/damage, no ammo tracking. Scoped this way
+  deliberately to match "ammo tracking for guns" (i.e. PC weapons), not
+  as an oversight.
+- **Found and fixed along the way**: a real, pre-existing bug in
+  `sync-obsidian.js` that unconditionally stripped quotes from every
+  generated object key, producing invalid JS the instant an item's name
+  started with a digit (triggered by a new "1414 Windbreaker" armor the
+  user had authored in Obsidian but never synced/built). This was silently
+  waiting to break the next `npm run build` regardless of the ammo work —
+  now only strips quotes from keys that are valid bare JS identifiers.
