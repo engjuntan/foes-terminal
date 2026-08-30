@@ -491,10 +491,36 @@ Final formulas to implement in `formulas.js`:
   log entirely because the message builder only showed effect text on
   a hit.
 
-## Stance/prone/crouch indicator (SCOPED, not yet built)
-## Radiation tracker, two-phase (SCOPED, not yet built)
-- See conversation for the manual's extracted rules and the proposed
-  implementation for both — user asked to scope only, not build yet.
+## Stance system (RESOLVED, built & live-tested)
+- Free-form per the user — no small-action cost enforced in code, they
+  govern the action economy themselves at the table. A player changes
+  their own PC's stance any time; the GM changes anyone's, including
+  NPCs. Prominent placement as asked: a selector right next to each
+  combatant's name in the initiative list.
+- Standing/Crouching/Prone/Knocked Down wired into resolveAttack()'s
+  real math (hit bonus, AC-from-AGI cap, prone blocking melee). Knocked
+  Down is now the real thing the crit system's knockdown effects set
+  (0 AC), not just a skip-turn status effect — and it auto-reverts to
+  standing the moment that status effect's duration expires.
+
+## Radiation tracker, two-phase (RESOLVED, built & live-tested)
+- Tweaked per the user from the original proposal: the GM sets each
+  PC's rads directly at will (not an automatic accrual system), and
+  using an item that adds/removes radiation (RadAway, and anything
+  authored like it) applies automatically — new stats.rad_removed/
+  rad_added item fields, a real useItem() action, a "USE" button in the
+  player's own inventory.
+- Two-phase display kept as originally proposed: player's own dashboard
+  always shows the vague in-character symptom text only; the GM sees
+  the exact number (Squad Monitor character modal). Didn't build the
+  Geiger-Counter-gated player reveal from the original proposal since
+  no such item exists yet and it wasn't reconfirmed — easy to add later
+  if wanted.
+- Radiation sickness debuffs (SPECIAL penalties, max HP penalties, the
+  400-rad tier's "no effect on Mutants" exemption) are computed live
+  from the current rads count inside calculateDerivedStats() every
+  time, not a discrete applied/removed effect — so RadAway immediately
+  changes the debuff too, with nothing left over to separately cure.
 
 ## Obsidian wiki search via the command bar (DISCUSSED, not built)
 - User asked purely as a feasibility discussion, not a build request.
