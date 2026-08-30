@@ -5,7 +5,7 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
 import { RACE_RULES, calculateDerivedStats } from './formulas.js';
 import { getMonster } from './bestiary.js';
-import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, BODY_PARTS } from './combat.js';
+import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { mapDatabase } from './maps.js';
 
@@ -33,6 +33,11 @@ export async function equipItem(itemId, targetSlot) {
   const charPath = `characters.${window.currentUser}`;
   const updatePayload = {};
   updatePayload[`${charPath}.equipment.${targetSlot}`] = itemId;
+  // Ammo tracking lives per equipped slot, not per item instance (the app
+  // doesn't track individual item copies anywhere). Equipping a weapon
+  // with a clip_size always assumes a fresh, full magazine; a weapon with
+  // no clip_size (melee, unarmed-type gear) just has no ammo entry at all.
+  updatePayload[`${charPath}.ammo.${targetSlot}`] = (item && item.clip_size) || null;
   try { await updateDoc(charRef, updatePayload); }
   catch (err) { alert("ERROR: " + err.message); }
 }
@@ -42,6 +47,7 @@ export async function unequipItem(targetSlot) {
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
   updatePayload[`characters.${window.currentUser}.equipment.${targetSlot}`] = null;
+  updatePayload[`characters.${window.currentUser}.ammo.${targetSlot}`] = null;
   await updateDoc(charRef, updatePayload);
 }
 
@@ -52,6 +58,38 @@ export async function gmUnequipItem(targetCharId, targetSlot) {
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
   updatePayload[`characters.${targetCharId}.equipment.${targetSlot}`] = null;
+  updatePayload[`characters.${targetCharId}.ammo.${targetSlot}`] = null;
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Small action — resets the equipped weapon's ammo in one slot back to
+// full. Deliberately does NOT touch turn_acted/turn_index: the manual
+// categorizes reloading as a "small action," distinct from the one main
+// action per turn the app already enforces, so this can be done alongside
+// (before or after) your actual attack, or on someone else's turn if the
+// table allows it narratively. Callable by the weapon's owner or the GM.
+export async function reloadWeapon(targetCharId, slot) {
+  if (!targetCharId || !slot) return;
+  const char = window.liveData.characters[targetCharId];
+  if (!char) return;
+  const equippedId = (char.equipment || {})[slot];
+  const item = equippedId && getItem(equippedId);
+  if (!item || !item.clip_size) { alert("NO AMMO-USING WEAPON EQUIPPED IN THAT SLOT"); return; }
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.ammo.${slot}`] = item.clip_size;
+
+  // If this happens mid-combat, log it so the table can see it happened —
+  // matches how every other combat action gets logged.
+  const combat = window.liveData.active_combat;
+  if (combat && combat.is_active) {
+    updatePayload.active_combat = {
+      ...combat,
+      log: [...combat.log, { id: `log_${Date.now()}`, type: 'system', message: `${char.name} reloads ${item.name}.`, timestamp: Date.now() }]
+    };
+  }
+
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
@@ -717,7 +755,11 @@ export async function resolveAttack() {
   const bodyPart = BODY_PARTS[bodyPartKey] || BODY_PARTS.torso;
 
   // --- Attacker's skill/hit% + attack definition ---
+  // Ammo/burst state (only meaningful for a PC firing an equipped gun with
+  // a clip_size — melee, unarmed, and monster attacks never touch this).
   let attackDef, attackerValue;
+  let burstPenalty = 0, isBurstShot = false;
+  let ammoCharId = null, ammoSlot = null, ammoAfterShot = null;
   if (attacker.ref_type === 'monster') {
     attackDef = (attacker.attacks || []).find(a => a.name === draft.attackKey);
     if (!attackDef) { alert("PICK AN ATTACK"); return; }
@@ -740,6 +782,24 @@ export async function resolveAttack() {
         damage: isMelee ? `${dmgDice}+${derived.meleeDamageBase}` : dmgDice,
         damageType: (weaponItem.stats && weaponItem.stats.dmgType) || 'normal'
       };
+
+      // --- Ammo check (only for weapons authored with a clip_size) ---
+      if (weaponItem.clip_size) {
+        const equip = char.equipment || {};
+        ammoSlot = equip.right_hand === draft.attackKey ? 'right_hand' : equip.left_hand === draft.attackKey ? 'left_hand' : null;
+        if (ammoSlot) {
+          ammoCharId = attacker.char_id;
+          const currentAmmo = (char.ammo || {})[ammoSlot] ?? weaponItem.clip_size;
+          isBurstShot = !!(draft.burst && weaponItem.burst_shots);
+          const shotCost = isBurstShot ? weaponItem.burst_shots : 1;
+          if (currentAmmo < shotCost) {
+            alert(`OUT OF AMMO (${currentAmmo}/${weaponItem.clip_size}) — RELOAD FIRST`);
+            return;
+          }
+          ammoAfterShot = currentAmmo - shotCost;
+          if (isBurstShot) burstPenalty = BURST_HIT_PENALTY;
+        }
+      }
     }
   }
 
@@ -758,15 +818,27 @@ export async function resolveAttack() {
     targetName = targetChar.name;
   }
 
-  const { effectiveChance, isHit } = resolveHit(attackerValue - bodyPart.penalty, targetAC, roll);
+  const { effectiveChance, isHit } = resolveHit(attackerValue - bodyPart.penalty - burstPenalty, targetAC, roll);
 
   let finalDamage = 0;
   let effectAppliedMsg = '';
   const newInitiativeOrder = combat.initiative_order.map(c => ({ ...c }));
   const charUpdates = {};
 
+  // Ammo is spent on firing, hit or miss — the rounds left the barrel
+  // either way. Applied regardless of isHit, once we know we're actually
+  // going through with the shot (past the earlier ammo-check return).
+  if (ammoCharId && ammoSlot) {
+    charUpdates[`characters.${ammoCharId}.ammo.${ammoSlot}`] = ammoAfterShot;
+  }
+
   if (isHit) {
-    const rawDamage = Math.round(rollDamage(attackDef.damage) * (bodyPart.damageMultiplier || 1));
+    // A simplified stand-in for "several rounds landing" on a burst —
+    // not the manual's per-round spray, just the damage dice rolled an
+    // extra time and summed (see combat.js BURST_DAMAGE_ROLLS comment).
+    let rolledDamage = rollDamage(attackDef.damage);
+    if (isBurstShot) for (let i = 1; i < BURST_DAMAGE_ROLLS; i++) rolledDamage += rollDamage(attackDef.damage);
+    const rawDamage = Math.round(rolledDamage * (bodyPart.damageMultiplier || 1));
     finalDamage = applyDamageReduction(rawDamage, targetDtdr, attackDef.damageType || 'normal');
     const idx = newInitiativeOrder.findIndex(c => c.combatant_id === target.combatant_id);
     let newCurrent;
@@ -801,9 +873,10 @@ export async function resolveAttack() {
   }
 
   const partTag = bodyPartKey !== 'torso' ? ` (aimed at ${bodyPart.label})` : '';
+  const burstTag = isBurstShot ? ` [BURST FIRE, ${ammoAfterShot}/${getItem(draft.attackKey).clip_size} ammo left]` : '';
   const message = isHit
-    ? `${attacker.name} attacks ${targetName}${partTag} with ${attackDef.name} — HIT for ${finalDamage} damage (rolled ${roll} vs ${effectiveChance}%).${effectAppliedMsg}`
-    : `${attacker.name} attacks ${targetName}${partTag} with ${attackDef.name} — MISS (rolled ${roll} vs ${effectiveChance}%).`;
+    ? `${attacker.name} attacks ${targetName}${partTag} with ${attackDef.name}${burstTag} — HIT for ${finalDamage} damage (rolled ${roll} vs ${effectiveChance}%).${effectAppliedMsg}`
+    : `${attacker.name} attacks ${targetName}${partTag} with ${attackDef.name}${burstTag} — MISS (rolled ${roll} vs ${effectiveChance}%).`;
 
   const updatedCombat = {
     ...combat,

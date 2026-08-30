@@ -15,6 +15,7 @@ window.currentTab = 'STATUS';
 // We must attach these to 'window' so onclick="window.equipItem()" works
 window.equipItem = Controllers.equipItem;
 window.unequipItem = Controllers.unequipItem;
+window.reloadWeapon = Controllers.reloadWeapon;
 window.createAccessCode = Controllers.createAccessCode;
 window.forceReset = Controllers.forceReset;
 window.gmGrantItem = () => Controllers.gmGrantItem(window.selectedCharId);

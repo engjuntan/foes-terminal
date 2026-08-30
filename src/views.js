@@ -4,7 +4,7 @@ import { getItem, itemDatabase } from './items.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
-import { BODY_PARTS } from './combat.js';
+import { BODY_PARTS, BURST_HIT_PENALTY } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { mapDatabase } from './maps.js';
 
@@ -350,14 +350,48 @@ export function getCombatView(liveData, userRole, currentUser) {
     } else {
       const char = liveData.characters[currentActor.char_id];
       const equip = (char && char.equipment) || {};
+      const ammo = (char && char.ammo) || {};
       const seen = new Set();
       const weaponOpts = [equip.right_hand, equip.left_hand].filter(Boolean).map(itemId => {
         if (seen.has(itemId)) return '';
         seen.add(itemId);
         const item = getItem(itemId);
-        return item ? `<option value="${itemId}" ${draft.attackKey === itemId ? 'selected' : ''}>${item.name}</option>` : '';
+        if (!item) return '';
+        const slot = equip.right_hand === itemId ? 'right_hand' : 'left_hand';
+        const ammoTag = item.clip_size ? ` (${ammo[slot] ?? item.clip_size}/${item.clip_size} ammo)` : '';
+        return `<option value="${itemId}" ${draft.attackKey === itemId ? 'selected' : ''}>${item.name}${ammoTag}</option>`;
       }).join('');
       attackOptions = `<option value="unarmed" ${!draft.attackKey || draft.attackKey === 'unarmed' ? 'selected' : ''}>Unarmed</option>${weaponOpts}`;
+    }
+
+    // Ammo/burst — a simplified stand-in for the manual's full multi-roll
+    // burst system (agreed with the user): one roll at a flat hit%
+    // penalty, roughly double damage, costs the weapon's burst_shots in
+    // ammo instead of 1. PC-only (matches resolveAttack() — monster
+    // attacks are hand-authored in the bestiary and don't carry ammo).
+    let ammoHtml = '';
+    let burstSelected = false;
+    let equippedWeaponItem = null, equippedWeaponSlot = null;
+    if (currentActor.ref_type === 'pc' && draft.attackKey && draft.attackKey !== 'unarmed') {
+      const char = liveData.characters[currentActor.char_id];
+      const equip = (char && char.equipment) || {};
+      equippedWeaponItem = getItem(draft.attackKey);
+      equippedWeaponSlot = equip.right_hand === draft.attackKey ? 'right_hand' : equip.left_hand === draft.attackKey ? 'left_hand' : null;
+      if (equippedWeaponItem && equippedWeaponItem.clip_size && equippedWeaponSlot) {
+        const currentAmmo = ((char.ammo || {})[equippedWeaponSlot]) ?? equippedWeaponItem.clip_size;
+        burstSelected = !!(draft.burst && equippedWeaponItem.burst_shots);
+        const burstOption = equippedWeaponItem.burst_shots ? `
+          <label style="font-size:11px; color:#666; display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+            <input type="checkbox" ${burstSelected ? 'checked' : ''} onchange="window.setCombatActionField('burst', this.checked)">
+            🔥 BURST FIRE (-${BURST_HIT_PENALTY}% hit, ~2x damage, uses ${equippedWeaponItem.burst_shots} ammo)
+          </label>` : '';
+        ammoHtml = `
+          <div style="display:flex; align-items:center; justify-content:space-between; font-size:11px; color:#888; margin-bottom:6px;">
+            <span>Ammo: <span style="color:var(--pip-green);">${currentAmmo}/${equippedWeaponItem.clip_size}</span></span>
+            <button class="gm-btn" style="padding:2px 8px; font-size:10px;" onclick="window.reloadWeapon('${currentActor.char_id}', '${equippedWeaponSlot}')">RELOAD</button>
+          </div>
+          ${burstOption}`;
+      }
     }
 
     // Aimed shots (VATS-style targeted shot) — attacker-agnostic, same as
@@ -407,7 +441,7 @@ export function getCombatView(liveData, userRole, currentUser) {
         }
         if (attackerValue !== null && targetAC !== null) {
           const part = BODY_PARTS[selectedPart] || BODY_PARTS.torso;
-          const chance = Math.max(0, attackerValue - part.penalty - targetAC);
+          const chance = Math.max(0, attackerValue - part.penalty - (burstSelected ? BURST_HIT_PENALTY : 0) - targetAC);
           previewHtml = `<div style="font-size:11px; color:#888; margin-bottom:6px;">Hit chance vs ${target.name}: <span style="color:var(--pip-green); font-weight:bold;">${chance}%</span></div>`;
         }
       }
@@ -431,6 +465,7 @@ export function getCombatView(liveData, userRole, currentUser) {
         <select onchange="window.setCombatActionField('attackKey', this.value)" style="width:100%; background:black; color:lime; border:1px solid #333; margin-bottom:8px;">
           <option value="">— choose —</option>${attackOptions}
         </select>
+        ${ammoHtml}
         ${bodyPartHtml}
         <label style="font-size:11px; color:#666;">ROLL (1-100)</label>
         <div style="display:flex; gap:6px; margin-bottom:10px;">

@@ -67,6 +67,19 @@ export const BODY_PARTS = {
   groin: { label: 'Groin', penalty: 20, effectId: 'stunned' }
 };
 
+// --- AMMO / BURST FIRE (new — simplified approximation, not the manual's
+// full multi-roll-until-a-100 system, agreed with the user) ---
+// A gun with a `clip_size` in its item JSON tracks ammo per equipped slot
+// on the character (no per-item-instance state exists anywhere in this
+// app, so the slot is the unit of tracking). A gun with a `burst_shots`
+// value can additionally be fired as a burst: it costs that many rounds
+// instead of 1, at a flat hit-chance penalty, for roughly double damage
+// (one extra full roll of the weapon's damage dice) — a deliberately
+// simple stand-in for "several rounds landing" rather than modeling an
+// actual spray/partial-hit spread.
+export const BURST_HIT_PENALTY = 15;
+export const BURST_DAMAGE_ROLLS = 2; // weapon's damage dice rolled this many times and summed
+
 // --- ATTACK RESOLUTION (manual p.81) ---
 // Hit chance is rolled as a percentile: 2d10 read as a tens digit and a
 // ones digit (matching the manual's worked example — Ahmad "rolls 2d10

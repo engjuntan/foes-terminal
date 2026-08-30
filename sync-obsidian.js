@@ -61,8 +61,14 @@ function generateFileContent(type, dataMap) {
   const helperFunc = helperFuncs[type] || helperFuncs.trait;
 
   const jsonString = JSON.stringify(dataMap, null, 2);
-  // regex to remove quotes from keys: "key": -> key:
-  const jsObjectString = jsonString.replace(/^  "([^"]+)":/gm, '  $1:');
+  // Cosmetic only: unquote a top-level key when it's a valid bare JS
+  // identifier (e.g. "homemade_pistol": -> homemade_pistol:). Keys that
+  // aren't valid identifiers — starting with a digit ("1414_windbreaker"),
+  // containing hyphens, etc. — must stay quoted or the generated file is
+  // invalid JS (a real bug this fixes: it previously stripped quotes
+  // unconditionally, breaking the build the moment an item's name started
+  // with a number).
+  const jsObjectString = jsonString.replace(/^  "([A-Za-z_$][A-Za-z0-9_$]*)":/gm, '  $1:');
 
   return `// AUTOMATICALLY GENERATED FILE. DO NOT EDIT MANUALLY.
 export const ${dbName} = ${jsObjectString};

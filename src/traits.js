@@ -1,5 +1,48 @@
 // AUTOMATICALLY GENERATED FILE. DO NOT EDIT MANUALLY.
 export const traitDatabase = {
+  triad_ties: {
+    "id": "triad_ties",
+    "name": "Triad Ties",
+    "type": "perk",
+    "description": "Lim Clan-aligned perk — discount from Lim-affiliated vendors, possible reputation trade-off elsewhere.",
+    "effect": "TBA",
+    "modifiers": {
+      "vendor_discount_lim_clan": "TBA",
+      "reputation_tradeoff": "TBA"
+    }
+  },
+  water_sense: {
+    "id": "water_sense",
+    "name": "Water Sense",
+    "type": "perk",
+    "description": "First perk written — sets the template precedent. Advantage on Survival checks to locate clean water sources.",
+    "effect": "TBA",
+    "modifiers": {
+      "survival_water_advantage": "TBA"
+    }
+  },
+  border_rat: {
+    "id": "border_rat",
+    "name": "Border Rat",
+    "type": "trait",
+    "description": "Grew up in Bandawang as a border town — bonus to speech/barter with smugglers, penalty with Federation officials.",
+    "effect": "TBA",
+    "modifiers": {
+      "skill_speech_smugglers": "TBA",
+      "skill_speech_federation": "TBA"
+    }
+  },
+  feral_blood: {
+    "id": "feral_blood",
+    "name": "Feral Blood",
+    "type": "trait",
+    "description": "Ghoul-specific trait — likely a STR or damage buff traded against a higher feral-check risk.",
+    "effect": "TBA",
+    "modifiers": {
+      "special_str": "TBA",
+      "feral_check_risk": "TBA"
+    }
+  },
   heavy_handed: {
     "id": "heavy_handed",
     "name": "Heavy Handed",
