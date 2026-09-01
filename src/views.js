@@ -380,7 +380,8 @@ export function getCombatView(liveData, userRole, currentUser) {
         const item = getItem(itemId);
         if (!item) return '';
         const slot = equip.right_hand === itemId ? 'right_hand' : 'left_hand';
-        const ammoTag = item.clip_size ? ` (${ammo[slot] ?? item.clip_size}/${item.clip_size} ammo)` : '';
+        const itemClipSize = item.stats && item.stats.clip_size;
+        const ammoTag = itemClipSize ? ` (${ammo[slot] ?? itemClipSize}/${itemClipSize} ammo)` : '';
         return `<option value="${itemId}" ${draft.attackKey === itemId ? 'selected' : ''}>${item.name}${ammoTag}</option>`;
       }).join('');
       attackOptions = `<option value="unarmed" ${!draft.attackKey || draft.attackKey === 'unarmed' ? 'selected' : ''}>Unarmed</option>${weaponOpts}`;
@@ -399,23 +400,26 @@ export function getCombatView(liveData, userRole, currentUser) {
       const equip = (char && char.equipment) || {};
       equippedWeaponItem = getItem(draft.attackKey);
       equippedWeaponSlot = equip.right_hand === draft.attackKey ? 'right_hand' : equip.left_hand === draft.attackKey ? 'left_hand' : null;
-      if (equippedWeaponItem && equippedWeaponItem.clip_size && equippedWeaponSlot) {
-        const currentAmmo = ((char.ammo || {})[equippedWeaponSlot]) ?? equippedWeaponItem.clip_size;
-        burstSelected = !!(draft.burst && equippedWeaponItem.burst_shots);
-        const burstOption = equippedWeaponItem.burst_shots ? `
+      // ammo_type/clip_size/burst_shots all live under the weapon's
+      // `stats` block, alongside dmg/range/dmgType.
+      const equippedStats = (equippedWeaponItem && equippedWeaponItem.stats) || {};
+      if (equippedWeaponItem && equippedStats.clip_size && equippedWeaponSlot) {
+        const currentAmmo = ((char.ammo || {})[equippedWeaponSlot]) ?? equippedStats.clip_size;
+        burstSelected = !!(draft.burst && equippedStats.burst_shots);
+        const burstOption = equippedStats.burst_shots ? `
           <label style="font-size:11px; color:#666; display:flex; align-items:center; gap:6px; margin-bottom:6px;">
             <input type="checkbox" ${burstSelected ? 'checked' : ''} onchange="window.setCombatActionField('burst', this.checked)">
-            🔥 BURST FIRE (-${BURST_HIT_PENALTY}% hit, ~2x damage, uses ${equippedWeaponItem.burst_shots} ammo)
+            🔥 BURST FIRE (-${BURST_HIT_PENALTY}% hit, ~2x damage, uses ${equippedStats.burst_shots} ammo)
           </label>` : '';
         // Spare-rounds count only applies to weapons authored with an
         // ammo_type — a weapon without one reloads for free (no real
         // inventory ammo item to track), same as before this feature.
-        const spareTag = equippedWeaponItem.ammo_type
-          ? ` <span style="color:#666;">(spare: ${Object.keys(normalizeInventory(char.inventory)).filter(id => { const d = getItem(id); return d && d.type === 'ammo' && d.ammo_type === equippedWeaponItem.ammo_type; }).reduce((sum, id) => sum + getInventoryQuantity(char.inventory, id), 0)})</span>`
+        const spareTag = equippedStats.ammo_type
+          ? ` <span style="color:#666;">(spare: ${Object.keys(normalizeInventory(char.inventory)).filter(id => { const d = getItem(id); return d && d.type === 'ammo' && d.ammo_type === equippedStats.ammo_type; }).reduce((sum, id) => sum + getInventoryQuantity(char.inventory, id), 0)})</span>`
           : '';
         ammoHtml = `
           <div style="display:flex; align-items:center; justify-content:space-between; font-size:11px; color:#888; margin-bottom:6px;">
-            <span>Ammo: <span style="color:var(--pip-green);">${currentAmmo}/${equippedWeaponItem.clip_size}</span>${spareTag}</span>
+            <span>Ammo: <span style="color:var(--pip-green);">${currentAmmo}/${equippedStats.clip_size}</span>${spareTag}</span>
             <button class="gm-btn" style="padding:2px 8px; font-size:10px;" onclick="window.reloadWeapon('${currentActor.char_id}', '${equippedWeaponSlot}')">RELOAD</button>
           </div>
           ${burstOption}`;

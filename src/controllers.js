@@ -54,7 +54,7 @@ export async function equipItem(itemId, targetSlot) {
   // doesn't track individual item copies anywhere). Equipping a weapon
   // with a clip_size always assumes a fresh, full magazine; a weapon with
   // no clip_size (melee, unarmed-type gear) just has no ammo entry at all.
-  updatePayload[`${charPath}.ammo.${targetSlot}`] = (item && item.clip_size) || null;
+  updatePayload[`${charPath}.ammo.${targetSlot}`] = (item && item.stats && item.stats.clip_size) || null;
   try { await updateDoc(charRef, updatePayload); }
   catch (err) { alert("ERROR: " + err.message); }
 }
@@ -100,10 +100,13 @@ export async function reloadWeapon(targetCharId, slot) {
   if (!char) return;
   const equippedId = (char.equipment || {})[slot];
   const item = equippedId && getItem(equippedId);
-  if (!item || !item.clip_size) { alert("NO AMMO-USING WEAPON EQUIPPED IN THAT SLOT"); return; }
+  // ammo_type/clip_size/burst_shots live under the weapon's `stats` block,
+  // alongside dmg/range/dmgType — matches how the item content is authored.
+  const weaponStats = (item && item.stats) || {};
+  if (!item || !weaponStats.clip_size) { alert("NO AMMO-USING WEAPON EQUIPPED IN THAT SLOT"); return; }
 
-  const currentAmmo = (char.ammo || {})[slot] ?? item.clip_size;
-  const deficit = item.clip_size - currentAmmo;
+  const currentAmmo = (char.ammo || {})[slot] ?? weaponStats.clip_size;
+  const deficit = weaponStats.clip_size - currentAmmo;
   if (deficit <= 0) { alert("ALREADY FULLY LOADED"); return; }
 
   const updatePayload = {};
@@ -113,15 +116,15 @@ export async function reloadWeapon(targetCharId, slot) {
   // ammo_type just refills for free, same as before this feature. Tops
   // up exactly the deficit (not a full clip's worth) so topping off a
   // partially-spent magazine doesn't waste rounds you didn't need to burn.
-  if (item.ammo_type) {
+  if (weaponStats.ammo_type) {
     const inv = normalizeInventory(char.inventory);
     const matchingAmmoIds = Object.keys(inv).filter(id => {
       const def = getItem(id);
-      return def && def.type === 'ammo' && def.ammo_type === item.ammo_type;
+      return def && def.type === 'ammo' && def.ammo_type === weaponStats.ammo_type;
     });
     const totalHeld = matchingAmmoIds.reduce((sum, id) => sum + inv[id], 0);
     if (totalHeld < deficit) {
-      alert(`NO AMMO! (need ${deficit} more ${item.ammo_type}, have ${totalHeld})`);
+      alert(`NO AMMO! (need ${deficit} more ${weaponStats.ammo_type}, have ${totalHeld})`);
       return;
     }
     // Drain the needed rounds across whichever matching ammo stack(s)
@@ -138,7 +141,7 @@ export async function reloadWeapon(targetCharId, slot) {
     updatePayload[`characters.${targetCharId}.inventory`] = newInv;
   }
 
-  updatePayload[`characters.${targetCharId}.ammo.${slot}`] = item.clip_size;
+  updatePayload[`characters.${targetCharId}.ammo.${slot}`] = weaponStats.clip_size;
 
   const charRef = doc(db, "prisoncampaign", "alpha_team");
 
@@ -909,17 +912,20 @@ export async function resolveAttack() {
         damageType: (weaponItem.stats && weaponItem.stats.dmgType) || 'normal'
       };
 
-      // --- Ammo check (only for weapons authored with a clip_size) ---
-      if (weaponItem.clip_size) {
+      // --- Ammo check (only for weapons authored with a clip_size, under
+      // stats — same block as dmg/range/dmgType) ---
+      const weaponClipSize = weaponItem.stats && weaponItem.stats.clip_size;
+      const weaponBurstShots = weaponItem.stats && weaponItem.stats.burst_shots;
+      if (weaponClipSize) {
         const equip = char.equipment || {};
         ammoSlot = equip.right_hand === draft.attackKey ? 'right_hand' : equip.left_hand === draft.attackKey ? 'left_hand' : null;
         if (ammoSlot) {
           ammoCharId = attacker.char_id;
-          const currentAmmo = (char.ammo || {})[ammoSlot] ?? weaponItem.clip_size;
-          isBurstShot = !!(draft.burst && weaponItem.burst_shots);
-          const shotCost = isBurstShot ? weaponItem.burst_shots : 1;
+          const currentAmmo = (char.ammo || {})[ammoSlot] ?? weaponClipSize;
+          isBurstShot = !!(draft.burst && weaponBurstShots);
+          const shotCost = isBurstShot ? weaponBurstShots : 1;
           if (currentAmmo < shotCost) {
-            alert(`OUT OF AMMO (${currentAmmo}/${weaponItem.clip_size}) — RELOAD FIRST`);
+            alert(`OUT OF AMMO (${currentAmmo}/${weaponClipSize}) — RELOAD FIRST`);
             return;
           }
           ammoAfterShot = currentAmmo - shotCost;
@@ -1202,7 +1208,7 @@ export async function resolveAttack() {
   }
 
   const partTag = bodyPartKey !== 'torso' ? ` (aimed at ${bodyPart.label})` : '';
-  const burstTag = isBurstShot ? ` [BURST FIRE, ${ammoAfterShot}/${getItem(draft.attackKey).clip_size} ammo left]` : '';
+  const burstTag = isBurstShot ? ` [BURST FIRE, ${ammoAfterShot}/${(getItem(draft.attackKey).stats || {}).clip_size} ammo left]` : '';
   const message = buildAttackLogMessage({
     isHit, attackerName: attacker.name, targetName, weaponName: attackDef.name,
     partTag, burstTag: burstTag + critTag, damage: finalDamage, roll, chance: effectiveChance, effectAppliedMsg

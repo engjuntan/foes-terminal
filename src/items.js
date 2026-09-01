@@ -9,6 +9,106 @@ export const itemDatabase = {
     "description": "A pair of corrective lenses, scavenged and re-fitted. It takes real skill to make these things. Hope you don't drop them. ",
     "value": 10
   },
+  ammo_10mm: {
+    "id": "ammo_10mm",
+    "name": "10mm",
+    "type": "ammo",
+    "icon": "",
+    "description": "Ammunition for 10mm Pistol and 10mm SMG.",
+    "ammo_type": "10mm",
+    "stackable": true,
+    "value": "TBA"
+  },
+  ammo_14mm: {
+    "id": "ammo_14mm",
+    "name": "14mm",
+    "type": "ammo",
+    "icon": "",
+    "description": "Ammunition for 14mm Pistol.",
+    "ammo_type": "14mm",
+    "stackable": true,
+    "value": "TBA"
+  },
+  "2mm_ec": {
+    "id": "2mm_ec",
+    "name": "2mm EC",
+    "type": "ammo",
+    "icon": "",
+    "description": "Ammunition for Gauss-class weapons (Gauss Rifle, Gauss Pistol). Distinct from Energy Cell and Plasma Cartridge.",
+    "ammo_type": "2mm_ec",
+    "stackable": true,
+    "value": "TBA"
+  },
+  "40mm_grenade": {
+    "id": "40mm_grenade",
+    "name": "40mm Grenade",
+    "type": "ammo",
+    "icon": "",
+    "description": "Ordinance for Grenade Launcher.",
+    "ammo_type": "40mm_grenade",
+    "stackable": true,
+    "value": "TBA"
+  },
+  ammo_556: {
+    "id": "ammo_556",
+    "name": "5.56",
+    "type": "ammo",
+    "icon": "",
+    "description": "Ammunition for Assault Rifle, Marksman Carbine, and .223 Pistol.",
+    "ammo_type": "5.56",
+    "stackable": true,
+    "value": "TBA"
+  },
+  ammo_5mm: {
+    "id": "ammo_5mm",
+    "name": "5mm",
+    "type": "ammo",
+    "icon": "",
+    "description": "Ammunition for Minigun and Light Machine Gun.",
+    "ammo_type": "5mm",
+    "stackable": true,
+    "value": "TBA"
+  },
+  ammo_762: {
+    "id": "ammo_762",
+    "name": "7.62",
+    "type": "ammo",
+    "icon": "",
+    "description": "Ammunition for Hunting Rifle, Sniper Rifle, Battle Rifle, and Gatling Gun.",
+    "ammo_type": "7.62",
+    "stackable": true,
+    "value": "TBA"
+  },
+  ammo_9mm: {
+    "id": "ammo_9mm",
+    "name": "9mm",
+    "type": "ammo",
+    "icon": "",
+    "description": "Ammunition for 9mm Pistol.",
+    "ammo_type": "9mm",
+    "stackable": true,
+    "value": "TBA"
+  },
+  energy_cell: {
+    "id": "energy_cell",
+    "name": "Energy Cell",
+    "type": "ammo",
+    "icon": "",
+    "description": "Ammunition for laser-class energy weapons (Laser Pistol/Rifle, Gatling Laser, Tesla Cannon).",
+    "ammo_type": "energy_cell",
+    "stackable": true,
+    "value": "TBA"
+  },
+  flamer_fuel: {
+    "id": "flamer_fuel",
+    "name": "Flamer Fuel",
+    "type": "ammo",
+    "icon": "",
+    "description": "Fuel canister ammunition for Flamer and Shishkebab.",
+    "ammo_type": "flamer_fuel",
+    "stackable": true,
+    "value": "TBA"
+  },
   makeshift_rounds: {
     "id": "makeshift_rounds",
     "name": "Makeshift Rounds",
@@ -17,6 +117,46 @@ export const itemDatabase = {
     "icon": "",
     "description": "Hand-loaded rounds, packed by whoever had the patience for it. Not pretty, but they go bang more often than not.",
     "value": 2
+  },
+  mini_nuke: {
+    "id": "mini_nuke",
+    "name": "Mini Nuke",
+    "type": "ammo",
+    "icon": "",
+    "description": "Extremely rare ordinance for the Fat Man.",
+    "ammo_type": "mini_nuke",
+    "stackable": true,
+    "value": "TBA"
+  },
+  missile: {
+    "id": "missile",
+    "name": "Missile",
+    "type": "ammo",
+    "icon": "",
+    "description": "Ordinance for Missile Launcher and Rocket Launcher.",
+    "ammo_type": "missile",
+    "stackable": true,
+    "value": "TBA"
+  },
+  plasma_cartridge: {
+    "id": "plasma_cartridge",
+    "name": "Plasma Cartridge",
+    "type": "ammo",
+    "icon": "",
+    "description": "Ammunition for plasma-class energy weapons (Plasma Pistol/Rifle, Plasma Caster).",
+    "ammo_type": "plasma_cartridge",
+    "stackable": true,
+    "value": "TBA"
+  },
+  ammo_shotgun_shells: {
+    "id": "ammo_shotgun_shells",
+    "name": "Shotgun Shells",
+    "type": "ammo",
+    "icon": "",
+    "description": "Ammunition for all shotgun-class weapons — unified bucket regardless of specific gauge, per campaign simplification.",
+    "ammo_type": "shotgun_shells",
+    "stackable": true,
+    "value": "TBA"
   },
   "1414_windbreaker": {
     "id": "1414_windbreaker",
@@ -431,6 +571,19 @@ export const itemDatabase = {
     "addictive": false,
     "value": "TBA"
   },
+  stimpak: {
+    "id": "stimpak",
+    "name": "Stimpak",
+    "type": "consumable",
+    "icon": "",
+    "description": "Standard pre-war combat medical syringe — mainline 'Stimpak.' Baseline healing item; can_use_stimpaks flag already exists in RACE_RULES (Robots cannot use).",
+    "effect": "TBA",
+    "stats": {
+      "heal": "TBA"
+    },
+    "addictive": false,
+    "value": "TBA"
+  },
   stolen_keturunan_manual: {
     "id": "stolen_keturunan_manual",
     "name": "Stolen Keturunan Manual",
@@ -537,6 +690,437 @@ export const itemDatabase = {
     },
     "value": "TBA"
   },
+  "50_cal_machine_gun": {
+    "id": "50_cal_machine_gun",
+    "name": ".50 cal Machine Gun",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "big_guns",
+    "icon": "",
+    "description": "Big Guns tier heavy weapon, highest per-round damage in the class. Burst-capable.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": ".50",
+      "burst_capable": true
+    },
+    "value": "TBA"
+  },
+  fat_man: {
+    "id": "fat_man",
+    "name": "Fat Man",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "big_guns",
+    "icon": "",
+    "description": "Unique/Quest-leaning Big Guns tier weapon — mini-nuke launcher, extremely rare ordinance.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "explosive",
+      "range": "TBA",
+      "ammo_type": "mini_nuke"
+    },
+    "value": "TBA"
+  },
+  flamer: {
+    "id": "flamer",
+    "name": "Flamer",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "big_guns",
+    "icon": "",
+    "description": "Big Guns tier fuel-based weapon, short range, area denial.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "fire",
+      "range": "TBA",
+      "ammo_type": "flamer_fuel"
+    },
+    "value": "TBA"
+  },
+  gatling_gun: {
+    "id": "gatling_gun",
+    "name": "Gatling Gun",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "big_guns",
+    "icon": "",
+    "description": "Big Guns tier heavy ballistic weapon, alternative to the Minigun. Burst/sustained-fire capable.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "7.62",
+      "burst_capable": true
+    },
+    "value": "TBA"
+  },
+  gatling_laser: {
+    "id": "gatling_laser",
+    "name": "Gatling Laser",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "big_guns",
+    "icon": "",
+    "description": "Big Guns tier heavy energy weapon. Burst/sustained-fire capable.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "laser",
+      "range": "TBA",
+      "ammo_type": "energy_cell",
+      "burst_capable": true
+    },
+    "value": "TBA"
+  },
+  light_machine_gun: {
+    "id": "light_machine_gun",
+    "name": "Light Machine Gun",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "big_guns",
+    "icon": "",
+    "description": "Big Guns tier sustained-fire weapon. Burst-capable.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "5mm",
+      "burst_capable": true
+    },
+    "value": "TBA"
+  },
+  minigun: {
+    "id": "minigun",
+    "name": "Minigun",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "big_guns",
+    "icon": "",
+    "description": "Big Guns tier heavy automatic weapon, high ammo consumption. Burst/sustained-fire capable.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "5mm",
+      "burst_capable": true
+    },
+    "value": "TBA"
+  },
+  missile_launcher: {
+    "id": "missile_launcher",
+    "name": "Missile Launcher",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "big_guns",
+    "icon": "",
+    "description": "Rare Big Guns tier weapon, single-target high explosive damage.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "explosive",
+      "range": "TBA",
+      "ammo_type": "missile"
+    },
+    "value": "TBA"
+  },
+  gauss_pistol: {
+    "id": "gauss_pistol",
+    "name": "Gauss Pistol",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "energy_weapons",
+    "icon": "",
+    "description": "Rare tier electromagnetic sidearm.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "2mm_ec"
+    },
+    "value": "TBA"
+  },
+  gauss_rifle: {
+    "id": "gauss_rifle",
+    "name": "Gauss Rifle",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "energy_weapons",
+    "icon": "",
+    "description": "Rare/Signature tier electromagnetic rifle, distinct ammo type from laser/plasma.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "2mm_ec"
+    },
+    "value": "TBA"
+  },
+  laser_pistol: {
+    "id": "laser_pistol",
+    "name": "Laser Pistol",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "energy_weapons",
+    "icon": "",
+    "description": "Normal-to-Faction-Issued tier energy sidearm, real pre-war tech, rarer than ballistic pistols.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "laser",
+      "range": "TBA",
+      "ammo_type": "energy_cell"
+    },
+    "value": "TBA"
+  },
+  laser_rifle: {
+    "id": "laser_rifle",
+    "name": "Laser Rifle",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "energy_weapons",
+    "icon": "",
+    "description": "Faction-Issued tier energy rifle, standard Federation-grade tech.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "laser",
+      "range": "TBA",
+      "ammo_type": "energy_cell"
+    },
+    "value": "TBA"
+  },
+  plasma_caster: {
+    "id": "plasma_caster",
+    "name": "Plasma Caster",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "energy_weapons",
+    "icon": "",
+    "description": "Top-tier Rare/Signature energy weapon, heaviest plasma option before Unique tier.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "plasma",
+      "range": "TBA",
+      "ammo_type": "plasma_cartridge"
+    },
+    "value": "TBA"
+  },
+  plasma_pistol: {
+    "id": "plasma_pistol",
+    "name": "Plasma Pistol",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "energy_weapons",
+    "icon": "",
+    "description": "Rare/Signature tier energy sidearm, higher damage than laser equivalents.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "plasma",
+      "range": "TBA",
+      "ammo_type": "plasma_cartridge"
+    },
+    "value": "TBA"
+  },
+  plasma_rifle: {
+    "id": "plasma_rifle",
+    "name": "Plasma Rifle",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "energy_weapons",
+    "icon": "",
+    "description": "Rare/Signature tier energy rifle, top of the energy weapon bracket short of Unique.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "plasma",
+      "range": "TBA",
+      "ammo_type": "plasma_cartridge"
+    },
+    "value": "TBA"
+  },
+  tesla_cannon: {
+    "id": "tesla_cannon",
+    "name": "Tesla Cannon",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "energy_weapons",
+    "icon": "",
+    "description": "Rare/Signature tier energy weapon, arc-damage across multiple targets.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "laser",
+      "range": "TBA",
+      "ammo_type": "energy_cell"
+    },
+    "value": "TBA"
+  },
+  dynamite: {
+    "id": "dynamite",
+    "name": "Dynamite",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "throwing",
+    "icon": "",
+    "description": "Thrown/placed explosive, pre-war construction demolition stock.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "explosive",
+      "range": "TBA"
+    },
+    "value": "TBA"
+  },
+  frag_grenade: {
+    "id": "frag_grenade",
+    "name": "Frag Grenade",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "throwing",
+    "icon": "",
+    "description": "Standard thrown explosive, self-contained — no separate ammo type needed.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "explosive",
+      "range": "TBA"
+    },
+    "value": "TBA"
+  },
+  grenade_launcher: {
+    "id": "grenade_launcher",
+    "name": "Grenade Launcher",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "big_guns",
+    "icon": "",
+    "description": "Rare tier launcher weapon, area damage at range.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "explosive",
+      "range": "TBA",
+      "ammo_type": "40mm_grenade"
+    },
+    "value": "TBA"
+  },
+  incendiary_grenade: {
+    "id": "incendiary_grenade",
+    "name": "Incendiary Grenade",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "throwing",
+    "icon": "",
+    "description": "Thrown fire explosive, self-contained, damage-over-time.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "fire",
+      "range": "TBA"
+    },
+    "value": "TBA"
+  },
+  land_mine: {
+    "id": "land_mine",
+    "name": "Land Mine",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "throwing",
+    "icon": "",
+    "description": "Placed explosive, triggered rather than thrown.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "explosive",
+      "range": "TBA"
+    },
+    "value": "TBA"
+  },
+  molotov_cocktail: {
+    "id": "molotov_cocktail",
+    "name": "Molotov Cocktail",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "throwing",
+    "icon": "",
+    "description": "Scrap tier thrown fire weapon, improvised, self-contained.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "fire",
+      "range": "TBA"
+    },
+    "value": "TBA"
+  },
+  plasma_grenade: {
+    "id": "plasma_grenade",
+    "name": "Plasma Grenade",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "throwing",
+    "icon": "",
+    "description": "Rare thrown energy explosive, self-contained.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "plasma",
+      "range": "TBA"
+    },
+    "value": "TBA"
+  },
+  rocket_launcher: {
+    "id": "rocket_launcher",
+    "name": "Rocket Launcher",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "big_guns",
+    "icon": "",
+    "description": "Rare Big Guns tier launcher, single-target high explosive damage.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "explosive",
+      "range": "TBA",
+      "ammo_type": "missile"
+    },
+    "value": "TBA"
+  },
   homemade_pistol: {
     "id": "homemade_pistol",
     "name": "Homemade Pistol",
@@ -550,10 +1134,10 @@ export const itemDatabase = {
     "stats": {
       "dmg": "1d6",
       "dmgType": "normal",
-      "range": 15
+      "range": 15,
+      "ammo_type": "makeshift_rounds",
+      "clip_size": 6
     },
-    "clip_size": 6,
-    "ammo_type": "makeshift_rounds",
     "value": 50
   },
   kitchen_knife: {
@@ -590,6 +1174,381 @@ export const itemDatabase = {
     },
     "value": "TBA"
   },
+  baseball_bat: {
+    "id": "baseball_bat",
+    "name": "Baseball Bat",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Normal tier blunt weapon.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  bowie_knife: {
+    "id": "bowie_knife",
+    "name": "Bowie Knife",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Normal tier bladed weapon, heavier than the standard Combat Knife.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  boxing_gloves: {
+    "id": "boxing_gloves",
+    "name": "Boxing Gloves",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "unarmed",
+    "icon": "",
+    "description": "Normal tier unarmed weapon.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  brass_knuckles: {
+    "id": "brass_knuckles",
+    "name": "Brass Knuckles",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "unarmed",
+    "icon": "",
+    "description": "Scrap tier unarmed weapon, common and concealable.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  chinese_officers_sword: {
+    "id": "chinese_officers_sword",
+    "name": "Chinese Officer's Sword",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Rare/Signature tier bladed weapon, pre-war military relic.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  cleaver: {
+    "id": "cleaver",
+    "name": "Cleaver",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Generic Normal tier bladed weapon — smaller than the custom Axe Gang Cleaver signature item.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  combat_knife: {
+    "id": "combat_knife",
+    "name": "Combat Knife",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Normal tier bladed weapon, military-issue design.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  deathclaw_gauntlet: {
+    "id": "deathclaw_gauntlet",
+    "name": "Deathclaw Gauntlet",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": false,
+    "skill": "unarmed",
+    "icon": "",
+    "description": "Unique/Quest-leaning unarmed weapon, made from a deathclaw's actual claws.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  fire_axe: {
+    "id": "fire_axe",
+    "name": "Fire Axe",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Normal tier bladed/blunt hybrid weapon.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  golf_club: {
+    "id": "golf_club",
+    "name": "Golf Club",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Scrap tier improvised blunt weapon.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  katana: {
+    "id": "katana",
+    "name": "Katana",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Rare/Signature tier bladed weapon, imported relic.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  machete: {
+    "id": "machete",
+    "name": "Machete",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Normal tier bladed weapon. Note: overlaps thematically with the existing custom Parang item — both fill a similar niche, kept separate since Parang is the Malaysian-flavor version and this is the generic Fallout-derived import.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  nightstick: {
+    "id": "nightstick",
+    "name": "Nightstick",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Normal tier blunt weapon, Federation crowd-control issue.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  pool_cue: {
+    "id": "pool_cue",
+    "name": "Pool Cue",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Scrap tier improvised blunt weapon.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  power_fist: {
+    "id": "power_fist",
+    "name": "Power Fist",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "unarmed",
+    "icon": "",
+    "description": "Rare/Signature tier unarmed weapon, powered gauntlet.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  ripper: {
+    "id": "ripper",
+    "name": "Ripper",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Rare/Signature tier bladed weapon, powered vibro-blade.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  shishkebab: {
+    "id": "shishkebab",
+    "name": "Shishkebab",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Rare/Signature tier bladed weapon, improvised fire sword, uses Flamer Fuel.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "fire",
+      "range": 1,
+      "ammo_type": "flamer_fuel"
+    },
+    "value": "TBA"
+  },
+  shovel: {
+    "id": "shovel",
+    "name": "Shovel",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Scrap tier improvised blunt weapon, dual-purpose tool.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  sledgehammer: {
+    "id": "sledgehammer",
+    "name": "Sledgehammer",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Normal tier heavy blunt weapon.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  super_sledge: {
+    "id": "super_sledge",
+    "name": "Super Sledge",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Rare/Signature tier heavy blunt weapon, reinforced/motorized variant of the Sledgehammer.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  switchblade: {
+    "id": "switchblade",
+    "name": "Switchblade",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Normal tier concealable bladed weapon.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
+  tire_iron: {
+    "id": "tire_iron",
+    "name": "Tire Iron",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Normal tier blunt weapon, ProTiga factory-tool origin.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "value": "TBA"
+  },
   parang: {
     "id": "parang",
     "name": "Parang",
@@ -604,6 +1563,114 @@ export const itemDatabase = {
       "dmg": "TBA",
       "dmgType": "normal",
       "range": 1
+    },
+    "value": "TBA"
+  },
+  "223_pistol": {
+    "id": "223_pistol",
+    "name": ".223 Pistol",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "High-end Normal-tier pistol, rifle-caliber conversion.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "5.56"
+    },
+    "value": "TBA"
+  },
+  "32_revolver": {
+    "id": "32_revolver",
+    "name": ".32 Revolver",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Normal tier revolver — light caliber, common starter sidearm.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": ".32"
+    },
+    "value": "TBA"
+  },
+  "44_revolver": {
+    "id": "44_revolver",
+    "name": ".44 Revolver",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Normal tier heavy revolver, higher stopping power than the .32.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": ".44"
+    },
+    "value": "TBA"
+  },
+  "10mm_pistol": {
+    "id": "10mm_pistol",
+    "name": "10mm Pistol",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Standard-issue pre-war sidearm, Normal tier — a real factory firearm, not a scrap improvisation.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "10mm"
+    },
+    "value": "TBA"
+  },
+  "14mm_pistol": {
+    "id": "14mm_pistol",
+    "name": "14mm Pistol",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Rare oversized pistol caliber, sits at the top of the Normal-tier pistol bracket.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "14mm"
+    },
+    "value": "TBA"
+  },
+  "9mm_pistol": {
+    "id": "9mm_pistol",
+    "name": "9mm Pistol",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Normal tier factory sidearm, easily concealed.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "9mm"
     },
     "value": "TBA"
   },
@@ -638,6 +1705,315 @@ export const itemDatabase = {
       "dmg": "TBA",
       "dmgType": "normal",
       "range": 1
+    },
+    "value": "TBA"
+  },
+  anti_materiel_rifle: {
+    "id": "anti_materiel_rifle",
+    "name": "Anti-Materiel Rifle",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Top-of-Normal-tier rifle, highest single-shot damage in the class.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": ".50"
+    },
+    "value": "TBA"
+  },
+  assault_rifle: {
+    "id": "assault_rifle",
+    "name": "Assault Rifle",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Normal tier automatic rifle. Burst-fire capable — see the campaign's burst mechanic (single roll, AC/DR debuff).",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "5.56",
+      "burst_capable": true
+    },
+    "value": "TBA"
+  },
+  battle_rifle: {
+    "id": "battle_rifle",
+    "name": "Battle Rifle",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Rare/Signature-leaning Normal tier rifle, harder-hitting than the Assault or Combat Rifle.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "7.62"
+    },
+    "value": "TBA"
+  },
+  combat_rifle: {
+    "id": "combat_rifle",
+    "name": "Combat Rifle",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Normal tier semi-automatic rifle, faction-standard issue.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": ".45"
+    },
+    "value": "TBA"
+  },
+  homemade_rifle: {
+    "id": "homemade_rifle",
+    "name": "Homemade Rifle",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Scrap tier — the rifle-length sibling to the Homemade Pistol. Improvised, no real ammo standard, no mod system.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "TBA"
+    },
+    "value": "TBA"
+  },
+  hunting_rifle: {
+    "id": "hunting_rifle",
+    "name": "Hunting Rifle",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Normal tier bolt-action rifle, common pre-war hunting/utility weapon.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "7.62"
+    },
+    "value": "TBA"
+  },
+  marksman_carbine: {
+    "id": "marksman_carbine",
+    "name": "Marksman Carbine",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Lower-end Normal tier carbine, common early rifle option.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "5.56"
+    },
+    "value": "TBA"
+  },
+  sniper_rifle: {
+    "id": "sniper_rifle",
+    "name": "Sniper Rifle",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Rare/Signature-leaning Normal tier rifle, long range and high single-shot damage.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "7.62"
+    },
+    "value": "TBA"
+  },
+  varmint_rifle: {
+    "id": "varmint_rifle",
+    "name": "Varmint Rifle",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Bottom-of-Normal-tier rifle, weak but common and cheap to feed.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": ".22"
+    },
+    "value": "TBA"
+  },
+  "10mm_smg": {
+    "id": "10mm_smg",
+    "name": "10mm SMG",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Normal tier automatic SMG. Burst-fire capable.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "10mm",
+      "burst_capable": true
+    },
+    "value": "TBA"
+  },
+  tommy_gun: {
+    "id": "tommy_gun",
+    "name": "Tommy Gun",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Normal tier automatic SMG, pre-war antique still in circulation. Burst-fire capable.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": ".45",
+      "burst_capable": true
+    },
+    "value": "TBA"
+  },
+  combat_shotgun: {
+    "id": "combat_shotgun",
+    "name": "Combat Shotgun",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Normal tier shotgun, faction-standard close-range weapon.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "shotgun_shells"
+    },
+    "value": "TBA"
+  },
+  double_barrel_shotgun: {
+    "id": "double_barrel_shotgun",
+    "name": "Double-Barrel Shotgun",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Normal tier shotgun, simple break-action design.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "shotgun_shells"
+    },
+    "value": "TBA"
+  },
+  lever_action_shotgun: {
+    "id": "lever_action_shotgun",
+    "name": "Lever-Action Shotgun",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Normal tier shotgun, tube-fed lever mechanism.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "shotgun_shells"
+    },
+    "value": "TBA"
+  },
+  pump_action_shotgun: {
+    "id": "pump_action_shotgun",
+    "name": "Pump-Action Shotgun",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Normal tier shotgun, the most common variant in circulation.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "shotgun_shells"
+    },
+    "value": "TBA"
+  },
+  riot_shotgun: {
+    "id": "riot_shotgun",
+    "name": "Riot Shotgun",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Faction-Issued leaning Normal tier shotgun, Federation crowd-control standard.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "shotgun_shells"
+    },
+    "value": "TBA"
+  },
+  sawed_off_shotgun: {
+    "id": "sawed_off_shotgun",
+    "name": "Sawed-Off Shotgun",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "Concealable Normal tier shotgun, very short range, high close-quarters damage.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": "TBA",
+      "ammo_type": "shotgun_shells"
     },
     "value": "TBA"
   },
