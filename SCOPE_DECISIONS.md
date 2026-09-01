@@ -522,6 +522,40 @@ Final formulas to implement in `formulas.js`:
   time, not a discrete applied/removed effect — so RadAway immediately
   changes the debuff too, with nothing left over to separately cure.
 
+## Ammo type integration (RESOLVED, built & live-tested)
+- User populated the wiki with 129 items (up from 45): ~45 weapons,
+  14 real ammo types. Found two real gaps between their authoring
+  convention and what the ammo system reads: (1) ammo_type/clip_size/
+  burst_shots are authored under `stats`, code was reading them
+  top-level — fixed everywhere; (2) none of the 14 ammo items had an
+  ammo_type tag matching the caliber string their weapons reference —
+  added the matching tag to all 14.
+- Content gaps flagged, not fixed (author's call): 5 calibers (.22,
+  .32, .44, .45, .50) referenced by weapons with no matching ammo item
+  yet; Homemade Rifle's ammo_type still "TBA"; no new weapon has
+  clip_size set yet, so ammo tracking stays dormant for all of them
+  until filled in.
+
+## Phase 5 — Weapon/Armor/Chem Numbering & Balance (SCOPED, not yet built)
+- Next roadmap phase. The manual has real numeric tables not yet fully
+  mined this session: tiered ranged-weapon damage/ST-req/clip-size
+  tables (Weak/Medium/Strong-style variants per category), a melee
+  weapon dice-formula table (already uses "+MD", matching the app's
+  existing meleeDamageBase), a named armor tier table (Clothes →
+  Slave/Prison Clothes → Supermutant Clothes → Ramshackle → Mercenary →
+  Leather, continues further), and a chems table with real Stimpak/
+  Med-X/Psycho/Buffout/Mentats/Turbo numbers.
+- Open question flagged, not resolved: the manual's standard ballistic
+  weapon categories (pistols/SMGs/rifles/shotguns) show flat "+N"
+  damage with no dice at all, unlike Energy Weapons' real dice
+  formulas — worth confirming whether that's genuinely intended before
+  committing numbers, since it reads unusually for a TTRPG.
+- Proposed process: work category by category (not all 129 at once),
+  map each item to the closest manual tier, propose the number before
+  writing it — same confirm-before-code rhythm as the rest of this
+  session. Needs the user's "Normal tier" language mapped to the
+  manual's Weak/Medium/Strong vocabulary before starting.
+
 ## Obsidian wiki search via the command bar (DISCUSSED, not built)
 - User asked purely as a feasibility discussion, not a build request.
 - See conversation for the full answer — short version: feasible, but
