@@ -188,6 +188,53 @@ export const itemDatabase = {
     },
     "value": "TBA"
   },
+  clothes: {
+    "id": "clothes",
+    "name": "Clothes",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual — baseline tier, no combat value. May wear armor over it.",
+    "stats": {
+      "ac": 1,
+      "dt_dr_normal": "0/5",
+      "dt_dr_laser": "0/0",
+      "dt_dr_fire": "0/0",
+      "dt_dr_plasma": "0/0",
+      "dt_dr_explosive": "0/0",
+      "er": 0,
+      "rr": 0,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
+  combat_leather_jacket: {
+    "id": "combat_leather_jacket",
+    "name": "Combat Leather Jacket",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual — grants CH+2.",
+    "stats": {
+      "ac": 20,
+      "dt_dr_normal": "2/30",
+      "dt_dr_laser": "0/20",
+      "dt_dr_fire": "2/25",
+      "dt_dr_plasma": "0/10",
+      "dt_dr_explosive": "1/25",
+      "er": 0,
+      "rr": 0,
+      "gr": 0,
+      "pr": 0
+    },
+    "modifiers": {
+      "special_cha": 2
+    },
+    "value": "TBA"
+  },
   factory_respirator: {
     "id": "factory_respirator",
     "name": "Factory Respirator",
@@ -221,6 +268,28 @@ export const itemDatabase = {
     },
     "value": "TBA"
   },
+  leather_armor: {
+    "id": "leather_armor",
+    "name": "Leather Armor",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual.",
+    "stats": {
+      "ac": 15,
+      "dt_dr_normal": "2/25",
+      "dt_dr_laser": "0/20",
+      "dt_dr_fire": "0/20",
+      "dt_dr_plasma": "0/10",
+      "dt_dr_explosive": "0/20",
+      "er": 0,
+      "rr": 20,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
   lim_clan_tailored_suit: {
     "id": "lim_clan_tailored_suit",
     "name": "Lim Clan Tailored Suit",
@@ -239,6 +308,121 @@ export const itemDatabase = {
     },
     "value": "TBA"
   },
+  malayan_frontliner_armor: {
+    "id": "malayan_frontliner_armor",
+    "name": "Malayan Frontliner Armor",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual — imposes -40 to Sneak, Steal, and Engineering while worn.",
+    "stats": {
+      "ac": 20,
+      "dt_dr_normal": "7/45",
+      "dt_dr_laser": "5/40",
+      "dt_dr_fire": "5/30",
+      "dt_dr_plasma": "4/40",
+      "dt_dr_explosive": "5/40",
+      "er": 50,
+      "rr": 0,
+      "gr": 0,
+      "pr": 0
+    },
+    "modifiers": {
+      "skill_sneak": -40,
+      "skill_steal": -40,
+      "skill_engineering": -40
+    },
+    "value": "TBA"
+  },
+  malayan_infantry_armor: {
+    "id": "malayan_infantry_armor",
+    "name": "Malayan Infantry Armor",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual.",
+    "stats": {
+      "ac": 15,
+      "dt_dr_normal": "3/35",
+      "dt_dr_laser": "1/10",
+      "dt_dr_fire": "1/20",
+      "dt_dr_plasma": "1/10",
+      "dt_dr_explosive": "1/30",
+      "er": 25,
+      "rr": 0,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
+  malayan_officers_uniform: {
+    "id": "malayan_officers_uniform",
+    "name": "Malayan Officers Uniform",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual.",
+    "stats": {
+      "ac": 2,
+      "dt_dr_normal": "1/7",
+      "dt_dr_laser": "0/5",
+      "dt_dr_fire": "0/5",
+      "dt_dr_plasma": "0/5",
+      "dt_dr_explosive": "1/5",
+      "er": 0,
+      "rr": 0,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
+  mercenary_armor: {
+    "id": "mercenary_armor",
+    "name": "Mercenary Armor",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual.",
+    "stats": {
+      "ac": 12,
+      "dt_dr_normal": "3/25",
+      "dt_dr_laser": "1/30",
+      "dt_dr_fire": "1/17",
+      "dt_dr_plasma": "1/30",
+      "dt_dr_explosive": "1/25",
+      "er": 0,
+      "rr": 0,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
+  metal_plates: {
+    "id": "metal_plates",
+    "name": "Metal Plates",
+    "type": "armor",
+    "slot": "body",
+    "size": "oversized",
+    "icon": "",
+    "description": "From the manual — Gergasi/Supermutant-specific armor, needs metal and leather parts to craft.",
+    "stats": {
+      "ac": 2.5,
+      "dt_dr_normal": "1/5",
+      "dt_dr_laser": "1/7.5",
+      "dt_dr_fire": "0.5/3",
+      "dt_dr_plasma": "0.5/7.5",
+      "dt_dr_explosive": "0.5/5",
+      "er": 0,
+      "rr": 20,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
   press_plate_armor_oversized: {
     "id": "press_plate_armor_oversized",
     "name": "Press-Plate Armor (Oversized)",
@@ -251,6 +435,121 @@ export const itemDatabase = {
       "dt": "TBA",
       "dr": "TBA",
       "dmgType": "normal"
+    },
+    "value": "TBA"
+  },
+  prison_slave_clothes: {
+    "id": "prison_slave_clothes",
+    "name": "Prison/Slave Clothes",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual — zero combat value. May wear armor over it.",
+    "stats": {
+      "ac": 0,
+      "dt_dr_normal": "0/0",
+      "dt_dr_laser": "0/0",
+      "dt_dr_fire": "0/0",
+      "dt_dr_plasma": "0/0",
+      "dt_dr_explosive": "0/0",
+      "er": 0,
+      "rr": 0,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
+  protectorate_heavy_trooper_armor: {
+    "id": "protectorate_heavy_trooper_armor",
+    "name": "Protectorate Heavy Trooper Armor",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual — top tier of the faction-armor progression. Grants LR+2, imposes -20 to Sneak and Steal while worn.",
+    "stats": {
+      "ac": 25,
+      "dt_dr_normal": "8/45",
+      "dt_dr_laser": "10/60",
+      "dt_dr_fire": "7/60",
+      "dt_dr_plasma": "9/60",
+      "dt_dr_explosive": "8/40",
+      "er": 40,
+      "rr": 0,
+      "gr": 0,
+      "pr": 0
+    },
+    "modifiers": {
+      "special_lk": 2,
+      "skill_sneak": -20,
+      "skill_steal": -20
+    },
+    "value": "TBA"
+  },
+  protectorate_infantry_armor: {
+    "id": "protectorate_infantry_armor",
+    "name": "Protectorate Infantry Armor",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual — note: distinct from the existing 'Protectorate Infantry' bestiary/monster entry, which uses this armor implicitly but didn't have it as its own item note until now.",
+    "stats": {
+      "ac": 20,
+      "dt_dr_normal": "4/35",
+      "dt_dr_laser": "1/30",
+      "dt_dr_fire": "1/20",
+      "dt_dr_plasma": "1/30",
+      "dt_dr_explosive": "1/20",
+      "er": 30,
+      "rr": 0,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
+  protectorate_officers_uniform: {
+    "id": "protectorate_officers_uniform",
+    "name": "Protectorate Officers Uniform",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual.",
+    "stats": {
+      "ac": 3,
+      "dt_dr_normal": "1/10",
+      "dt_dr_laser": "1/15",
+      "dt_dr_fire": "1/10",
+      "dt_dr_plasma": "1/15",
+      "dt_dr_explosive": "0/10",
+      "er": 25,
+      "rr": 0,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
+  ramshackle_armor: {
+    "id": "ramshackle_armor",
+    "name": "Ramshackle Armor",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual — first real armor tier.",
+    "stats": {
+      "ac": 8,
+      "dt_dr_normal": "2/25",
+      "dt_dr_laser": "0/25",
+      "dt_dr_fire": "0/15",
+      "dt_dr_plasma": "0/25",
+      "dt_dr_explosive": "1/20",
+      "er": 0,
+      "rr": 0,
+      "gr": 0,
+      "pr": 0
     },
     "value": "TBA"
   },
@@ -269,6 +568,116 @@ export const itemDatabase = {
     },
     "value": "TBA"
   },
+  studded_leather_armor: {
+    "id": "studded_leather_armor",
+    "name": "Studded Leather Armor",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual.",
+    "stats": {
+      "ac": 20,
+      "dt_dr_normal": "3/25",
+      "dt_dr_laser": "1/30",
+      "dt_dr_fire": "1/17",
+      "dt_dr_plasma": "1/30",
+      "dt_dr_explosive": "1/25",
+      "er": 0,
+      "rr": 0,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
+  supermutant_clothes: {
+    "id": "supermutant_clothes",
+    "name": "Supermutant Clothes",
+    "type": "armor",
+    "slot": "body",
+    "size": "oversized",
+    "icon": "",
+    "description": "From the manual — the Supermutant/Gergasi-sized clothing baseline, meaningfully tougher than human clothes.",
+    "stats": {
+      "ac": 10,
+      "dt_dr_normal": "3/25",
+      "dt_dr_laser": "1/15",
+      "dt_dr_fire": "1/15",
+      "dt_dr_plasma": "1/15",
+      "dt_dr_explosive": "1/15",
+      "er": 20,
+      "rr": 0,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
+  ucl_officers_uniform: {
+    "id": "ucl_officers_uniform",
+    "name": "UCL Officers Uniform",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual.",
+    "stats": {
+      "ac": 2,
+      "dt_dr_normal": "0/7",
+      "dt_dr_laser": "0/0",
+      "dt_dr_fire": "0/7",
+      "dt_dr_plasma": "0/0",
+      "dt_dr_explosive": "0/7",
+      "er": 10,
+      "rr": 10,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
+  ucl_soldier_armor: {
+    "id": "ucl_soldier_armor",
+    "name": "UCL Soldier Armor",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual.",
+    "stats": {
+      "ac": 15,
+      "dt_dr_normal": "2/25",
+      "dt_dr_laser": "1/20",
+      "dt_dr_fire": "0/20",
+      "dt_dr_plasma": "0/20",
+      "dt_dr_explosive": "1/30",
+      "er": 10,
+      "rr": 10,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
+  ucl_vanguard_armor: {
+    "id": "ucl_vanguard_armor",
+    "name": "UCL Vanguard Armor",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "From the manual — top UCL faction armor tier.",
+    "stats": {
+      "ac": 20,
+      "dt_dr_normal": "5/40",
+      "dt_dr_laser": "4/50",
+      "dt_dr_fire": "3/30",
+      "dt_dr_plasma": "3/30",
+      "dt_dr_explosive": "3/30",
+      "er": 10,
+      "rr": 20,
+      "gr": 0,
+      "pr": 0
+    },
+    "value": "TBA"
+  },
   water_wardens_slicker: {
     "id": "water_wardens_slicker",
     "name": "Water Warden's Slicker",
@@ -282,6 +691,19 @@ export const itemDatabase = {
       "dr": "TBA",
       "dmgType": "normal"
     },
+    "value": "TBA"
+  },
+  addictol: {
+    "id": "addictol",
+    "name": "Addictol",
+    "type": "consumable",
+    "icon": "",
+    "description": "From the manual: cures addiction. One-time use pill, comes in a strip of 6. No duration, debuff, or addiction risk of its own.",
+    "effect": "Cures addiction",
+    "stats": {
+      "cures_addiction": true
+    },
+    "addictive": false,
     "value": "TBA"
   },
   ah_bengs_moonshine: {
@@ -313,6 +735,18 @@ export const itemDatabase = {
     "addictive": false,
     "value": "TBA"
   },
+  bear_trap: {
+    "id": "bear_trap",
+    "name": "Bear Trap",
+    "type": "consumable",
+    "icon": "",
+    "description": "From the manual: pressure-sensitive placed trap. Deals 2d20 True Damage and instantly cripples unless the target wears metal boots. Requires a ST-1 roll to remove.",
+    "stats": {
+      "dmg": "2d20",
+      "dmgType": "true"
+    },
+    "value": "TBA"
+  },
   bedil_peluru: {
     "id": "bedil_peluru",
     "name": "Bedil & Peluru",
@@ -341,6 +775,31 @@ export const itemDatabase = {
     },
     "addictive": true,
     "addiction_chance": "TBA",
+    "value": "TBA"
+  },
+  c4_plastique: {
+    "id": "c4_plastique",
+    "name": "C4 Plastique",
+    "type": "consumable",
+    "icon": "",
+    "description": "From the manual: shapeable explosive. Setting requires a successful Traps roll. Deals 2d20+20 damage in a small radius; target may roll AG-2 to dodge. Each additional plastique combined adds 1d20 damage.",
+    "stats": {
+      "dmg": "2d20+20",
+      "dmgType": "explosive"
+    },
+    "value": "TBA"
+  },
+  can_of_food: {
+    "id": "can_of_food",
+    "name": "Can of Food",
+    "type": "consumable",
+    "icon": "",
+    "description": "From the manual — the original baseline food item. Rationed, lasts up to a day.",
+    "effect": "Sustains for up to a day if rationed",
+    "stats": {
+      "hunger": "TBA"
+    },
+    "addictive": false,
     "value": "TBA"
   },
   cap_kilat_cola: {
@@ -398,6 +857,19 @@ export const itemDatabase = {
     "addictive": false,
     "value": "TBA"
   },
+  healing_poultice: {
+    "id": "healing_poultice",
+    "name": "Healing Poultice",
+    "type": "consumable",
+    "icon": "",
+    "description": "From the manual: comes in a small pouch. No addiction risk at all — the safe, low-tech alternative to a Stimpak.",
+    "effect": "Heals 1d10+5 HP",
+    "stats": {
+      "heal": "1d10+5"
+    },
+    "addictive": false,
+    "value": "TBA"
+  },
   ikan_masin_jerky: {
     "id": "ikan_masin_jerky",
     "name": "Ikan Masin Jerky",
@@ -451,6 +923,19 @@ export const itemDatabase = {
     "stats": {
       "skill_bonus": "TBA",
       "permanent": true
+    },
+    "addictive": false,
+    "value": "TBA"
+  },
+  med_kit: {
+    "id": "med_kit",
+    "name": "Med-Kit",
+    "type": "consumable",
+    "icon": "",
+    "description": "From the manual: acts as a successful Medicine skill use. Heals 1d10 HP over 1d10 minutes. Single use.",
+    "effect": "Heals 1d10 HP over 1d10 minutes",
+    "stats": {
+      "heal": "1d10"
     },
     "addictive": false,
     "value": "TBA"
@@ -627,6 +1112,23 @@ export const itemDatabase = {
     },
     "addictive": true,
     "addiction_chance": "TBA",
+    "value": "TBA"
+  },
+  turbo: {
+    "id": "turbo",
+    "name": "Turbo",
+    "type": "consumable",
+    "icon": "",
+    "description": "From the manual: grants an extra action and +20% hit chance for 1 hour. Addiction rate 70 — one of the steepest in the chem list. Requires aerosol delivery.",
+    "effect": "Gain another action, +20% Hit Chance",
+    "stats": {
+      "duration": "1 Hour"
+    },
+    "addictive": true,
+    "addiction_rate": 70,
+    "addiction_effect": "-5 to SPECIAL, Exhaustion Level x3",
+    "addiction_threshold": 300,
+    "debuff_effect": "-3 to SPECIAL for 2 hours",
     "value": "TBA"
   },
   dinar: {
@@ -1361,6 +1863,24 @@ export const itemDatabase = {
     },
     "value": "TBA"
   },
+  keris: {
+    "id": "keris",
+    "name": "Keris",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "From the manual — a real Malaysian ceremonial dagger, already statted. Smithed tier. Special Move: Lithe Thrust — -20% Hit Chance, ignores DT and DR, inflicts 2d4 bleed damage until the wound is closed. Takes 1 turn to prepare.",
+    "stats": {
+      "dmg": "2d6+4",
+      "dmgType": "normal",
+      "range": 1,
+      "st_req": 4
+    },
+    "value": "TBA"
+  },
   machete: {
     "id": "machete",
     "name": "Machete",
@@ -1575,14 +2095,14 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
-    "description": "High-end Normal-tier pistol, rifle-caliber conversion.",
+    "description": "High-end Normal-tier pistol, rifle-caliber conversion. Tier 2 (Faction-Issued), top of the pistol bracket.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d8+4",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 18,
       "ammo_type": "5.56"
     },
-    "value": "TBA"
+    "value": 240
   },
   "32_revolver": {
     "id": "32_revolver",
@@ -1593,14 +2113,14 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
-    "description": "Normal tier revolver — light caliber, common starter sidearm.",
+    "description": "Normal tier revolver — light caliber, common starter sidearm. Tier 1 (Normal), low end.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d6+3",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 10,
       "ammo_type": ".32"
     },
-    "value": "TBA"
+    "value": 70
   },
   "44_revolver": {
     "id": "44_revolver",
@@ -1611,14 +2131,14 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
-    "description": "Normal tier heavy revolver, higher stopping power than the .32.",
+    "description": "Normal tier heavy revolver, higher stopping power than the .32. Tier 1 (Normal), high end.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d6+3",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 14,
       "ammo_type": ".44"
     },
-    "value": "TBA"
+    "value": 130
   },
   "10mm_pistol": {
     "id": "10mm_pistol",
@@ -1629,14 +2149,14 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
-    "description": "Standard-issue pre-war sidearm, Normal tier — a real factory firearm, not a scrap improvisation.",
+    "description": "Standard-issue pre-war sidearm, Normal tier — a real factory firearm, not a scrap improvisation. Tier 1 (Normal). Ranged weapons don't get an MD bonus (no ST scaling per the manual).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d6+2",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 15,
       "ammo_type": "10mm"
     },
-    "value": "TBA"
+    "value": 110
   },
   "14mm_pistol": {
     "id": "14mm_pistol",
@@ -1647,14 +2167,14 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
-    "description": "Rare oversized pistol caliber, sits at the top of the Normal-tier pistol bracket.",
+    "description": "Rare oversized pistol caliber, sits at the top of the Normal-tier pistol bracket. Tier 2 (Faction-Issued).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d8+3",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 15,
       "ammo_type": "14mm"
     },
-    "value": "TBA"
+    "value": 220
   },
   "9mm_pistol": {
     "id": "9mm_pistol",
@@ -1665,14 +2185,14 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
-    "description": "Normal tier factory sidearm, easily concealed.",
+    "description": "Normal tier factory sidearm, easily concealed. Tier 1 (Normal), low end.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+3",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 12,
       "ammo_type": "9mm"
     },
-    "value": "TBA"
+    "value": 90
   },
   pneumatic_nail_driver: {
     "id": "pneumatic_nail_driver",
