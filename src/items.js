@@ -1787,13 +1787,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Normal tier bladed weapon, military-issue design.",
+    "description": "Normal tier bladed weapon, military-issue design. Tier 1 (Normal). Stats assigned via 7-10 round combat framework (target avg ~6-10).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 75
   },
   deathclaw_gauntlet: {
     "id": "deathclaw_gauntlet",
@@ -2310,14 +2310,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Scrap tier — the rifle-length sibling to the Homemade Pistol. Improvised, no real ammo standard, no mod system.",
+    "description": "Scrap tier — the rifle-length sibling to the Homemade Pistol. Improvised, no real ammo standard, no mod system. Tier 0 (Scrap). Stats assigned via 7-10 round combat framework.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+1",
       "dmgType": "normal",
-      "range": "TBA",
-      "ammo_type": "TBA"
+      "range": 18,
+      "ammo_type": "makeshift_rounds"
     },
-    "value": "TBA"
+    "value": 55
   },
   hunting_rifle: {
     "id": "hunting_rifle",
