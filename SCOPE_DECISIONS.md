@@ -570,3 +570,40 @@ Final formulas to implement in `formulas.js`:
   Scoping question for later: search just the structured game data
   (quick, reuses existing sync), or actual free-text wiki prose search
   (bigger, needs a new sync step to extract and index page bodies).
+
+## Quests tab + wiki-sourced glossary tooltips (BUILT)
+- Quests tab: mirrors the Data Logs pattern (folder-derived
+  category_path, GM grant/player unlock, unread badge) but with more
+  structure per the user's choice — a static `objectives` checklist
+  (self-toggled by the player, stored as completed-index arrays so
+  reordering objectives doesn't silently misalign old progress) and a
+  GM-set per-player `quest_status` (Active/Completed/Failed, defaults
+  to Active on grant). New `type: "quest"` in the sync pipeline,
+  `src/quests.js` generated the same way as `dataLogs.js`.
+- Glossary tooltips: directly answers the "search the wiki" scoping
+  question above, narrower than either option floated there — no
+  search UI, just automatic hover/tap definitions wherever a wiki term
+  appears in Data Log or Quest body text. sync-obsidian.js now treats
+  plain-prose pages (no ```json block) in an ALLOWLIST of lore folders
+  (Locations, 02_Factions, 01_World Details, Religions, Fallout
+  Details, Bandawang) as implicit glossary entries — filename becomes
+  the term, first real sentence of stripped markdown becomes the
+  summary, auto-extract only (per the user's choice — no manual
+  override field). Deliberately NOT a denylist: 99_Backend Engine (GM
+  plot notes, session prep) and every other folder stay untouched, so
+  a new GM-notes folder can never silently leak into a player-visible
+  tooltip by omission.
+- Reused rather than built: the app already had a full hover/tap
+  tooltip system (`renderWikiLink`, `showTooltip`/`toggleTooltip`, the
+  `.wiki-link` CSS class) wired up for SPECIAL stats, skills, traits,
+  and item names — just never pointed at prose body text or wiki-
+  sourced data. Data Log/Quest bodies now run through the same
+  mechanism via a new `applyGlossaryTooltips()` pass in views.js
+  (regex term-match against escaped HTML, longest-name-first,
+  delegates the actual markup to `renderWikiLink`).
+- Found and fixed along the way: `openQuest()` is called from both the
+  GM and player quest views (Data Logs' `openDataLog()` is only ever
+  called from the player side), and `window.currentUser` is `'GM'` in
+  the GM view — a key with no entry in `liveData.characters`. Added an
+  early return so the GM opening a quest to review it doesn't crash on
+  a nonexistent character's `read_quests`.

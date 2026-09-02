@@ -17,6 +17,17 @@ const STATUS_EFFECTS_TARGET = path.join(__dirname, 'src', 'statusEffects.js');
 const BESTIARY_TARGET = path.join(__dirname, 'src', 'bestiary.js');
 const DATA_LOGS_TARGET = path.join(__dirname, 'src', 'dataLogs.js');
 const MAPS_TARGET = path.join(__dirname, 'src', 'maps.js');
+const QUESTS_TARGET = path.join(__dirname, 'src', 'quests.js');
+const GLOSSARY_TARGET = path.join(__dirname, 'src', 'glossary.js');
+
+// Folders whose plain-prose pages (no ```json block at all) become
+// implicit glossary entries — filename is the term, first sentence of
+// the body is the auto-extracted summary. This is an ALLOWLIST, not a
+// denylist, on purpose: anything not listed here (Items, Bestiary,
+// Character Details, Maps, Media, and critically 99_Backend Engine,
+// which holds GM-only plot notes and session prep) never becomes a
+// player-visible tooltip, even by accident.
+const GLOSSARY_FOLDERS = ['01_World Details', '02_Factions', 'Locations', 'Religions', 'Fallout Details', 'Bandawang'];
 
 let itemsMap = {};
 let traitsMap = {};
@@ -24,6 +35,8 @@ let statusEffectsMap = {};
 let bestiaryMap = {};
 let dataLogsMap = {};
 let mapsMap = {};
+let questsMap = {};
+let glossaryMap = {};
 
 // --- HELPER FUNCTIONS ---
 
@@ -47,7 +60,7 @@ function getAllFiles(dirPath, arrayOfFiles) {
 
 // Generate the final JS file content
 function generateFileContent(type, dataMap) {
-  const dbNames = { item: 'itemDatabase', status_effect: 'statusEffectDatabase', monster: 'bestiaryDatabase', trait: 'traitDatabase', data_log: 'dataLogDatabase', map: 'mapDatabase' };
+  const dbNames = { item: 'itemDatabase', status_effect: 'statusEffectDatabase', monster: 'bestiaryDatabase', trait: 'traitDatabase', data_log: 'dataLogDatabase', map: 'mapDatabase', quest: 'questDatabase', glossary: 'glossaryDatabase' };
   const dbName = dbNames[type] || dbNames.trait;
 
   const helperFuncs = {
@@ -56,7 +69,9 @@ function generateFileContent(type, dataMap) {
     status_effect: `export function getStatusEffect(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return statusEffectDatabase[cleanId] || null; }`,
     monster: `export function getMonster(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return bestiaryDatabase[cleanId] || null; }`,
     data_log: `export function getDataLog(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return dataLogDatabase[cleanId] || null; }`,
-    map: `export function getMap(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return mapDatabase[cleanId] || null; }`
+    map: `export function getMap(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return mapDatabase[cleanId] || null; }`,
+    quest: `export function getQuest(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return questDatabase[cleanId] || null; }`,
+    glossary: `export function getGlossaryTerm(id) { if (!id) return null; return glossaryDatabase[id] || null; }`
   };
   const helperFunc = helperFuncs[type] || helperFuncs.trait;
 
@@ -77,11 +92,94 @@ ${helperFunc}
 `;
 }
 
+// --- GLOSSARY EXTRACTION HELPERS ---
+
+// Strips Obsidian/markdown syntax down to plain readable prose: YAML
+// frontmatter, image embeds, wiki-links (keeps the display text —
+// [[Batu Kapur|the city]] -> "the city", [[RobCo]] -> "RobCo"),
+// standard markdown links, heading markers, emphasis markers, inline
+// code, and collapses whitespace.
+function stripMarkdown(text) {
+  return text
+    .replace(/^---\n[\s\S]*?\n---\n?/, '')            // YAML frontmatter (only at the very top)
+    .replace(/!\[\[[^\]]*\]\]/g, '')                   // image/file embeds
+    .replace(/\[\[([^\]|]*)\|([^\]]*)\]\]/g, '$2')     // [[target|alias]] -> alias
+    .replace(/\[\[([^\]]*)\]\]/g, '$1')                // [[target]] -> target
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')           // [text](url) -> text
+    .replace(/^#{1,6}[^\n]*\n?/gm, '')                 // whole heading lines, not just the # marker — a
+                                                        // heading's own text ("# 🏢 Protiga") isn't prose
+    // Paired emphasis/code markers only — not a blanket strip of every
+    // *_` character, which would also eat literal underscores inside a
+    // filename-derived link target (e.g. a stray [[01_Federation of
+    // Malaya]] turning into the mangled "01Federation of Malaya").
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/__([^_]+)__/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\r/g, '')
+    .replace(/[ \t]+/g, ' ')
+    .trim();
+}
+
+// A line that's structural rather than prose: a bare divider, an
+// Obsidian/Dataview inline field ("Status:: Major Faction", also
+// covers "Label**:: value" once the bold markers around Label are
+// stripped), or a short label-only line with no sentence-ending
+// punctuation ("Preamble"). None of these read as a usable tooltip on
+// their own — skip past them to find the first actual sentence.
+function isStructuralLine(line) {
+  if (/^[-=*]{3,}$/.test(line)) return true;
+  if (/^\S[^:]*::/.test(line)) return true;
+  if (line.length < 25 && !/[.!?]$/.test(line)) return true;
+  return false;
+}
+
+// First real sentence of the (already-stripped) body — walks past
+// blank/structural lines left over from stripped headers, embeds, and
+// metadata fields, then takes up to the first sentence-ending
+// punctuation. Hard-capped as a fallback for prose that runs long
+// before hitting one (semicolon-delimited declarations, etc.).
+function firstSentence(strippedText) {
+  const lines = strippedText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const line = lines.find(l => !isStructuralLine(l)) || lines[0];
+  if (!line) return '';
+  const sentenceMatch = line.match(/^.*?[.!?](?=\s|$)/);
+  const sentence = sentenceMatch ? sentenceMatch[0] : line;
+  return sentence.length > 280 ? sentence.slice(0, 277).trimEnd() + '…' : sentence;
+}
+
+function isInGlossaryFolder(filePath) {
+  const relDir = path.relative(OBSIDIAN_PATH, path.dirname(filePath));
+  const topFolder = relDir.split(path.sep)[0];
+  return GLOSSARY_FOLDERS.includes(topFolder);
+}
+
+function processGlossaryCandidate(filePath, rawContent) {
+  const name = path.basename(filePath, '.md')
+    .replace(/^\d+[_ ]/, '')                                       // Obsidian sort-order prefixes ("01_", "02 ")
+    .replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\s]+/u, '') // leading emoji + variation selectors
+    .trim();
+  if (!name) return;
+  const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  if (!id) return;
+  const stripped = stripMarkdown(rawContent);
+  const summary = firstSentence(stripped);
+  if (!summary) return; // nothing but a title/embed — not useful as a tooltip
+  const relDir = path.relative(OBSIDIAN_PATH, path.dirname(filePath));
+  glossaryMap[id] = {
+    id,
+    name,
+    summary,
+    category_path: relDir ? relDir.split(path.sep) : []
+  };
+  console.log(`[GLOSSARY] Extracted: ${name}`);
+}
+
 // Process a single file to extract JSON
 function processFile(filePath) {
   try {
     const content = fs.readFileSync(filePath, 'utf8');
-    
+
     // Regex that is forgiving (works even if you forget the closing ticks)
     const jsonBlockRegex = /```json\s*([\s\S]*?)(```|$)/;
     const match = content.match(jsonBlockRegex);
@@ -111,6 +209,12 @@ function processFile(filePath) {
           data.category_path = relDir ? relDir.split(path.sep) : [];
           dataLogsMap[data.id] = data;
           console.log(`[DATA LOG] Loaded: ${data.name} (${data.category_path.join(' > ') || 'root'})`);
+        } else if (data.type === 'quest') {
+          // Same folder-derived category_path convention as data logs.
+          const relDir = path.relative(OBSIDIAN_PATH, path.dirname(filePath));
+          data.category_path = relDir ? relDir.split(path.sep) : [];
+          questsMap[data.id] = data;
+          console.log(`[QUEST] Loaded: ${data.name} (${data.category_path.join(' > ') || 'root'})`);
         } else if (data.type === 'map') {
           mapsMap[data.id] = data;
           console.log(`[MAP] Loaded: ${data.name}`);
@@ -118,6 +222,16 @@ function processFile(filePath) {
       } catch (e) {
         // Ignore JSON parse errors (likely incomplete editing)
       }
+      return;
+    }
+
+    // No ```json block at all — if this page lives in one of the
+    // allowlisted lore folders, it becomes an auto-extracted glossary
+    // entry instead. Files that DO have a json block (handled above)
+    // never fall through to here, so a data_log/quest page never
+    // double-counts as a glossary term too.
+    if (isInGlossaryFolder(filePath)) {
+      processGlossaryCandidate(filePath, content);
     }
   } catch (err) {
     console.error(`Error reading ${filePath}: ${err.message}`);
@@ -133,6 +247,8 @@ function runSync() {
   bestiaryMap = {};
   dataLogsMap = {};
   mapsMap = {};
+  questsMap = {};
+  glossaryMap = {};
 
   const allFiles = getAllFiles(OBSIDIAN_PATH);
 
@@ -149,8 +265,10 @@ function runSync() {
   fs.writeFileSync(BESTIARY_TARGET, generateFileContent('monster', bestiaryMap));
   fs.writeFileSync(DATA_LOGS_TARGET, generateFileContent('data_log', dataLogsMap));
   fs.writeFileSync(MAPS_TARGET, generateFileContent('map', mapsMap));
+  fs.writeFileSync(QUESTS_TARGET, generateFileContent('quest', questsMap));
+  fs.writeFileSync(GLOSSARY_TARGET, generateFileContent('glossary', glossaryMap));
 
-  console.log(`[SYNC] Complete. Items: ${Object.keys(itemsMap).length} | Traits: ${Object.keys(traitsMap).length} | Status Effects: ${Object.keys(statusEffectsMap).length} | Bestiary: ${Object.keys(bestiaryMap).length} | Data Logs: ${Object.keys(dataLogsMap).length} | Maps: ${Object.keys(mapsMap).length}`);
+  console.log(`[SYNC] Complete. Items: ${Object.keys(itemsMap).length} | Traits: ${Object.keys(traitsMap).length} | Status Effects: ${Object.keys(statusEffectsMap).length} | Bestiary: ${Object.keys(bestiaryMap).length} | Data Logs: ${Object.keys(dataLogsMap).length} | Maps: ${Object.keys(mapsMap).length} | Quests: ${Object.keys(questsMap).length} | Glossary: ${Object.keys(glossaryMap).length}`);
 }
 
 // --- WATCHER START ---

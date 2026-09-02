@@ -9,6 +9,8 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
 import { BODY_PARTS, BURST_HIT_PENALTY, STANCES } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
+import { questDatabase } from './quests.js';
+import { glossaryDatabase } from './glossary.js';
 import { mapDatabase } from './maps.js';
 
 // --- HELPERS ---
@@ -16,6 +18,41 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+function escapeRegex(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Wraps any glossary term found in already-escaped HTML with the
+// app's existing hover/tap tooltip (renderWikiLink — same mechanism
+// already used for SPECIAL stats, skills, traits, and item names), so
+// Data Log / Quest bodies can surface quick definitions pulled from
+// the wiki. Longest-name-first in the alternation so e.g. "The
+// Federation" (if authored) wins over a bare "Federation" at the same
+// starting position — standard regex alternation already prefers the
+// earlier/longer branch when several match at once, so no extra
+// overlap-resolution logic is needed. Must run AFTER escapeHtml(),
+// never before — matching happens on the final markup, and the
+// matched (already-safe) text is what gets handed to renderWikiLink
+// as the visible name, so nothing unescaped ever gets inserted.
+let glossaryPattern = null;
+function getGlossaryPattern() {
+  if (glossaryPattern) return glossaryPattern;
+  const terms = Object.values(glossaryDatabase).sort((a, b) => b.name.length - a.name.length);
+  if (terms.length === 0) return null;
+  const alternation = terms.map(t => escapeRegex(t.name)).join('|');
+  glossaryPattern = { regex: new RegExp(`\\b(${alternation})\\b`, 'gi'), terms };
+  return glossaryPattern;
+}
+function applyGlossaryTooltips(safeHtml) {
+  const pattern = getGlossaryPattern();
+  if (!pattern) return safeHtml;
+  return safeHtml.replace(pattern.regex, (matchText) => {
+    const term = pattern.terms.find(t => t.name.toLowerCase() === matchText.toLowerCase());
+    if (!term) return matchText;
+    return renderWikiLink(matchText, term.summary);
+  });
 }
 
 // Builds a nested tree from a flat list of entries carrying a
@@ -771,7 +808,7 @@ export function getDataLogsView(liveData, userRole, currentUser) {
         <div onclick="window.openDataLog('${log.id}')" style="cursor:pointer; padding:6px 0; border-bottom:1px dashed #222; ${isUnread ? 'font-weight:bold; color:var(--pip-green);' : 'color:#888;'}">
           ${isUnread ? '<span style="color:red;">●</span> ' : ''}${log.name}
         </div>
-        ${isOpen ? `<div style="background:rgba(0,50,0,0.2); border:1px solid var(--pip-dim); padding:10px; margin:6px 0; font-size:13px; color:#ccc; white-space:pre-wrap;">${escapeHtml(log.body || '')}</div>` : ''}
+        ${isOpen ? `<div style="background:rgba(0,50,0,0.2); border:1px solid var(--pip-dim); padding:10px; margin:6px 0; font-size:13px; color:#ccc; white-space:pre-wrap;">${applyGlossaryTooltips(escapeHtml(log.body || ''))}</div>` : ''}
       </div>`;
   };
 
@@ -780,6 +817,105 @@ export function getDataLogsView(liveData, userRole, currentUser) {
       <div class="panel">
         <h2>DATA LOGS</h2>
         ${visibleLogs.length === 0 ? '<p style="color:#555; font-size:13px;">Nothing unlocked yet — your GM will grant you access as the story unfolds.</p>' : renderCategoryTree(buildCategoryTree(visibleLogs), renderLog)}
+      </div>
+    </div>`;
+}
+
+// --- QUESTS ---
+const QUEST_STATUS_COLOR = { active: 'var(--pip-green)', completed: '#4af', failed: '#f55' };
+const QUEST_STATUS_LABEL = { active: 'ACTIVE', completed: 'COMPLETED', failed: 'FAILED' };
+
+export function getQuestsView(liveData, userRole, currentUser) {
+  const allQuests = Object.values(questDatabase);
+  const players = Object.entries(liveData.characters || {}).filter(([, c]) => c.is_finalized);
+
+  if (userRole === 'gm') {
+    const openId = window.openQuestId;
+    const renderQuest = (quest) => {
+      const isOpen = openId === quest.id;
+      const holders = players.filter(([, c]) => (c.unlocked_quests || []).includes(quest.id));
+      return `
+        <div style="border-bottom:1px dashed #222; padding:5px 0;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span onclick="window.openQuest('${quest.id}')" style="cursor:pointer;">${quest.name}</span>
+            <div style="display:flex; gap:4px;">
+              <select id="grantQuestTarget_${quest.id}" style="background:black; color:lime; border:1px solid #333; font-size:11px;">
+                <option value="all">ALL PLAYERS</option>
+                ${players.map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('')}
+              </select>
+              <button class="gm-btn" style="padding:0 8px; font-size:11px;" onclick="window.gmGrantQuest('${quest.id}', document.getElementById('grantQuestTarget_${quest.id}').value)">GRANT</button>
+            </div>
+          </div>
+          ${isOpen ? `
+            <div style="background:rgba(0,50,0,0.2); border:1px solid var(--pip-dim); padding:10px; margin:6px 0; font-size:13px;">
+              <div style="color:#ccc; white-space:pre-wrap; margin-bottom:8px;">${applyGlossaryTooltips(escapeHtml(quest.body || ''))}</div>
+              ${(quest.objectives || []).length > 0 ? `<ol style="margin:0 0 10px 18px; padding:0; color:#aaa; font-size:12px;">${quest.objectives.map(o => `<li>${escapeHtml(o)}</li>`).join('')}</ol>` : ''}
+              ${holders.length === 0 ? '<p style="color:#555; font-size:11px;">Not granted to anyone yet.</p>' : `
+                <div style="border-top:1px dashed #333; padding-top:6px;">
+                  <div style="font-size:11px; color:var(--pip-dim); text-transform:uppercase; margin-bottom:4px;">Status per player</div>
+                  ${holders.map(([id, c]) => {
+                    const status = (c.quest_status || {})[quest.id] || 'active';
+                    return `
+                      <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 0;">
+                        <span style="font-size:12px;">${c.name}</span>
+                        <select id="questStatus_${quest.id}_${id}" style="background:black; color:${QUEST_STATUS_COLOR[status]}; border:1px solid #333; font-size:11px;">
+                          ${['active', 'completed', 'failed'].map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${QUEST_STATUS_LABEL[s]}</option>`).join('')}
+                        </select>
+                        <button class="gm-btn" style="padding:0 6px; font-size:10px;" onclick="window.gmSetQuestStatus('${quest.id}', '${id}', document.getElementById('questStatus_${quest.id}_${id}').value)">SET</button>
+                      </div>`;
+                  }).join('')}
+                </div>`}
+            </div>` : ''}
+        </div>`;
+    };
+    return `
+      <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto; padding-top:10px;">
+        <div class="panel">
+          <h2>QUESTS — GM VIEW</h2>
+          <p style="font-size:12px; color:#666;">Click a title to review it and set status per player. Grant unlocks it for a player (or everyone) — new grants default to Active.</p>
+          ${allQuests.length > 0 ? renderCategoryTree(buildCategoryTree(allQuests), renderQuest) : '<p style="color:#555;">No quests authored yet.</p>'}
+        </div>
+      </div>`;
+  }
+
+  const char = liveData.characters[currentUser];
+  const unlocked = new Set(char.unlocked_quests || []);
+  const readSet = new Set(char.read_quests || []);
+  const statusMap = char.quest_status || {};
+  const progressMap = char.quest_progress || {};
+  const visibleQuests = allQuests.filter(q => unlocked.has(q.id));
+  const openId = window.openQuestId;
+
+  const renderQuest = (quest) => {
+    const isUnread = !readSet.has(quest.id);
+    const isOpen = openId === quest.id;
+    const status = statusMap[quest.id] || 'active';
+    const completedObjectives = new Set(progressMap[quest.id] || []);
+    return `
+      <div>
+        <div onclick="window.openQuest('${quest.id}')" style="cursor:pointer; padding:6px 0; border-bottom:1px dashed #222; display:flex; justify-content:space-between; align-items:center; ${isUnread ? 'font-weight:bold; color:var(--pip-green);' : 'color:#888;'}">
+          <span>${isUnread ? '<span style="color:red;">●</span> ' : ''}${quest.name}</span>
+          <span style="font-size:10px; color:${QUEST_STATUS_COLOR[status]};">${QUEST_STATUS_LABEL[status]}</span>
+        </div>
+        ${isOpen ? `
+          <div style="background:rgba(0,50,0,0.2); border:1px solid var(--pip-dim); padding:10px; margin:6px 0; font-size:13px;">
+            <div style="color:#ccc; white-space:pre-wrap; margin-bottom:8px;">${applyGlossaryTooltips(escapeHtml(quest.body || ''))}</div>
+            ${(quest.objectives || []).length > 0 ? `
+              <div style="border-top:1px dashed #333; padding-top:6px;">
+                ${quest.objectives.map((o, i) => `
+                  <div onclick="event.stopPropagation(); window.toggleQuestObjective('${currentUser}', '${quest.id}', ${i})" style="cursor:pointer; display:flex; gap:6px; align-items:baseline; padding:2px 0; ${completedObjectives.has(i) ? 'color:#666; text-decoration:line-through;' : 'color:#ccc;'}">
+                    <span>${completedObjectives.has(i) ? '[X]' : '[ ]'}</span><span style="font-size:12px;">${escapeHtml(o)}</span>
+                  </div>`).join('')}
+              </div>` : ''}
+          </div>` : ''}
+      </div>`;
+  };
+
+  return `
+    <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto; padding-top:10px;">
+      <div class="panel">
+        <h2>QUESTS</h2>
+        ${visibleQuests.length === 0 ? '<p style="color:#555; font-size:13px;">No quests unlocked yet — your GM will grant them as the story unfolds.</p>' : renderCategoryTree(buildCategoryTree(visibleQuests), renderQuest)}
       </div>
     </div>`;
 }

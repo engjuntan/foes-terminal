@@ -7,6 +7,7 @@ import { RACE_RULES, calculateDerivedStats } from './formulas.js';
 import { getMonster } from './bestiary.js';
 import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
+import { questDatabase } from './quests.js';
 import { mapDatabase } from './maps.js';
 import { normalizeInventory, getInventoryQuantity, addToInventory, removeFromInventory } from './inventory.js';
 import { DIFFICULTY_TIERS, rollD10, rollD20, resolveSpecialCheck, resolveSkillCheck } from './checks.js';
@@ -267,6 +268,78 @@ export async function openDataLog(logId) {
     updatePayload[`characters.${window.currentUser}.read_logs`] = [...readLogs, logId];
     try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
   }
+}
+
+// --- QUESTS --- (same grant/unlock/read shape as Data Logs, plus a
+// GM-set status per character and a player-toggleable objective
+// checklist, since a quest is something to track progress on rather
+// than a one-shot piece of lore.)
+export async function gmGrantQuest(questId, target) {
+  const characters = window.liveData.characters || {};
+  const targets = target === 'all' ? Object.keys(characters).filter(id => characters[id].is_finalized) : [target];
+  const updatePayload = {};
+  targets.forEach(charId => {
+    const current = characters[charId].unlocked_quests || [];
+    if (!current.includes(questId)) updatePayload[`characters.${charId}.unlocked_quests`] = [...current, questId];
+    // Newly-granted quests default to Active — GM can flip it later.
+    if (!(characters[charId].quest_status || {})[questId]) {
+      updatePayload[`characters.${charId}.quest_status.${questId}`] = 'active';
+    }
+  });
+  if (Object.keys(updatePayload).length === 0) return;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+export async function openQuest(questId) {
+  window.openQuestId = window.openQuestId === questId ? null : questId;
+  window.render();
+  // Unlike Data Logs (where only the player-facing view ever calls
+  // openDataLog), the GM view also opens a quest inline to review it
+  // and set status — window.currentUser is 'GM' there, which has no
+  // entry in liveData.characters, so there's no "read" state to track.
+  const char = window.liveData.characters[window.currentUser];
+  if (!char) return;
+  const readQuests = char.read_quests || [];
+  if (!readQuests.includes(questId)) {
+    const charRef = doc(db, "prisoncampaign", "alpha_team");
+    const updatePayload = {};
+    updatePayload[`characters.${window.currentUser}.read_quests`] = [...readQuests, questId];
+    try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+  }
+}
+
+// GM-only: Active / Completed / Failed. Targets one character or 'all'
+// unlocked players, matching the grant flow's target picker.
+export async function gmSetQuestStatus(questId, target, status) {
+  const characters = window.liveData.characters || {};
+  const targets = target === 'all'
+    ? Object.keys(characters).filter(id => characters[id].is_finalized && (characters[id].unlocked_quests || []).includes(questId))
+    : [target];
+  const updatePayload = {};
+  targets.forEach(charId => {
+    updatePayload[`characters.${charId}.quest_status.${questId}`] = status;
+  });
+  if (Object.keys(updatePayload).length === 0) return;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Self-tracked, like a real checklist — either the player or the GM
+// (on their behalf) can check/uncheck one objective. Stored as a set
+// of completed indices rather than booleans-per-index so a quest with
+// reordered objectives doesn't silently misalign old progress.
+export async function toggleQuestObjective(targetCharId, questId, objectiveIndex) {
+  const char = window.liveData.characters[targetCharId];
+  if (!char) return;
+  const progress = (char.quest_progress || {})[questId] || [];
+  const newProgress = progress.includes(objectiveIndex)
+    ? progress.filter(i => i !== objectiveIndex)
+    : [...progress, objectiveIndex];
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.quest_progress.${questId}`] = newProgress;
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // --- MAPS ---

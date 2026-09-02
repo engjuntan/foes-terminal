@@ -43,6 +43,10 @@ window.gmUnequipItem = (slot) => Controllers.gmUnequipItem(window.selectedCharId
 window.gmSaveBiography = () => Controllers.gmSaveBiography(window.selectedCharId);
 window.gmGrantDataLog = Controllers.gmGrantDataLog;
 window.openDataLog = Controllers.openDataLog;
+window.gmGrantQuest = Controllers.gmGrantQuest;
+window.openQuest = Controllers.openQuest;
+window.gmSetQuestStatus = Controllers.gmSetQuestStatus;
+window.toggleQuestObjective = Controllers.toggleQuestObjective;
 window.gmGrantMap = Controllers.gmGrantMap;
 window.openMap = Controllers.openMap;
 window.sendMessage = Controllers.sendMessage;
@@ -204,7 +208,7 @@ window.render = function() {
   if (appInterface) appInterface.classList.remove('hidden');
 
   // 3. Sync sidebar active state to the current tab, plus unread badges
-  const navMap = { STATUS: 'btn-dashboard', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks' };
+  const navMap = { STATUS: 'btn-dashboard', QUESTS: 'btn-quests', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks' };
   Object.entries(navMap).forEach(([tab, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', window.currentTab === tab);
@@ -215,21 +219,28 @@ window.render = function() {
     const readLogs = new Set(char.read_logs || []);
     const unreadLogCount = (char.unlocked_logs || []).filter(id => !readLogs.has(id)).length;
 
+    const readQuests = new Set(char.read_quests || []);
+    const unreadQuestCount = (char.unlocked_quests || []).filter(id => !readQuests.has(id)).length;
+
     const readMessages = new Set(char.read_messages || []);
     const unreadMsgCount = (window.liveData.messages || [])
       .filter(m => m.target === 'all' || m.target === window.currentUser)
       .filter(m => !readMessages.has(m.id)).length;
 
+    const questsBtn = document.getElementById('btn-quests');
+    if (questsBtn) questsBtn.innerHTML = `2. QUESTS${unreadQuestCount > 0 ? ` <span style="color:red;">(${unreadQuestCount})</span>` : ''}`;
     const logsBtn = document.getElementById('btn-logs');
-    if (logsBtn) logsBtn.innerHTML = `2. DATA LOGS${unreadLogCount > 0 ? ` <span style="color:red;">(${unreadLogCount})</span>` : ''}`;
+    if (logsBtn) logsBtn.innerHTML = `3. DATA LOGS${unreadLogCount > 0 ? ` <span style="color:red;">(${unreadLogCount})</span>` : ''}`;
     const msgBtn = document.getElementById('btn-messages');
-    if (msgBtn) msgBtn.innerHTML = `3. MESSAGES${unreadMsgCount > 0 ? ` <span style="color:red;">(${unreadMsgCount})</span>` : ''}`;
+    if (msgBtn) msgBtn.innerHTML = `4. MESSAGES${unreadMsgCount > 0 ? ` <span style="color:red;">(${unreadMsgCount})</span>` : ''}`;
   }
 
   // 4. Render Main Content
   if (window.userRole === 'gm') {
     if (window.currentTab === 'COMBAT') {
       viewport.innerHTML = Views.getCombatView(window.liveData, 'gm', window.currentUser);
+    } else if (window.currentTab === 'QUESTS') {
+      viewport.innerHTML = Views.getQuestsView(window.liveData, 'gm', window.currentUser);
     } else if (window.currentTab === 'DATA_LOGS') {
       viewport.innerHTML = Views.getDataLogsView(window.liveData, 'gm', window.currentUser);
     } else if (window.currentTab === 'MESSAGES') {
@@ -255,6 +266,8 @@ window.render = function() {
           viewport.innerHTML = Views.getGoatReviewView(window.currentUser, window.liveData);
        } else if (window.currentTab === 'COMBAT') {
           viewport.innerHTML = Views.getCombatView(window.liveData, 'player', window.currentUser);
+       } else if (window.currentTab === 'QUESTS') {
+          viewport.innerHTML = Views.getQuestsView(window.liveData, 'player', window.currentUser);
        } else if (window.currentTab === 'DATA_LOGS') {
           viewport.innerHTML = Views.getDataLogsView(window.liveData, 'player', window.currentUser);
        } else if (window.currentTab === 'MESSAGES') {
