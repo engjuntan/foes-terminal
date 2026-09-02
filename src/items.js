@@ -165,11 +165,10 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "description": "Cheap, gang-colored, instantly recognizable jacket of the 1414 Gang.",
+    "description": "Cheap, gang-colored, instantly recognizable jacket of the 1414 Gang. Mapped to the manual's Clothes tier, barely above rags.",
     "stats": {
-      "dt": "TBA",
-      "dr": "TBA",
-      "dmgType": "normal"
+      "ac": 1,
+      "dt_dr_normal": "0/5"
     },
     "value": "TBA"
   },
@@ -180,11 +179,10 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "description": "Factory-issue coveralls worn by ProTiga factory workers in North Bandawang. Light, cheap, common.",
+    "description": "Factory-issue coveralls worn by ProTiga factory workers in North Bandawang. Light, cheap, common. Mapped to the manual's Ramshackle Armor tier.",
     "stats": {
-      "dt": "TBA",
-      "dr": "TBA",
-      "dmgType": "normal"
+      "ac": 8,
+      "dt_dr_normal": "2/25"
     },
     "value": "TBA"
   },
@@ -296,14 +294,13 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "description": "Status armor worn by Tan/Choo subfamily members of the Lim Clan Association. Low DR, social value instead.",
+    "description": "Status armor worn by Tan/Choo subfamily members of the Lim Clan Association. Low DR, social value instead. Mapped to the manual's Protectorate Officers Uniform tier (status armor, not combat armor).",
     "stats": {
-      "dt": "TBA",
-      "dr": "TBA",
-      "dmgType": "normal"
+      "ac": 3,
+      "dt_dr_normal": "1/10"
     },
     "modifiers": {
-      "special_cha": "TBA"
+      "special_cha": 2
     },
     "value": "TBA"
   },
@@ -700,7 +697,7 @@ export const itemDatabase = {
       "cures_addiction": true
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 100
   },
   ah_bengs_moonshine: {
     "id": "ah_bengs_moonshine",
@@ -708,28 +705,28 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Homebrew liquor, staple of Lim Clan Association gambling dens.",
-    "effect": "TBA",
+    "effect": "+2 CHA, -2 PER for 2 hours",
     "stats": {
-      "buff": "TBA",
-      "debuff": "TBA",
-      "duration": "TBA"
+      "buff": "+2 CHA",
+      "debuff": "-2 PER",
+      "duration": "2 Hours"
     },
     "addictive": true,
-    "addiction_chance": "TBA",
-    "value": "TBA"
+    "addiction_chance": 35,
+    "value": 15
   },
   anti_venom: {
     "id": "anti_venom",
     "name": "Anti-Venom",
     "type": "consumable",
     "icon": "",
-    "description": "Poison cure — ties into the existing poison_res stat.",
-    "effect": "TBA",
+    "description": "Poison cure — ties into the existing poison_res stat. Poison is tracked as a status effect rather than a numeric level, so this clears the Poison status outright (same boolean pattern as Addictol's cures_addiction) rather than removing 'poison points.'",
+    "effect": "Cures Poison status effect",
     "stats": {
-      "poison_removed": "TBA"
+      "cures_status": "poison"
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 50
   },
   bear_trap: {
     "id": "bear_trap",
@@ -741,21 +738,21 @@ export const itemDatabase = {
       "dmg": "2d20",
       "dmgType": "true"
     },
-    "value": "TBA"
+    "value": 60
   },
   bedil_peluru: {
     "id": "bedil_peluru",
     "name": "Bedil & Peluru",
     "type": "consumable",
     "icon": "",
-    "description": "Skill book — small guns/gunsmith trade magazine, mainline 'Guns and Bullets' analogue. One-time use, permanent bonus.",
-    "effect": "TBA",
+    "description": "Skill book — small guns/gunsmith trade magazine, mainline 'Guns and Bullets' analogue. One-time use, permanent bonus. Uses the same skill_<name> key convention formulas.js already reads for trait/perk modifiers, so it's ready to plug in once skill books get wired into calculateDerivedStats.",
+    "effect": "Permanently grants +1 Small Guns skill",
     "stats": {
-      "skill_bonus": "TBA",
+      "skill_small_guns": 1,
       "permanent": true
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 200
   },
   buffout: {
     "id": "buffout",
@@ -763,15 +760,16 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "STR/END buff, addictive — mainline 'Buffout.'",
-    "effect": "TBA",
+    "effect": "ST +2, AG +2, EN +3",
     "stats": {
-      "special_str": "TBA",
-      "special_end": "TBA",
-      "duration": "TBA"
+      "duration": "1d6+2 Hours"
     },
     "addictive": true,
-    "addiction_chance": "TBA",
-    "value": "TBA"
+    "addiction_rate": 50,
+    "addiction_effect": "ST -4, AG -3, EN -3, Exhaustion Level x2",
+    "addiction_threshold": 100,
+    "debuff_effect": "ST -3, AG -2, EN -3 for 2 hours",
+    "value": 65
   },
   c4_plastique: {
     "id": "c4_plastique",
@@ -783,7 +781,7 @@ export const itemDatabase = {
       "dmg": "2d20+20",
       "dmgType": "explosive"
     },
-    "value": "TBA"
+    "value": 150
   },
   can_of_food: {
     "id": "can_of_food",
@@ -793,24 +791,24 @@ export const itemDatabase = {
     "description": "From the manual — the original baseline food item. Rationed, lasts up to a day.",
     "effect": "Sustains for up to a day if rationed",
     "stats": {
-      "hunger": "TBA"
+      "hunger": 8
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 10
   },
   cap_kilat_cola: {
     "id": "cap_kilat_cola",
     "name": "Cap Kilat Cola",
     "type": "consumable",
     "icon": "",
-    "description": "Fictional in-universe soda brand — Nuka-Cola-style icon/collectible. A rare 'Cap Kilat Emas' (Golden) variant could exist as a Quantum-equivalent.",
-    "effect": "TBA",
+    "description": "Fictional in-universe soda brand — Nuka-Cola-style icon/collectible. A rare 'Cap Kilat Emas' (Golden) variant could exist as a Quantum-equivalent (not authored as a separate item yet).",
+    "effect": "+1 AGI for 30 minutes",
     "stats": {
-      "buff": "TBA",
-      "duration": "TBA"
+      "buff": "+1 AGI",
+      "duration": "30 Minutes"
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 10
   },
   dirty_water: {
     "id": "dirty_water",
@@ -818,40 +816,40 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Cheaper, riskier contamination counterpart to Purified Water.",
-    "effect": "TBA",
+    "effect": "Sustains hydration; risk of contamination",
     "stats": {
-      "hydration": "TBA",
-      "contamination_chance": "TBA"
+      "hydration": 6,
+      "contamination_chance": 20
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 3
   },
   doctors_bag: {
     "id": "doctors_bag",
     "name": "Doctor's Bag",
     "type": "consumable",
     "icon": "",
-    "description": "Larger heal than Stimpak, slower to use — the tradeoff for its stronger restore.",
-    "effect": "TBA",
+    "description": "Larger heal than Stimpak, slower to use — the tradeoff for its stronger restore. Manual's Doctor's Bag item is a +15% Medicine skill-check bonus for treating crippled limbs/blindness/poison rather than a direct heal; this item follows the flavor text's own direct-heal design instead, a deliberate departure worth double-checking.",
+    "effect": "Heals 2d10+10 HP, full action to use",
     "stats": {
-      "heal": "TBA",
-      "use_time": "TBA"
+      "heal": "2d10+10",
+      "use_time": "full_action"
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 130
   },
   feral_suppressant: {
     "id": "feral_suppressant",
     "name": "Feral Suppressant",
     "type": "consumable",
     "icon": "",
-    "description": "Not a mainline Fallout item — original to this campaign. Ghoul-specific: buys time before the feral roll at HIGH rad exposure, ties directly into the Ghoul is_radioactive flag and the manual's 600/1000 rad-threshold feral mechanic.",
-    "effect": "TBA",
+    "description": "Not a mainline Fallout item — original to this campaign. Ghoul-specific: buys time before the feral roll at HIGH rad exposure, ties directly into the Ghoul is_radioactive flag and the manual's 600/1000 rad-threshold feral mechanic. The feral roll itself is GM-adjudicated narrative judgment, not a numeric formula, so this delay is a descriptive duration rather than a dice/percentage value.",
+    "effect": "Delays the feral check by roughly one encounter",
     "stats": {
-      "feral_check_delay": "TBA"
+      "feral_check_delay": "1 encounter"
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 80
   },
   healing_poultice: {
     "id": "healing_poultice",
@@ -864,7 +862,7 @@ export const itemDatabase = {
       "heal": "1d10+5"
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 40
   },
   ikan_masin_jerky: {
     "id": "ikan_masin_jerky",
@@ -872,56 +870,58 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Salted fish jerky — real regional food culture reflavored as wasteland staple.",
-    "effect": "TBA",
+    "effect": "Heals 1d4 HP, sustains hunger",
     "stats": {
-      "hunger": "TBA",
-      "heal": "TBA"
+      "hunger": 4,
+      "heal": "1d4"
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 15
   },
   jet: {
     "id": "jet",
     "name": "Jet",
     "type": "consumable",
     "icon": "",
-    "description": "AP/speed buff, highly addictive — mainline 'Jet.'",
-    "effect": "TBA",
+    "description": "AP/speed buff, highly addictive — mainline 'Jet.' Not in the manual's chem table and this game has no AP economy (one action per turn) — same caveat that already applies to Turbo's 'extra action' effect, which is also inert until an actions system exists. Numbered for consistency with the other chems; effect is reference-only for now.",
+    "effect": "Slows perceived time, faster reactions",
     "stats": {
-      "ap_buff": "TBA",
-      "duration": "TBA"
+      "duration": "10 Minutes"
     },
     "addictive": true,
-    "addiction_chance": "TBA",
-    "value": "TBA"
+    "addiction_rate": 80,
+    "addiction_effect": "-3 to SPECIAL, Exhaustion Level x2",
+    "addiction_threshold": 60,
+    "debuff_effect": "-2 AGI for 10 minutes",
+    "value": 45
   },
   kopi_o_stim_packet: {
     "id": "kopi_o_stim_packet",
     "name": "Kopi-O Stim Packet",
     "type": "consumable",
     "icon": "",
-    "description": "Instant black coffee sachet, common across Bandawang. Mild caffeine-dependency flavor, non-mechanical.",
-    "effect": "TBA",
+    "description": "Instant black coffee sachet, common across Bandawang. Mild caffeine-dependency flavor, non-mechanical — kept as a small, harmless alertness bump rather than a real ap_buff to match that 'non-mechanical' intent.",
+    "effect": "+1 PER for 30 minutes",
     "stats": {
-      "ap_buff": "TBA",
-      "duration": "TBA"
+      "special_per": 1,
+      "duration": "30 Minutes"
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 5
   },
   loceng_kunci: {
     "id": "loceng_kunci",
     "name": "Loceng & Kunci",
     "type": "consumable",
     "icon": "",
-    "description": "Skill book — lockpick trade magazine, mainline 'Tumblers Today' analogue. One-time use, permanent bonus.",
-    "effect": "TBA",
+    "description": "Skill book — lockpick trade magazine, mainline 'Tumblers Today' analogue. One-time use, permanent bonus. Uses the same skill_<name> key convention formulas.js already reads for trait/perk modifiers.",
+    "effect": "Permanently grants +1 Lockpick skill",
     "stats": {
-      "skill_bonus": "TBA",
+      "skill_lockpick": 1,
       "permanent": true
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 180
   },
   med_kit: {
     "id": "med_kit",
@@ -934,7 +934,7 @@ export const itemDatabase = {
       "heal": "1d10"
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 55
   },
   med_x: {
     "id": "med_x",
@@ -942,14 +942,16 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Analgesic — temporary damage resistance buff, addictive.",
-    "effect": "TBA",
+    "effect": "+3 DT, +20% DR to all damage types",
     "stats": {
-      "dr_buff": "TBA",
-      "duration": "TBA"
+      "duration": "1 Hour"
     },
     "addictive": true,
-    "addiction_chance": "TBA",
-    "value": "TBA"
+    "addiction_rate": 25,
+    "addiction_effect": "-3 DT, -20% DR to all damage types (permanent until treated)",
+    "addiction_threshold": 50,
+    "debuff_effect": "n/a",
+    "value": 60
   },
   mentats: {
     "id": "mentats",
@@ -957,16 +959,16 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "INT/PER/CHA buff, addictive — mainline 'Mentats.'",
-    "effect": "TBA",
+    "effect": "PE +2, IN +2, CH +2",
     "stats": {
-      "special_int": "TBA",
-      "special_per": "TBA",
-      "special_cha": "TBA",
-      "duration": "TBA"
+      "duration": "1 Hour"
     },
     "addictive": true,
-    "addiction_chance": "TBA",
-    "value": "TBA"
+    "addiction_rate": 60,
+    "addiction_effect": "PE -4, IN -2, Exhaustion Level x1",
+    "addiction_threshold": 80,
+    "debuff_effect": "PE -1, IN -1 for 1 hour",
+    "value": 50
   },
   nasi_lemak_ration_brick: {
     "id": "nasi_lemak_ration_brick",
@@ -974,13 +976,13 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Compressed dehydrated ration built from a real regional dish.",
-    "effect": "TBA",
+    "effect": "Heals 1d6 HP, sustains hunger",
     "stats": {
-      "hunger": "TBA",
-      "heal": "TBA"
+      "hunger": 6,
+      "heal": "1d6"
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 20
   },
   psycho: {
     "id": "psycho",
@@ -988,14 +990,16 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Damage buff, addictive — mainline 'Psycho.'",
-    "effect": "TBA",
+    "effect": "ST +3, AG +3, DT +2, IN -3",
     "stats": {
-      "dmg_buff": "TBA",
-      "duration": "TBA"
+      "duration": "1d2 Hours"
     },
     "addictive": true,
-    "addiction_chance": "TBA",
-    "value": "TBA"
+    "addiction_rate": 50,
+    "addiction_effect": "Permanent Exhaustion Level x3",
+    "addiction_threshold": 100,
+    "debuff_effect": "-3 to SPECIAL for 1d2 hours",
+    "value": 70
   },
   purified_water: {
     "id": "purified_water",
@@ -1003,27 +1007,27 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Direct mechanical link to the exhaustion/water system. Federation-controlled — narrative lever for the water-scarcity arc.",
-    "effect": "TBA",
+    "effect": "Heals 1d4 HP, sustains hydration for a day",
     "stats": {
-      "hydration": "TBA",
-      "heal": "TBA"
+      "hydration": 8,
+      "heal": "1d4"
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 15
   },
   rad_x: {
     "id": "rad_x",
     "name": "Rad-X",
     "type": "consumable",
     "icon": "",
-    "description": "Preventative counterpart to RadAway — buffs rad resistance before exposure, doesn't touch existing accumulated rads.",
-    "effect": "TBA",
+    "description": "Preventative counterpart to RadAway — buffs rad resistance before exposure, doesn't touch existing accumulated rads. Not in the manual's chem table; sized using the classic Fallout Rad-X convention (a flat percentage rad-resistance buff for a few hours) since the manual doesn't cover it.",
+    "effect": "+25% Radiation Resistance for 4 hours",
     "stats": {
-      "rad_res_buff": "TBA",
-      "duration": "TBA"
+      "rad_res_buff": 25,
+      "duration": "4 Hours"
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 35
   },
   radaway: {
     "id": "radaway",
@@ -1043,14 +1047,14 @@ export const itemDatabase = {
     "name": "Sains Untuk Semua",
     "type": "consumable",
     "icon": "",
-    "description": "Skill book — pre-war children's science magazine, mainline 'Big Book of Science' analogue. One-time use, permanent bonus.",
-    "effect": "TBA",
+    "description": "Skill book — pre-war children's science magazine, mainline 'Big Book of Science' analogue. One-time use, permanent bonus. Uses the same skill_<name> key convention formulas.js already reads for trait/perk modifiers.",
+    "effect": "Permanently grants +1 Science skill",
     "stats": {
-      "skill_bonus": "TBA",
+      "skill_science": 1,
       "permanent": true
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 220
   },
   stimpak: {
     "id": "stimpak",
@@ -1058,26 +1062,26 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Standard pre-war combat medical syringe — mainline 'Stimpak.' Baseline healing item; can_use_stimpaks flag already exists in RACE_RULES (Robots cannot use).",
-    "effect": "TBA",
+    "effect": "Heals 1d10+10 HP",
     "stats": {
-      "heal": "TBA"
+      "heal": "1d10+10"
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 75
   },
   stolen_keturunan_manual: {
     "id": "stolen_keturunan_manual",
     "name": "Stolen Keturunan Manual",
     "type": "consumable",
     "icon": "",
-    "description": "Skill book — ties to the knowledge-scarcity theme. One-time use, permanent small skill bonus on read.",
-    "effect": "TBA",
+    "description": "Skill book — ties to the knowledge-scarcity theme. One-time use, permanent small skill bonus on read. No target skill was specified in the original flavor text; guessed Speech (a lineage/heritage document trading on social standing) rather than leaving it unresolved — worth confirming or retargeting.",
+    "effect": "Permanently grants +1 Speech skill",
     "stats": {
-      "skill_bonus": "TBA",
+      "skill_speech": 1,
       "permanent": true
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 250
   },
   teh_tarik_concentrate: {
     "id": "teh_tarik_concentrate",
@@ -1085,14 +1089,14 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Canned 'pulled tea' concentrate, sold in Bandawang Lama by street vendors.",
-    "effect": "TBA",
+    "effect": "+1 CHA, +1 PER for 1 hour",
     "stats": {
-      "special_cha": "TBA",
-      "special_per": "TBA",
-      "duration": "TBA"
+      "special_cha": 1,
+      "special_per": 1,
+      "duration": "1 Hour"
     },
     "addictive": false,
-    "value": "TBA"
+    "value": 12
   },
   toddy: {
     "id": "toddy",
@@ -1100,15 +1104,15 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Fermented palm sap, traditional Southeast Asian drink reflavored as a Bandawang Lama wasteland staple. Mild buff/debuff, low addiction.",
-    "effect": "TBA",
+    "effect": "+1 CHA, -1 AGI for 1 hour",
     "stats": {
-      "buff": "TBA",
-      "debuff": "TBA",
-      "duration": "TBA"
+      "buff": "+1 CHA",
+      "debuff": "-1 AGI",
+      "duration": "1 Hour"
     },
     "addictive": true,
-    "addiction_chance": "TBA",
-    "value": "TBA"
+    "addiction_chance": 20,
+    "value": 8
   },
   turbo: {
     "id": "turbo",
@@ -1125,7 +1129,7 @@ export const itemDatabase = {
     "addiction_effect": "-5 to SPECIAL, Exhaustion Level x3",
     "addiction_threshold": 300,
     "debuff_effect": "-3 to SPECIAL for 2 hours",
-    "value": "TBA"
+    "value": 90
   },
   dinar: {
     "id": "dinar",

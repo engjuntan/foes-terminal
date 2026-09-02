@@ -378,10 +378,16 @@ export async function gmSetRadiation(targetCharId, amount) {
 }
 
 // Consumes one copy of an item from inventory and applies whatever
-// mechanical effect it's authored with — right now just rad_removed/
-// rad_added (RadAway and anything like it), the concrete case the user
-// asked for. Callable by the character themselves or the GM on their
-// behalf, same permission shape as everything else here.
+// mechanical effect it's authored with: rad_removed/rad_added (RadAway
+// and anything like it) and stats.heal (Stimpak and every other direct-
+// heal consumable — a dice string like "1d10+10", rolled via the same
+// parser combat damage uses). Everything else a consumable can carry
+// right now (SPECIAL buffs/duration, addiction, skill-book bonuses,
+// hunger/hydration, cures_addiction/cures_status) has no tracked state
+// to act on yet — no duration timers, no addiction counter, no hunger
+// meter — so those stay reference-only until that system exists.
+// Callable by the character themselves or the GM on their behalf, same
+// permission shape as everything else here.
 export async function useItem(targetCharId, itemId) {
   const char = window.liveData.characters[targetCharId];
   if (!char) return;
@@ -393,15 +399,28 @@ export async function useItem(targetCharId, itemId) {
   const updatePayload = {};
   updatePayload[`characters.${targetCharId}.inventory`] = removeFromInventory(char.inventory, itemId, 1);
 
+  const msgParts = [];
+
   const radRemoved = (item.stats && Number(item.stats.rad_removed)) || 0;
   const radAdded = (item.stats && Number(item.stats.rad_added)) || 0;
-  let usedMsg = `Used ${item.name}.`;
   if (radRemoved || radAdded) {
     const currentRads = char.rads || 0;
     const newRads = Math.max(0, Math.min(1000, currentRads - radRemoved + radAdded));
     updatePayload[`characters.${targetCharId}.rads`] = newRads;
-    usedMsg = `Used ${item.name} — radiation ${newRads > currentRads ? 'increased' : 'decreased'} to ${newRads} rads.`;
+    msgParts.push(`radiation ${newRads > currentRads ? 'increased' : 'decreased'} to ${newRads} rads`);
   }
+
+  const healDice = item.stats && item.stats.heal;
+  if (healDice) {
+    const healed = rollDamage(healDice);
+    const currentHp = (char.hp && char.hp.current) || 0;
+    const maxHp = (char.hp && char.hp.max) || currentHp;
+    const newHp = Math.max(0, Math.min(maxHp, currentHp + healed));
+    updatePayload[`characters.${targetCharId}.hp.current`] = newHp;
+    msgParts.push(`healed ${healed} HP (${newHp}/${maxHp})`);
+  }
+
+  const usedMsg = msgParts.length ? `Used ${item.name} — ${msgParts.join(', ')}.` : `Used ${item.name}.`;
 
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   try {
