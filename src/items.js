@@ -242,11 +242,10 @@ export const itemDatabase = {
     "slot": "head",
     "size": "medium",
     "icon": "",
-    "description": "Gas mask analogue sourced from ProTiga — ties into the existing gas resistance stat.",
+    "description": "Gas mask analogue sourced from ProTiga — ties into the existing gas resistance stat. Mapped to the manual's Clothes tier as a base, plus a gas resistance modifier for its actual function.",
     "stats": {
-      "dt": "TBA",
-      "dr": "TBA",
-      "dmgType": "normal"
+      "ac": 1,
+      "dt_dr_normal": "0/5"
     },
     "modifiers": {
       "gas_res": "TBA"
@@ -430,11 +429,10 @@ export const itemDatabase = {
     "slot": "body",
     "size": "oversized",
     "icon": "",
-    "description": "Addresses the race-size gap — Gergasi/Half-Mutant can't wear human-sized armor. Sized for larger frames, sourced from ProTiga's stamping press housing.",
+    "description": "Addresses the race-size gap — Gergasi/Half-Mutant can't wear human-sized armor. Sized for larger frames, sourced from ProTiga's stamping press housing. Mapped between Studded Leather and Malayan Infantry tier: heavy but improvised, not manufactured.",
     "stats": {
-      "dt": "TBA",
-      "dr": "TBA",
-      "dmgType": "normal"
+      "ac": 15,
+      "dt_dr_normal": "3/30"
     },
     "value": "TBA"
   },
@@ -560,11 +558,10 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "description": "Improvised DR armor built from scrap metal and rebar strapping.",
+    "description": "Improvised DR armor built from scrap metal and rebar strapping. Mapped to the manual's Mercenary Armor tier, since unlike Coveralls this is purpose-built protection.",
     "stats": {
-      "dt": "TBA",
-      "dr": "TBA",
-      "dmgType": "normal"
+      "ac": 12,
+      "dt_dr_normal": "3/25"
     },
     "value": "TBA"
   },
@@ -685,11 +682,10 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "description": "Worn by those who guard/control Federation water distribution.",
+    "description": "Worn by those who guard/control Federation water distribution. Mapped to the manual's UCL Officers Uniform tier: light, breathable rainwear rather than combat armor.",
     "stats": {
-      "dt": "TBA",
-      "dr": "TBA",
-      "dmgType": "normal"
+      "ac": 2,
+      "dt_dr_normal": "0/7"
     },
     "value": "TBA"
   },

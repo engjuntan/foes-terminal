@@ -5,7 +5,7 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
 import { RACE_RULES, calculateDerivedStats } from './formulas.js';
 import { getMonster } from './bestiary.js';
-import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES } from './combat.js';
+import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { mapDatabase } from './maps.js';
 import { normalizeInventory, getInventoryQuantity, addToInventory, removeFromInventory } from './inventory.js';
@@ -953,7 +953,7 @@ export async function resolveAttack() {
       targetAC = targetAC - targetDerived.special.agi + Math.min(targetDerived.special.agi, targetStanceDef.agiCap);
     }
     const armorItem = getItem((targetChar.equipment || {}).body);
-    targetDtdr = (armorItem && armorItem.dtdr) || {}; // no armor authored yet -> defaults to no mitigation
+    targetDtdr = armorItem ? parseArmorDtdr(armorItem) : {};
     targetName = targetChar.name;
   }
 
@@ -1047,7 +1047,7 @@ export async function resolveAttack() {
     } else {
       const otherChar = window.liveData.characters[combatantRef.char_id];
       const armorItem = getItem((otherChar.equipment || {}).body);
-      dtdrForThis = (armorItem && armorItem.dtdr) || {};
+      dtdrForThis = armorItem ? parseArmorDtdr(armorItem) : {};
     }
     const mitigated = bypassMitigation ? dmg : applyDamageReduction(dmg, dtdrForThis, attackDef.damageType || 'normal');
     let newCurrent;

@@ -217,6 +217,27 @@ export function applyDamageReduction(rawDamage, dtdrBlock, damageType) {
   return Math.max(0, Math.round(afterDr));
 }
 
+// Armor items are authored with DT/DR as "DT/DR" strings per damage type
+// (stats.dt_dr_normal, stats.dt_dr_laser, ...) — matches the manual's own
+// table layout, and is the schema every numbered armor piece in the vault
+// actually uses. Converts that into the { normal: {dt,dr}, ... } shape
+// applyDamageReduction expects (the same shape the bestiary stores
+// natively, since monsters skip this string-parsing step entirely).
+const ARMOR_DAMAGE_TYPES = ['normal', 'laser', 'fire', 'plasma', 'explosive'];
+export function parseArmorDtdr(armorItem) {
+  const stats = (armorItem && armorItem.stats) || {};
+  const result = {};
+  ARMOR_DAMAGE_TYPES.forEach(type => {
+    const raw = stats[`dt_dr_${type}`];
+    if (typeof raw !== 'string') return;
+    const [dtStr, drStr] = raw.split('/');
+    const dt = parseFloat(dtStr);
+    const dr = parseFloat(drStr);
+    if (!Number.isNaN(dt) && !Number.isNaN(dr)) result[type] = { dt, dr };
+  });
+  return result;
+}
+
 // --- RANDOMIZED COMBAT LOG FLAVOR TEXT ---
 // Purely cosmetic — every variant still carries the same mechanical
 // numbers (roll, chance, damage, part/burst tags, effect applied), just

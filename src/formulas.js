@@ -1,5 +1,6 @@
 // src/formulas.js
 import { getTrait } from './traits.js';
+import { getItem } from './items.js';
 
 // activeStatusEffects: array of instances already living on the character
 // (e.g. charData.status_effects), each shaped { name, modifiers: {...} }.
@@ -77,8 +78,18 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   // --- 2. DERIVED VITALS ---
   
   // AC / Sequence
-  let armorClass = agi + (raceDef.stats?.ac_bonus || 0); 
-  let sequenceBonus = agi; 
+  let armorClass = agi + (raceDef.stats?.ac_bonus || 0);
+  let sequenceBonus = agi;
+
+  // Equipped body armor's own AC is added on top of Agility — manual:
+  // "The Armor Class from the armor is added with your Agility to
+  // create your Total Armor Class." Previously never wired in, so every
+  // armor piece's stats.ac sat as inert reference data regardless of
+  // what was equipped.
+  const equippedBodyArmor = getItem((equipment || {}).body);
+  if (equippedBodyArmor && typeof equippedBodyArmor.stats?.ac === 'number') {
+    armorClass += equippedBodyArmor.stats.ac;
+  }
 
   // Melee Damage Base (Melee Weapons)
   let meleeDamageBase = Math.max(1, str - 5);
