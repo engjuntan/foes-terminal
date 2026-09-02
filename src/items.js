@@ -1220,14 +1220,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
-    "description": "Unique/Quest-leaning Big Guns tier weapon — mini-nuke launcher, extremely rare ordinance.",
+    "description": "Unique/Quest-leaning Big Guns tier weapon — mini-nuke launcher, extremely rare ordinance. Tier 4 (Unique) — deliberately exceeds the standard tier ceiling given its rarity and narrative weight, but bounded rather than an automatic kill against high-DR targets.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "6d10+20",
       "dmgType": "explosive",
-      "range": "TBA",
+      "range": 30,
       "ammo_type": "mini_nuke"
     },
-    "value": "TBA"
+    "value": 2000
   },
   flamer: {
     "id": "flamer",
@@ -1238,14 +1238,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
-    "description": "Big Guns tier fuel-based weapon, short range, area denial.",
+    "description": "Big Guns tier fuel-based weapon, short range, area denial. Tier 2. Short range, area denial with lingering fire field.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d6+3",
       "dmgType": "fire",
-      "range": "TBA",
+      "range": 6,
       "ammo_type": "flamer_fuel"
     },
-    "value": "TBA"
+    "value": 260
   },
   gatling_gun: {
     "id": "gatling_gun",
@@ -1256,15 +1256,15 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
-    "description": "Big Guns tier heavy ballistic weapon, alternative to the Minigun. Burst/sustained-fire capable.",
+    "description": "Big Guns tier heavy ballistic weapon, alternative to the Minigun. Burst/sustained-fire capable. Tier 2, per-bullet damage.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+3",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 20,
       "ammo_type": "7.62",
       "burst_capable": true
     },
-    "value": "TBA"
+    "value": 380
   },
   gatling_laser: {
     "id": "gatling_laser",
@@ -1275,15 +1275,15 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
-    "description": "Big Guns tier heavy energy weapon. Burst/sustained-fire capable.",
+    "description": "Big Guns tier heavy energy weapon. Burst/sustained-fire capable. Tier 2, per-bullet damage.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+4",
       "dmgType": "laser",
-      "range": "TBA",
+      "range": 22,
       "ammo_type": "energy_cell",
       "burst_capable": true
     },
-    "value": "TBA"
+    "value": 450
   },
   light_machine_gun: {
     "id": "light_machine_gun",
@@ -1313,15 +1313,15 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
-    "description": "Big Guns tier heavy automatic weapon, high ammo consumption. Burst/sustained-fire capable.",
+    "description": "Big Guns tier heavy automatic weapon, high ammo consumption. Burst/sustained-fire capable. Tier 2, per-bullet damage kept modest since sustained fire + the burst AC/DR debuff carries this weapon's real power.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+3",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 20,
       "ammo_type": "5mm",
       "burst_capable": true
     },
-    "value": "TBA"
+    "value": 400
   },
   missile_launcher: {
     "id": "missile_launcher",
@@ -1685,13 +1685,13 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Normal tier blunt weapon.",
+    "description": "Normal tier blunt weapon. Tier 1 (Normal).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 80
   },
   bowie_knife: {
     "id": "bowie_knife",
@@ -1702,13 +1702,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Normal tier bladed weapon, heavier than the standard Combat Knife.",
+    "description": "Normal tier bladed weapon, heavier than the standard Combat Knife. Tier 1 (Normal).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+2+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 100
   },
   boxing_gloves: {
     "id": "boxing_gloves",
@@ -1719,13 +1719,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "unarmed",
     "icon": "",
-    "description": "Normal tier unarmed weapon.",
+    "description": "Normal tier unarmed weapon. Intentionally low tier; padded gloves deal less damage by design — the manual's own number, kept as-is.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d2+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 15
   },
   brass_knuckles: {
     "id": "brass_knuckles",
@@ -1736,13 +1736,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "unarmed",
     "icon": "",
-    "description": "Scrap tier unarmed weapon, common and concealable.",
+    "description": "Scrap tier unarmed weapon, common and concealable. Tier 0/1 border — the manual's exact number fit well, kept as-is.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d10+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 40
   },
   chinese_officers_sword: {
     "id": "chinese_officers_sword",
@@ -1753,13 +1753,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Rare/Signature tier bladed weapon, pre-war military relic.",
+    "description": "Rare/Signature tier bladed weapon, pre-war military relic. Tier 3 (Rare/Signature).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d10+6+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 250
   },
   cleaver: {
     "id": "cleaver",
@@ -1770,13 +1770,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Generic Normal tier bladed weapon — smaller than the custom Axe Gang Cleaver signature item.",
+    "description": "Generic Normal tier bladed weapon — smaller than the custom Axe Gang Cleaver signature item. Tier 1 (Normal).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 75
   },
   combat_knife: {
     "id": "combat_knife",
@@ -1804,13 +1804,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "unarmed",
     "icon": "",
-    "description": "Unique/Quest-leaning unarmed weapon, made from a deathclaw's actual claws.",
+    "description": "Unique/Quest-leaning unarmed weapon, made from a deathclaw's actual claws. Tier 4 (Unique/Quest) — slightly above the Tier 3 ceiling, appropriate for its rarity.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d8+8+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 450
   },
   fire_axe: {
     "id": "fire_axe",
@@ -1821,13 +1821,13 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Normal tier bladed/blunt hybrid weapon.",
+    "description": "Normal tier bladed/blunt hybrid weapon. Tier 1 (Normal).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+2+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 90
   },
   golf_club: {
     "id": "golf_club",
@@ -1838,13 +1838,13 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Scrap tier improvised blunt weapon.",
+    "description": "Scrap tier improvised blunt weapon. Tier 0 (Scrap).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d6+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 25
   },
   katana: {
     "id": "katana",
@@ -1855,13 +1855,13 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Rare/Signature tier bladed weapon, imported relic.",
+    "description": "Rare/Signature tier bladed weapon, imported relic. Tier 3 (Rare/Signature) — scaled down from the manual's Claymore-tier numbers to fit the 7-10 round target.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d8+6+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 300
   },
   keris: {
     "id": "keris",
@@ -1890,13 +1890,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Normal tier bladed weapon. Note: overlaps thematically with the existing custom Parang item — both fill a similar niche, kept separate since Parang is the Malaysian-flavor version and this is the generic Fallout-derived import.",
+    "description": "Normal tier bladed weapon. Note: overlaps thematically with the existing custom Parang item — both fill a similar niche, kept separate since Parang is the Malaysian-flavor version and this is the generic Fallout-derived import. Tier 1 (Normal).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 85
   },
   nightstick: {
     "id": "nightstick",
@@ -1907,13 +1907,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Normal tier blunt weapon, Federation crowd-control issue.",
+    "description": "Normal tier blunt weapon, Federation crowd-control issue. Tier 1 (Normal). Stats assigned via 7-10 round combat framework.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 65
   },
   pool_cue: {
     "id": "pool_cue",
@@ -1924,13 +1924,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Scrap tier improvised blunt weapon.",
+    "description": "Scrap tier improvised blunt weapon. Tier 0 (Scrap). Stats assigned via 7-10 round combat framework (target avg ~4-6).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d4+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 20
   },
   power_fist: {
     "id": "power_fist",
@@ -1941,13 +1941,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "unarmed",
     "icon": "",
-    "description": "Rare/Signature tier unarmed weapon, powered gauntlet.",
+    "description": "Rare/Signature tier unarmed weapon, powered gauntlet. Tier 3 (Rare/Signature). Heavily scaled down from the manual's 4d4+20+MD, which ran far too hot for the 7-10 round target.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d6+6+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 300
   },
   ripper: {
     "id": "ripper",
@@ -1958,13 +1958,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Rare/Signature tier bladed weapon, powered vibro-blade.",
+    "description": "Rare/Signature tier bladed weapon, powered vibro-blade. Tier 3 (Rare/Signature). Scaled down from the manual's Chain Weapons numbers, which ran hot across the whole family.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d8+6+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 280
   },
   shishkebab: {
     "id": "shishkebab",
@@ -1975,14 +1975,14 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Rare/Signature tier bladed weapon, improvised fire sword, uses Flamer Fuel.",
+    "description": "Rare/Signature tier bladed weapon, improvised fire sword, uses Flamer Fuel. Tier 3 (Rare/Signature). Not in the manual — fresh numbers built to fit the 7-10 round target.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d8+6+MD",
       "dmgType": "fire",
       "range": 1,
       "ammo_type": "flamer_fuel"
     },
-    "value": "TBA"
+    "value": 290
   },
   shovel: {
     "id": "shovel",
@@ -1993,13 +1993,13 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Scrap tier improvised blunt weapon, dual-purpose tool.",
+    "description": "Scrap tier improvised blunt weapon, dual-purpose tool. Tier 0 (Scrap). Stats assigned via 7-10 round combat framework.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d6+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 20
   },
   sledgehammer: {
     "id": "sledgehammer",
@@ -2010,13 +2010,13 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Normal tier heavy blunt weapon.",
+    "description": "Normal tier heavy blunt weapon. Tier 2 (Faction-Issued). Scaled down significantly from the manual's flat bonus, which ran far too hot for the 7-10 round target.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d6+3+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 150
   },
   super_sledge: {
     "id": "super_sledge",
@@ -2027,13 +2027,13 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Rare/Signature tier heavy blunt weapon, reinforced/motorized variant of the Sledgehammer.",
+    "description": "Rare/Signature tier heavy blunt weapon, reinforced/motorized variant of the Sledgehammer. Tier 3 (Rare/Signature). Heavily scaled down from the manual's 6d4+20+MD, which would have one-shot even a level-10 character.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d8+6+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 320
   },
   switchblade: {
     "id": "switchblade",
@@ -2044,13 +2044,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Normal tier concealable bladed weapon.",
+    "description": "Normal tier concealable bladed weapon. Tier 1 (Normal), light/concealable. Stats assigned via 7-10 round combat framework.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d6+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 60
   },
   tire_iron: {
     "id": "tire_iron",
@@ -2061,13 +2061,13 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Normal tier blunt weapon, ProTiga factory-tool origin.",
+    "description": "Normal tier blunt weapon, ProTiga factory-tool origin. Tier 1 (Normal). Stats assigned via 7-10 round combat framework.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+MD",
       "dmgType": "normal",
       "range": 1
     },
-    "value": "TBA"
+    "value": 70
   },
   parang: {
     "id": "parang",
@@ -2237,14 +2237,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Top-of-Normal-tier rifle, highest single-shot damage in the class.",
+    "description": "Top-of-Normal-tier rifle, highest single-shot damage in the class. Tier 4 (Unique-leaning) — runs slightly above the Tier 3 ceiling by design, the single hardest-hitting standard rifle in the game.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "3d10+8",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 50,
       "ammo_type": ".50"
     },
-    "value": "TBA"
+    "value": 500
   },
   assault_rifle: {
     "id": "assault_rifle",
@@ -2255,15 +2255,15 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Normal tier automatic rifle. Burst-fire capable — see the campaign's burst mechanic (single roll, AC/DR debuff).",
+    "description": "Normal tier automatic rifle. Burst-fire capable — see the campaign's burst mechanic (single roll, AC/DR debuff). Tier 2 (Faction-Issued).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d6+4",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 25,
       "ammo_type": "5.56",
       "burst_capable": true
     },
-    "value": "TBA"
+    "value": 200
   },
   battle_rifle: {
     "id": "battle_rifle",
@@ -2274,14 +2274,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Rare/Signature-leaning Normal tier rifle, harder-hitting than the Assault or Combat Rifle.",
+    "description": "Rare/Signature-leaning Normal tier rifle, harder-hitting than the Assault or Combat Rifle. Tier 3 (Rare/Signature).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d10+6",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 32,
       "ammo_type": "7.62"
     },
-    "value": "TBA"
+    "value": 330
   },
   combat_rifle: {
     "id": "combat_rifle",
@@ -2292,14 +2292,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Normal tier semi-automatic rifle, faction-standard issue.",
+    "description": "Normal tier semi-automatic rifle, faction-standard issue. Tier 2 (Faction-Issued).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d8+3",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 28,
       "ammo_type": ".45"
     },
-    "value": "TBA"
+    "value": 210
   },
   homemade_rifle: {
     "id": "homemade_rifle",
@@ -2328,14 +2328,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Normal tier bolt-action rifle, common pre-war hunting/utility weapon.",
+    "description": "Normal tier bolt-action rifle, common pre-war hunting/utility weapon. Tier 1 (Normal).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d8+2",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 30,
       "ammo_type": "7.62"
     },
-    "value": "TBA"
+    "value": 130
   },
   marksman_carbine: {
     "id": "marksman_carbine",
@@ -2346,14 +2346,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Lower-end Normal tier carbine, common early rifle option.",
+    "description": "Lower-end Normal tier carbine, common early rifle option. Tier 1 (Normal).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d6+3",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 22,
       "ammo_type": "5.56"
     },
-    "value": "TBA"
+    "value": 150
   },
   sniper_rifle: {
     "id": "sniper_rifle",
@@ -2364,14 +2364,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Rare/Signature-leaning Normal tier rifle, long range and high single-shot damage.",
+    "description": "Rare/Signature-leaning Normal tier rifle, long range and high single-shot damage. Tier 3 (Rare/Signature).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d10+7",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 45,
       "ammo_type": "7.62"
     },
-    "value": "TBA"
+    "value": 350
   },
   varmint_rifle: {
     "id": "varmint_rifle",
@@ -2382,14 +2382,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Bottom-of-Normal-tier rifle, weak but common and cheap to feed.",
+    "description": "Bottom-of-Normal-tier rifle, weak but common and cheap to feed. Tier 0/1 border, weakest rifle.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d6+2",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 20,
       "ammo_type": ".22"
     },
-    "value": "TBA"
+    "value": 60
   },
   "10mm_smg": {
     "id": "10mm_smg",
@@ -2400,15 +2400,15 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Normal tier automatic SMG. Burst-fire capable.",
+    "description": "Normal tier automatic SMG. Burst-fire capable. Tier 1 (Normal), per-round damage — burst mode applies the AC/DR debuff convention.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "1d8+2",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 15,
       "ammo_type": "10mm",
       "burst_capable": true
     },
-    "value": "TBA"
+    "value": 140
   },
   tommy_gun: {
     "id": "tommy_gun",
@@ -2419,15 +2419,15 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Normal tier automatic SMG, pre-war antique still in circulation. Burst-fire capable.",
+    "description": "Normal tier automatic SMG, pre-war antique still in circulation. Burst-fire capable. Tier 2 (Faction-Issued), per-round damage.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d6+3",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 15,
       "ammo_type": ".45",
       "burst_capable": true
     },
-    "value": "TBA"
+    "value": 190
   },
   combat_shotgun: {
     "id": "combat_shotgun",
@@ -2438,14 +2438,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Normal tier shotgun, faction-standard close-range weapon.",
+    "description": "Normal tier shotgun, faction-standard close-range weapon. Tier 2 (Faction-Issued).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d8+4",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 10,
       "ammo_type": "shotgun_shells"
     },
-    "value": "TBA"
+    "value": 200
   },
   double_barrel_shotgun: {
     "id": "double_barrel_shotgun",
@@ -2456,14 +2456,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Normal tier shotgun, simple break-action design.",
+    "description": "Normal tier shotgun, simple break-action design. Tier 1/2 border.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d8+2",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 8,
       "ammo_type": "shotgun_shells"
     },
-    "value": "TBA"
+    "value": 160
   },
   lever_action_shotgun: {
     "id": "lever_action_shotgun",
@@ -2474,14 +2474,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Normal tier shotgun, tube-fed lever mechanism.",
+    "description": "Normal tier shotgun, tube-fed lever mechanism. Tier 1 (Normal).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d6+3",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 10,
       "ammo_type": "shotgun_shells"
     },
-    "value": "TBA"
+    "value": 150
   },
   pump_action_shotgun: {
     "id": "pump_action_shotgun",
@@ -2492,14 +2492,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Normal tier shotgun, the most common variant in circulation.",
+    "description": "Normal tier shotgun, the most common variant in circulation. Tier 1 (Normal), most common variant.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d6+4",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 10,
       "ammo_type": "shotgun_shells"
     },
-    "value": "TBA"
+    "value": 155
   },
   riot_shotgun: {
     "id": "riot_shotgun",
@@ -2510,14 +2510,14 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "description": "Faction-Issued leaning Normal tier shotgun, Federation crowd-control standard.",
+    "description": "Faction-Issued leaning Normal tier shotgun, Federation crowd-control standard. Tier 2 (Faction-Issued).",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d8+4",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 10,
       "ammo_type": "shotgun_shells"
     },
-    "value": "TBA"
+    "value": 210
   },
   sawed_off_shotgun: {
     "id": "sawed_off_shotgun",
@@ -2528,14 +2528,14 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
-    "description": "Concealable Normal tier shotgun, very short range, high close-quarters damage.",
+    "description": "Concealable Normal tier shotgun, very short range, high close-quarters damage. Tier 1 (Normal), very short range.",
     "stats": {
-      "dmg": "TBA",
+      "dmg": "2d6+3",
       "dmgType": "normal",
-      "range": "TBA",
+      "range": 5,
       "ammo_type": "shotgun_shells"
     },
-    "value": "TBA"
+    "value": 130
   },
   water_pipe_cudgel: {
     "id": "water_pipe_cudgel",
