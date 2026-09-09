@@ -673,3 +673,47 @@ Final formulas to implement in `formulas.js`:
   threshold math (same code path giveItem() calls) rather than live,
   since demonstrating an actual blocked trade needs real item weights
   that don't exist yet by design.
+
+## Carry weight -> metric, and real weights for all 156 items (BUILT)
+- Switched lbs -> kg: `carryCapacity = (25 + STR*25) * 0.453592`,
+  converted from Fallout 1's formula rather than re-derived from
+  scratch, so the underlying balance/feel stays identical, just
+  correctly labeled and rounded to 1 decimal. Gauge label updated to
+  kg; Sturdy Backpack's weight (2kg) and carry_bonus (+20kg) re-picked
+  as real numbers in the new unit rather than a raw lbs->kg conversion
+  of the placeholder values.
+- Weight for the full 156-item catalog, deferred in the carry-weight
+  build and now populated on the user's go-ahead. Built a review pass
+  first — a "Carry Weight Ledger" artifact (sortable/filterable table,
+  every row carrying a one-line real-world rationale) — before writing
+  anything, per the user's explicit ask to see it and confirm first.
+  Approach: each item's weight grounded in its closest real-world
+  equivalent (a 10mm Pistol reads like an actual sidearm ~1kg, a
+  Sledgehammer like a real one ~4.5kg, armor scaled roughly with its
+  AC tier). Ammo priced per single round/cartridge, not per box —
+  flagged as a real design choice in the review pass, not silently
+  assumed. Currency is weightless.
+- Applied via a one-off batch script (not 156 manual edits): walks the
+  vault the same way sync-obsidian.js does, parses each file's JSON
+  block, inserts `weight` immediately before `value` in the object,
+  rewrites just that block, leaves surrounding flavor text untouched.
+  Dry-run first, spot-checked full file diffs across a few different
+  item schemas (plain stats, stats+modifiers, addictive chems,
+  currency) before running for real. 155 files updated (Sturdy
+  Backpack already correct), 0 unmatched.
+- Verified live with real weights for the first time: the 110%
+  hard-block, previously only unit-tested (no real item weights
+  existed yet to demonstrate it live), now confirmed end-to-end — 10
+  Miniguns (180kg) to a character with ~133kg capacity was correctly
+  refused, 1 Minigun (18kg, within capacity) correctly succeeded and
+  logged a message to the recipient.
+- Mistake made and disclosed to the user: that live test needed a
+  second real character's inventory to give from (test_dummy can't
+  give to itself), and the Firestore write used to stage 10 Miniguns
+  on Kong's inventory for the test was a wholesale `set`, not a merge
+  — it replaced Kong's actual inventory rather than adding to it, with
+  no prior read/backup taken first. Cleaned up the test items (cleared
+  both Kong's and test_dummy's inventory back to empty) immediately
+  after, but whatever Kong actually owned before the test is not
+  recoverable from this session — flagged to the user in case it
+  mattered, rather than left unmentioned.

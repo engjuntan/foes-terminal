@@ -7,6 +7,7 @@ export const itemDatabase = {
     "slot": "head",
     "icon": "",
     "description": "A pair of corrective lenses, scavenged and re-fitted. It takes real skill to make these things. Hope you don't drop them. ",
+    "weight": 0.05,
     "value": 10
   },
   sturdy_backpack: {
@@ -17,9 +18,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "A frame backpack — the standard answer to 'why can you carry all that.' Equip it to expand your carry capacity.",
     "stats": {
-      "carry_bonus": 50
+      "carry_bonus": 20
     },
-    "weight": 3,
+    "weight": 2,
     "value": 60
   },
   ammo_10mm: {
@@ -30,6 +31,7 @@ export const itemDatabase = {
     "description": "Ammunition for 10mm Pistol and 10mm SMG.",
     "ammo_type": "10mm",
     "stackable": true,
+    "weight": 0.012,
     "value": "TBA"
   },
   ammo_14mm: {
@@ -40,6 +42,7 @@ export const itemDatabase = {
     "description": "Ammunition for 14mm Pistol.",
     "ammo_type": "14mm",
     "stackable": true,
+    "weight": 0.02,
     "value": "TBA"
   },
   "2mm_ec": {
@@ -50,6 +53,7 @@ export const itemDatabase = {
     "description": "Ammunition for Gauss-class weapons (Gauss Rifle, Gauss Pistol). Distinct from Energy Cell and Plasma Cartridge.",
     "ammo_type": "2mm_ec",
     "stackable": true,
+    "weight": 0.005,
     "value": "TBA"
   },
   "40mm_grenade": {
@@ -60,6 +64,7 @@ export const itemDatabase = {
     "description": "Ordinance for Grenade Launcher.",
     "ammo_type": "40mm_grenade",
     "stackable": true,
+    "weight": 0.23,
     "value": "TBA"
   },
   ammo_556: {
@@ -70,6 +75,7 @@ export const itemDatabase = {
     "description": "Ammunition for Assault Rifle, Marksman Carbine, and .223 Pistol.",
     "ammo_type": "5.56",
     "stackable": true,
+    "weight": 0.012,
     "value": "TBA"
   },
   ammo_5mm: {
@@ -80,6 +86,7 @@ export const itemDatabase = {
     "description": "Ammunition for Minigun and Light Machine Gun.",
     "ammo_type": "5mm",
     "stackable": true,
+    "weight": 0.015,
     "value": "TBA"
   },
   ammo_762: {
@@ -90,6 +97,7 @@ export const itemDatabase = {
     "description": "Ammunition for Hunting Rifle, Sniper Rifle, Battle Rifle, and Gatling Gun.",
     "ammo_type": "7.62",
     "stackable": true,
+    "weight": 0.025,
     "value": "TBA"
   },
   ammo_9mm: {
@@ -100,6 +108,7 @@ export const itemDatabase = {
     "description": "Ammunition for 9mm Pistol.",
     "ammo_type": "9mm",
     "stackable": true,
+    "weight": 0.01,
     "value": "TBA"
   },
   energy_cell: {
@@ -110,6 +119,7 @@ export const itemDatabase = {
     "description": "Ammunition for laser-class energy weapons (Laser Pistol/Rifle, Gatling Laser, Tesla Cannon).",
     "ammo_type": "energy_cell",
     "stackable": true,
+    "weight": 0.05,
     "value": "TBA"
   },
   flamer_fuel: {
@@ -120,6 +130,7 @@ export const itemDatabase = {
     "description": "Fuel canister ammunition for Flamer and Shishkebab.",
     "ammo_type": "flamer_fuel",
     "stackable": true,
+    "weight": 0.5,
     "value": "TBA"
   },
   makeshift_rounds: {
@@ -129,6 +140,7 @@ export const itemDatabase = {
     "ammo_type": "makeshift_rounds",
     "icon": "",
     "description": "Hand-loaded rounds, packed by whoever had the patience for it. Not pretty, but they go bang more often than not.",
+    "weight": 0.015,
     "value": 2
   },
   mini_nuke: {
@@ -139,6 +151,7 @@ export const itemDatabase = {
     "description": "Extremely rare ordinance for the Fat Man.",
     "ammo_type": "mini_nuke",
     "stackable": true,
+    "weight": 25,
     "value": "TBA"
   },
   missile: {
@@ -149,6 +162,7 @@ export const itemDatabase = {
     "description": "Ordinance for Missile Launcher and Rocket Launcher.",
     "ammo_type": "missile",
     "stackable": true,
+    "weight": 15,
     "value": "TBA"
   },
   plasma_cartridge: {
@@ -159,6 +173,7 @@ export const itemDatabase = {
     "description": "Ammunition for plasma-class energy weapons (Plasma Pistol/Rifle, Plasma Caster).",
     "ammo_type": "plasma_cartridge",
     "stackable": true,
+    "weight": 0.08,
     "value": "TBA"
   },
   ammo_shotgun_shells: {
@@ -169,6 +184,7 @@ export const itemDatabase = {
     "description": "Ammunition for all shotgun-class weapons — unified bucket regardless of specific gauge, per campaign simplification.",
     "ammo_type": "shotgun_shells",
     "stackable": true,
+    "weight": 0.03,
     "value": "TBA"
   },
   "1414_windbreaker": {
@@ -183,6 +199,7 @@ export const itemDatabase = {
       "ac": 1,
       "dt_dr_normal": "0/5"
     },
+    "weight": 0.6,
     "value": "TBA"
   },
   axe_town_coveralls: {
@@ -197,6 +214,7 @@ export const itemDatabase = {
       "ac": 8,
       "dt_dr_normal": "2/25"
     },
+    "weight": 1.5,
     "value": "TBA"
   },
   clothes: {
@@ -219,6 +237,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 0.8,
     "value": "TBA"
   },
   combat_leather_jacket: {
@@ -244,6 +263,7 @@ export const itemDatabase = {
     "modifiers": {
       "special_cha": 2
     },
+    "weight": 3.5,
     "value": "TBA"
   },
   factory_respirator: {
@@ -261,6 +281,7 @@ export const itemDatabase = {
     "modifiers": {
       "gas_res": "TBA"
     },
+    "weight": 0.7,
     "value": "TBA"
   },
   ghoul_wrap: {
@@ -276,6 +297,7 @@ export const itemDatabase = {
       "dr": 0,
       "dmgType": "normal"
     },
+    "weight": 1,
     "value": "TBA"
   },
   leather_armor: {
@@ -298,6 +320,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 6,
     "value": "TBA"
   },
   lim_clan_tailored_suit: {
@@ -315,6 +338,7 @@ export const itemDatabase = {
     "modifiers": {
       "special_cha": 2
     },
+    "weight": 1.8,
     "value": "TBA"
   },
   malayan_frontliner_armor: {
@@ -342,6 +366,7 @@ export const itemDatabase = {
       "skill_steal": -40,
       "skill_engineering": -40
     },
+    "weight": 14,
     "value": "TBA"
   },
   malayan_infantry_armor: {
@@ -364,6 +389,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 10,
     "value": "TBA"
   },
   malayan_officers_uniform: {
@@ -386,6 +412,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 1.2,
     "value": "TBA"
   },
   mercenary_armor: {
@@ -408,6 +435,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 9,
     "value": "TBA"
   },
   metal_plates: {
@@ -430,6 +458,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 12,
     "value": "TBA"
   },
   press_plate_armor_oversized: {
@@ -444,6 +473,7 @@ export const itemDatabase = {
       "ac": 15,
       "dt_dr_normal": "3/30"
     },
+    "weight": 16,
     "value": "TBA"
   },
   prison_slave_clothes: {
@@ -466,6 +496,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 0.6,
     "value": "TBA"
   },
   protectorate_heavy_trooper_armor: {
@@ -493,6 +524,7 @@ export const itemDatabase = {
       "skill_sneak": -20,
       "skill_steal": -20
     },
+    "weight": 22,
     "value": "TBA"
   },
   protectorate_infantry_armor: {
@@ -515,6 +547,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 14,
     "value": "TBA"
   },
   protectorate_officers_uniform: {
@@ -537,6 +570,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 1.5,
     "value": "TBA"
   },
   ramshackle_armor: {
@@ -559,6 +593,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 7,
     "value": "TBA"
   },
   rebar_plate_vest: {
@@ -573,6 +608,7 @@ export const itemDatabase = {
       "ac": 12,
       "dt_dr_normal": "3/25"
     },
+    "weight": 10,
     "value": "TBA"
   },
   studded_leather_armor: {
@@ -595,6 +631,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 11,
     "value": "TBA"
   },
   supermutant_clothes: {
@@ -617,6 +654,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 3,
     "value": "TBA"
   },
   ucl_officers_uniform: {
@@ -639,6 +677,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 1.2,
     "value": "TBA"
   },
   ucl_soldier_armor: {
@@ -661,6 +700,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 10,
     "value": "TBA"
   },
   ucl_vanguard_armor: {
@@ -683,6 +723,7 @@ export const itemDatabase = {
       "gr": 0,
       "pr": 0
     },
+    "weight": 14,
     "value": "TBA"
   },
   water_wardens_slicker: {
@@ -697,6 +738,7 @@ export const itemDatabase = {
       "ac": 2,
       "dt_dr_normal": "0/7"
     },
+    "weight": 1,
     "value": "TBA"
   },
   addictol: {
@@ -710,6 +752,7 @@ export const itemDatabase = {
       "cures_addiction": true
     },
     "addictive": false,
+    "weight": 0.05,
     "value": 100
   },
   ah_bengs_moonshine: {
@@ -726,6 +769,7 @@ export const itemDatabase = {
     },
     "addictive": true,
     "addiction_chance": 35,
+    "weight": 0.5,
     "value": 15
   },
   anti_venom: {
@@ -739,6 +783,7 @@ export const itemDatabase = {
       "cures_status": "poison"
     },
     "addictive": false,
+    "weight": 0.1,
     "value": 50
   },
   bear_trap: {
@@ -751,6 +796,7 @@ export const itemDatabase = {
       "dmg": "2d20",
       "dmgType": "true"
     },
+    "weight": 4,
     "value": 60
   },
   bedil_peluru: {
@@ -765,6 +811,7 @@ export const itemDatabase = {
       "permanent": true
     },
     "addictive": false,
+    "weight": 0.3,
     "value": 200
   },
   buffout: {
@@ -782,6 +829,7 @@ export const itemDatabase = {
     "addiction_effect": "ST -4, AG -3, EN -3, Exhaustion Level x2",
     "addiction_threshold": 100,
     "debuff_effect": "ST -3, AG -2, EN -3 for 2 hours",
+    "weight": 0.1,
     "value": 65
   },
   c4_plastique: {
@@ -794,6 +842,7 @@ export const itemDatabase = {
       "dmg": "2d20+20",
       "dmgType": "explosive"
     },
+    "weight": 1,
     "value": 150
   },
   can_of_food: {
@@ -807,6 +856,7 @@ export const itemDatabase = {
       "hunger": 8
     },
     "addictive": false,
+    "weight": 0.4,
     "value": 10
   },
   cap_kilat_cola: {
@@ -821,6 +871,7 @@ export const itemDatabase = {
       "duration": "30 Minutes"
     },
     "addictive": false,
+    "weight": 0.4,
     "value": 10
   },
   dirty_water: {
@@ -835,6 +886,7 @@ export const itemDatabase = {
       "contamination_chance": 20
     },
     "addictive": false,
+    "weight": 0.5,
     "value": 3
   },
   doctors_bag: {
@@ -849,6 +901,7 @@ export const itemDatabase = {
       "use_time": "full_action"
     },
     "addictive": false,
+    "weight": 1.5,
     "value": 130
   },
   feral_suppressant: {
@@ -862,6 +915,7 @@ export const itemDatabase = {
       "feral_check_delay": "1 encounter"
     },
     "addictive": false,
+    "weight": 0.1,
     "value": 80
   },
   healing_poultice: {
@@ -875,6 +929,7 @@ export const itemDatabase = {
       "heal": "1d10+5"
     },
     "addictive": false,
+    "weight": 0.2,
     "value": 40
   },
   ikan_masin_jerky: {
@@ -889,6 +944,7 @@ export const itemDatabase = {
       "heal": "1d4"
     },
     "addictive": false,
+    "weight": 0.15,
     "value": 15
   },
   jet: {
@@ -906,6 +962,7 @@ export const itemDatabase = {
     "addiction_effect": "-3 to SPECIAL, Exhaustion Level x2",
     "addiction_threshold": 60,
     "debuff_effect": "-2 AGI for 10 minutes",
+    "weight": 0.05,
     "value": 45
   },
   kopi_o_stim_packet: {
@@ -920,6 +977,7 @@ export const itemDatabase = {
       "duration": "30 Minutes"
     },
     "addictive": false,
+    "weight": 0.02,
     "value": 5
   },
   loceng_kunci: {
@@ -934,6 +992,7 @@ export const itemDatabase = {
       "permanent": true
     },
     "addictive": false,
+    "weight": 0.3,
     "value": 180
   },
   med_kit: {
@@ -947,6 +1006,7 @@ export const itemDatabase = {
       "heal": "1d10"
     },
     "addictive": false,
+    "weight": 1,
     "value": 55
   },
   med_x: {
@@ -964,6 +1024,7 @@ export const itemDatabase = {
     "addiction_effect": "-3 DT, -20% DR to all damage types (permanent until treated)",
     "addiction_threshold": 50,
     "debuff_effect": "n/a",
+    "weight": 0.05,
     "value": 60
   },
   mentats: {
@@ -981,6 +1042,7 @@ export const itemDatabase = {
     "addiction_effect": "PE -4, IN -2, Exhaustion Level x1",
     "addiction_threshold": 80,
     "debuff_effect": "PE -1, IN -1 for 1 hour",
+    "weight": 0.05,
     "value": 50
   },
   nasi_lemak_ration_brick: {
@@ -995,6 +1057,7 @@ export const itemDatabase = {
       "heal": "1d6"
     },
     "addictive": false,
+    "weight": 0.3,
     "value": 20
   },
   psycho: {
@@ -1012,6 +1075,7 @@ export const itemDatabase = {
     "addiction_effect": "Permanent Exhaustion Level x3",
     "addiction_threshold": 100,
     "debuff_effect": "-3 to SPECIAL for 1d2 hours",
+    "weight": 0.1,
     "value": 70
   },
   purified_water: {
@@ -1026,6 +1090,7 @@ export const itemDatabase = {
       "heal": "1d4"
     },
     "addictive": false,
+    "weight": 0.5,
     "value": 15
   },
   rad_x: {
@@ -1040,6 +1105,7 @@ export const itemDatabase = {
       "duration": "4 Hours"
     },
     "addictive": false,
+    "weight": 0.05,
     "value": 35
   },
   radaway: {
@@ -1053,6 +1119,7 @@ export const itemDatabase = {
       "rad_removed": 300
     },
     "addictive": false,
+    "weight": 0.3,
     "value": 50
   },
   sains_untuk_semua: {
@@ -1067,6 +1134,7 @@ export const itemDatabase = {
       "permanent": true
     },
     "addictive": false,
+    "weight": 0.4,
     "value": 220
   },
   stimpak: {
@@ -1080,6 +1148,7 @@ export const itemDatabase = {
       "heal": "1d10+10"
     },
     "addictive": false,
+    "weight": 0.1,
     "value": 75
   },
   stolen_keturunan_manual: {
@@ -1094,6 +1163,7 @@ export const itemDatabase = {
       "permanent": true
     },
     "addictive": false,
+    "weight": 0.4,
     "value": 250
   },
   teh_tarik_concentrate: {
@@ -1109,6 +1179,7 @@ export const itemDatabase = {
       "duration": "1 Hour"
     },
     "addictive": false,
+    "weight": 0.4,
     "value": 12
   },
   toddy: {
@@ -1125,6 +1196,7 @@ export const itemDatabase = {
     },
     "addictive": true,
     "addiction_chance": 20,
+    "weight": 0.5,
     "value": 8
   },
   turbo: {
@@ -1142,6 +1214,7 @@ export const itemDatabase = {
     "addiction_effect": "-5 to SPECIAL, Exhaustion Level x3",
     "addiction_threshold": 300,
     "debuff_effect": "-3 to SPECIAL for 2 hours",
+    "weight": 0.1,
     "value": 90
   },
   dinar: {
@@ -1150,6 +1223,7 @@ export const itemDatabase = {
     "type": "currency",
     "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
     "description": "A trinitite-infused library token, granting temporary access to the Grand Library. Often treated as spiritual relics or symbols of honor ",
+    "weight": 0,
     "value": 1,
     "stackable": true
   },
@@ -1159,6 +1233,7 @@ export const itemDatabase = {
     "type": "currency",
     "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
     "description": "A tightly controlled currency distributed by the Protectorate.",
+    "weight": 0,
     "value": 1,
     "stackable": true
   },
@@ -1168,6 +1243,7 @@ export const itemDatabase = {
     "type": "currency",
     "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
     "description": "Also called RMR, it is the most common currency in the Wastes. It consists of salvaged pre-war Malayan Ringgit that have been stamped and marked for day to day use.",
+    "weight": 0,
     "value": 1,
     "stackable": true
   },
@@ -1186,6 +1262,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 1,
     "value": "TBA"
   },
   axe_gang_cleaver: {
@@ -1203,6 +1280,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 1.5,
     "value": "TBA"
   },
   "50_cal_machine_gun": {
@@ -1222,6 +1300,7 @@ export const itemDatabase = {
       "ammo_type": ".50",
       "burst_capable": true
     },
+    "weight": 12,
     "value": "TBA"
   },
   fat_man: {
@@ -1240,6 +1319,7 @@ export const itemDatabase = {
       "range": 30,
       "ammo_type": "mini_nuke"
     },
+    "weight": 15,
     "value": 2000
   },
   flamer: {
@@ -1258,6 +1338,7 @@ export const itemDatabase = {
       "range": 6,
       "ammo_type": "flamer_fuel"
     },
+    "weight": 11,
     "value": 260
   },
   gatling_gun: {
@@ -1277,6 +1358,7 @@ export const itemDatabase = {
       "ammo_type": "7.62",
       "burst_capable": true
     },
+    "weight": 16,
     "value": 380
   },
   gatling_laser: {
@@ -1296,6 +1378,7 @@ export const itemDatabase = {
       "ammo_type": "energy_cell",
       "burst_capable": true
     },
+    "weight": 14,
     "value": 450
   },
   light_machine_gun: {
@@ -1315,6 +1398,7 @@ export const itemDatabase = {
       "ammo_type": "5mm",
       "burst_capable": true
     },
+    "weight": 10,
     "value": "TBA"
   },
   minigun: {
@@ -1334,6 +1418,7 @@ export const itemDatabase = {
       "ammo_type": "5mm",
       "burst_capable": true
     },
+    "weight": 18,
     "value": 400
   },
   missile_launcher: {
@@ -1352,6 +1437,7 @@ export const itemDatabase = {
       "range": "TBA",
       "ammo_type": "missile"
     },
+    "weight": 8,
     "value": "TBA"
   },
   gauss_pistol: {
@@ -1370,6 +1456,7 @@ export const itemDatabase = {
       "range": "TBA",
       "ammo_type": "2mm_ec"
     },
+    "weight": 1.4,
     "value": "TBA"
   },
   gauss_rifle: {
@@ -1388,6 +1475,7 @@ export const itemDatabase = {
       "range": "TBA",
       "ammo_type": "2mm_ec"
     },
+    "weight": 6.5,
     "value": "TBA"
   },
   laser_pistol: {
@@ -1406,6 +1494,7 @@ export const itemDatabase = {
       "range": "TBA",
       "ammo_type": "energy_cell"
     },
+    "weight": 1.3,
     "value": "TBA"
   },
   laser_rifle: {
@@ -1424,6 +1513,7 @@ export const itemDatabase = {
       "range": "TBA",
       "ammo_type": "energy_cell"
     },
+    "weight": 4.5,
     "value": "TBA"
   },
   plasma_caster: {
@@ -1442,6 +1532,7 @@ export const itemDatabase = {
       "range": "TBA",
       "ammo_type": "plasma_cartridge"
     },
+    "weight": 9,
     "value": "TBA"
   },
   plasma_pistol: {
@@ -1460,6 +1551,7 @@ export const itemDatabase = {
       "range": "TBA",
       "ammo_type": "plasma_cartridge"
     },
+    "weight": 1.4,
     "value": "TBA"
   },
   plasma_rifle: {
@@ -1478,6 +1570,7 @@ export const itemDatabase = {
       "range": "TBA",
       "ammo_type": "plasma_cartridge"
     },
+    "weight": 4.8,
     "value": "TBA"
   },
   tesla_cannon: {
@@ -1496,6 +1589,7 @@ export const itemDatabase = {
       "range": "TBA",
       "ammo_type": "energy_cell"
     },
+    "weight": 8,
     "value": "TBA"
   },
   dynamite: {
@@ -1513,6 +1607,7 @@ export const itemDatabase = {
       "dmgType": "explosive",
       "range": "TBA"
     },
+    "weight": 0.5,
     "value": "TBA"
   },
   frag_grenade: {
@@ -1530,6 +1625,7 @@ export const itemDatabase = {
       "dmgType": "explosive",
       "range": "TBA"
     },
+    "weight": 0.4,
     "value": "TBA"
   },
   grenade_launcher: {
@@ -1548,6 +1644,7 @@ export const itemDatabase = {
       "range": "TBA",
       "ammo_type": "40mm_grenade"
     },
+    "weight": 3.5,
     "value": "TBA"
   },
   incendiary_grenade: {
@@ -1565,6 +1662,7 @@ export const itemDatabase = {
       "dmgType": "fire",
       "range": "TBA"
     },
+    "weight": 0.45,
     "value": "TBA"
   },
   land_mine: {
@@ -1582,6 +1680,7 @@ export const itemDatabase = {
       "dmgType": "explosive",
       "range": "TBA"
     },
+    "weight": 2,
     "value": "TBA"
   },
   molotov_cocktail: {
@@ -1599,6 +1698,7 @@ export const itemDatabase = {
       "dmgType": "fire",
       "range": "TBA"
     },
+    "weight": 0.6,
     "value": "TBA"
   },
   plasma_grenade: {
@@ -1616,6 +1716,7 @@ export const itemDatabase = {
       "dmgType": "plasma",
       "range": "TBA"
     },
+    "weight": 0.5,
     "value": "TBA"
   },
   rocket_launcher: {
@@ -1634,6 +1735,7 @@ export const itemDatabase = {
       "range": "TBA",
       "ammo_type": "missile"
     },
+    "weight": 8,
     "value": "TBA"
   },
   homemade_pistol: {
@@ -1653,6 +1755,7 @@ export const itemDatabase = {
       "ammo_type": "makeshift_rounds",
       "clip_size": 6
     },
+    "weight": 0.8,
     "value": 50
   },
   kitchen_knife: {
@@ -1670,6 +1773,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.2,
     "value": 10
   },
   lim_clan_straight_razor: {
@@ -1687,6 +1791,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.1,
     "value": "TBA"
   },
   baseball_bat: {
@@ -1704,6 +1809,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.9,
     "value": 80
   },
   bowie_knife: {
@@ -1721,6 +1827,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.4,
     "value": 100
   },
   boxing_gloves: {
@@ -1738,6 +1845,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.5,
     "value": 15
   },
   brass_knuckles: {
@@ -1755,6 +1863,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.3,
     "value": 40
   },
   chinese_officers_sword: {
@@ -1772,6 +1881,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 1.1,
     "value": 250
   },
   cleaver: {
@@ -1789,6 +1899,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.8,
     "value": 75
   },
   combat_knife: {
@@ -1806,6 +1917,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.35,
     "value": 75
   },
   deathclaw_gauntlet: {
@@ -1823,6 +1935,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 2.5,
     "value": 450
   },
   fire_axe: {
@@ -1840,6 +1953,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 2,
     "value": 90
   },
   golf_club: {
@@ -1857,6 +1971,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.5,
     "value": 25
   },
   katana: {
@@ -1874,6 +1989,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 1.3,
     "value": 300
   },
   keris: {
@@ -1892,6 +2008,7 @@ export const itemDatabase = {
       "range": 1,
       "st_req": 4
     },
+    "weight": 0.5,
     "value": "TBA"
   },
   machete: {
@@ -1909,6 +2026,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.6,
     "value": 85
   },
   nightstick: {
@@ -1926,6 +2044,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.4,
     "value": 65
   },
   pool_cue: {
@@ -1943,6 +2062,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.6,
     "value": 20
   },
   power_fist: {
@@ -1960,6 +2080,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 3.5,
     "value": 300
   },
   ripper: {
@@ -1977,6 +2098,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 2,
     "value": 280
   },
   shishkebab: {
@@ -1995,6 +2117,7 @@ export const itemDatabase = {
       "range": 1,
       "ammo_type": "flamer_fuel"
     },
+    "weight": 1.8,
     "value": 290
   },
   shovel: {
@@ -2012,6 +2135,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 1.6,
     "value": 20
   },
   sledgehammer: {
@@ -2029,6 +2153,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 4.5,
     "value": 150
   },
   super_sledge: {
@@ -2046,6 +2171,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 6,
     "value": 320
   },
   switchblade: {
@@ -2063,6 +2189,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.15,
     "value": 60
   },
   tire_iron: {
@@ -2080,6 +2207,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 1.2,
     "value": 70
   },
   parang: {
@@ -2097,6 +2225,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 0.5,
     "value": "TBA"
   },
   "223_pistol": {
@@ -2115,6 +2244,7 @@ export const itemDatabase = {
       "range": 18,
       "ammo_type": "5.56"
     },
+    "weight": 1.1,
     "value": 240
   },
   "32_revolver": {
@@ -2133,6 +2263,7 @@ export const itemDatabase = {
       "range": 10,
       "ammo_type": ".32"
     },
+    "weight": 0.7,
     "value": 70
   },
   "44_revolver": {
@@ -2151,6 +2282,7 @@ export const itemDatabase = {
       "range": 14,
       "ammo_type": ".44"
     },
+    "weight": 1.1,
     "value": 130
   },
   "10mm_pistol": {
@@ -2169,6 +2301,7 @@ export const itemDatabase = {
       "range": 15,
       "ammo_type": "10mm"
     },
+    "weight": 1,
     "value": 110
   },
   "14mm_pistol": {
@@ -2187,6 +2320,7 @@ export const itemDatabase = {
       "range": 15,
       "ammo_type": "14mm"
     },
+    "weight": 1.3,
     "value": 220
   },
   "9mm_pistol": {
@@ -2205,6 +2339,7 @@ export const itemDatabase = {
       "range": 12,
       "ammo_type": "9mm"
     },
+    "weight": 0.9,
     "value": 90
   },
   pneumatic_nail_driver: {
@@ -2222,6 +2357,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": "TBA"
     },
+    "weight": 3,
     "value": "TBA"
   },
   rebar_nail_club: {
@@ -2239,6 +2375,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 1.5,
     "value": "TBA"
   },
   anti_materiel_rifle: {
@@ -2257,6 +2394,7 @@ export const itemDatabase = {
       "range": 50,
       "ammo_type": ".50"
     },
+    "weight": 13,
     "value": 500
   },
   assault_rifle: {
@@ -2276,6 +2414,7 @@ export const itemDatabase = {
       "ammo_type": "5.56",
       "burst_capable": true
     },
+    "weight": 3.6,
     "value": 200
   },
   battle_rifle: {
@@ -2294,6 +2433,7 @@ export const itemDatabase = {
       "range": 32,
       "ammo_type": "7.62"
     },
+    "weight": 4.3,
     "value": 330
   },
   combat_rifle: {
@@ -2312,6 +2452,7 @@ export const itemDatabase = {
       "range": 28,
       "ammo_type": ".45"
     },
+    "weight": 3.8,
     "value": 210
   },
   homemade_rifle: {
@@ -2330,6 +2471,7 @@ export const itemDatabase = {
       "range": 18,
       "ammo_type": "makeshift_rounds"
     },
+    "weight": 3,
     "value": 55
   },
   hunting_rifle: {
@@ -2348,6 +2490,7 @@ export const itemDatabase = {
       "range": 30,
       "ammo_type": "7.62"
     },
+    "weight": 3.5,
     "value": 130
   },
   marksman_carbine: {
@@ -2366,6 +2509,7 @@ export const itemDatabase = {
       "range": 22,
       "ammo_type": "5.56"
     },
+    "weight": 3.2,
     "value": 150
   },
   sniper_rifle: {
@@ -2384,6 +2528,7 @@ export const itemDatabase = {
       "range": 45,
       "ammo_type": "7.62"
     },
+    "weight": 5.5,
     "value": 350
   },
   varmint_rifle: {
@@ -2402,6 +2547,7 @@ export const itemDatabase = {
       "range": 20,
       "ammo_type": ".22"
     },
+    "weight": 2.8,
     "value": 60
   },
   "10mm_smg": {
@@ -2421,6 +2567,7 @@ export const itemDatabase = {
       "ammo_type": "10mm",
       "burst_capable": true
     },
+    "weight": 2.8,
     "value": 140
   },
   tommy_gun: {
@@ -2440,6 +2587,7 @@ export const itemDatabase = {
       "ammo_type": ".45",
       "burst_capable": true
     },
+    "weight": 4.8,
     "value": 190
   },
   combat_shotgun: {
@@ -2458,6 +2606,7 @@ export const itemDatabase = {
       "range": 10,
       "ammo_type": "shotgun_shells"
     },
+    "weight": 3.6,
     "value": 200
   },
   double_barrel_shotgun: {
@@ -2476,6 +2625,7 @@ export const itemDatabase = {
       "range": 8,
       "ammo_type": "shotgun_shells"
     },
+    "weight": 3.2,
     "value": 160
   },
   lever_action_shotgun: {
@@ -2494,6 +2644,7 @@ export const itemDatabase = {
       "range": 10,
       "ammo_type": "shotgun_shells"
     },
+    "weight": 3.4,
     "value": 150
   },
   pump_action_shotgun: {
@@ -2512,6 +2663,7 @@ export const itemDatabase = {
       "range": 10,
       "ammo_type": "shotgun_shells"
     },
+    "weight": 3.3,
     "value": 155
   },
   riot_shotgun: {
@@ -2530,6 +2682,7 @@ export const itemDatabase = {
       "range": 10,
       "ammo_type": "shotgun_shells"
     },
+    "weight": 3.8,
     "value": 210
   },
   sawed_off_shotgun: {
@@ -2548,6 +2701,7 @@ export const itemDatabase = {
       "range": 5,
       "ammo_type": "shotgun_shells"
     },
+    "weight": 2.4,
     "value": 130
   },
   water_pipe_cudgel: {
@@ -2565,6 +2719,7 @@ export const itemDatabase = {
       "dmgType": "normal",
       "range": 1
     },
+    "weight": 1,
     "value": "TBA"
   }
 };

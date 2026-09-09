@@ -34,7 +34,7 @@ function renderCarryWeightGauge(used, capacity) {
     <div style="margin-bottom:20px;">
       <label>CARRY WEIGHT</label>
       <div style="background:#222; height:14px; border:1px solid ${color}; margin-top:5px;"><div style="width:${pct}%; background:${color}; height:100%;"></div></div>
-      <div style="text-align:right; font-size:12px; color:${color};">${Math.round(used)} / ${Math.round(capacity)} lbs</div>
+      <div style="text-align:right; font-size:12px; color:${color};">${used.toFixed(1)} / ${capacity.toFixed(1)} kg</div>
     </div>`;
 }
 

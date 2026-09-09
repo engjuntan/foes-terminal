@@ -103,8 +103,12 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   // systems are things like... carry weight... this game is less about
   // math") — no in-manual formula exists, so this uses Fallout 1's
   // classic one instead, per the GM's own call: 25 + (STR * 25) lbs
-  // base, before any equipped-gear bonus.
-  const carryBase = 25 + (str * 25);
+  // base, before any equipped-gear bonus — converted to kg (the GM's
+  // preferred unit) rather than re-derived, so the underlying game
+  // balance/feel stays identical to the source formula, just correctly
+  // labeled. Rounded to 1 decimal; item weights are in kg too.
+  const LBS_TO_KG = 0.453592;
+  const carryBase = Math.round((25 + str * 25) * LBS_TO_KG * 10) / 10;
   let carryBonus = 0;
   Object.values(equipment || {}).forEach(itemId => {
     if (!itemId) return;
