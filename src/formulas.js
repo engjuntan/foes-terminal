@@ -1,13 +1,20 @@
 // src/formulas.js
 import { getTrait } from './traits.js';
 import { getItem } from './items.js';
+import { normalizeInventory } from './inventory.js';
+
+// How far over carryCapacity a character is allowed to go before
+// acquiring more items gets hard-blocked (trades, GM grants). Below
+// this line, going over capacity is simply permitted — no penalty,
+// per the GM's own call — the gauge just turns red as a warning.
+export const CARRY_OVERAGE_ALLOWANCE = 1.10;
 
 // activeStatusEffects: array of instances already living on the character
 // (e.g. charData.status_effects), each shaped { name, modifiers: {...} }.
 // Unlike traits/perks (looked up by id from a database), status effect
 // instances already carry their own resolved modifiers, ad-hoc or from
 // the status-effect library, so they need no lookup step here.
-export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [], activePerks = [], race = 'human', activeStatusEffects = [], equipment = {}, rads = 0) {
+export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [], activePerks = [], race = 'human', activeStatusEffects = [], equipment = {}, rads = 0, inventory = {}) {
 
   // --- 0. RACE DATA ---
   const raceDef = RACE_RULES[race] || RACE_RULES['human'];
@@ -91,6 +98,40 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
     armorClass += equippedBodyArmor.stats.ac;
   }
 
+  // --- Carry Weight ---
+  // The manual explicitly cuts carry weight as a system ("Removed
+  // systems are things like... carry weight... this game is less about
+  // math") — no in-manual formula exists, so this uses Fallout 1's
+  // classic one instead, per the GM's own call: 25 + (STR * 25) lbs
+  // base, before any equipped-gear bonus.
+  const carryBase = 25 + (str * 25);
+  let carryBonus = 0;
+  Object.values(equipment || {}).forEach(itemId => {
+    if (!itemId) return;
+    const eqItem = getItem(itemId);
+    if (eqItem && typeof eqItem.stats?.carry_bonus === 'number') carryBonus += eqItem.stats.carry_bonus;
+  });
+  const carryCapacity = carryBase + carryBonus;
+
+  // What's actually being carried: unequipped inventory (still a stacked
+  // {itemId: qty} map) PLUS whatever's currently worn — equipping moves
+  // an item OUT of the inventory map and into the equipment slot
+  // reference, so both have to be summed or worn gear would read as
+  // weightless. Items with no `weight` field yet (the vast majority,
+  // until that numbering pass happens) contribute 0 — the gauge starts
+  // near-empty and fills in as items get real numbers, never crashes.
+  let carryUsed = 0;
+  const invMap = normalizeInventory(inventory);
+  Object.entries(invMap).forEach(([itemId, qty]) => {
+    const invItem = getItem(itemId);
+    if (invItem && typeof invItem.weight === 'number') carryUsed += invItem.weight * qty;
+  });
+  Object.values(equipment || {}).forEach(itemId => {
+    if (!itemId) return;
+    const eqItem = getItem(itemId);
+    if (eqItem && typeof eqItem.weight === 'number') carryUsed += eqItem.weight;
+  });
+
   // Melee Damage Base (Melee Weapons)
   let meleeDamageBase = Math.max(1, str - 5);
 
@@ -173,6 +214,8 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   return {
     special: { str, per, end, cha, int, agi, luk },
     armorClass,
+    carryCapacity,
+    carryUsed,
     sequenceBonus,
     meleeDamageBase,
     unarmedDamageFull,

@@ -3,7 +3,7 @@ import { doc, updateDoc, setDoc, getDoc } from "firebase/firestore";
 import { db } from './firebase.js'; // Imports the connection we made in File 1
 import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
-import { RACE_RULES, calculateDerivedStats } from './formulas.js';
+import { RACE_RULES, calculateDerivedStats, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
 import { getMonster } from './bestiary.js';
 import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
@@ -214,7 +214,7 @@ export async function forceReset() {
         tags: { unarmed: true, survival: true },
         skill_ranks: {},
         inventory: ["homemade_pistol", "stimpak", "leather_jacket"], 
-        equipment: { head: null, body: null, right_hand: null, left_hand: null },
+        equipment: { head: null, body: null, right_hand: null, left_hand: null, back: null },
         traits: ["heavy_handed"],
         perks: ["strong_back"] 
       }
@@ -499,6 +499,68 @@ export async function useItem(targetCharId, itemId) {
   try {
     await updateDoc(charRef, updatePayload);
     alert(usedMsg);
+  } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Player-to-player item transfer. Direct/immediate — no accept step,
+// matching every other one-click action in this app — but the
+// recipient (and the GM) get a message out of it, since a silent
+// transfer would be the one inventory action nobody else ever sees.
+// Reuses the existing shared `messages` array/Messages tab rather than
+// building separate notification plumbing: a message targeted at the
+// recipient shows up in their own inbox, and the GM's Messages view
+// already lists every message ever sent regardless of target.
+//
+// Capacity check: the GM's own rule — going over carryCapacity is
+// allowed up to CARRY_OVERAGE_ALLOWANCE (10% over) with no penalty,
+// but acquiring anything past that is refused outright. This applies
+// to the recipient's projected total after the gift; it does NOT gate
+// gmGrantItem — a GM grant is an out-of-fiction administrative action
+// (same category as gmAdjustHP/gmSetRadiation), not something the
+// game's own carry-weight rule constrains.
+export async function giveItem(itemId, qty, toCharId) {
+  const fromCharId = window.currentUser;
+  if (!fromCharId || !toCharId || fromCharId === toCharId) return;
+  const fromChar = window.liveData.characters[fromCharId];
+  const toChar = window.liveData.characters[toCharId];
+  if (!fromChar || !toChar) return;
+  const item = getItem(itemId);
+  if (!item) return;
+  qty = Math.max(1, Number(qty) || 1);
+
+  const owned = getInventoryQuantity(fromChar.inventory, itemId);
+  if (owned < qty) { alert(`YOU DON'T HAVE ${qty}x ${item.name.toUpperCase()}`); return; }
+
+  const itemWeight = typeof item.weight === 'number' ? item.weight : 0;
+  if (itemWeight > 0) {
+    const toDerived = calculateDerivedStats(toChar.special, toChar.level || 1, toChar.traits || [], toChar.perks || [], toChar.race || 'human', toChar.status_effects || [], toChar.equipment || {}, toChar.rads || 0, toChar.inventory || {});
+    const projectedUsed = toDerived.carryUsed + (itemWeight * qty);
+    if (projectedUsed > toDerived.carryCapacity * CARRY_OVERAGE_ALLOWANCE) {
+      alert(`${toChar.name.toUpperCase()} CAN'T CARRY THAT MUCH — OVER CAPACITY`);
+      return;
+    }
+  }
+
+  const newFromInv = removeFromInventory(fromChar.inventory, itemId, qty);
+  const newToInv = addToInventory(toChar.inventory, itemId, qty);
+
+  const messages = window.liveData.messages || [];
+  const message = {
+    id: `msg_${Date.now()}`,
+    from: fromChar.name || fromCharId,
+    target: toCharId,
+    body: `${fromChar.name} gave you ${qty > 1 ? `${qty}x ` : ''}${item.name}.`,
+    timestamp: Date.now()
+  };
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${fromCharId}.inventory`] = newFromInv;
+  updatePayload[`characters.${toCharId}.inventory`] = newToInv;
+  updatePayload.messages = [...messages, message];
+  try {
+    await updateDoc(charRef, updatePayload);
+    alert(`GAVE ${qty > 1 ? `${qty}x ` : ''}${item.name.toUpperCase()} TO ${toChar.name.toUpperCase()}`);
   } catch (err) { alert("ERROR: " + err.message); }
 }
 
@@ -982,7 +1044,7 @@ export async function resolveAttack() {
     attackerValue = attackDef.hit_percent;
   } else {
     const char = window.liveData.characters[attacker.char_id];
-    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0);
+    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {});
     const wantsMelee = !draft.attackKey || draft.attackKey === 'unarmed' || (() => {
       const wi = getItem(draft.attackKey);
       return !wi || !wi.stats || (wi.stats.range || 0) <= 1;
@@ -1035,7 +1097,7 @@ export async function resolveAttack() {
     targetName = target.name;
   } else {
     const targetChar = window.liveData.characters[target.char_id];
-    const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0);
+    const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0, targetChar.inventory || {});
     targetAC = targetDerived.armorClass;
     // Crouching/prone/knocked-down caps how much of AC comes from AGI —
     // only meaningful for a PC, since AC's AGI component is what's being
@@ -1577,7 +1639,7 @@ export async function gmFactoryReset(targetCharId) {
   updatePayload[`characters.${targetCharId}.special`] = { str: 5, per: 5, end: 5, cha: 5, int: 5, agi: 5, luk: 5 };
   updatePayload[`characters.${targetCharId}.tags`] = {};
   updatePayload[`characters.${targetCharId}.inventory`] = {};
-  updatePayload[`characters.${targetCharId}.equipment`] = { head: null, body: null, right_hand: null, left_hand: null };
+  updatePayload[`characters.${targetCharId}.equipment`] = { head: null, body: null, right_hand: null, left_hand: null, back: null };
   updatePayload[`characters.${targetCharId}.skill_points`] = 0;
   updatePayload[`characters.${targetCharId}.level`] = 1;
   updatePayload[`characters.${targetCharId}.hp`] = { current: 15, max: 15 };
@@ -1630,7 +1692,7 @@ export async function resolvePlayerCheck() {
   if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
 
   const char = window.liveData.characters[window.currentUser];
-  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0);
+  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {});
   const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
   const result = draft.kind === 'special' ? resolveSpecialCheck(value, draft.tier, roll, draft.useD20) : resolveSkillCheck(value, draft.tier, roll);
 
@@ -1720,7 +1782,7 @@ export async function resolveGmCheck() {
     // PC — that'd be a lot of typing for the GM).
     Object.entries(window.liveData.characters || {}).forEach(([charId, char]) => {
       if (!char.is_finalized) return;
-      const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0);
+      const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {});
       const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
       const roll = draft.kind === 'special' ? (draft.useD20 ? rollD20() : rollD10()) : rollPercentile();
       const result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
@@ -1746,7 +1808,7 @@ export async function resolveGmCheck() {
     const roll = Number(draft.roll);
     const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
     if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
-    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0);
+    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {});
     const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
     const result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
     results.push({ char_id: draft.targetCharId, name: char.name, roll, threshold: result.threshold, success: result.success, critType: result.critType || null });

@@ -54,6 +54,7 @@ window.openMessage = Controllers.openMessage;
 window.gmAdjustHP = (amt) => Controllers.gmAdjustHP(window.selectedCharId, amt);
 window.gmSetRadiation = (amt) => Controllers.gmSetRadiation(window.selectedCharId, amt);
 window.useItem = Controllers.useItem;
+window.giveItem = Controllers.giveItem;
 window.gmAdjustVaultPoints = (amt) => Controllers.gmAdjustVaultPoints(window.selectedCharId, amt);
 window.gmGrantLevel = () => Controllers.gmGrantLevel(window.selectedCharId);
 window.gmApplyStatusEffect = () => Controllers.gmApplyStatusEffect(window.selectedCharId);

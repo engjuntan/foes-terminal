@@ -607,3 +607,69 @@ Final formulas to implement in `formulas.js`:
   the GM view — a key with no entry in `liveData.characters`. Added an
   early return so the GM opening a quest to review it doesn't crash on
   a nonexistent character's `read_quests`.
+
+## Carry weight + backpacks + player-to-player item giving (BUILT)
+- No manual formula exists — the manual explicitly lists carry weight
+  among the systems its own designer removed for simplicity. Used
+  Fallout 1's classic formula instead, per the GM's own fallback call:
+  `carryCapacity = 25 + (STR * 25)` lbs, plus the sum of `carry_bonus`
+  from every currently equipped item (not gated to backpacks
+  specifically — any equipped item, any slot, can carry that field;
+  a backpack is just the first instance of "gear that expands
+  capacity," matching how armor's `ac` stat already generalizes).
+- New top-level `weight` field on items (same convention as `value`),
+  defaulting to 0/absent for the ~155 already-numbered items — the
+  user is assigning real weights to the whole catalog in a future
+  pass, so the gauge intentionally starts near-empty rather than this
+  session guessing at ~155 numbers. Verified the math directly
+  (25+STR*25, backpack bonus, threshold at 100%/110%) rather than via
+  fabricated item weights, to stay inside that boundary.
+- New `back` equipment slot (alongside head/body/right_hand/
+  left_hand) — a backpack is `type: "accessory", slot: "back"`, same
+  pattern Glasses already uses for `head`. Seeded a real "Sturdy
+  Backpack" item (`carry_bonus: 50`, `weight: 3`, both real numbers
+  since this is a new item entirely of this session's own creation,
+  not part of the deferred numbering pass) so the mechanic is
+  immediately testable.
+- Overweight rule, per the GM's own call: going over capacity is
+  freely allowed up to 110% (`CARRY_OVERAGE_ALLOWANCE`, exported from
+  formulas.js as the single source of truth) with no mechanical
+  penalty — the gauge just turns yellow past 100%, red past 110%.
+  Past that 110% line, *acquiring* more is hard-blocked. "Acquiring"
+  only covers player-to-player giving (see below) — NOT `gmGrantItem`,
+  which stays unblocked like every other GM tool (gmAdjustHP,
+  gmSetRadiation, etc. all bypass rules that constrain players). Never
+  blocks equip/unequip either — moving gear between the inventory map
+  and an equipment slot doesn't change total weight carried, so there
+  was nothing to gate there to begin with.
+- Player-to-player giving: direct/immediate transfer per the GM's own
+  call (no accept step — matches every other one-click action in this
+  app), but the recipient AND the GM both get a message out of it, per
+  the GM's explicit ask. Built on the existing Messages tab rather than
+  new infrastructure: a message targeted at the recipient shows up in
+  their own inbox (unread badge included), and the GM's Messages view
+  already lists every message ever sent regardless of target — so
+  "log it for the GM" needed zero new code once the message itself
+  existed. New `giveItem(itemId, qty, toCharId)` in controllers.js, a
+  GIVE button + target-player dropdown added inline to each unequipped
+  inventory row in the player dashboard (views.js) — no new tab.
+- Example Data Log entry, per the GM's brief: a Federation Gazette
+  newspaper article on the Bandawang water treatment plant explosion,
+  red smoke, the Council's silence, an incoming Federation
+  investigation force, and suspected Sepuluh Ribu involvement. Checked
+  it against the existing wiki first — Bandawang Refugees.md already
+  references this exact explosion, and Sepuluh Ribu.md's own "Public
+  Image and Propaganda" section confirms Federation state media
+  already frames them as terrorists — so the article's angle and tone
+  slot in as canon-consistent rather than inventing a contradiction.
+  Placed in the vault under Bandawang/, synced as a normal data_log.
+- Verified live in the browser: base capacity (STR 9 -> 250 lbs),
+  backpack equip raising it to 300 and its own weight counting toward
+  used, GIVE moving an item between two real characters' inventories,
+  the message landing in both the recipient's inbox and the GM's
+  History panel, and the new Data Log rendering with working glossary
+  tooltips on "Sepuluh Ribu" and "Federation of Malaya." The 110%
+  hard-block itself was verified via direct unit test of the shared
+  threshold math (same code path giveItem() calls) rather than live,
+  since demonstrating an actual blocked trade needs real item weights
+  that don't exist yet by design.

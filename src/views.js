@@ -1,5 +1,5 @@
 // src/views.js
-import { calculateDerivedStats, RACE_RULES, getRadiationTier, RAD_THRESHOLDS } from './formulas.js';
+import { calculateDerivedStats, RACE_RULES, getRadiationTier, RAD_THRESHOLDS, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
 import { getItem, itemDatabase } from './items.js';
 import { normalizeInventory, getInventoryQuantity } from './inventory.js';
 import { SPECIAL_INFO, SKILL_INFO } from './goatContent.js';
@@ -18,6 +18,24 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// used/capacity gauge for the carry-weight system — green under
+// capacity, yellow in the GM's 10% grace zone (allowed, no penalty,
+// just a warning), red at/over the hard-block line (acquiring more
+// gets refused there, see CARRY_OVERAGE_ALLOWANCE).
+function renderCarryWeightGauge(used, capacity) {
+  const hardLimit = capacity * CARRY_OVERAGE_ALLOWANCE;
+  const pct = capacity > 0 ? Math.min(100, (used / capacity) * 100) : 0;
+  let color = 'var(--pip-green)';
+  if (used > capacity) color = 'yellow';
+  if (used >= hardLimit) color = 'red';
+  return `
+    <div style="margin-bottom:20px;">
+      <label>CARRY WEIGHT</label>
+      <div style="background:#222; height:14px; border:1px solid ${color}; margin-top:5px;"><div style="width:${pct}%; background:${color}; height:100%;"></div></div>
+      <div style="text-align:right; font-size:12px; color:${color};">${Math.round(used)} / ${Math.round(capacity)} lbs</div>
+    </div>`;
 }
 
 function escapeRegex(text) {
@@ -1055,7 +1073,7 @@ export function getPlayerView(charId, liveData) {
   const charData = liveData.characters[charId];
   if (!charData) return `<h1>> ERROR: IDENTITY '${charId.toUpperCase()}' NOT FOUND</h1>`;
 
-  const equip = charData.equipment || { head: null, body: null, right_hand: null, left_hand: null };
+  const equip = charData.equipment || { head: null, body: null, right_hand: null, left_hand: null, back: null };
   const activeStatusEffects = charData.status_effects || [];
 
   // PASS RACE + STATUS EFFECTS + EQUIPMENT TO FORMULAS
@@ -1067,7 +1085,8 @@ export function getPlayerView(charId, liveData) {
     charData.race || 'human', // Default to human if missing
     activeStatusEffects,
     equip,
-    charData.rads || 0
+    charData.rads || 0,
+    charData.inventory || {}
   );
 
   // --- 1. LEVEL UP & PERKS STATE ---
@@ -1134,6 +1153,12 @@ export function getPlayerView(charId, liveData) {
   let inventoryHtml = "";
   let walletHtml = "";
 
+  // Other finalized party members — the give-item target list. Excludes
+  // this character themselves; nothing to give to if nobody else has
+  // finished G.O.A.T. registration yet.
+  const otherPlayers = Object.entries(liveData.characters || {})
+    .filter(([id, c]) => id !== charId && c.is_finalized);
+
   if (charData.inventory) {
     const invMap = normalizeInventory(charData.inventory);
     const rawInv = Object.entries(invMap).map(([itemId, qty]) => {
@@ -1158,10 +1183,20 @@ export function getPlayerView(charId, liveData) {
             if (itemDef.slot === "hand") buttons = `<button onclick="window.equipItem('${itemId}', 'right_hand')">R</button> <button onclick="window.equipItem('${itemId}', 'left_hand')">L</button>`;
             else if (itemDef.slot === "body") buttons = `<button onclick="window.equipItem('${itemId}', 'body')">EQUIP</button>`;
             else if (itemDef.slot === "head") buttons = `<button onclick="window.equipItem('${itemId}', 'head')">EQUIP</button>`;
+            else if (itemDef.slot === "back") buttons = `<button onclick="window.equipItem('${itemId}', 'back')">EQUIP</button>`;
             else if (itemDef.type === "consumable") buttons = `<button onclick="window.useItem('${charId}', '${itemId}')">USE</button>`;
           } else { buttons = `<span style="color:var(--pip-green); font-size:10px;">[EQUIPPED]</span>`; }
 
-          return `<li class="inv-card" style="${style}"><img src="${itemDef.icon}" class="inv-icon"><div class="inv-info"><span class="inv-name" style="cursor:help; border-bottom:1px dotted var(--pip-green);" onmouseover="window.showTooltip('${safeDesc}', event)" onmouseout="window.hideTooltip()">${itemDef.name}</span>${qtyTag}<span class="inv-meta">${itemDef.type.toUpperCase()}</span></div><div class="inv-actions">${buttons}</div></li>`;
+          // Give-to-party-member — only for unequipped items (equipped
+          // gear has to come off first, same as any other inventory
+          // action), and only when there's someone else to give it to.
+          const giveControl = (!isEquipped && otherPlayers.length > 0) ? `
+            <select id="giveTarget_${itemId}" style="background:black; color:lime; border:1px solid #333; font-size:10px; max-width:70px;">
+              ${otherPlayers.map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('')}
+            </select>
+            <button onclick="window.giveItem('${itemId}', 1, document.getElementById('giveTarget_${itemId}').value)">GIVE</button>` : '';
+
+          return `<li class="inv-card" style="${style}"><img src="${itemDef.icon}" class="inv-icon"><div class="inv-info"><span class="inv-name" style="cursor:help; border-bottom:1px dotted var(--pip-green);" onmouseover="window.showTooltip('${safeDesc}', event)" onmouseout="window.hideTooltip()">${itemDef.name}</span>${qtyTag}<span class="inv-meta">${itemDef.type.toUpperCase()}</span></div><div class="inv-actions">${buttons}${giveControl}</div></li>`;
         } else { return `<li>${itemId} (DATA SYNC PENDING)</li>`; }
     }).join("") + `</ul>`;
   }
@@ -1288,13 +1323,14 @@ export function getPlayerView(charId, liveData) {
           <div style="border:1px solid #333; padding:5px; text-align:center;"><small>AC</small><br><strong style="font-size:24px;">${derived.armorClass}</strong></div>
           <div style="border:1px solid #333; padding:5px; text-align:center;"><small>SEQ</small><br><strong style="font-size:24px;">${derived.sequenceBonus}</strong></div>
         </div>
+        ${renderCarryWeightGauge(derived.carryUsed, derived.carryCapacity)}
         <h2>SKILLS</h2>
         <div style="flex-grow:1; overflow-y:auto;">${skillsHtml}</div>
       </div>
 
       <div class="panel">
         <h2>EQUIPPED GEAR</h2>
-        <div class="equipment-grid">${renderSlot("HEAD", "head")}${renderSlot("BODY", "body")}${renderSlot("R. HAND", "right_hand")}${renderSlot("L. HAND", "left_hand")}</div>
+        <div class="equipment-grid">${renderSlot("HEAD", "head")}${renderSlot("BODY", "body")}${renderSlot("R. HAND", "right_hand")}${renderSlot("L. HAND", "left_hand")}${renderSlot("BACK", "back")}</div>
 
         <h4 style="color:#555; border-bottom:1px dashed #333; margin-top:15px; margin-bottom:5px;">IMPLANTS <span style="font-size:11px;">(COMING SOON)</span></h4>
         <div class="equipment-grid">

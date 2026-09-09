@@ -9,6 +9,19 @@ export const itemDatabase = {
     "description": "A pair of corrective lenses, scavenged and re-fitted. It takes real skill to make these things. Hope you don't drop them. ",
     "value": 10
   },
+  sturdy_backpack: {
+    "id": "sturdy_backpack",
+    "name": "Sturdy Backpack",
+    "type": "accessory",
+    "slot": "back",
+    "icon": "",
+    "description": "A frame backpack — the standard answer to 'why can you carry all that.' Equip it to expand your carry capacity.",
+    "stats": {
+      "carry_bonus": 50
+    },
+    "weight": 3,
+    "value": 60
+  },
   ammo_10mm: {
     "id": "ammo_10mm",
     "name": "10mm",
