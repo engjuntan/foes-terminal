@@ -5,6 +5,14 @@
 // not campaign content). Edit directly here if the manual's wording
 // changes.
 
+// Canonical display order. The stat keys are stored in Firestore as a
+// plain object, and Firestore does NOT preserve key order — reading a
+// character back gives them in effectively arbitrary order, which is
+// why the dashboard used to render "LUK STR INT AGI CHA...". Anything
+// that lists SPECIAL for a human to read iterates THIS, never
+// Object.entries() on the stored object.
+export const SPECIAL_ORDER = ['str', 'per', 'end', 'cha', 'int', 'agi', 'luk'];
+
 export const SPECIAL_INFO = {
   str: "Raw physical power. Sets weapon Strength requirements, melee damage, and starting HP. Used to push, smash, or throw heavy things.",
   per: "Awareness — sharp eyes and ears. Governs effective firing range and hit chance at distance, plus spotting traps or hidden things.",

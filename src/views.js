@@ -2,7 +2,7 @@
 import { calculateDerivedStats, RACE_RULES, getRadiationTier, RAD_THRESHOLDS, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
 import { getItem, itemDatabase } from './items.js';
 import { normalizeInventory, getInventoryQuantity } from './inventory.js';
-import { SPECIAL_INFO, SKILL_INFO } from './goatContent.js';
+import { SPECIAL_INFO, SPECIAL_ORDER, SKILL_INFO } from './goatContent.js';
 import { DIFFICULTY_TIERS } from './checks.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
@@ -255,8 +255,8 @@ export function getGoatReviewView(charId, liveData) {
   const raceDef = RACE_RULES[char.race] || RACE_RULES['human'];
   const tags = Object.keys(char.tags || {});
 
-  const specialRows = Object.entries(char.special || {})
-    .map(([k, v]) => `<div class="special-row"><span>${renderWikiLink(k.toUpperCase(), SPECIAL_INFO[k])}</span><span>${v}</span></div>`)
+  const specialRows = SPECIAL_ORDER
+    .map(k => `<div class="special-row"><span>${renderWikiLink(k.toUpperCase(), SPECIAL_INFO[k])}</span><span>${(char.special || {})[k] ?? '-'}</span></div>`)
     .join('');
 
   const tagsHtml = tags.length > 0
@@ -1303,7 +1303,7 @@ export function getPlayerView(charId, liveData) {
         </div>` : ''}
 
         <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px;">S.P.E.C.I.A.L.</h3>
-        ${Object.entries(charData.special).map(([k, v]) => `<div class="special-row"><span>${renderWikiLink(k.toUpperCase(), SPECIAL_INFO[k])}</span><span>${v}</span></div>`).join("")}
+        ${SPECIAL_ORDER.map(k => `<div class="special-row"><span>${renderWikiLink(k.toUpperCase(), SPECIAL_INFO[k])}</span><span>${charData.special[k] ?? '-'}</span></div>`).join("")}
         
         <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px;">TRAITS</h3>
         ${traitsHtml || "> NONE"}

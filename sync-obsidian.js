@@ -148,6 +148,21 @@ function firstSentence(strippedText) {
   return sentence.length > 280 ? sentence.slice(0, 277).trimEnd() + '…' : sentence;
 }
 
+// --- DUPLICATE ID GUARD ---
+// id -> the file path that claimed it first this run.
+let idOwners = {};
+let duplicateIds = [];
+
+function claimId(id, filePath) {
+  if (idOwners[id]) {
+    duplicateIds.push({ id, kept: idOwners[id], ignored: filePath });
+    console.warn(`[DUPLICATE ID] "${id}" is already used by ${path.relative(OBSIDIAN_PATH, idOwners[id])} — IGNORING ${path.relative(OBSIDIAN_PATH, filePath)}`);
+    return false;
+  }
+  idOwners[id] = filePath;
+  return true;
+}
+
 function isInGlossaryFolder(filePath) {
   const relDir = path.relative(OBSIDIAN_PATH, path.dirname(filePath));
   const topFolder = relDir.split(path.sep)[0];
@@ -188,6 +203,12 @@ function processFile(filePath) {
       try {
         const data = JSON.parse(match[1].trim());
         if (!data.id || !data.type) return;
+        // Two files claiming the same id used to mean whichever one the
+        // walk reached last silently won, and the other's content simply
+        // never appeared in the app — no error, nothing to notice. That
+        // has now bitten twice (duplicate "(1)" item drafts, then a
+        // copied quest file). Refuse the second claim and say so loudly.
+        if (!claimId(data.id, filePath)) return;
 
         if (['weapon', 'armor', 'consumable', 'currency', 'accessory', 'ammo'].includes(data.type)) {
           itemsMap[data.id] = data;
@@ -249,6 +270,8 @@ function runSync() {
   mapsMap = {};
   questsMap = {};
   glossaryMap = {};
+  idOwners = {};
+  duplicateIds = [];
 
   const allFiles = getAllFiles(OBSIDIAN_PATH);
 
@@ -267,6 +290,12 @@ function runSync() {
   fs.writeFileSync(MAPS_TARGET, generateFileContent('map', mapsMap));
   fs.writeFileSync(QUESTS_TARGET, generateFileContent('quest', questsMap));
   fs.writeFileSync(GLOSSARY_TARGET, generateFileContent('glossary', glossaryMap));
+
+  if (duplicateIds.length > 0) {
+    console.warn(`\n[!] ${duplicateIds.length} DUPLICATE ID(S) — these files did NOT make it into the app:`);
+    duplicateIds.forEach(d => console.warn(`    "${d.id}": kept ${path.relative(OBSIDIAN_PATH, d.kept)}, ignored ${path.relative(OBSIDIAN_PATH, d.ignored)}`));
+    console.warn(`    Fix: give each file its own unique "id".\n`);
+  }
 
   console.log(`[SYNC] Complete. Items: ${Object.keys(itemsMap).length} | Traits: ${Object.keys(traitsMap).length} | Status Effects: ${Object.keys(statusEffectsMap).length} | Bestiary: ${Object.keys(bestiaryMap).length} | Data Logs: ${Object.keys(dataLogsMap).length} | Maps: ${Object.keys(mapsMap).length} | Quests: ${Object.keys(questsMap).length} | Glossary: ${Object.keys(glossaryMap).length}`);
 }
