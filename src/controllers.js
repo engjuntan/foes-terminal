@@ -1,5 +1,5 @@
 // src/controllers.js
-import { doc, updateDoc, setDoc, getDoc } from "firebase/firestore";
+import { doc, updateDoc, setDoc, getDoc, deleteField } from "firebase/firestore";
 import { db } from './firebase.js'; // Imports the connection we made in File 1
 import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
@@ -12,6 +12,8 @@ import { mapDatabase } from './maps.js';
 import { normalizeInventory, getInventoryQuantity, addToInventory, removeFromInventory } from './inventory.js';
 import { DIFFICULTY_TIERS, rollD10, rollD20, resolveSpecialCheck, resolveSkillCheck } from './checks.js';
 import { normalizeNeeds, decayNeeds, rollRestHealing, formatGameTime } from './needs.js';
+import { getRecipe } from './recipes.js';
+import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
 
 // --- GAME ACTIONS ---
 export async function equipItem(itemId, targetSlot) {
@@ -357,6 +359,40 @@ export async function gmGrantMap(mapId, target) {
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
+// --- CRAFTING STATIONS ---
+// Same grant pattern as gmGrantMap above, but writes a map key rather
+// than pushing to an array — characters.<id>.stations is { [stationId]:
+// locationLabel }, so the Workshop can show "where you found it" rather
+// than just a checkmark. field_kit needs no grant; STATIONS.field_kit is
+// always available (see crafting.js's hasStation()).
+export async function gmGrantStation(stationId, target, locationLabel) {
+  if (!STATIONS[stationId]) return;
+  const characters = window.liveData.characters || {};
+  const targets = target === 'all' ? Object.keys(characters).filter(id => characters[id].is_finalized) : [target];
+  const updatePayload = {};
+  targets.forEach(charId => {
+    updatePayload[`characters.${charId}.stations.${stationId}`] = locationLabel || STATIONS[stationId].name;
+  });
+  if (Object.keys(updatePayload).length === 0) return;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// The party leaving a settlement is exactly when a granted bench should
+// go away again — deleteField() rather than writing null, so hasStation()'s
+// truthy check keeps working without needing to special-case an empty string.
+export async function gmRevokeStation(stationId, target) {
+  const characters = window.liveData.characters || {};
+  const targets = target === 'all' ? Object.keys(characters).filter(id => characters[id].is_finalized) : [target];
+  const updatePayload = {};
+  targets.forEach(charId => {
+    updatePayload[`characters.${charId}.stations.${stationId}`] = deleteField();
+  });
+  if (Object.keys(updatePayload).length === 0) return;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
 // Pure local toggle — no read-tracking for maps, just image preview.
 export function openMap(mapId) {
   window.openMapId = window.openMapId === mapId ? null : mapId;
@@ -647,6 +683,89 @@ export async function useItem(targetCharId, itemId) {
   try {
     await updateDoc(charRef, updatePayload);
     alert(usedMsg);
+  } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// --- CRAFTING ---
+
+// Instant, no roll (the GM's own call — see CRAFTING_SPEC.md §0): meet the
+// skill floor, have the inputs, be at the right station, and the item is
+// made on the spot. Same one-updatePayload/one-updateDoc shape as useItem
+// above. Callable by the character themselves only — unlike useItem/
+// gmAdjustHP, there's no GM-on-behalf-of path, since crafting is read
+// entirely off the crafter's own skills and stations.
+export async function craftItem(recipeId) {
+  const charId = window.currentUser;
+  if (!charId || !window.liveData) return;
+  const recipe = getRecipe(recipeId);
+  if (!recipe) return;
+  const char = window.liveData.characters[charId];
+  if (!char) return;
+  const outputItem = getItem(recipe.produces && recipe.produces.item);
+  if (!outputItem) { alert("THIS RECIPE'S OUTPUT ITEM IS MISSING — TELL YOUR GM"); return; }
+
+  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
+  const { ok, reasons } = canCraft(recipe, char, derived.skills);
+  if (!ok) { alert(reasons.join('\n')); return; }
+
+  // Crafting usually consumes more mass than it produces (scrap metal is
+  // heavier than the gizmo it becomes), so this only fires on the rare
+  // recipe that adds net weight — same CARRY_OVERAGE_ALLOWANCE rule
+  // giveItem() uses, applied to the crafter's own projected total.
+  const weightDelta = netWeightDelta(recipe);
+  if (weightDelta > 0) {
+    const projectedUsed = derived.carryUsed + weightDelta;
+    if (projectedUsed > derived.carryCapacity * CARRY_OVERAGE_ALLOWANCE) {
+      alert("CAN'T CARRY THAT MUCH — OVER CAPACITY");
+      return;
+    }
+  }
+
+  let inv = normalizeInventory(char.inventory);
+  Object.entries(recipe.inputs || {}).forEach(([componentId, qty]) => {
+    inv = removeFromInventory(inv, componentId, qty);
+  });
+  inv = addToInventory(inv, recipe.produces.item, recipe.produces.qty || 1);
+
+  const consumedText = Object.entries(recipe.inputs || {})
+    .map(([id, qty]) => `${qty} ${(getItem(id) || {}).name || id}`).join(', ');
+
+  const updatePayload = {};
+  updatePayload[`characters.${charId}.inventory`] = inv;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, updatePayload);
+    alert(`Crafted ${outputItem.name}. Consumed: ${consumedText}.`);
+  } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// The inverse of crafting — break a junk item down into its components.
+// Instant and irreversible, no confirm dialog: junk is low-value by
+// definition (see CRAFTING_SPEC.md §4.1), so the blast radius of a
+// misclick is small, same reasoning as unequip having no confirm step.
+export async function scrapItem(itemId) {
+  const charId = window.currentUser;
+  if (!charId || !window.liveData) return;
+  const char = window.liveData.characters[charId];
+  if (!char) return;
+  const item = getItem(itemId);
+  if (!item || !item.scrap_yield) return;
+  if (getInventoryQuantity(char.inventory, itemId) < 1) { alert("YOU DON'T HAVE THAT"); return; }
+
+  let inv = removeFromInventory(char.inventory, itemId, 1);
+  Object.entries(item.scrap_yield).forEach(([componentId, qty]) => {
+    inv = addToInventory(inv, componentId, qty);
+  });
+
+  const yieldText = Object.entries(item.scrap_yield)
+    .map(([id, qty]) => `${qty} ${(getItem(id) || {}).name || id}`).join(', ');
+
+  const updatePayload = {};
+  updatePayload[`characters.${charId}.inventory`] = inv;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, updatePayload);
+    alert(`Scrapped ${item.name} → ${yieldText}.`);
   } catch (err) { alert("ERROR: " + err.message); }
 }
 

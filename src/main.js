@@ -58,6 +58,10 @@ window.gmSetNeed = (needKey, val) => Controllers.gmSetNeed(window.selectedCharId
 window.advanceTime = Controllers.advanceTime;
 window.requestRest = Controllers.requestRest;
 window.gmAdvanceTimeAction = Controllers.gmAdvanceTimeAction;
+window.craftItem = Controllers.craftItem;
+window.scrapItem = Controllers.scrapItem;
+window.gmGrantStation = Controllers.gmGrantStation;
+window.gmRevokeStation = Controllers.gmRevokeStation;
 window.useItem = Controllers.useItem;
 window.giveItem = Controllers.giveItem;
 window.gmAdjustVaultPoints = (amt) => Controllers.gmAdjustVaultPoints(window.selectedCharId, amt);
@@ -290,6 +294,8 @@ window.render = function() {
           viewport.innerHTML = Views.getMapsView(window.liveData, 'player', window.currentUser);
        } else if (window.currentTab === 'CHECKS') {
           viewport.innerHTML = Views.getChecksView(window.liveData, 'player', window.currentUser);
+       } else if (window.currentTab === 'WORKSHOP') {
+          viewport.innerHTML = Views.getWorkshopView(window.currentUser, window.liveData);
        } else {
           viewport.innerHTML = Views.getPlayerView(window.currentUser, window.liveData);
        }

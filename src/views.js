@@ -13,6 +13,8 @@ import { questDatabase } from './quests.js';
 import { glossaryDatabase } from './glossary.js';
 import { mapDatabase } from './maps.js';
 import { normalizeNeeds, getNeedTier, formatGameTime, NEED_RATES } from './needs.js';
+import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
+import { recipeDatabase } from './recipes.js';
 
 // --- HELPERS ---
 function escapeHtml(text) {
@@ -1418,6 +1420,128 @@ export function getPlayerView(charId, liveData) {
   `;
 }
 
+// --- WORKSHOP (CRAFTING) ---
+export function getWorkshopView(charId, liveData) {
+  const charData = liveData.characters[charId];
+  if (!charData) return `<h1>&gt; ERROR: IDENTITY NOT FOUND</h1>`;
+  const inventory = normalizeInventory(charData.inventory);
+  const stations = charData.stations || {};
+
+  const derived = calculateDerivedStats(
+    charData.special, charData.level || 1, charData.traits || [], charData.perks || [],
+    charData.race || 'human', charData.status_effects || [], charData.equipment || {},
+    charData.rads || 0, charData.inventory || {}, charData.needs || {}
+  );
+
+  // COMPONENTS — every item authored as type:"component", dimmed at 0.
+  // Not hardcoded to the 9 ids CRAFTING_SPEC.md proposes, so a newly
+  // authored component shows up here the moment it syncs, no code change.
+  const components = Object.values(itemDatabase)
+    .filter(i => i.type === 'component')
+    .sort((a, b) => a.name.localeCompare(b.name));
+  const componentsHtml = components.length ? components.map(c => {
+    const owned = inventory[c.id] || 0;
+    return `
+      <div style="display:flex; justify-content:space-between; padding:3px 0; ${owned === 0 ? 'opacity:0.4;' : ''}">
+        <span>${renderWikiLink(c.name, c.description)}</span>
+        <span style="color:var(--pip-green); font-variant-numeric:tabular-nums;">${owned}</span>
+      </div>`;
+  }).join('') : `<div style="color:#555; font-size:12px;">No components authored yet.</div>`;
+
+  // STATIONS — field_kit always available; everything else read off
+  // characters.<id>.stations, which only the GM's gmGrantStation writes to.
+  const stationsHtml = Object.values(STATIONS).map(s => {
+    const available = s.always || !!stations[s.id];
+    const label = s.always ? 'always' : (stations[s.id] || '[not found]');
+    return `
+      <div style="display:flex; justify-content:space-between; padding:3px 0; ${available ? '' : 'opacity:0.4;'}">
+        <span>${available ? '<span style="color:var(--pip-green);">●</span>' : '<span style="color:#555;">○</span>'} ${renderWikiLink(s.name, s.description)}</span>
+        <span style="font-size:12px; color:#aaa;">${label}</span>
+      </div>`;
+  }).join('');
+
+  // RECIPES — grouped by category, craftable ones sorted above blocked
+  // ones within each group. A blocked recipe stays visible and dimmed
+  // with every blocking reason shown, never hidden — discovering what
+  // you COULD build if you found the parts is half the appeal.
+  const recipes = Object.values(recipeDatabase);
+  const categoryLabels = { weapons: 'WEAPONS', armour: 'ARMOUR', ammo: 'AMMO', chems: 'CHEMS', food: 'FOOD', gear: 'GEAR' };
+  const byCategory = {};
+  recipes.forEach(r => {
+    const cat = r.category || 'gear';
+    (byCategory[cat] = byCategory[cat] || []).push(r);
+  });
+
+  const recipesHtml = Object.keys(byCategory).length === 0
+    ? `<div style="color:#555; font-size:12px;">No recipes authored yet.</div>`
+    : Object.entries(byCategory).map(([cat, list]) => {
+        const scored = list.map(r => ({ r, result: canCraft(r, charData, derived.skills) }))
+          .sort((a, b) => (a.result.ok === b.result.ok) ? 0 : (a.result.ok ? -1 : 1));
+        const rowsHtml = scored.map(({ r, result }) => {
+          const outputItem = getItem(r.produces && r.produces.item);
+          const inputsHtml = Object.entries(r.inputs || {}).map(([id, qty]) => {
+            const owned = inventory[id] || 0;
+            const short = owned < qty;
+            const item = getItem(id);
+            return `<span style="color:${short ? 'var(--danger, #d4574a)' : 'var(--pip-green)'};">${qty} ${item ? item.name : id}</span>`;
+          }).join(' · ');
+          return `
+            <div style="border:1px solid #222; padding:8px; margin-bottom:6px; ${result.ok ? '' : 'opacity:0.55;'}">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>${outputItem ? renderWikiLink(outputItem.name, r.description) : r.name}</strong>
+                <button class="gm-btn" ${result.ok ? '' : 'disabled'} style="border-color:var(--pip-green); color:var(--pip-green); ${result.ok ? '' : 'opacity:0.5; cursor:not-allowed;'}" onclick="window.craftItem('${r.id}')">CRAFT</button>
+              </div>
+              <div style="font-size:12px; margin-top:4px;">${inputsHtml}</div>
+              ${!result.ok ? `<div style="font-size:11px; color:var(--danger, #d4574a); margin-top:4px;">${result.reasons.join(' — ')}</div>` : ''}
+            </div>`;
+        }).join('');
+        return `<h4 style="color:var(--pip-dim); border-bottom:1px dashed var(--pip-dim); margin-top:14px;">${categoryLabels[cat] || cat.toUpperCase()}</h4>${rowsHtml}`;
+      }).join('');
+
+  // SALVAGE — junk currently owned (qty > 0), scrap to components.
+  const junkOwned = Object.keys(inventory)
+    .map(id => getItem(id))
+    .filter(i => i && i.type === 'junk' && i.scrap_yield && inventory[i.id] > 0);
+  const salvageHtml = junkOwned.length === 0
+    ? `<div style="color:#555; font-size:12px;">Nothing to scrap.</div>`
+    : junkOwned.map(j => {
+        const yieldText = Object.entries(j.scrap_yield).map(([id, qty]) => {
+          const c = getItem(id);
+          return `${qty} ${c ? c.name : id}`;
+        }).join(', ');
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #222; padding:6px 8px; margin-bottom:4px;">
+            <div>
+              <span>${renderWikiLink(j.name, j.description)} <span style="color:#666; font-size:11px;">x${inventory[j.id]}</span></span>
+              <div style="font-size:11px; color:#888;">→ ${yieldText}</div>
+            </div>
+            <button class="gm-btn" onclick="window.scrapItem('${j.id}')">SCRAP</button>
+          </div>`;
+      }).join('');
+
+  return `
+    <div class="dashboard-container">
+      <div class="panel">
+        <h2>COMPONENTS</h2>
+        <div style="margin-bottom:16px;">${componentsHtml}</div>
+        <h2>STATIONS</h2>
+        <div>${stationsHtml}</div>
+      </div>
+
+      <div class="panel">
+        <h2>RECIPES</h2>
+        <div style="overflow-y:auto; flex-grow:1;">${recipesHtml}</div>
+      </div>
+
+      <div class="panel">
+        <h2>SALVAGE</h2>
+        <p style="font-size:11px; color:#666;">Scrapping is instant and can't be undone.</p>
+        <div>${salvageHtml}</div>
+      </div>
+    </div>
+  `;
+}
+
 // --- GM SCREEN ---
 export function renderGMScreen(liveData) {
   const chars = liveData.characters || {};
@@ -1535,6 +1659,23 @@ export function renderGMScreen(liveData) {
                      onchange="window.gmSetNeed('${key}', Number(this.value))">
               <span style="display:none;">${Math.round(val)}</span>
             </div>`;
+          }).join('')}
+        </div>
+
+        <h4 style="color:var(--pip-green); border-bottom:1px dashed var(--pip-green);">CRAFTING STATIONS</h4>
+        <div style="margin-bottom:10px;">
+          ${Object.values(STATIONS).filter(s => !s.always).map(s => {
+            const granted = targetChar && targetChar.stations && targetChar.stations[s.id];
+            return granted ? `
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 0;">
+                <span><span style="color:var(--pip-green);">●</span> ${s.name} <span style="color:#888; font-size:11px;">— ${granted}</span></span>
+                <button class="gm-btn" style="border-color:red; color:red; padding:0 6px;" onclick="window.gmRevokeStation('${s.id}', window.selectedCharId)">REVOKE</button>
+              </div>` : `
+              <div style="display:flex; gap:6px; align-items:center; padding:3px 0;">
+                <span style="flex-grow:1;"><span style="color:#555;">○</span> ${s.name}</span>
+                <input type="text" id="stationLabel_${s.id}" placeholder="location" style="width:90px; background:black; color:var(--pip-green); border:1px solid var(--pip-dim); font-size:11px; padding:2px 4px;">
+                <button class="gm-btn" style="padding:0 6px;" onclick="window.gmGrantStation('${s.id}', window.selectedCharId, document.getElementById('stationLabel_${s.id}').value)">GRANT</button>
+              </div>`;
           }).join('')}
         </div>
 

@@ -264,7 +264,7 @@ export const itemDatabase = {
       "special_cha": 2
     },
     "weight": 3.5,
-    "value": "TBA"
+    "value": 60
   },
   factory_respirator: {
     "id": "factory_respirator",
@@ -321,7 +321,7 @@ export const itemDatabase = {
       "pr": 0
     },
     "weight": 6,
-    "value": "TBA"
+    "value": 55
   },
   lim_clan_tailored_suit: {
     "id": "lim_clan_tailored_suit",
@@ -594,7 +594,7 @@ export const itemDatabase = {
       "pr": 0
     },
     "weight": 7,
-    "value": "TBA"
+    "value": 35
   },
   rebar_plate_vest: {
     "id": "rebar_plate_vest",
@@ -632,7 +632,7 @@ export const itemDatabase = {
       "pr": 0
     },
     "weight": 11,
-    "value": "TBA"
+    "value": 75
   },
   supermutant_clothes: {
     "id": "supermutant_clothes",
@@ -740,6 +740,96 @@ export const itemDatabase = {
     },
     "weight": 1,
     "value": "TBA"
+  },
+  adhesive: {
+    "id": "adhesive",
+    "name": "Adhesive",
+    "type": "component",
+    "icon": "",
+    "description": "Glue, resin, tape — the universal binder. Small amounts appear in almost every recipe.",
+    "stackable": true,
+    "weight": 0.1,
+    "value": 3
+  },
+  chemicals: {
+    "id": "chemicals",
+    "name": "Chemicals",
+    "type": "component",
+    "icon": "",
+    "description": "Solvents, reagents, propellant — chems, stims, and explosives crafting.",
+    "stackable": true,
+    "weight": 0.2,
+    "value": 5
+  },
+  cloth: {
+    "id": "cloth",
+    "name": "Cloth & Hide",
+    "type": "component",
+    "icon": "",
+    "description": "Fabric, leather, webbing — armor, bandages, and packs.",
+    "stackable": true,
+    "weight": 0.1,
+    "value": 2
+  },
+  electronics: {
+    "id": "electronics",
+    "name": "Electronics",
+    "type": "component",
+    "icon": "",
+    "description": "Wiring, boards, cells — energy weapons, tech, and robotics crafting.",
+    "stackable": true,
+    "weight": 0.2,
+    "value": 6
+  },
+  gun_parts: {
+    "id": "gun_parts",
+    "name": "Gun Parts",
+    "type": "component",
+    "icon": "",
+    "description": "Springs, pins, receivers, barrels — weapons and ammo crafting only. The one component that's a gunsmith's alone.",
+    "stackable": true,
+    "weight": 0.3,
+    "value": 5
+  },
+  hardened_alloy: {
+    "id": "hardened_alloy",
+    "name": "Hardened Alloy",
+    "type": "component",
+    "icon": "",
+    "description": "Ballistic plate, military-grade steel — gates top-tier weapons and armor. Rare: the GM drops this deliberately, not as regular loot.",
+    "stackable": true,
+    "weight": 0.8,
+    "value": 30
+  },
+  organics: {
+    "id": "organics",
+    "name": "Organics",
+    "type": "component",
+    "icon": "",
+    "description": "Plant matter, meat, bone — food, water purification, and primitive gear crafting.",
+    "stackable": true,
+    "weight": 0.2,
+    "value": 2
+  },
+  prewar_tech: {
+    "id": "prewar_tech",
+    "name": "Pre-War Tech",
+    "type": "component",
+    "icon": "",
+    "description": "Intact circuitry, military-grade electronics — gates energy weapons and advanced mods. Rare: the GM drops this deliberately, not as regular loot.",
+    "stackable": true,
+    "weight": 0.2,
+    "value": 25
+  },
+  scrap_metal: {
+    "id": "scrap_metal",
+    "name": "Scrap Metal",
+    "type": "component",
+    "icon": "",
+    "description": "Structural filler — weapon frames, armor plate, ammo casings. The most common crafting component in the Wastes.",
+    "stackable": true,
+    "weight": 0.5,
+    "value": 2
   },
   addictol: {
     "id": "addictol",
@@ -1218,6 +1308,85 @@ export const itemDatabase = {
     "weight": 0.1,
     "value": 90
   },
+  bobby_pin: {
+    "id": "bobby_pin",
+    "name": "Bobby Pin",
+    "type": "junk",
+    "icon": "",
+    "description": "Lockpicking resource — mainline staple item, functions almost as its own currency in most Fallout games. Not much to it once you look closely: just bent scrap.",
+    "scrap_yield": {
+      "scrap_metal": 1
+    },
+    "stackable": true,
+    "weight": 0.01,
+    "value": 2
+  },
+  circuit_board_fragment: {
+    "id": "circuit_board_fragment",
+    "name": "Circuit Board Fragment",
+    "type": "junk",
+    "icon": "",
+    "description": "Robotics/science crafting component, sourced from North Bandawang factory equipment.",
+    "scrap_yield": {
+      "electronics": 2
+    },
+    "stackable": true,
+    "weight": 0.1,
+    "value": 4
+  },
+  copper_wire_spool: {
+    "id": "copper_wire_spool",
+    "name": "Copper Wire Spool",
+    "type": "junk",
+    "icon": "",
+    "description": "Electronics crafting component, sourced from North Bandawang factory wiring.",
+    "scrap_yield": {
+      "electronics": 2,
+      "scrap_metal": 1
+    },
+    "stackable": true,
+    "weight": 0.15,
+    "value": 4
+  },
+  duct_tape: {
+    "id": "duct_tape",
+    "name": "Duct Tape",
+    "type": "junk",
+    "icon": "",
+    "description": "Universal crafting binder — mainline staple.",
+    "scrap_yield": {
+      "adhesive": 3
+    },
+    "stackable": true,
+    "weight": 0.1,
+    "value": 3
+  },
+  protiga_factory_scrap: {
+    "id": "protiga_factory_scrap",
+    "name": "ProTiga Factory Scrap",
+    "type": "junk",
+    "icon": "",
+    "description": "Core local salvage pool — the ProTiga factory site is the obvious crafting-component source for North Bandawang/Axe Town.",
+    "scrap_yield": {
+      "scrap_metal": 3
+    },
+    "stackable": true,
+    "weight": 0.6,
+    "value": 3
+  },
+  rusted_pipe_segment: {
+    "id": "rusted_pipe_segment",
+    "name": "Rusted Pipe Segment",
+    "type": "junk",
+    "icon": "",
+    "description": "Dual-purpose: crafting component or reflavored into the Water Pipe Cudgel weapon, from Bandawang Lama.",
+    "scrap_yield": {
+      "scrap_metal": 2
+    },
+    "stackable": true,
+    "weight": 0.8,
+    "value": 3
+  },
   dinar: {
     "id": "dinar",
     "name": "Caliphate Dinar",
@@ -1247,6 +1416,335 @@ export const itemDatabase = {
     "weight": 0,
     "value": 1,
     "stackable": true
+  },
+  broken_ceiling_fan_blade: {
+    "id": "broken_ceiling_fan_blade",
+    "name": "Broken Ceiling Fan Blade",
+    "type": "junk",
+    "icon": "",
+    "description": "A snapped-off blade from a household ceiling fan — common indoor scavenge across Bandawang.",
+    "scrap_yield": {
+      "scrap_metal": 2
+    },
+    "stackable": true,
+    "weight": 0.4,
+    "value": 2
+  },
+  broken_pressure_cooker: {
+    "id": "broken_pressure_cooker",
+    "name": "Broken Pressure Cooker",
+    "type": "junk",
+    "icon": "",
+    "description": "A dented kitchen pressure cooker — a kampung kitchen staple before the bombs.",
+    "scrap_yield": {
+      "scrap_metal": 2,
+      "chemicals": 1
+    },
+    "stackable": true,
+    "weight": 1.5,
+    "value": 3
+  },
+  broken_radio_set: {
+    "id": "broken_radio_set",
+    "name": "Broken Radio Set",
+    "type": "junk",
+    "icon": "",
+    "description": "A household radio set, casing cracked, innards mostly intact.",
+    "scrap_yield": {
+      "electronics": 3,
+      "scrap_metal": 1
+    },
+    "stackable": true,
+    "weight": 1,
+    "value": 6
+  },
+  broken_streetlamp_fixture: {
+    "id": "broken_streetlamp_fixture",
+    "name": "Broken Streetlamp Fixture",
+    "type": "junk",
+    "icon": "",
+    "description": "A fallen streetlamp head, casing dented, bulb long gone.",
+    "scrap_yield": {
+      "scrap_metal": 2,
+      "electronics": 1
+    },
+    "stackable": true,
+    "weight": 1.8,
+    "value": 3
+  },
+  cracked_lcd_panel: {
+    "id": "cracked_lcd_panel",
+    "name": "Cracked LCD Panel",
+    "type": "junk",
+    "icon": "",
+    "description": "A shattered display panel, scavenged from a pre-War shopfront or office.",
+    "scrap_yield": {
+      "electronics": 2
+    },
+    "stackable": true,
+    "weight": 0.3,
+    "value": 4
+  },
+  cracked_motorbike_mirror: {
+    "id": "cracked_motorbike_mirror",
+    "name": "Cracked Motorbike Mirror",
+    "type": "junk",
+    "icon": "",
+    "description": "A snapped-off wing mirror, still on its mounting arm.",
+    "scrap_yield": {
+      "scrap_metal": 1,
+      "electronics": 1
+    },
+    "stackable": true,
+    "weight": 0.2,
+    "value": 2
+  },
+  cracked_motorcycle_helmet: {
+    "id": "cracked_motorcycle_helmet",
+    "name": "Cracked Motorcycle Helmet",
+    "type": "junk",
+    "icon": "",
+    "description": "A shattered helmet shell, padding and strap still attached.",
+    "scrap_yield": {
+      "scrap_metal": 1,
+      "cloth": 1
+    },
+    "stackable": true,
+    "weight": 0.9,
+    "value": 2
+  },
+  cracked_rain_barrel: {
+    "id": "cracked_rain_barrel",
+    "name": "Cracked Rain Barrel",
+    "type": "junk",
+    "icon": "",
+    "description": "A plastic rain-collection barrel, split down one side.",
+    "scrap_yield": {
+      "scrap_metal": 1,
+      "organics": 1
+    },
+    "stackable": true,
+    "weight": 1.2,
+    "value": 2
+  },
+  dead_car_battery: {
+    "id": "dead_car_battery",
+    "name": "Dead Car Battery",
+    "type": "junk",
+    "icon": "",
+    "description": "A spent lead-acid battery, pulled from a wreck long since stripped of everything else.",
+    "scrap_yield": {
+      "chemicals": 2,
+      "scrap_metal": 1
+    },
+    "stackable": true,
+    "weight": 3,
+    "value": 4
+  },
+  dried_fish_bones: {
+    "id": "dried_fish_bones",
+    "name": "Dried Fish Bones",
+    "type": "junk",
+    "icon": "",
+    "description": "The remains of a salted-fish meal — ikan masin's leftovers, everywhere along the coast.",
+    "scrap_yield": {
+      "organics": 2
+    },
+    "stackable": true,
+    "weight": 0.1,
+    "value": 1
+  },
+  empty_kerosene_tin: {
+    "id": "empty_kerosene_tin",
+    "name": "Empty Kerosene Tin",
+    "type": "junk",
+    "icon": "",
+    "description": "A rusted kerosene tin, the kind kampung households kept for the stove.",
+    "scrap_yield": {
+      "scrap_metal": 2,
+      "chemicals": 1
+    },
+    "stackable": true,
+    "weight": 0.6,
+    "value": 2
+  },
+  federation_ration_tin: {
+    "id": "federation_ration_tin",
+    "name": "Federation Ration Tin",
+    "type": "junk",
+    "icon": "",
+    "description": "A discarded Federation-issue ration tin. Common wherever Federation patrols have passed through.",
+    "scrap_yield": {
+      "scrap_metal": 1,
+      "organics": 1
+    },
+    "stackable": true,
+    "weight": 0.15,
+    "value": 1
+  },
+  jammed_sewing_machine: {
+    "id": "jammed_sewing_machine",
+    "name": "Jammed Sewing Machine",
+    "type": "junk",
+    "icon": "",
+    "description": "An old treadle sewing machine, mechanism mostly intact under the rust.",
+    "scrap_yield": {
+      "gun_parts": 2,
+      "scrap_metal": 1
+    },
+    "stackable": true,
+    "weight": 4,
+    "value": 4
+  },
+  moth_eaten_prayer_mat: {
+    "id": "moth_eaten_prayer_mat",
+    "name": "Moth-Eaten Prayer Mat",
+    "type": "junk",
+    "icon": "",
+    "description": "A woven prayer mat, faded and holed through but still real fabric.",
+    "scrap_yield": {
+      "cloth": 3
+    },
+    "stackable": true,
+    "weight": 0.4,
+    "value": 1
+  },
+  rubber_sandal_strap: {
+    "id": "rubber_sandal_strap",
+    "name": "Rubber Sandal Strap",
+    "type": "junk",
+    "icon": "",
+    "description": "A snapped rubber sandal strap — the most common footwear in the pre-War Peninsula, still lying everywhere.",
+    "scrap_yield": {
+      "cloth": 1,
+      "adhesive": 1
+    },
+    "stackable": true,
+    "weight": 0.05,
+    "value": 1
+  },
+  rusted_kapcai_carburettor: {
+    "id": "rusted_kapcai_carburettor",
+    "name": "Rusted Kapcai Carburettor",
+    "type": "junk",
+    "icon": "",
+    "description": "Scavenged straight off a wrecked kapcai — Bandawang's old commuter bike of choice.",
+    "scrap_yield": {
+      "scrap_metal": 2,
+      "adhesive": 1
+    },
+    "stackable": true,
+    "weight": 0.8,
+    "value": 3
+  },
+  rusty_bicycle_chain: {
+    "id": "rusty_bicycle_chain",
+    "name": "Rusty Bicycle Chain",
+    "type": "junk",
+    "icon": "",
+    "description": "A corroded bicycle chain, common enough scrap wherever there used to be a bike rack.",
+    "scrap_yield": {
+      "scrap_metal": 2,
+      "gun_parts": 1
+    },
+    "stackable": true,
+    "weight": 0.4,
+    "value": 3
+  },
+  shredded_tarpaulin: {
+    "id": "shredded_tarpaulin",
+    "name": "Shredded Tarpaulin",
+    "type": "junk",
+    "icon": "",
+    "description": "Blue plastic tarp, the kind every stall and stockroom in Bandawang used to have rolls of.",
+    "scrap_yield": {
+      "cloth": 3
+    },
+    "stackable": true,
+    "weight": 0.5,
+    "value": 2
+  },
+  spoiled_coconut_husk_sack: {
+    "id": "spoiled_coconut_husk_sack",
+    "name": "Spoiled Coconut Husk Sack",
+    "type": "junk",
+    "icon": "",
+    "description": "A burlap sack of coconut husk fibre — old plantation waste, still tough as rope.",
+    "scrap_yield": {
+      "organics": 2,
+      "cloth": 1
+    },
+    "stackable": true,
+    "weight": 0.7,
+    "value": 2
+  },
+  spool_of_fishing_line: {
+    "id": "spool_of_fishing_line",
+    "name": "Spool of Fishing Line",
+    "type": "junk",
+    "icon": "",
+    "description": "Nylon fishing line off a broken reel — common salvage near Bandawang's waterfront.",
+    "scrap_yield": {
+      "cloth": 1,
+      "adhesive": 1
+    },
+    "stackable": true,
+    "weight": 0.1,
+    "value": 2
+  },
+  tangled_barbed_wire_coil: {
+    "id": "tangled_barbed_wire_coil",
+    "name": "Tangled Barbed Wire Coil",
+    "type": "junk",
+    "icon": "",
+    "description": "A rusted coil of barbed wire, pulled off an old perimeter fence.",
+    "scrap_yield": {
+      "scrap_metal": 3
+    },
+    "stackable": true,
+    "weight": 1,
+    "value": 2
+  },
+  torn_umbrella_frame: {
+    "id": "torn_umbrella_frame",
+    "name": "Torn Umbrella Frame",
+    "type": "junk",
+    "icon": "",
+    "description": "A collapsed umbrella's metal ribs — useless as shelter, useful as scrap.",
+    "scrap_yield": {
+      "scrap_metal": 1,
+      "cloth": 1
+    },
+    "stackable": true,
+    "weight": 0.2,
+    "value": 1
+  },
+  warung_signboard: {
+    "id": "warung_signboard",
+    "name": "Warung Signboard",
+    "type": "junk",
+    "icon": "",
+    "description": "A roadside stall's old tin signboard — every Bandawang street had a dozen of these once.",
+    "scrap_yield": {
+      "scrap_metal": 2,
+      "cloth": 1
+    },
+    "stackable": true,
+    "weight": 1.2,
+    "value": 3
+  },
+  withered_herb_bundle: {
+    "id": "withered_herb_bundle",
+    "name": "Withered Herb Bundle",
+    "type": "junk",
+    "icon": "",
+    "description": "A bundle of dried kitchen herbs, found hanging in an abandoned stall.",
+    "scrap_yield": {
+      "organics": 2
+    },
+    "stackable": true,
+    "weight": 0.05,
+    "value": 1
   },
   "1414_chain_whip": {
     "id": "1414_chain_whip",

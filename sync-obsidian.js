@@ -18,6 +18,7 @@ const BESTIARY_TARGET = path.join(__dirname, 'src', 'bestiary.js');
 const DATA_LOGS_TARGET = path.join(__dirname, 'src', 'dataLogs.js');
 const MAPS_TARGET = path.join(__dirname, 'src', 'maps.js');
 const QUESTS_TARGET = path.join(__dirname, 'src', 'quests.js');
+const RECIPES_TARGET = path.join(__dirname, 'src', 'recipes.js');
 const GLOSSARY_TARGET = path.join(__dirname, 'src', 'glossary.js');
 
 // Folders whose plain-prose pages (no ```json block at all) become
@@ -36,6 +37,7 @@ let bestiaryMap = {};
 let dataLogsMap = {};
 let mapsMap = {};
 let questsMap = {};
+let recipesMap = {};
 let glossaryMap = {};
 
 // --- HELPER FUNCTIONS ---
@@ -60,7 +62,7 @@ function getAllFiles(dirPath, arrayOfFiles) {
 
 // Generate the final JS file content
 function generateFileContent(type, dataMap) {
-  const dbNames = { item: 'itemDatabase', status_effect: 'statusEffectDatabase', monster: 'bestiaryDatabase', trait: 'traitDatabase', data_log: 'dataLogDatabase', map: 'mapDatabase', quest: 'questDatabase', glossary: 'glossaryDatabase' };
+  const dbNames = { item: 'itemDatabase', status_effect: 'statusEffectDatabase', monster: 'bestiaryDatabase', trait: 'traitDatabase', data_log: 'dataLogDatabase', map: 'mapDatabase', quest: 'questDatabase', recipe: 'recipeDatabase', glossary: 'glossaryDatabase' };
   const dbName = dbNames[type] || dbNames.trait;
 
   const helperFuncs = {
@@ -71,6 +73,7 @@ function generateFileContent(type, dataMap) {
     data_log: `export function getDataLog(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return dataLogDatabase[cleanId] || null; }`,
     map: `export function getMap(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return mapDatabase[cleanId] || null; }`,
     quest: `export function getQuest(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return questDatabase[cleanId] || null; }`,
+    recipe: `export function getRecipe(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return recipeDatabase[cleanId] || null; }`,
     glossary: `export function getGlossaryTerm(id) { if (!id) return null; return glossaryDatabase[id] || null; }`
   };
   const helperFunc = helperFuncs[type] || helperFuncs.trait;
@@ -210,7 +213,7 @@ function processFile(filePath) {
         // copied quest file). Refuse the second claim and say so loudly.
         if (!claimId(data.id, filePath)) return;
 
-        if (['weapon', 'armor', 'consumable', 'currency', 'accessory', 'ammo'].includes(data.type)) {
+        if (['weapon', 'armor', 'consumable', 'currency', 'accessory', 'ammo', 'component', 'junk'].includes(data.type)) {
           itemsMap[data.id] = data;
           console.log(`[ITEM] Loaded: ${data.name}`);
         } else if (['trait', 'perk'].includes(data.type)) {
@@ -239,6 +242,14 @@ function processFile(filePath) {
         } else if (data.type === 'map') {
           mapsMap[data.id] = data;
           console.log(`[MAP] Loaded: ${data.name}`);
+        } else if (data.type === 'recipe') {
+          // produces.item is checked against itemsMap AFTER the full file
+          // walk finishes (see runSync) rather than here — the item a
+          // recipe produces might not have been visited yet depending on
+          // directory-walk order, and checking too early would print a
+          // false-positive warning for a perfectly valid recipe.
+          recipesMap[data.id] = data;
+          console.log(`[RECIPE] Loaded: ${data.name}`);
         }
       } catch (e) {
         // Ignore JSON parse errors (likely incomplete editing)
@@ -269,6 +280,7 @@ function runSync() {
   dataLogsMap = {};
   mapsMap = {};
   questsMap = {};
+  recipesMap = {};
   glossaryMap = {};
   idOwners = {};
   duplicateIds = [];
@@ -281,6 +293,20 @@ function runSync() {
 
   allFiles.forEach(file => processFile(file));
 
+  // A recipe naming an item that doesn't exist is exactly the kind of
+  // silent content loss the duplicate-ID guard above was built to stop —
+  // checked here, after the full walk, so a recipe is never flagged just
+  // because its output item happened to be visited later in the walk.
+  const badRecipes = Object.values(recipesMap).filter(r => {
+    const outId = r.produces && r.produces.item;
+    return outId && !itemsMap[outId.toLowerCase().replace(/ /g, '_')];
+  });
+  if (badRecipes.length > 0) {
+    console.warn(`\n[!] ${badRecipes.length} RECIPE(S) PRODUCE AN UNKNOWN ITEM:`);
+    badRecipes.forEach(r => console.warn(`    "${r.id}" produces "${r.produces.item}" — no item with that id exists.`));
+    console.warn(`    Fix: correct the recipe's produces.item, or author the missing item.\n`);
+  }
+
   // Write the output files
   fs.writeFileSync(ITEMS_TARGET, generateFileContent('item', itemsMap));
   fs.writeFileSync(TRAITS_TARGET, generateFileContent('trait', traitsMap));
@@ -289,6 +315,7 @@ function runSync() {
   fs.writeFileSync(DATA_LOGS_TARGET, generateFileContent('data_log', dataLogsMap));
   fs.writeFileSync(MAPS_TARGET, generateFileContent('map', mapsMap));
   fs.writeFileSync(QUESTS_TARGET, generateFileContent('quest', questsMap));
+  fs.writeFileSync(RECIPES_TARGET, generateFileContent('recipe', recipesMap));
   fs.writeFileSync(GLOSSARY_TARGET, generateFileContent('glossary', glossaryMap));
 
   if (duplicateIds.length > 0) {
@@ -297,7 +324,7 @@ function runSync() {
     console.warn(`    Fix: give each file its own unique "id".\n`);
   }
 
-  console.log(`[SYNC] Complete. Items: ${Object.keys(itemsMap).length} | Traits: ${Object.keys(traitsMap).length} | Status Effects: ${Object.keys(statusEffectsMap).length} | Bestiary: ${Object.keys(bestiaryMap).length} | Data Logs: ${Object.keys(dataLogsMap).length} | Maps: ${Object.keys(mapsMap).length} | Quests: ${Object.keys(questsMap).length} | Glossary: ${Object.keys(glossaryMap).length}`);
+  console.log(`[SYNC] Complete. Items: ${Object.keys(itemsMap).length} | Traits: ${Object.keys(traitsMap).length} | Status Effects: ${Object.keys(statusEffectsMap).length} | Bestiary: ${Object.keys(bestiaryMap).length} | Data Logs: ${Object.keys(dataLogsMap).length} | Maps: ${Object.keys(mapsMap).length} | Quests: ${Object.keys(questsMap).length} | Recipes: ${Object.keys(recipesMap).length} | Glossary: ${Object.keys(glossaryMap).length}`);
 }
 
 // --- WATCHER START ---
