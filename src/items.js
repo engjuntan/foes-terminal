@@ -850,10 +850,10 @@ export const itemDatabase = {
     "name": "Can of Food",
     "type": "consumable",
     "icon": "",
-    "description": "From the manual — the original baseline food item. Rationed, lasts up to a day.",
-    "effect": "Sustains for up to a day if rationed",
+    "description": "From the manual — the original baseline food item.",
+    "effect": "Restores 30 Hunger",
     "stats": {
-      "hunger": 8
+      "hunger": 30
     },
     "addictive": false,
     "weight": 0.4,
@@ -880,9 +880,9 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Cheaper, riskier contamination counterpart to Purified Water.",
-    "effect": "Sustains hydration; risk of contamination",
+    "effect": "Restores 25 Thirst; risk of contamination",
     "stats": {
-      "hydration": 6,
+      "thirst": 25,
       "contamination_chance": 20
     },
     "addictive": false,
@@ -937,10 +937,11 @@ export const itemDatabase = {
     "name": "Ikan Masin Jerky",
     "type": "consumable",
     "icon": "",
-    "description": "Salted fish jerky — real regional food culture reflavored as wasteland staple.",
-    "effect": "Heals 1d4 HP, sustains hunger",
+    "description": "Salted fish jerky — real regional food culture reflavored as wasteland staple. Salt-cured, so it costs you water to eat.",
+    "effect": "Heals 1d4 HP, restores 15 Hunger, costs 8 Thirst",
     "stats": {
-      "hunger": 4,
+      "hunger": 15,
+      "thirst": -8,
       "heal": "1d4"
     },
     "addictive": false,
@@ -1051,9 +1052,9 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Compressed dehydrated ration built from a real regional dish.",
-    "effect": "Heals 1d6 HP, sustains hunger",
+    "effect": "Heals 1d6 HP, restores 25 Hunger",
     "stats": {
-      "hunger": 6,
+      "hunger": 25,
       "heal": "1d6"
     },
     "addictive": false,
@@ -1083,10 +1084,10 @@ export const itemDatabase = {
     "name": "Purified Water",
     "type": "consumable",
     "icon": "",
-    "description": "Direct mechanical link to the exhaustion/water system. Federation-controlled — narrative lever for the water-scarcity arc.",
-    "effect": "Heals 1d4 HP, sustains hydration for a day",
+    "description": "Direct mechanical link to the hunger/thirst system. Federation-controlled — narrative lever for the water-scarcity arc.",
+    "effect": "Heals 1d4 HP, restores 30 Thirst",
     "stats": {
-      "hydration": 8,
+      "thirst": 30,
       "heal": "1d4"
     },
     "addictive": false,

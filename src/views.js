@@ -12,6 +12,7 @@ import { dataLogDatabase } from './dataLogs.js';
 import { questDatabase } from './quests.js';
 import { glossaryDatabase } from './glossary.js';
 import { mapDatabase } from './maps.js';
+import { normalizeNeeds, getNeedTier, formatGameTime, NEED_RATES } from './needs.js';
 
 // --- HELPERS ---
 function escapeHtml(text) {
@@ -35,6 +36,49 @@ function renderCarryWeightGauge(used, capacity) {
       <label>CARRY WEIGHT</label>
       <div style="background:#222; height:14px; border:1px solid ${color}; margin-top:5px;"><div style="width:${pct}%; background:${color}; height:100%;"></div></div>
       <div style="text-align:right; font-size:12px; color:${color};">${used.toFixed(1)} / ${capacity.toFixed(1)} kg</div>
+    </div>`;
+}
+
+// Same gauge idiom as carry weight, generalized for the three needs —
+// green full, sliding to red as it EMPTIES (100 -> 0). Radiation uses the
+// same visual language but in reverse (fills as it worsens, see
+// renderRadiationGauge below) so all four sit together as one legible row.
+function renderNeedGauge(label, value, tier) {
+  let color = 'var(--pip-green)';
+  if (value <= 60) color = 'yellow';
+  if (value <= 40) color = 'orange';
+  if (value <= 20) color = 'red';
+  const penaltyText = Object.entries(tier.modifiers || {})
+    .filter(([k]) => k.startsWith('special_'))
+    .map(([k, v]) => `${k.replace('special_', '').toUpperCase()} ${v}`)
+    .join(' ');
+  return `
+    <div style="margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; font-size:11px;">
+        <label>${label}</label>
+        <span style="color:${color};">${Math.round(value)} — ${tier.label}${penaltyText ? ` (${penaltyText})` : ''}</span>
+      </div>
+      <div style="background:#222; height:10px; border:1px solid ${color}; margin-top:3px;"><div style="width:${value}%; background:${color}; height:100%;"></div></div>
+    </div>`;
+}
+
+// Radiation's own gauge, pulled out of getPlayerView so it sits in the
+// same VITALS block as the three need gauges above — visually identical
+// row, but FILLS as it worsens (0 rads = empty/safe) instead of emptying.
+function renderRadiationGauge(rads) {
+  const radTierIndex = RAD_THRESHOLDS.findIndex(t => t.rads === getRadiationTier(rads).rads);
+  const radPercent = (radTierIndex / (RAD_THRESHOLDS.length - 1)) * 100; // tier-based, not exact rads — stays vague
+  let color = "yellow";
+  if (rads > 400) color = "orange";
+  if (rads > 800) color = "red";
+  if (rads === 0) color = "var(--pip-green)";
+  return `
+    <div style="margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; font-size:11px;">
+        <label>RADIATION</label>
+        <span style="color:${color}; font-style:italic;">${getRadiationTier(rads).description}</span>
+      </div>
+      <div style="background:#222; height:10px; border:1px solid ${color}; margin-top:3px;"><div style="width:${radPercent}%; background:${color}; height:100%;"></div></div>
     </div>`;
 }
 
@@ -506,7 +550,7 @@ export function getCombatView(liveData, userRole, currentUser) {
           if (attackDef) attackerValue = attackDef.hit_percent;
         } else {
           const char = liveData.characters[currentActor.char_id];
-          const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0);
+          const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
           if (!draft.attackKey || draft.attackKey === 'unarmed') {
             attackerValue = derived.skills.unarmed;
           } else {
@@ -523,7 +567,7 @@ export function getCombatView(liveData, userRole, currentUser) {
           targetAC = target.ac;
         } else {
           const targetChar = liveData.characters[target.char_id];
-          const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0);
+          const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0, {}, targetChar.needs || {});
           targetAC = targetDerived.armorClass;
         }
         if (attackerValue !== null && targetAC !== null) {
@@ -1086,7 +1130,8 @@ export function getPlayerView(charId, liveData) {
     activeStatusEffects,
     equip,
     charData.rads || 0,
-    charData.inventory || {}
+    charData.inventory || {},
+    charData.needs || {}
   );
 
   // --- 1. LEVEL UP & PERKS STATE ---
@@ -1253,12 +1298,11 @@ export function getPlayerView(charId, liveData) {
   // The GM sees the real count elsewhere (the Squad Monitor character
   // modal), and sets it directly at will rather than it accruing on its own.
   const rads = charData.rads || 0;
-  const radTierIndex = RAD_THRESHOLDS.findIndex(t => t.rads === getRadiationTier(rads).rads);
-  const radPercent = (radTierIndex / (RAD_THRESHOLDS.length - 1)) * 100; // tier-based, not exact rads — stays vague
-  let radColor = "yellow";
-  if (rads > 400) radColor = "orange";
-  if (rads > 800) radColor = "red";
-  if (rads === 0) radColor = "var(--pip-green)";
+  const needs = normalizeNeeds(charData.needs);
+  const hungerTier = getNeedTier('hunger', needs.hunger);
+  const thirstTier = getNeedTier('thirst', needs.thirst);
+  const sleepTier = getNeedTier('sleep', needs.sleep);
+  const inCombat = !!(liveData.active_combat && liveData.active_combat.is_active);
 
   return `
     <div class="dashboard-container">
@@ -1283,10 +1327,22 @@ export function getPlayerView(charId, liveData) {
            <div style="text-align:right;">${charData.hp.current} / ${charData.hp.max}</div>
         </div>
 
-        <div style="margin-bottom:15px;">
-           <label>RADIATION</label>
-           <div style="background:#333; height:10px; border:1px solid ${radColor}; margin-top:2px;"><div style="width:${radPercent}%; background:${radColor}; height:100%;"></div></div>
-           <div style="font-size:12px; color:${radColor}; margin-top:4px; font-style:italic;">${getRadiationTier(rads).description}</div>
+        <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:5px;">VITALS</h3>
+        <div style="margin-bottom:8px;">
+          ${renderNeedGauge('HUNGER', needs.hunger, hungerTier)}
+          ${renderNeedGauge('THIRST', needs.thirst, thirstTier)}
+          ${renderNeedGauge('SLEEP', needs.sleep, sleepTier)}
+          ${renderRadiationGauge(rads)}
+        </div>
+
+        <div style="border:1px solid var(--pip-dim); padding:8px; margin-bottom:15px;">
+          ${inCombat
+            ? `<div style="font-size:11px; color:#888; text-align:center;">CAN'T REST — COMBAT IN PROGRESS</div>`
+            : `<div style="display:flex; gap:6px; align-items:center;">
+                 <input type="number" id="restHours" min="0.5" max="24" step="0.5" value="8" style="width:60px; background:black; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:'VT323'; font-size:16px; padding:4px;">
+                 <span style="font-size:11px; color:#888; flex-grow:1;">hours &mdash; 6+ restores Sleep &amp; heals &times;1.5</span>
+                 <button class="gm-btn" style="border-color:var(--pip-green); color:var(--pip-green);" onclick="window.requestRest(Number(document.getElementById('restHours').value))">REST</button>
+               </div>`}
         </div>
 
         <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px dashed var(--pip-dim); padding-bottom:5px;">
@@ -1462,6 +1518,26 @@ export function renderGMScreen(liveData) {
           <button class="gm-btn" style="border-color:yellow; color:yellow;" onclick="window.gmSetRadiation(Number(document.getElementById('gmRadInput').value))">SET</button>
         </div>
 
+        <h4 style="color:var(--pip-green); border-bottom:1px dashed var(--pip-green);">SURVIVAL NEEDS</h4>
+        <div style="margin-bottom:10px;">
+          ${['hunger', 'thirst', 'sleep'].map(key => {
+            const needs = normalizeNeeds(targetChar && targetChar.needs);
+            const val = needs[key];
+            const tier = getNeedTier(key, val);
+            return `
+            <div style="margin-bottom:8px;">
+              <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
+                <span>${key.toUpperCase()}</span>
+                <span style="color:var(--pip-green);">${Math.round(val)} — ${tier.label}</span>
+              </div>
+              <input type="range" min="0" max="100" value="${val}" style="width:100%;"
+                     oninput="this.nextElementSibling.textContent = this.value"
+                     onchange="window.gmSetNeed('${key}', Number(this.value))">
+              <span style="display:none;">${Math.round(val)}</span>
+            </div>`;
+          }).join('')}
+        </div>
+
         <h4 style="color:cyan; border-bottom:1px dashed cyan;">REWARDS</h4>
         <div style="display:flex; gap:10px; margin-bottom:10px;">
           <button class="gm-btn" style="border-color:cyan; color:cyan;" onclick="window.gmAdjustVaultPoints(1)">+1 VP</button>
@@ -1524,6 +1600,23 @@ export function renderGMScreen(liveData) {
 
       <div class="panel">
         <h2 style="color:var(--pip-gold);">>> GAMEMASTER DASHBOARD</h2>
+
+        <h3 style="color:var(--pip-green);">TIME CONTROL</h3>
+        <div style="display:flex; gap:4px; margin-bottom:8px;">
+          <button class="gm-btn" onclick="window.advanceTime(60, {initiatedBy:'GM'})">+1h</button>
+          <button class="gm-btn" onclick="window.advanceTime(240, {initiatedBy:'GM'})">+4h</button>
+          <button class="gm-btn" style="border-color:var(--pip-green); color:var(--pip-green);" onclick="window.advanceTime(480, {isRest:true, initiatedBy:'GM'})">+8h REST</button>
+          <button class="gm-btn" onclick="window.advanceTime(1440, {initiatedBy:'GM'})">+1 DAY</button>
+        </div>
+        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+          <input type="number" id="gmTimeHours" min="0.5" step="0.5" placeholder="HRS" style="width:60px; background:black; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:'VT323'; font-size:16px; padding:4px;">
+          <label style="font-size:11px; color:#888; display:flex; align-items:center; gap:4px; flex-grow:1;">
+            <input type="checkbox" id="gmTimeIsRest" style="width:auto;"> mark as rest (restores Sleep, &times;1.5 heal if &ge;6h)
+          </label>
+          <button class="gm-btn" onclick="window.gmAdvanceTimeAction()">GO</button>
+        </div>
+        <p style="font-size:11px; color:#555; margin-bottom:14px;">Blocked automatically while combat is active. Every advance heals the party a little (manual p.446); marking a rest additionally restores Sleep and boosts healing &times;1.5 once the span hits 6+ hours.</p>
+
         <h3>SQUAD MONITOR</h3>
         <p style="font-size:12px; color:#666;">(CLICK CARD TO MANAGE)</p>
         <div class="gm-grid">${squadHtml}</div>

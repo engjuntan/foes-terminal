@@ -3,6 +3,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from './firebase.js'; // Connection
 import * as Views from './views.js'; // All HTML generators
 import * as Controllers from './controllers.js'; // All Actions
+import { formatGameTime } from './needs.js';
 import './style.css';
 
 // --- GLOBAL STATE ---
@@ -53,6 +54,10 @@ window.sendMessage = Controllers.sendMessage;
 window.openMessage = Controllers.openMessage;
 window.gmAdjustHP = (amt) => Controllers.gmAdjustHP(window.selectedCharId, amt);
 window.gmSetRadiation = (amt) => Controllers.gmSetRadiation(window.selectedCharId, amt);
+window.gmSetNeed = (needKey, val) => Controllers.gmSetNeed(window.selectedCharId, needKey, val);
+window.advanceTime = Controllers.advanceTime;
+window.requestRest = Controllers.requestRest;
+window.gmAdvanceTimeAction = Controllers.gmAdvanceTimeAction;
 window.useItem = Controllers.useItem;
 window.giveItem = Controllers.giveItem;
 window.gmAdjustVaultPoints = (amt) => Controllers.gmAdjustVaultPoints(window.selectedCharId, amt);
@@ -208,7 +213,15 @@ window.render = function() {
   if (loginScreen) loginScreen.style.display = 'none';
   if (appInterface) appInterface.classList.remove('hidden');
 
-  // 3. Sync sidebar active state to the current tab, plus unread badges
+  // 3. World clock — lives in the sidebar shell (index.html), not the
+  // per-tab viewport, so it's visible on every screen for every role.
+  const clockEl = document.getElementById('game-clock');
+  if (clockEl) {
+    const worldMinutes = (window.liveData.world && window.liveData.world.minutes) || 480;
+    clockEl.textContent = formatGameTime(worldMinutes).label;
+  }
+
+  // 4. Sync sidebar active state to the current tab, plus unread badges
   const navMap = { STATUS: 'btn-dashboard', QUESTS: 'btn-quests', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks' };
   Object.entries(navMap).forEach(([tab, id]) => {
     const el = document.getElementById(id);
@@ -236,7 +249,7 @@ window.render = function() {
     if (msgBtn) msgBtn.innerHTML = `4. MESSAGES${unreadMsgCount > 0 ? ` <span style="color:red;">(${unreadMsgCount})</span>` : ''}`;
   }
 
-  // 4. Render Main Content
+  // 5. Render Main Content
   if (window.userRole === 'gm') {
     if (window.currentTab === 'COMBAT') {
       viewport.innerHTML = Views.getCombatView(window.liveData, 'gm', window.currentUser);

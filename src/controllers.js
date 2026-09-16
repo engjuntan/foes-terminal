@@ -11,6 +11,7 @@ import { questDatabase } from './quests.js';
 import { mapDatabase } from './maps.js';
 import { normalizeInventory, getInventoryQuantity, addToInventory, removeFromInventory } from './inventory.js';
 import { DIFFICULTY_TIERS, rollD10, rollD20, resolveSpecialCheck, resolveSkillCheck } from './checks.js';
+import { normalizeNeeds, decayNeeds, rollRestHealing, formatGameTime } from './needs.js';
 
 // --- GAME ACTIONS ---
 export async function equipItem(itemId, targetSlot) {
@@ -450,15 +451,144 @@ export async function gmSetRadiation(targetCharId, amount) {
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
+// --- TIME & SURVIVAL NEEDS ---
+
+export async function gmSetNeed(targetCharId, needKey, value) {
+  const char = window.liveData.characters[targetCharId];
+  if (!char) return;
+  if (!['hunger', 'thirst', 'sleep'].includes(needKey)) return;
+  const clamped = Math.max(0, Math.min(100, Math.round(value)));
+  const needs = normalizeNeeds(char.needs);
+  needs[needKey] = clamped;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.needs`] = needs;
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// The single core time-advance transaction — every clock movement in the
+// app (GM travel buttons, GM's marked-as-rest presets, and a player's own
+// Rest action) routes through this one function so there is only one place
+// that can get the party-wide math wrong.
+//
+// opts.isRest gates two things ONLY: whether a rest of >=6h restores Sleep
+// to 100, and whether natural healing gets the manual's 1.5x long-rest
+// bonus. Base healing itself (1d10 capped at EN, manual p.446) fires on
+// EVERY advance regardless of isRest — ordinary GM travel time heals a
+// little too, it just never gets the bonus or the free sleep reset.
+//
+// Never call this from inside combat — combat rounds are seconds, and
+// letting a round advance the clock would silently drain the whole party's
+// needs over what's fictionally a few minutes. Blocked below for that
+// reason, not just as a courtesy.
+export async function advanceTime(minutes, opts = {}) {
+  const { isRest = false, initiatedBy = 'GM' } = opts;
+  if (!window.liveData) return;
+  // active_combat is never cleared after combat ends, only its is_active
+  // flag flips false (see endCombat()) — checking the object's mere
+  // presence would permanently block time advance after the campaign's
+  // very first fight, so this must check is_active specifically, same
+  // as every other "is combat happening right now" check in the app.
+  if (window.liveData.active_combat && window.liveData.active_combat.is_active) { alert("CANNOT ADVANCE TIME DURING COMBAT"); return; }
+  const mins = Number(minutes);
+  if (!mins || mins <= 0) { alert("ENTER A VALID DURATION"); return; }
+
+  const hoursElapsed = mins / 60;
+  const isLongRest = isRest && hoursElapsed >= 6;
+  const currentMinutes = (window.liveData.world && window.liveData.world.minutes) || 480;
+  const updatePayload = { 'world.minutes': currentMinutes + mins };
+
+  const characters = window.liveData.characters || {};
+  const reportLines = [];
+
+  Object.entries(characters).forEach(([charId, char]) => {
+    if (!char.is_finalized) return;
+
+    const before = normalizeNeeds(char.needs);
+    const { needs: afterDecay, damage } = decayNeeds(char.needs, hoursElapsed);
+    if (isLongRest) afterDecay.sleep = 100;
+
+    // healingRateCap depends on EN, which the needs tiers themselves can
+    // penalize (Famished/Starving hit END) — derive it from needs BEFORE
+    // this tick's decay, since that's the state the character rested in.
+    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
+    const healed = rollRestHealing(derived.healingRateCap, hoursElapsed, isLongRest);
+    const totalDamage = damage.hunger + damage.thirst + damage.sleep;
+
+    const currentHp = (char.hp && char.hp.current) || 0;
+    const maxHp = (char.hp && char.hp.max) || currentHp;
+    const newHp = Math.max(0, Math.min(maxHp, currentHp - totalDamage + healed));
+
+    updatePayload[`characters.${charId}.needs`] = afterDecay;
+    if (newHp !== currentHp) updatePayload[`characters.${charId}.hp.current`] = newHp;
+
+    const parts = [
+      `thirst ${Math.round(before.thirst)}→${Math.round(afterDecay.thirst)}`,
+      `hunger ${Math.round(before.hunger)}→${Math.round(afterDecay.hunger)}`,
+      `sleep ${Math.round(before.sleep)}→${Math.round(afterDecay.sleep)}`
+    ];
+    // Report the HP change that actually landed, not the raw healing
+    // roll — a character already at full HP can roll a nonzero heal that
+    // the max-HP clamp above throws away entirely, and "+54 HP" next to
+    // an unchanged HP total would be actively misleading in the log.
+    const netHp = newHp - currentHp;
+    if (netHp !== 0) parts.push(`${netHp > 0 ? '+' : ''}${netHp} HP (${newHp}/${maxHp})`);
+    reportLines.push(`  ${char.name}   ${parts.join('  ')}`);
+  });
+
+  const fromLabel = formatGameTime(currentMinutes).label;
+  const toLabel = formatGameTime(currentMinutes + mins).label;
+  const hoursLabel = Number.isInteger(hoursElapsed) ? `${hoursElapsed}h` : `${hoursElapsed.toFixed(1)}h`;
+  const header = isRest ? `${initiatedBy} calls for a rest (${hoursLabel}).` : `${initiatedBy} advances time by ${hoursLabel}.`;
+  const body = `${header}\n${fromLabel} → ${toLabel}${reportLines.length ? '\n' + reportLines.join('\n') : ''}`;
+
+  const currentMessages = window.liveData.messages || [];
+  updatePayload.messages = [...currentMessages, { id: `msg_${Date.now()}`, from: initiatedBy, target: 'all', body, timestamp: Date.now() }];
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Player-facing Rest — any player can trigger this, not just the GM.
+// Instant, no accept step (same convention as useItem/giveItem): the
+// broadcast message IS the notification, not a request waiting on anyone
+// else's click. Hours are player-adjustable; hitting 6+ is what earns the
+// manual's long-rest bonus (1.5x healing, Sleep restored to 100) — under
+// 6h is just a breather that still costs the hour's hunger/thirst.
+export async function requestRest(hours) {
+  const charId = window.currentUser;
+  if (!charId || !window.liveData) return;
+  const char = window.liveData.characters[charId];
+  if (!char) return;
+  const h = Number(hours);
+  if (isNaN(h) || h <= 0) { alert("ENTER A VALID NUMBER OF HOURS"); return; }
+  const clampedHours = Math.max(0.5, Math.min(24, h));
+  await advanceTime(clampedHours * 60, { isRest: true, initiatedBy: char.name || charId });
+}
+
+// DOM-read wrapper for the GM's free-form time panel — same pattern as
+// sendMessage() reading its inputs directly rather than a draft object,
+// since this is a one-shot action with no per-keystroke UI to preserve.
+export async function gmAdvanceTimeAction() {
+  const hoursInput = document.getElementById('gmTimeHours');
+  const restCheckbox = document.getElementById('gmTimeIsRest');
+  const hours = Number(hoursInput && hoursInput.value);
+  if (isNaN(hours) || hours <= 0) { alert("ENTER A VALID NUMBER OF HOURS"); return; }
+  await advanceTime(hours * 60, { isRest: !!(restCheckbox && restCheckbox.checked), initiatedBy: 'GM' });
+}
+
 // Consumes one copy of an item from inventory and applies whatever
 // mechanical effect it's authored with: rad_removed/rad_added (RadAway
-// and anything like it) and stats.heal (Stimpak and every other direct-
+// and anything like it), stats.heal (Stimpak and every other direct-
 // heal consumable — a dice string like "1d10+10", rolled via the same
-// parser combat damage uses). Everything else a consumable can carry
-// right now (SPECIAL buffs/duration, addiction, skill-book bonuses,
-// hunger/hydration, cures_addiction/cures_status) has no tracked state
-// to act on yet — no duration timers, no addiction counter, no hunger
-// meter — so those stay reference-only until that system exists.
+// parser combat damage uses), and stats.hunger/thirst/sleep (food, water,
+// and rest-adjacent items — see needs.js; clamped 0-100, so a negative
+// value like Ikan Masin Jerky's thirst cost just can't push a need below
+// zero on its own). Everything else a consumable can carry right now
+// (SPECIAL buffs/duration, addiction, skill-book bonuses,
+// cures_addiction/cures_status) has no tracked state to act on yet — no
+// duration timers, no addiction counter — so those stay reference-only
+// until that system exists.
 // Callable by the character themselves or the GM on their behalf, same
 // permission shape as everything else here.
 export async function useItem(targetCharId, itemId) {
@@ -491,6 +621,24 @@ export async function useItem(targetCharId, itemId) {
     const newHp = Math.max(0, Math.min(maxHp, currentHp + healed));
     updatePayload[`characters.${targetCharId}.hp.current`] = newHp;
     msgParts.push(`healed ${healed} HP (${newHp}/${maxHp})`);
+  }
+
+  // Hunger/thirst/sleep — same clamp-and-report shape as radiation above.
+  // Values may be negative (Ikan Masin Jerky's salt costs thirst even as
+  // it feeds you) — clamping at 0 means a negative value can't push a
+  // need below zero on its own, it just eats into whatever margin the
+  // positive restore already bought this same use.
+  const needs = normalizeNeeds(char.needs);
+  const needDelta = item.stats && (item.stats.hunger || item.stats.thirst || item.stats.sleep) ? item.stats : null;
+  if (needDelta) {
+    ['hunger', 'thirst', 'sleep'].forEach(key => {
+      const delta = Number(needDelta[key]) || 0;
+      if (!delta) return;
+      const before = needs[key];
+      needs[key] = Math.max(0, Math.min(100, before + delta));
+      msgParts.push(`${key} ${delta > 0 ? '+' : ''}${delta} (${needs[key]}/100)`);
+    });
+    updatePayload[`characters.${targetCharId}.needs`] = needs;
   }
 
   const usedMsg = msgParts.length ? `Used ${item.name} — ${msgParts.join(', ')}.` : `Used ${item.name}.`;
@@ -533,7 +681,7 @@ export async function giveItem(itemId, qty, toCharId) {
 
   const itemWeight = typeof item.weight === 'number' ? item.weight : 0;
   if (itemWeight > 0) {
-    const toDerived = calculateDerivedStats(toChar.special, toChar.level || 1, toChar.traits || [], toChar.perks || [], toChar.race || 'human', toChar.status_effects || [], toChar.equipment || {}, toChar.rads || 0, toChar.inventory || {});
+    const toDerived = calculateDerivedStats(toChar.special, toChar.level || 1, toChar.traits || [], toChar.perks || [], toChar.race || 'human', toChar.status_effects || [], toChar.equipment || {}, toChar.rads || 0, toChar.inventory || {}, toChar.needs || {});
     const projectedUsed = toDerived.carryUsed + (itemWeight * qty);
     if (projectedUsed > toDerived.carryCapacity * CARRY_OVERAGE_ALLOWANCE) {
       alert(`${toChar.name.toUpperCase()} CAN'T CARRY THAT MUCH — OVER CAPACITY`);
@@ -877,7 +1025,7 @@ export async function startCombat() {
     if (!char.is_finalized) return;
     const derived = calculateDerivedStats(
       char.special, char.level || 1, char.traits || [], char.perks || [],
-      char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0
+      char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}
     );
     const { roll, total } = rollInitiative(derived.sequenceBonus);
     initiative_order.push({
@@ -1044,7 +1192,7 @@ export async function resolveAttack() {
     attackerValue = attackDef.hit_percent;
   } else {
     const char = window.liveData.characters[attacker.char_id];
-    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {});
+    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
     const wantsMelee = !draft.attackKey || draft.attackKey === 'unarmed' || (() => {
       const wi = getItem(draft.attackKey);
       return !wi || !wi.stats || (wi.stats.range || 0) <= 1;
@@ -1097,7 +1245,7 @@ export async function resolveAttack() {
     targetName = target.name;
   } else {
     const targetChar = window.liveData.characters[target.char_id];
-    const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0, targetChar.inventory || {});
+    const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0, targetChar.inventory || {}, targetChar.needs || {});
     targetAC = targetDerived.armorClass;
     // Crouching/prone/knocked-down caps how much of AC comes from AGI —
     // only meaningful for a PC, since AC's AGI component is what's being
@@ -1692,7 +1840,7 @@ export async function resolvePlayerCheck() {
   if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
 
   const char = window.liveData.characters[window.currentUser];
-  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {});
+  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
   const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
   const result = draft.kind === 'special' ? resolveSpecialCheck(value, draft.tier, roll, draft.useD20) : resolveSkillCheck(value, draft.tier, roll);
 
@@ -1782,7 +1930,7 @@ export async function resolveGmCheck() {
     // PC — that'd be a lot of typing for the GM).
     Object.entries(window.liveData.characters || {}).forEach(([charId, char]) => {
       if (!char.is_finalized) return;
-      const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {});
+      const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
       const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
       const roll = draft.kind === 'special' ? (draft.useD20 ? rollD20() : rollD10()) : rollPercentile();
       const result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
@@ -1808,7 +1956,7 @@ export async function resolveGmCheck() {
     const roll = Number(draft.roll);
     const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
     if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
-    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {});
+    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
     const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
     const result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
     results.push({ char_id: draft.targetCharId, name: char.name, roll, threshold: result.threshold, success: result.success, critType: result.critType || null });

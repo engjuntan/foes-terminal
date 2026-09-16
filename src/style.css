@@ -108,6 +108,21 @@ body {
 }
 .nav-btn.hidden { display: none !important; }
 
+/* Persistent world clock — lives in the sidebar shell, not the per-tab
+   viewport, so it stays visible on every screen for every role (GM and
+   player alike), not just a dashboard someone might navigate away from. */
+.game-clock {
+  font-family: 'VT323', monospace;
+  font-size: 28px;
+  letter-spacing: 0.04em;
+  color: var(--pip-green);
+  text-align: center;
+  border: 1px solid var(--pip-dim);
+  padding: 8px 4px;
+  margin: 10px 0;
+  text-shadow: 0 0 6px var(--pip-green);
+}
+
 /* GM BUTTON (Restored) */
 .gm-btn {
   background: #300;

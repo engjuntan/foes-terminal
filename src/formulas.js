@@ -2,6 +2,7 @@
 import { getTrait } from './traits.js';
 import { getItem } from './items.js';
 import { normalizeInventory } from './inventory.js';
+import { getNeedTier } from './needs.js';
 
 // How far over carryCapacity a character is allowed to go before
 // acquiring more items gets hard-blocked (trades, GM grants). Below
@@ -14,7 +15,7 @@ export const CARRY_OVERAGE_ALLOWANCE = 1.10;
 // Unlike traits/perks (looked up by id from a database), status effect
 // instances already carry their own resolved modifiers, ad-hoc or from
 // the status-effect library, so they need no lookup step here.
-export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [], activePerks = [], race = 'human', activeStatusEffects = [], equipment = {}, rads = 0, inventory = {}) {
+export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [], activePerks = [], race = 'human', activeStatusEffects = [], equipment = {}, rads = 0, inventory = {}, needs = {}) {
 
   // --- 0. RACE DATA ---
   const raceDef = RACE_RULES[race] || RACE_RULES['human'];
@@ -33,6 +34,12 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   if (radModifiers.max_hp_flat && radTier.maxHpExemptRaces && radTier.maxHpExemptRaces.includes(race)) {
     delete radModifiers.max_hp_flat; // manual: "No effect on Mutants" at the 400-rad tier
   }
+  // Survival needs (hunger/thirst/sleep) fold in exactly like radiation —
+  // a pure function of the current value, recomputed fresh every render,
+  // nothing left over to manually cure once the need is restored.
+  const hungerTier = getNeedTier('hunger', (needs || {}).hunger);
+  const thirstTier = getNeedTier('thirst', (needs || {}).thirst);
+  const sleepTier = getNeedTier('sleep', (needs || {}).sleep);
   // One combined list of resolved modifier objects, regardless of source.
   // A source with "suppressed_by_item" is a downside negated by wearing
   // something (e.g. Short-Sighted's -1 PER goes away while Glasses are
@@ -40,8 +47,12 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   const modifierSources = [
     ...allModifiers.map(id => getTrait(id)),
     ...(activeStatusEffects || []),
-    { modifiers: radModifiers }
+    { modifiers: radModifiers },
+    { modifiers: hungerTier.modifiers },
+    { modifiers: thirstTier.modifiers },
+    { modifiers: sleepTier.modifiers }
   ].filter(source => !source || !source.suppressed_by_item || !isItemEquipped(source.suppressed_by_item));
+  let healingRateBonus = 0;
   let special = { ...baseSpecial };
 
   modifierSources.forEach(source => {
@@ -53,6 +64,7 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
       if (source.modifiers.special_int) special.int += source.modifiers.special_int;
       if (source.modifiers.special_agi) special.agi += source.modifiers.special_agi;
       if (source.modifiers.special_luk) special.luk += source.modifiers.special_luk;
+      if (source.modifiers.healing_rate_bonus) healingRateBonus += source.modifiers.healing_rate_bonus;
     }
   });
 
@@ -152,7 +164,10 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   // then +hpPerLevel for each level gained after level 1.
   const baseHp = 15 + str + (2 * end);
   let maxHpCalculated = baseHp + ((level - 1) * hpPerLevel);
-  if (radModifiers.max_hp_flat) maxHpCalculated = Math.max(1, maxHpCalculated + radModifiers.max_hp_flat);
+  // Summed across every source now, not just radiation — Starving/Dehydrated
+  // tiers carry max_hp_flat too (see needs.js), same as the 400+ rad tiers.
+  const totalMaxHpFlat = modifierSources.reduce((sum, s) => sum + ((s && s.modifiers && s.modifiers.max_hp_flat) || 0), 0);
+  if (totalMaxHpFlat) maxHpCalculated = Math.max(1, maxHpCalculated + totalMaxHpFlat);
 
   // Resistances
   let poisonRes = (end * 5) + (raceDef.stats?.poison_res || 0);
@@ -232,6 +247,12 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
     skillPointsPerLevel,
     perksAllowed,
     skills,
+    // Manual p.446: "Roll a 1d10, and regain hp per hour up to the maximum
+    // of your EN" — EN after all modifiers (including the needs tiers just
+    // folded in above), plus any healing_rate_bonus perks (Faster Healing,
+    // Rad Child, Cancerous Growth). Consumed by needs.js's rollRestHealing.
+    healingRateCap: Math.max(0, end + healingRateBonus),
+    needTiers: { hunger: hungerTier, thirst: thirstTier, sleep: sleepTier },
     raceDef // Export rules so View can check flags (like 'can_wear_small_armor')
   };
 }

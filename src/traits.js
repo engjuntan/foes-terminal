@@ -1,5 +1,36 @@
 // AUTOMATICALLY GENERATED FILE. DO NOT EDIT MANUALLY.
 export const traitDatabase = {
+  cancerous_growth: {
+    "id": "cancerous_growth",
+    "name": "Cancerous Growth",
+    "type": "perk",
+    "description": "Requires ST 7, Level 6. Ghoul-only. Gain +2 Healing Rate and regenerate a crippled limb in 1 day.",
+    "effect": "+2 Healing Rate, regrow a crippled limb in 1 day",
+    "race_requirement": "ghoul",
+    "modifiers": {
+      "healing_rate_bonus": 2
+    }
+  },
+  faster_healing: {
+    "id": "faster_healing",
+    "name": "Faster Healing",
+    "type": "perk",
+    "description": "Requires EN 6, Level 3. For each rank of this perk you gain a +2 to the Healing Rate.",
+    "effect": "+2 Healing Rate per rank",
+    "modifiers": {
+      "healing_rate_bonus": 2
+    }
+  },
+  rad_child: {
+    "id": "rad_child",
+    "name": "Rad Child",
+    "type": "perk",
+    "description": "Requires EN 6, Level 3. Gain +5 Healing Rate.",
+    "effect": "+5 Healing Rate",
+    "modifiers": {
+      "healing_rate_bonus": 5
+    }
+  },
   triad_ties: {
     "id": "triad_ties",
     "name": "Triad Ties",
