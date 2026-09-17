@@ -461,6 +461,22 @@ export const itemDatabase = {
     "weight": 12,
     "value": "TBA"
   },
+  padded_coveralls: {
+    "id": "padded_coveralls",
+    "name": "Padded Coveralls",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "Factory workwear with a hand-stitched padded lining. Cheap, basic protection.",
+    "image_prompt": "Worn blue factory coveralls with visible hand-stitched padding lining, patched knees and elbows, wasteland workwear, isolated on dark background, game icon style",
+    "stats": {
+      "ac": 3,
+      "dt_dr_normal": "0/8"
+    },
+    "weight": 1,
+    "value": 8
+  },
   press_plate_armor_oversized: {
     "id": "press_plate_armor_oversized",
     "name": "Press-Plate Armor (Oversized)",
@@ -596,6 +612,22 @@ export const itemDatabase = {
     "weight": 7,
     "value": 35
   },
+  rattan_basket_armor: {
+    "id": "rattan_basket_armor",
+    "name": "Rattan Basket Armor",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "Tightly woven rattan panels lashed over a wooden frame — traditional weaving technique repurposed as armor.",
+    "image_prompt": "Armor made of tightly woven rattan cane panels lashed to a wooden frame with rope, traditional Southeast Asian basketweave pattern, isolated on dark background, game icon style",
+    "stats": {
+      "ac": 4,
+      "dt_dr_normal": "1/10"
+    },
+    "weight": 2,
+    "value": 12
+  },
   rebar_plate_vest: {
     "id": "rebar_plate_vest",
     "name": "Rebar Plate Vest",
@@ -610,6 +642,74 @@ export const itemDatabase = {
     },
     "weight": 10,
     "value": "TBA"
+  },
+  reinforced_tarpaulin_wrap: {
+    "id": "reinforced_tarpaulin_wrap",
+    "name": "Reinforced Tarpaulin Wrap",
+    "type": "armor",
+    "slot": "body",
+    "size": "oversized",
+    "icon": "",
+    "description": "Multiple layers of tarpaulin and padding wound and lashed around the torso — bulky, improvised, the 'wear the whole pile of scrap you found' option.",
+    "image_prompt": "Torso wrapped in multiple layers of blue and grey tarpaulin bound with rope and cargo straps, bulky improvised padded armor, wasteland aesthetic, isolated on dark background, game icon style",
+    "stats": {
+      "ac": 5,
+      "dt_dr_normal": "1/15"
+    },
+    "weight": 8,
+    "value": 25
+  },
+  rusted_riot_shield_harness: {
+    "id": "rusted_riot_shield_harness",
+    "name": "Rusted Riot Shield Harness",
+    "type": "armor",
+    "slot": "body",
+    "size": "oversized",
+    "icon": "",
+    "description": "A riot shield converted into wearable armor, strapped across the torso. High flat damage reduction, mediocre against sustained fire — a shield, not a suit.",
+    "image_prompt": "A large rusted riot shield with Federation crowd-control markings, converted with leather straps into wearable chest armor, scratched polycarbonate window, oversized and bulky, isolated on dark background, game icon style",
+    "stats": {
+      "ac": 10,
+      "dt_dr_normal": "4/15"
+    },
+    "weight": 10,
+    "value": 50
+  },
+  salvaged_power_armor_chestplate: {
+    "id": "salvaged_power_armor_chestplate",
+    "name": "Salvaged Power Armor Chestplate",
+    "type": "armor",
+    "slot": "body",
+    "size": "oversized",
+    "icon": "",
+    "description": "A genuine Power Armor chestplate, found without its frame or servos — worn as heavy standalone plate rather than a powered suit. Best AC in the game, at a real weight cost. Rare find.",
+    "image_prompt": "A massive military power armor chestplate, dead servo motors visible at the joints, rust patches over hardened alloy plating, disconnected from its frame, oversized and imposing, isolated on dark background, game icon style",
+    "condition": "disrepair",
+    "stats": {
+      "ac": 14,
+      "dt_dr_normal": "3/28",
+      "dt_dr_laser": "1/15",
+      "dt_dr_explosive": "2/20"
+    },
+    "weight": 14,
+    "value": 140
+  },
+  salvaged_power_armor_helmet: {
+    "id": "salvaged_power_armor_helmet",
+    "name": "Salvaged Power Armor Helmet",
+    "type": "armor",
+    "slot": "head",
+    "size": "oversized",
+    "icon": "",
+    "description": "A Power Armor helmet with a dead HUD and cracked seal. Pairs with the Chestplate, sold and found separately on purpose. Rare find.",
+    "image_prompt": "A battered military power armor helmet, cracked visor seal, dead internal HUD display visible through the crack, rust streaks over dark metal, oversized and heavy, isolated on dark background, game icon style",
+    "condition": "disrepair",
+    "stats": {
+      "ac": 4,
+      "dt_dr_normal": "1/10"
+    },
+    "weight": 5,
+    "value": 60
   },
   studded_leather_armor: {
     "id": "studded_leather_armor",
@@ -656,6 +756,22 @@ export const itemDatabase = {
     },
     "weight": 3,
     "value": "TBA"
+  },
+  tarp_poncho: {
+    "id": "tarp_poncho",
+    "name": "Tarp Poncho",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "description": "A poncho cut from stall tarpaulin. Barely armor, but it's something.",
+    "image_prompt": "A simple poncho cut from blue plastic market tarpaulin, rope drawstring, weathered and patched, isolated on dark background, game icon style",
+    "stats": {
+      "ac": 2,
+      "dt_dr_normal": "0/5"
+    },
+    "weight": 0.4,
+    "value": 5
   },
   ucl_officers_uniform: {
     "id": "ucl_officers_uniform",
@@ -949,6 +1065,21 @@ export const itemDatabase = {
     "weight": 0.4,
     "value": 10
   },
+  canned_winter_melon_drink: {
+    "id": "canned_winter_melon_drink",
+    "name": "Canned Winter Melon Drink",
+    "type": "consumable",
+    "icon": "",
+    "description": "A rusted can of sweet winter melon drink. Cloudy but drinkable.",
+    "image_prompt": "A rusted aluminum drink can with faded winter melon illustration, one side corroded, condensation droplets, wasteland soft drink, isolated on dark background, game icon style",
+    "effect": "Restores 25 Thirst",
+    "stats": {
+      "thirst": 25
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 12
+  },
   cap_kilat_cola: {
     "id": "cap_kilat_cola",
     "name": "Cap Kilat Cola",
@@ -962,6 +1093,53 @@ export const itemDatabase = {
     },
     "addictive": false,
     "weight": 0.4,
+    "value": 10
+  },
+  charred_char_siu_ration: {
+    "id": "charred_char_siu_ration",
+    "name": "Charred Char Siu Ration",
+    "type": "consumable",
+    "icon": "",
+    "description": "A compressed ration bar glazed to resemble barbecued pork. Better than it sounds.",
+    "image_prompt": "A compressed reddish-glazed ration bar resembling char siu barbecue pork, wrapped in waxed paper, wasteland food item, isolated on dark background, game icon style",
+    "effect": "Heals 1d4 HP, restores 30 Hunger",
+    "stats": {
+      "hunger": 30,
+      "heal": "1d4"
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 18
+  },
+  cicak_on_a_stick: {
+    "id": "cicak_on_a_stick",
+    "name": "Cicak on a Stick",
+    "type": "consumable",
+    "icon": "",
+    "description": "A grilled house lizard on a skewer — street food born of necessity. There is always another cicak.",
+    "image_prompt": "A small grilled lizard skewered on a bamboo stick, charred and salted, street-food style presentation, isolated on dark background, game icon style",
+    "effect": "Restores 20 Hunger",
+    "stats": {
+      "hunger": 20
+    },
+    "addictive": false,
+    "weight": 0.1,
+    "value": 6
+  },
+  cincau_drink: {
+    "id": "cincau_drink",
+    "name": "Cincau Drink",
+    "type": "consumable",
+    "icon": "",
+    "description": "Grass jelly cubes in sweetened syrup water, a classic cooling dessert drink.",
+    "image_prompt": "A cup of black grass jelly cubes floating in translucent brown syrup water, condensation on plastic cup, Malaysian dessert drink, isolated on dark background, game icon style",
+    "effect": "Restores 20 Thirst, restores 5 Hunger",
+    "stats": {
+      "thirst": 20,
+      "hunger": 5
+    },
+    "addictive": false,
+    "weight": 0.3,
     "value": 10
   },
   dirty_water: {
@@ -994,6 +1172,21 @@ export const itemDatabase = {
     "weight": 1.5,
     "value": 130
   },
+  dried_longan_cluster: {
+    "id": "dried_longan_cluster",
+    "name": "Dried Longan Cluster",
+    "type": "consumable",
+    "icon": "",
+    "description": "A cluster of dried longan fruit, still on the stem. Sweet, chewy, keeps forever.",
+    "image_prompt": "A small cluster of dried brown longan fruit still attached to a twig, wrinkled leathery skin, wasteland foraged snack, isolated on dark background, game icon style",
+    "effect": "Restores 10 Hunger",
+    "stats": {
+      "hunger": 10
+    },
+    "addictive": false,
+    "weight": 0.05,
+    "value": 4
+  },
   feral_suppressant: {
     "id": "feral_suppressant",
     "name": "Feral Suppressant",
@@ -1007,6 +1200,21 @@ export const itemDatabase = {
     "addictive": false,
     "weight": 0.1,
     "value": 80
+  },
+  fermented_rice_wine_flask: {
+    "id": "fermented_rice_wine_flask",
+    "name": "Fermented Rice Wine Flask",
+    "type": "consumable",
+    "icon": "",
+    "description": "A flask of home-fermented rice wine, aged well past anyone's original intention. Addictive.",
+    "image_prompt": "A battered metal flask with hand-painted Chinese characters, rice wine sloshing inside visible through a dent, wasteland trade good, isolated on dark background, game icon style",
+    "effect": "Restores 15 Thirst",
+    "stats": {
+      "thirst": 15
+    },
+    "addictive": true,
+    "weight": 0.4,
+    "value": 20
   },
   healing_poultice: {
     "id": "healing_poultice",
@@ -1037,6 +1245,37 @@ export const itemDatabase = {
     "addictive": false,
     "weight": 0.15,
     "value": 15
+  },
+  indah_water_soy_sauce: {
+    "id": "indah_water_soy_sauce",
+    "name": "Indah Water Soy Sauce",
+    "type": "consumable",
+    "icon": "",
+    "description": "A small vial of dark, salty sauce, bottled and stamped with the old national sewerage utility's logo — a joke that got funnier once nobody was left to enforce a health code. One real flavor in a world of rations.",
+    "image_prompt": "A small dark glass vial of soy sauce, weathered label with a stylized water-utility logo, sealed with wax, wasteland trade curiosity, isolated on dark background, game icon style",
+    "effect": "Restores 5 Hunger, costs 3 Thirst",
+    "stats": {
+      "hunger": 5,
+      "thirst": -3
+    },
+    "addictive": false,
+    "weight": 0.05,
+    "value": 3
+  },
+  instant_mee_sup_rimau: {
+    "id": "instant_mee_sup_rimau",
+    "name": "Instant Mee Sup Rimau",
+    "type": "consumable",
+    "icon": "",
+    "description": "Instant noodle brick, Tiger Soup flavor, packet long faded. Still edible, allegedly.",
+    "image_prompt": "A faded instant noodle packet, tiger mascot logo worn and peeling, 'Mee Sup Rimau' branding, wasteland ration item, isolated on dark background, game icon style",
+    "effect": "Restores 25 Hunger",
+    "stats": {
+      "hunger": 25
+    },
+    "addictive": false,
+    "weight": 0.2,
+    "value": 8
   },
   jet: {
     "id": "jet",
@@ -1151,6 +1390,21 @@ export const itemDatabase = {
     "weight": 0.3,
     "value": 20
   },
+  preserved_salted_egg: {
+    "id": "preserved_salted_egg",
+    "name": "Preserved Salted Egg",
+    "type": "consumable",
+    "icon": "",
+    "description": "A century-egg-style preserved egg, cured in ash and salt. Keeps for years.",
+    "image_prompt": "A single preserved century egg with dark translucent shell, cut in half showing black-green interior, resting on ash-covered cloth, isolated on dark background, game icon style",
+    "effect": "Restores 15 Hunger",
+    "stats": {
+      "hunger": 15
+    },
+    "addictive": false,
+    "weight": 0.1,
+    "value": 6
+  },
   psycho: {
     "id": "psycho",
     "name": "Psycho",
@@ -1213,6 +1467,22 @@ export const itemDatabase = {
     "weight": 0.3,
     "value": 50
   },
+  reboiled_kopi_peng: {
+    "id": "reboiled_kopi_peng",
+    "name": "Reboiled Kopi Peng",
+    "type": "consumable",
+    "icon": "",
+    "description": "Iced coffee, reprocessed one too many times. Defers a rest that now costs real thirst.",
+    "image_prompt": "A scratched plastic cup of dark iced coffee with melting ice, condensation dripping, wasteland kopitiam relic, isolated on dark background, game icon style",
+    "effect": "Restores 15 Thirst, costs 10 Sleep",
+    "stats": {
+      "thirst": 15,
+      "sleep": -10
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 10
+  },
   sains_untuk_semua: {
     "id": "sains_untuk_semua",
     "name": "Sains Untuk Semua",
@@ -1227,6 +1497,38 @@ export const itemDatabase = {
     "addictive": false,
     "weight": 0.4,
     "value": 220
+  },
+  salvaged_birds_nest_broth: {
+    "id": "salvaged_birds_nest_broth",
+    "name": "Salvaged Bird's Nest Broth",
+    "type": "consumable",
+    "icon": "",
+    "description": "A sealed jar of bird's nest broth, a pre-War luxury good found improbably intact. Rare find.",
+    "image_prompt": "An ornate sealed glass jar of pale golden bird's nest broth, gold foil label peeling at the edges, luxury pre-war good, isolated on dark background, game icon style",
+    "effect": "Heals 1d8+2 HP, restores 20 Hunger and 15 Thirst",
+    "stats": {
+      "hunger": 20,
+      "thirst": 15,
+      "heal": "1d8+2"
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 45
+  },
+  soyabean_milk: {
+    "id": "soyabean_milk",
+    "name": "Soyabean Milk",
+    "type": "consumable",
+    "icon": "",
+    "description": "A bottle of sweetened soyabean milk, the classic roadside stall drink. Still made fresh where soy can be grown.",
+    "image_prompt": "A reused glass bottle filled with pale creamy soyabean milk, hand-tied plastic cap, condensation on the glass, roadside stall drink, isolated on dark background, game icon style",
+    "effect": "Restores 20 Thirst",
+    "stats": {
+      "thirst": 20
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 8
   },
   stimpak: {
     "id": "stimpak",
@@ -1764,6 +2066,25 @@ export const itemDatabase = {
     "weight": 1,
     "value": "TBA"
   },
+  angkasa_wrench: {
+    "id": "angkasa_wrench",
+    "name": "Angkasa Wrench",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "oversized",
+    "two_handed": true,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "An industrial pipe wrench scaled for factory machinery, repurposed as a two-handed bludgeon. Heavy, slow, and it ends fights.",
+    "image_prompt": "A massive industrial pipe wrench, chipped red paint over rusted steel, factory brand markings, held two-handed, oversized wasteland weapon, isolated on dark background, game icon style",
+    "stats": {
+      "dmg": "2d6+2",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "weight": 6,
+    "value": 45
+  },
   axe_gang_cleaver: {
     "id": "axe_gang_cleaver",
     "name": "Axe Gang Cleaver",
@@ -1781,6 +2102,25 @@ export const itemDatabase = {
     },
     "weight": 1.5,
     "value": "TBA"
+  },
+  bent_rebar_spear: {
+    "id": "bent_rebar_spear",
+    "name": "Bent Rebar Spear",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Scrap-tier improvised spear, straightened rebar ground to a point.",
+    "image_prompt": "A crude spear made from a length of rusted rebar, hammered straight and ground to a point, wrapped grip, wasteland scavenge aesthetic, isolated on dark background, game icon style",
+    "stats": {
+      "dmg": "1d6",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "weight": 1.5,
+    "value": 8
   },
   "50_cal_machine_gun": {
     "id": "50_cal_machine_gun",
@@ -1938,6 +2278,46 @@ export const itemDatabase = {
     },
     "weight": 8,
     "value": "TBA"
+  },
+  corroded_minigun_barrel_club: {
+    "id": "corroded_minigun_barrel_club",
+    "name": "Corroded Minigun Barrel Club",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "oversized",
+    "two_handed": true,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "A rotary minigun barrel cluster, seized solid with rust and repurposed as the heaviest melee weapon around.",
+    "image_prompt": "A rusted rotary minigun barrel cluster repurposed as a heavy improvised club, six fused barrels, welded handle grip, oversized wasteland weapon, isolated on dark background, game icon style",
+    "stats": {
+      "dmg": "2d6+4",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "weight": 9,
+    "value": 55
+  },
+  cracked_pvc_pipe_gun: {
+    "id": "cracked_pvc_pipe_gun",
+    "name": "Cracked PVC Pipe Gun",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "A single-shot improvised firearm built from PVC piping and a nail-strike mechanism.",
+    "image_prompt": "A crude single-shot pipe gun made from white PVC pipe, rubber bands and a nail firing pin, duct tape wrapped grip, isolated on dark background, game icon style",
+    "stats": {
+      "dmg": "1d4",
+      "dmgType": "normal",
+      "range": 8,
+      "ammo_type": "makeshift_rounds",
+      "clip_size": 1
+    },
+    "weight": 0.6,
+    "value": 12
   },
   gauss_pistol: {
     "id": "gauss_pistol",
@@ -2236,6 +2616,27 @@ export const itemDatabase = {
     },
     "weight": 8,
     "value": "TBA"
+  },
+  fractured_laser_rifle: {
+    "id": "fractured_laser_rifle",
+    "name": "Fractured Laser Rifle",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "energy_weapons",
+    "icon": "",
+    "description": "A genuine pre-War Laser Rifle, badly aged — cracked housing and a chipped focusing lens leave it recognizably special but mechanically weak. Disrepair, not pristine.",
+    "image_prompt": "A cracked and weathered pre-war laser rifle, chipped crystal focusing lens, exposed wiring, faded Federation markings, damaged but recognizable high-tech weapon, isolated on dark background, game icon style",
+    "condition": "disrepair",
+    "stats": {
+      "dmg": "1d6",
+      "dmgType": "laser",
+      "range": 10,
+      "ammo_type": "energy_cell"
+    },
+    "weight": 4.5,
+    "value": 30
   },
   homemade_pistol: {
     "id": "homemade_pistol",
@@ -2709,6 +3110,25 @@ export const itemDatabase = {
     "weight": 1.2,
     "value": 70
   },
+  nail_board: {
+    "id": "nail_board",
+    "name": "Nail Board",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "A plank of wood studded with bent nails — the archetypal wasteland weapon.",
+    "image_prompt": "A wooden plank bristling with rusty bent nails driven through it, wrapped cloth handle, dried blood stains, wasteland scavenge aesthetic, isolated on dark background, game icon style",
+    "stats": {
+      "dmg": "1d6+1",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "weight": 1.2,
+    "value": 10
+  },
   parang: {
     "id": "parang",
     "name": "Parang",
@@ -3088,6 +3508,25 @@ export const itemDatabase = {
     },
     "weight": 4.8,
     "value": 190
+  },
+  salvaged_rebar_greatsword: {
+    "id": "salvaged_rebar_greatsword",
+    "name": "Salvaged Rebar Greatsword",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "oversized",
+    "two_handed": true,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "A crude but effective greatsword welded together from flattened rebar lengths. The best pure damage a bench can currently produce.",
+    "image_prompt": "A large improvised greatsword forged from flattened rebar segments welded together, rough weld seams visible, wrapped leather grip, oversized wasteland weapon, isolated on dark background, game icon style",
+    "stats": {
+      "dmg": "2d8",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "weight": 7,
+    "value": 60
   },
   combat_shotgun: {
     "id": "combat_shotgun",
