@@ -189,12 +189,12 @@ export const itemDatabase = {
   },
   "1414_windbreaker": {
     "id": "1414_windbreaker",
-    "name": "1414 Windbreaker",
+    "name": "Rakan Watch Windbreaker",
     "type": "armor",
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "description": "Cheap, gang-colored, instantly recognizable jacket of the 1414 Gang. Mapped to the manual's Clothes tier, barely above rags.",
+    "description": "Cheap, gang-colored, instantly recognizable jacket of The Rakan Watch. Mapped to the manual's Clothes tier, barely above rags.",
     "stats": {
       "ac": 1,
       "dt_dr_normal": "0/5"
@@ -1748,14 +1748,14 @@ export const itemDatabase = {
   },
   "1414_chain_whip": {
     "id": "1414_chain_whip",
-    "name": "1414 Chain Whip",
+    "name": "Rakan Watch Chain Whip",
     "type": "weapon",
     "slot": "hand",
     "size": "small",
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Bicycle chain wrapped in tape, the 1414 Gang's signature improvised flail.",
+    "description": "Bicycle chain wrapped in tape, The Rakan Watch's signature improvised flail.",
     "stats": {
       "dmg": "TBA",
       "dmgType": "normal",

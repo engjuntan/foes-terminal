@@ -13,6 +13,44 @@
 // Object.entries() on the stored object.
 export const SPECIAL_ORDER = ['str', 'per', 'end', 'cha', 'int', 'agi', 'luk'];
 
+// Broad, one-per-stat flavor text for the G.O.A.T. exam / creation
+// screen — the New Vegas-style "Strength is a measure of your raw
+// physical power..." narrator card, not a per-value breakdown. Each
+// entry also carries an image_url slot for the GM's own 1080x1080
+// generated art (one card per stat); left blank until supplied.
+// Distinct from SPECIAL_INFO below, which stays the terse mechanical
+// hover text used everywhere else in the app (character sheet, combat).
+export const SPECIAL_FLAVOR = {
+  str: {
+    description: "Strength is how much of the wasteland you can bend to your will by force alone — what you can carry, what you can break, and how hard you hit when the talking's done. The strong don't ask twice.",
+    image_url: ""
+  },
+  per: {
+    description: "Perception is what you catch before it catches you — the tripwire across the doorway, the glint of a scope two streets over, the one word in a lie that didn't sit right. Sharp eyes outlive strong arms.",
+    image_url: ""
+  },
+  end: {
+    description: "Endurance is what's left of you after the radiation, the hunger, and the beating you took last week. It's how much the wasteland can throw at your body before your body stops throwing it back.",
+    image_url: ""
+  },
+  cha: {
+    description: "Charisma is the door that opens because you're the one knocking. It's the ration you get an extra scoop of, the guard who looks the other way, the room that goes quiet when you walk in — earned or borrowed, it works the same.",
+    image_url: ""
+  },
+  int: {
+    description: "Intelligence is how fast you turn scrap into a plan — reading a situation, a machine, or a person, and knowing which wire to pull. The wasteland rewards the clever at least as often as the strong.",
+    image_url: ""
+  },
+  agi: {
+    description: "Agility is the half-second between the shot fired and the one that finds you. It's how fast you move, how fast you react, and how many things you can get done before the moment's gone.",
+    image_url: ""
+  },
+  luk: {
+    description: "Luck is the reason you found the stimpak instead of the landmine. Nobody plans around it, everybody's alive because of it — the thumb on the scale the wasteland never tells you is there.",
+    image_url: ""
+  }
+};
+
 export const SPECIAL_INFO = {
   str: "Raw physical power. Sets weapon Strength requirements, melee damage, and starting HP. Used to push, smash, or throw heavy things.",
   per: "Awareness — sharp eyes and ears. Governs effective firing range and hit chance at distance, plus spotting traps or hidden things.",

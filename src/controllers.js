@@ -1043,17 +1043,28 @@ export function cancelLevelUp() {
 export function adjustCreationStat(stat, amount) {
   const draft = window.creationDraft; // Assumes draft is initialized in View
   if (!draft) return;
-  
+
   // Calculate current total
   const total = Object.values(draft.special).reduce((a, b) => a + b, 0);
   const MAX_POOL = 40;
-  
+
   // Rules: Prevent going over 40 total
-  if (amount > 0 && total >= MAX_POOL) return; 
-  
+  if (amount > 0 && total >= MAX_POOL) return;
+
   // Update Draft
   draft.special[stat] += amount;
+  draft.lastTouched = stat; // drives the persistent SPECIAL_FLAVOR panel
   window.render(); // Re-render to update UI
+}
+
+// A stat already at its min/max still needs to be inspectable — clicking
+// the label itself (rather than a now-disabled +/- button) focuses the
+// flavor panel on it without changing anything.
+export function setCreationFocus(stat) {
+  const draft = window.creationDraft;
+  if (!draft) return;
+  draft.lastTouched = stat;
+  window.render();
 }
 
 export function setCreationRace(raceKey) {

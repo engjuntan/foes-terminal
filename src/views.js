@@ -2,7 +2,7 @@
 import { calculateDerivedStats, RACE_RULES, getRadiationTier, RAD_THRESHOLDS, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
 import { getItem, itemDatabase } from './items.js';
 import { normalizeInventory, getInventoryQuantity } from './inventory.js';
-import { SPECIAL_INFO, SPECIAL_ORDER, SKILL_INFO } from './goatContent.js';
+import { SPECIAL_INFO, SPECIAL_ORDER, SPECIAL_FLAVOR, SKILL_INFO } from './goatContent.js';
 import { DIFFICULTY_TIERS } from './checks.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
@@ -221,9 +221,10 @@ export function getRegistrationView(charId, liveData) {
     const canMinus = val > min ? '' : 'disabled style="opacity:0.3"';
     const canPlus = (val < max && remaining > 0) ? '' : 'disabled style="opacity:0.3"';
 
+    const isFocused = (draft.lastTouched || 'str') === stat;
     return `
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; border-bottom:1px dashed #333; padding:5px;">
-        <span style="width:50px; font-weight:bold; color:var(--pip-dim);">${renderWikiLink(label, SPECIAL_INFO[stat])}</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; border-bottom:1px dashed ${isFocused ? 'var(--pip-green)' : '#333'}; padding:5px;">
+        <span style="width:50px; font-weight:bold; color:var(--pip-dim); cursor:pointer;" onclick="window.setCreationFocus('${stat}')">${renderWikiLink(label, SPECIAL_INFO[stat])}</span>
         <div style="display:flex; align-items:center; gap:10px;">
           <button ${canMinus} onclick="window.adjustCreationStat('${stat}', -1)">[-]</button>
           <span style="color:${val >= 10 ? 'gold' : 'var(--pip-green)'}; width:30px; text-align:center;">${val}</span>
@@ -233,6 +234,21 @@ export function getRegistrationView(charId, liveData) {
       </div>
     `;
   };
+
+  // Live derived-stat preview — calculateDerivedStats already computes
+  // everything from a draft; the creation screen just never called it
+  // before, so raising END from 5 to 7 gave no feedback at all about
+  // what those two points actually bought.
+  const previewDerived = calculateDerivedStats(draft.special, 1, [], [], draft.race, []);
+
+  // Persistent flavor panel — New Vegas-style broad description per
+  // stat, not per-value. Defaults to STR so the panel is never empty on
+  // first load; setCreationFocus/adjustCreationStat both update
+  // draft.lastTouched. Works identically on mobile (tap the label) and
+  // desktop (tap +/-), unlike the old hover-only SPECIAL_INFO tooltip.
+  const focusedStat = draft.lastTouched || 'str';
+  const focusedLabel = { str: 'STRENGTH', per: 'PERCEPTION', end: 'ENDURANCE', cha: 'CHARISMA', int: 'INTELLIGENCE', agi: 'AGILITY', luk: 'LUCK' }[focusedStat];
+  const flavor = SPECIAL_FLAVOR[focusedStat];
 
   // Render Skills
   const allSkills = ["small_guns", "big_guns", "energy_weapons", "melee_weapons", "unarmed", "throwing", "medicine", "science", "lockpick", "sneak", "speech", "survival"];
@@ -278,6 +294,23 @@ export function getRegistrationView(charId, liveData) {
           </div>
           ${renderRow('str', 'STR')} ${renderRow('per', 'PER')} ${renderRow('end', 'END')}
           ${renderRow('cha', 'CHA')} ${renderRow('int', 'INT')} ${renderRow('agi', 'AGI')} ${renderRow('luk', 'LUK')}
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:20px; text-align:center;">
+          <div style="border:1px solid #333; padding:6px;"><small style="color:#888;">HP</small><br><strong style="color:var(--pip-green);">${previewDerived.maxHpCalculated}</strong></div>
+          <div style="border:1px solid #333; padding:6px;"><small style="color:#888;">AC</small><br><strong style="color:var(--pip-green);">${previewDerived.armorClass}</strong></div>
+          <div style="border:1px solid #333; padding:6px;"><small style="color:#888;">CARRY</small><br><strong style="color:var(--pip-green);">${previewDerived.carryCapacity.toFixed(0)}kg</strong></div>
+          <div style="border:1px solid #333; padding:6px;"><small style="color:#888;">SEQ</small><br><strong style="color:var(--pip-green);">${previewDerived.sequenceBonus}</strong></div>
+        </div>
+
+        <div style="border:1px solid var(--pip-dim); margin-bottom:20px;">
+          ${flavor && flavor.image_url
+            ? `<img src="${flavor.image_url}" style="width:100%; display:block; border-bottom:1px solid var(--pip-dim);">`
+            : `<div style="aspect-ratio:1; display:flex; align-items:center; justify-content:center; color:#444; font-size:12px; border-bottom:1px solid var(--pip-dim);">[ ART PENDING — ${focusedLabel} ]</div>`}
+          <div style="padding:10px;">
+            <div style="color:var(--pip-green); font-weight:bold; margin-bottom:4px;">${focusedLabel}</div>
+            <div style="font-size:13px; color:#ccc; line-height:1.5;">${(flavor && flavor.description) || ''}</div>
+          </div>
         </div>
 
         <h3 style="border-bottom:1px solid var(--pip-dim);">TAG SKILLS (${draft.tags.length}/3)</h3>

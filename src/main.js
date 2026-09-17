@@ -99,6 +99,7 @@ window.gmApplyStatusEffectInCombat = Controllers.gmApplyStatusEffectInCombat;
 window.gmRemoveStatusEffectDirect = Controllers.gmRemoveStatusEffect;
 // Character Creation Actions
 window.adjustCreationStat = Controllers.adjustCreationStat;
+window.setCreationFocus = Controllers.setCreationFocus;
 window.setCreationRace = Controllers.setCreationRace;
 window.toggleCreationTag = Controllers.toggleCreationTag;
 window.finalizeCharacter = Controllers.finalizeCharacter;
