@@ -1005,21 +1005,6 @@ export const itemDatabase = {
     "weight": 4,
     "value": 60
   },
-  bedil_peluru: {
-    "id": "bedil_peluru",
-    "name": "Bedil & Peluru",
-    "type": "consumable",
-    "icon": "",
-    "description": "Skill book — small guns/gunsmith trade magazine, mainline 'Guns and Bullets' analogue. One-time use, permanent bonus. Uses the same skill_<name> key convention formulas.js already reads for trait/perk modifiers, so it's ready to plug in once skill books get wired into calculateDerivedStats.",
-    "effect": "Permanently grants +1 Small Guns skill",
-    "stats": {
-      "skill_small_guns": 1,
-      "permanent": true
-    },
-    "addictive": false,
-    "weight": 0.3,
-    "value": 200
-  },
   buffout: {
     "id": "buffout",
     "name": "Buffout",
@@ -1310,21 +1295,6 @@ export const itemDatabase = {
     "weight": 0.02,
     "value": 5
   },
-  loceng_kunci: {
-    "id": "loceng_kunci",
-    "name": "Loceng & Kunci",
-    "type": "consumable",
-    "icon": "",
-    "description": "Skill book — lockpick trade magazine, mainline 'Tumblers Today' analogue. One-time use, permanent bonus. Uses the same skill_<name> key convention formulas.js already reads for trait/perk modifiers.",
-    "effect": "Permanently grants +1 Lockpick skill",
-    "stats": {
-      "skill_lockpick": 1,
-      "permanent": true
-    },
-    "addictive": false,
-    "weight": 0.3,
-    "value": 180
-  },
   med_kit: {
     "id": "med_kit",
     "name": "Med-Kit",
@@ -1483,21 +1453,6 @@ export const itemDatabase = {
     "weight": 0.3,
     "value": 10
   },
-  sains_untuk_semua: {
-    "id": "sains_untuk_semua",
-    "name": "Sains Untuk Semua",
-    "type": "consumable",
-    "icon": "",
-    "description": "Skill book — pre-war children's science magazine, mainline 'Big Book of Science' analogue. One-time use, permanent bonus. Uses the same skill_<name> key convention formulas.js already reads for trait/perk modifiers.",
-    "effect": "Permanently grants +1 Science skill",
-    "stats": {
-      "skill_science": 1,
-      "permanent": true
-    },
-    "addictive": false,
-    "weight": 0.4,
-    "value": 220
-  },
   salvaged_birds_nest_broth: {
     "id": "salvaged_birds_nest_broth",
     "name": "Salvaged Bird's Nest Broth",
@@ -1514,6 +1469,867 @@ export const itemDatabase = {
     "addictive": false,
     "weight": 0.3,
     "value": 45
+  },
+  ghoul_engineer_charge_notes: {
+    "id": "ghoul_engineer_charge_notes",
+    "name": "A Ghoul Engineer's Charge-Weapon Notes",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — field notes on charge weapons by a ghoul engineer.",
+    "image_prompt": "Loose technical notes on capacitors and charge weapons, faintly scorched at the edges, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Energy Weapons skill",
+    "stats": {
+      "skill_energy_weapons": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 240
+  },
+  lifters_private_notes: {
+    "id": "lifters_private_notes",
+    "name": "A Lifter's Private Notes",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a working thief's private notes on lifting.",
+    "image_prompt": "A cramped little notebook in tight shorthand, hidden binding, no title, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Steal skill",
+    "stats": {
+      "skill_steal": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 185
+  },
+  nomads_survival_log: {
+    "id": "nomads_survival_log",
+    "name": "A Nomad's Survival Log",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a wanderer's running log of water, forage and terrain.",
+    "image_prompt": "A travel-worn log book with hand-drawn water maps, string-tied covers, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Survival skill",
+    "stats": {
+      "skill_survival": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 200
+  },
+  raiders_grenade_primer: {
+    "id": "raiders_grenade_primer",
+    "name": "A Raider's Grenade Primer",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a raider's crude primer on thrown explosives.",
+    "image_prompt": "A crude hand-stapled pamphlet on grenade handling, scrawled warnings in the margins, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Throwing skill",
+    "stats": {
+      "skill_throwing": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 185
+  },
+  salvagers_notes_dead_machines: {
+    "id": "salvagers_notes_dead_machines",
+    "name": "A Salvager's Notes on Dead Machines",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a salvager's hard-won notes on disabled robots.",
+    "image_prompt": "A salvager's notebook with robot schematics and warning annotations, oil-smudged, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Robotics skill",
+    "stats": {
+      "skill_robotics": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 250
+  },
+  scouts_field_diary: {
+    "id": "scouts_field_diary",
+    "name": "A Scout's Field Diary",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a scout's field diary on moving unseen.",
+    "image_prompt": "A weathered field diary with terrain sketches and movement notes, elastic band closure, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Sneak skill",
+    "stats": {
+      "skill_sneak": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 195
+  },
+  thiefs_practical_notes: {
+    "id": "thiefs_practical_notes",
+    "name": "A Thief's Practical Notes",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a working thief's practical notes on locks.",
+    "image_prompt": "A slim pocket notebook of lock diagrams and timings, pencil smudges throughout, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Lockpick skill",
+    "stats": {
+      "skill_lockpick": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 190
+  },
+  traders_book_of_persuasion: {
+    "id": "traders_book_of_persuasion",
+    "name": "A Trader's Book of Persuasion",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a merchant's collected techniques of persuasion.",
+    "image_prompt": "A merchant's leather-bound book of sales patter, ribbon bookmark, worn edges, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Speech skill",
+    "stats": {
+      "skill_speech": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 220
+  },
+  trappers_field_guide: {
+    "id": "trappers_field_guide",
+    "name": "A Trapper's Field Guide",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a trapper's hand-bound field guide.",
+    "image_prompt": "A hand-bound field guide of trap diagrams drawn in ink, twine binding, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Traps skill",
+    "stats": {
+      "skill_traps": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 195
+  },
+  wasteland_medic_field_log: {
+    "id": "wasteland_medic_field_log",
+    "name": "A Wasteland Medic's Field Log",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a field medic's working log.",
+    "image_prompt": "A field medic's log book with a faded red cross on the cover, tabbed pages, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Medicine skill",
+    "stats": {
+      "skill_medicine": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 250
+  },
+  ah_longs_guide: {
+    "id": "ah_longs_guide",
+    "name": "Ah Long's Guide to Reclaiming What's Yours",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a loan shark's euphemistic handbook. No formal subject exists for this.",
+    "image_prompt": "A cheaply printed handbook with a smiling businessman on the cover, red and gold design, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Steal skill",
+    "stats": {
+      "skill_steal": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 175
+  },
+  bm_pidato_perbahasan: {
+    "id": "bm_pidato_perbahasan",
+    "name": "BM — Pidato & Perbahasan",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — school Bahasa Malaysia textbook, speech and debate module.",
+    "image_prompt": "A school language textbook open to a public speaking chapter with podium illustrations, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Speech skill",
+    "stats": {
+      "skill_speech": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 160
+  },
+  bayang_senyap: {
+    "id": "bayang_senyap",
+    "name": "Bayang Senyap",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — pre-War spy serial, unexpectedly instructive.",
+    "image_prompt": "A pulp spy novel with a shadowed figure on the cover, cheap paper yellowed, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Sneak skill",
+    "stats": {
+      "skill_sneak": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 185
+  },
+  doktor_wilayah: {
+    "id": "doktor_wilayah",
+    "name": "Doktor Wilayah",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — pre-War regional medical journal.",
+    "image_prompt": "A pre-war medical journal with a clinical cover design, water-damaged corner, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Medicine skill",
+    "stats": {
+      "skill_medicine": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 240
+  },
+  bedil_peluru: {
+    "id": "bedil_peluru",
+    "name": "Guns and Bullets",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — small arms trade magazine, the Peninsula's edition of the pre-War standard. One-time read, permanent bonus.",
+    "image_prompt": "A worn pre-war firearms trade magazine, cover showing a rifle diagram, creased and water-stained, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Small Guns skill",
+    "stats": {
+      "skill_small_guns": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 200
+  },
+  heavy_duty: {
+    "id": "heavy_duty",
+    "name": "Heavy Duty",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — heavy weapons trade quarterly.",
+    "image_prompt": "A heavy-stock trade magazine with a minigun on the cover, corner torn off, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Big Guns skill",
+    "stats": {
+      "skill_big_guns": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 210
+  },
+  hidup_di_alam_liar: {
+    "id": "hidup_di_alam_liar",
+    "name": "Hidup di Alam Liar",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — pre-War outdoors magazine, now read very differently.",
+    "image_prompt": "A pre-war outdoor recreation magazine, jungle photograph cover, heavily thumbed, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Survival skill",
+    "stats": {
+      "skill_survival": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 180
+  },
+  jurutera_wilayah: {
+    "id": "jurutera_wilayah",
+    "name": "Jurutera Wilayah",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — pre-War regional engineering journal.",
+    "image_prompt": "A dense technical engineering journal, structural diagrams, institutional cover design, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Engineering skill",
+    "stats": {
+      "skill_engineering": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 235
+  },
+  kajian_tempatan_alam_sekitar: {
+    "id": "kajian_tempatan_alam_sekitar",
+    "name": "Kajian Tempatan — Alam Sekitar",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — school local studies textbook, environment module.",
+    "image_prompt": "A school local studies textbook open to a regional map and rainfall chart, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Survival skill",
+    "stats": {
+      "skill_survival": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 155
+  },
+  kata_hati_course: {
+    "id": "kata_hati_course",
+    "name": "Kata Hati: An Unaccredited Correspondence Course",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — the surviving first lesson of a mail-order course. No formal subject exists for this.",
+    "image_prompt": "A single mail-order correspondence lesson in a torn envelope, official-looking letterhead, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Instinct skill",
+    "stats": {
+      "skill_instinct": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 165
+  },
+  kemahiran_hidup_kraf_logam: {
+    "id": "kemahiran_hidup_kraf_logam",
+    "name": "Kemahiran Hidup — Kraf Logam",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — primary school Living Skills textbook, metalcraft module.",
+    "image_prompt": "A school Living Skills textbook open to a metalwork module with hand-tool diagrams, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Melee Weapons skill",
+    "stats": {
+      "skill_melee_weapons": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 150
+  },
+  kemahiran_hidup_mekanisme_ringkas: {
+    "id": "kemahiran_hidup_mekanisme_ringkas",
+    "name": "Kemahiran Hidup — Mekanisme Ringkas",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — school Living Skills textbook, simple mechanisms module.",
+    "image_prompt": "A school textbook open to a simple mechanisms chapter showing levers and pin diagrams, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Lockpick skill",
+    "stats": {
+      "skill_lockpick": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 150
+  },
+  loceng_kunci: {
+    "id": "loceng_kunci",
+    "name": "Loceng & Kunci",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — lockpick trade magazine, mainline 'Tumblers Today' analogue. One-time use, permanent bonus. Uses the same skill_<name> key convention formulas.js already reads for trait/perk modifiers.",
+    "effect": "Permanently grants +1 Lockpick skill",
+    "stats": {
+      "skill_lockpick": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 180
+  },
+  nasi_lemak_for_the_soul: {
+    "id": "nasi_lemak_for_the_soul",
+    "name": "Nasi Lemak for the Soul",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a sentimental story collection about trusting your gut.",
+    "image_prompt": "A sentimental inspirational story collection with a warm homely cover illustration, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Instinct skill",
+    "stats": {
+      "skill_instinct": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 170
+  },
+  notes_from_the_pit: {
+    "id": "notes_from_the_pit",
+    "name": "Notes from the Pit — A Fighter's Diary",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a pit fighter's personal diary.",
+    "image_prompt": "A small battered diary, bloodstained thumbprint on the cover, terse handwritten entries, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Unarmed skill",
+    "stats": {
+      "skill_unarmed": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 190
+  },
+  olympic_throwing: {
+    "id": "olympic_throwing",
+    "name": "Olympic Throwing",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — pre-War athletics manual on throwing events.",
+    "image_prompt": "A pre-war athletics manual with a javelin thrower on the cover, olympic rings faded, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Throwing skill",
+    "stats": {
+      "skill_throwing": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 175
+  },
+  pjk_unit_bola_baling: {
+    "id": "pjk_unit_bola_baling",
+    "name": "PJK — Unit Bola Baling",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — school PE textbook, handball unit.",
+    "image_prompt": "A school PE textbook open to a handball unit, throwing-motion illustrations, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Throwing skill",
+    "stats": {
+      "skill_throwing": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 145
+  },
+  pjk_unit_silat: {
+    "id": "pjk_unit_silat",
+    "name": "PJK — Unit Silat",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — school PE textbook, silat unit.",
+    "image_prompt": "A school physical education textbook open to a silat unit with stance photographs, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Unarmed skill",
+    "stats": {
+      "skill_unarmed": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 150
+  },
+  pencak_silat: {
+    "id": "pencak_silat",
+    "name": "Pencak Silat",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — illustrated silat form manual, blade chapter included.",
+    "image_prompt": "An illustrated martial arts form manual showing sequential stances, traditional Southeast Asian design, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Melee Weapons skill",
+    "stats": {
+      "skill_melee_weapons": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 200
+  },
+  pendidikan_kesihatan_pertolongan_cemas: {
+    "id": "pendidikan_kesihatan_pertolongan_cemas",
+    "name": "Pendidikan Kesihatan — Pertolongan Cemas",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — school health education textbook, first aid module.",
+    "image_prompt": "A school health education textbook open to a first aid module with bandaging diagrams, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Medicine skill",
+    "stats": {
+      "skill_medicine": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 160
+  },
+  perangkap_jerat: {
+    "id": "perangkap_jerat",
+    "name": "Perangkap & Jerat",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — pre-War trapping quarterly.",
+    "image_prompt": "A trapping trade magazine with a snare diagram cover, damp-warped pages, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Traps skill",
+    "stats": {
+      "skill_traps": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 185
+  },
+  ponteng_guide: {
+    "id": "ponteng_guide",
+    "name": "Ponteng: A Beginner's Guide to Not Being Seen",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a student's tongue-in-cheek guide to truancy. No formal subject exists for this.",
+    "image_prompt": "A crudely photocopied student zine about skipping class, hand-drawn school map on the cover, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Sneak skill",
+    "stats": {
+      "skill_sneak": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 165
+  },
+  rbt_bengkel_logam: {
+    "id": "rbt_bengkel_logam",
+    "name": "RBT — Bengkel Logam",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — school Design & Technology textbook, metal workshop module.",
+    "image_prompt": "A school workshop textbook open to metalworking techniques with tool photographs, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Gunsmith skill",
+    "stats": {
+      "skill_gunsmith": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 160
+  },
+  rbt_mekanisme: {
+    "id": "rbt_mekanisme",
+    "name": "RBT — Mekanisme",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — school Design & Technology textbook, mechanisms module.",
+    "image_prompt": "A school design and technology textbook open to a mechanisms chapter with lever diagrams, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Traps skill",
+    "stats": {
+      "skill_traps": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 155
+  },
+  reka_bentuk_dan_teknologi: {
+    "id": "reka_bentuk_dan_teknologi",
+    "name": "Reka Bentuk dan Teknologi",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — school Design & Technology textbook, complete.",
+    "image_prompt": "A thick school design and technology textbook, bright cover, annotated margins, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Engineering skill",
+    "stats": {
+      "skill_engineering": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.5,
+    "value": 165
+  },
+  robotik_masa_depan: {
+    "id": "robotik_masa_depan",
+    "name": "Robotik & Masa Depan",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — pre-War robotics magazine.",
+    "image_prompt": "A retro-futurist robotics magazine with a friendly robot on the cover, optimistic design, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Robotics skill",
+    "stats": {
+      "skill_robotics": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 245
+  },
+  sains_tahun_5: {
+    "id": "sains_tahun_5",
+    "name": "Sains Tahun 5",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — primary school science textbook, Year 5.",
+    "image_prompt": "A primary school science textbook, bright cover with cartoon scientists, worn corners, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Science skill",
+    "stats": {
+      "skill_science": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 150
+  },
+  sains_tahun_6_elektrik: {
+    "id": "sains_tahun_6_elektrik",
+    "name": "Sains Tahun 6 — Bab Elektrik",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — primary school science textbook, electricity chapter.",
+    "image_prompt": "A primary school science textbook open to an electricity chapter, child's colouring on the diagram, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Energy Weapons skill",
+    "stats": {
+      "skill_energy_weapons": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 160
+  },
+  sains_untuk_semua: {
+    "id": "sains_untuk_semua",
+    "name": "Sains Untuk Semua",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — pre-war children's science magazine, mainline 'Big Book of Science' analogue. One-time use, permanent bonus. Uses the same skill_<name> key convention formulas.js already reads for trait/perk modifiers.",
+    "effect": "Permanently grants +1 Science skill",
+    "stats": {
+      "skill_science": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 220
+  },
+  sains_teknologi_masa_depan: {
+    "id": "sains_teknologi_masa_depan",
+    "name": "Sains — Bab Teknologi Masa Depan",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — school science textbook, future technology chapter.",
+    "image_prompt": "A school science textbook open to a cheerful future-technology chapter with robot illustrations, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Robotics skill",
+    "stats": {
+      "skill_robotics": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 160
+  },
+  scrapyard_heavy_ordnance_log: {
+    "id": "scrapyard_heavy_ordnance_log",
+    "name": "Scrapyard Heavy Ordnance Log",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a scrapyard's running log of heavy weapons salvage.",
+    "image_prompt": "A thick ledger of handwritten heavy-weapon salvage notes, many entries struck through, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Big Guns skill",
+    "stats": {
+      "skill_big_guns": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 180
+  },
+  sinaran_mingguan: {
+    "id": "sinaran_mingguan",
+    "name": "Sinaran Mingguan",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — pre-War energy weapons weekly.",
+    "image_prompt": "A glossy pre-war energy weapons magazine, laser rifle on the cover, sun-bleached, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Energy Weapons skill",
+    "stats": {
+      "skill_energy_weapons": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 230
+  },
+  stolen_keturunan_manual: {
+    "id": "stolen_keturunan_manual",
+    "name": "Stolen Keturunan Manual",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — ties to the knowledge-scarcity theme. One-time use, permanent small skill bonus on read. No target skill was specified in the original flavor text; guessed Speech (a lineage/heritage document trading on social standing) rather than leaving it unresolved — worth confirming or retargeting.",
+    "effect": "Permanently grants +1 Speech skill",
+    "stats": {
+      "skill_speech": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 250
+  },
+  bench_gunsmith_mod_log: {
+    "id": "bench_gunsmith_mod_log",
+    "name": "The Bench Gunsmith's Modification Log",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a bench gunsmith's running modification log.",
+    "image_prompt": "A workshop log book of weapon modifications, tick marks and crossings-out, oil stains, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Gunsmith skill",
+    "stats": {
+      "skill_gunsmith": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 215
+  },
+  homemade_gunsmith_notebook: {
+    "id": "homemade_gunsmith_notebook",
+    "name": "The Homemade Gunsmith's Notebook",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a hand-bound field notebook on improvised firearms.",
+    "image_prompt": "A hand-bound notebook stuffed with loose diagrams of improvised guns, grease-stained pages, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Small Guns skill",
+    "stats": {
+      "skill_small_guns": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 170
+  },
+  pickpockets_pocket_guide: {
+    "id": "pickpockets_pocket_guide",
+    "name": "The Pickpocket's Pocket Guide to Picking Pockets",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a pocket-sized trade guide to lifting.",
+    "image_prompt": "A tiny pocket-sized guidebook, comically small, worn cloth cover, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Steal skill",
+    "stats": {
+      "skill_steal": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.2,
+    "value": 195
+  },
+  scavenger_scientist_journal: {
+    "id": "scavenger_scientist_journal",
+    "name": "The Scavenger-Scientist's Journal",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a working journal of post-collapse experiments.",
+    "image_prompt": "A thick handwritten research journal, taped spine, pressed samples between pages, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Science skill",
+    "stats": {
+      "skill_science": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 230
+  },
+  scrapyard_engineers_workbook: {
+    "id": "scrapyard_engineers_workbook",
+    "name": "The Scrapyard Engineer's Workbook",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a working engineer's scrapyard workbook.",
+    "image_prompt": "A grease-stained workbook full of repair schematics, metal clip binding, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Engineering skill",
+    "stats": {
+      "skill_engineering": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 215
+  },
+  scrapyard_smiths_primer: {
+    "id": "scrapyard_smiths_primer",
+    "name": "The Scrapyard Smith's Primer",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a scrapyard smith's primer on improvised blades.",
+    "image_prompt": "A grubby workshop primer on improvised blade-making, metal shavings in the spine, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Melee Weapons skill",
+    "stats": {
+      "skill_melee_weapons": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 170
+  },
+  tukang_senjata: {
+    "id": "tukang_senjata",
+    "name": "Tukang Senjata",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — pre-War weaponsmithing trade journal.",
+    "image_prompt": "A weaponsmithing trade journal with exploded gun diagrams on the cover, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Gunsmith skill",
+    "stats": {
+      "skill_gunsmith": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 225
+  },
+  tumbuk_majalah: {
+    "id": "tumbuk_majalah",
+    "name": "Tumbuk Majalah",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — pre-War fighting magazine.",
+    "image_prompt": "A pulp fighting magazine with two boxers on the cover, dog-eared and taped, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Unarmed skill",
+    "stats": {
+      "skill_unarmed": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 180
+  },
+  um_guide_to_big_weapons: {
+    "id": "um_guide_to_big_weapons",
+    "name": "UM: Guide to Big Weapons",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — bound university lecture notes on heavy weapon systems.",
+    "image_prompt": "Bound university lecture notes, faded institutional crest on the cover, technical diagrams, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Big Guns skill",
+    "stats": {
+      "skill_big_guns": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 220
+  },
+  understanding_gut_instincts: {
+    "id": "understanding_gut_instincts",
+    "name": "Understanding Gut Instincts",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — a study of intuition and threat perception.",
+    "image_prompt": "A sober academic-looking paperback on intuition, plain typographic cover, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Instinct skill",
+    "stats": {
+      "skill_instinct": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 190
+  },
+  your_rifle_and_you: {
+    "id": "your_rifle_and_you",
+    "name": "Your Rifle and You",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — pre-War military training pamphlet, relentlessly cheerful.",
+    "image_prompt": "A thin pre-war military training pamphlet with a smiling cartoon soldier on the cover, isolated on dark background, game icon style",
+    "effect": "Permanently grants +1 Small Guns skill",
+    "stats": {
+      "skill_small_guns": 1,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 190
   },
   soyabean_milk: {
     "id": "soyabean_milk",
@@ -1543,21 +2359,6 @@ export const itemDatabase = {
     "addictive": false,
     "weight": 0.1,
     "value": 75
-  },
-  stolen_keturunan_manual: {
-    "id": "stolen_keturunan_manual",
-    "name": "Stolen Keturunan Manual",
-    "type": "consumable",
-    "icon": "",
-    "description": "Skill book — ties to the knowledge-scarcity theme. One-time use, permanent small skill bonus on read. No target skill was specified in the original flavor text; guessed Speech (a lineage/heritage document trading on social standing) rather than leaving it unresolved — worth confirming or retargeting.",
-    "effect": "Permanently grants +1 Speech skill",
-    "stats": {
-      "skill_speech": 1,
-      "permanent": true
-    },
-    "addictive": false,
-    "weight": 0.4,
-    "value": 250
   },
   teh_tarik_concentrate: {
     "id": "teh_tarik_concentrate",
