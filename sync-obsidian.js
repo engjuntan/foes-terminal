@@ -172,6 +172,64 @@ function isInGlossaryFolder(filePath) {
   return GLOSSARY_FOLDERS.includes(topFolder);
 }
 
+// Glossary terms are named after their file, which means they're formal
+// ("Federation of Malaya", "The Free City of Bandawang") while prose is
+// not ("the Federation", "Bandawang"). Without aliases the hover system
+// silently matches almost nothing in a real data log — and worse, terms
+// whose filename carries a disambiguator ("Chosen (Federation)") could
+// never match anything a human would actually write.
+//
+// Two sources:
+//   1. Obsidian's own `aliases:` frontmatter, which the vault already
+//      uses in ~15 files, in both the inline-array and YAML-list forms.
+//      Chosen deliberately by the GM, so matched case-INsensitively.
+//   2. An auto-derived alias from stripping a parenthetical suffix, which
+//      fixes the "(Federation)" family in one go — but produces ordinary
+//      English words ("Chosen", "Ruled", "Sword"). Returned separately as
+//      `strict`, and matched case-SENSITIVELY, so the capitalised faction
+//      name links and "he had chosen" / "the land ruled by" do not.
+//
+// Deliberately NOT auto-stripping a leading "The": it would turn "The
+// Path" into "Path" and put a tooltip on every use of an ordinary word.
+// Those cases get an explicit alias in the vault file instead.
+function extractAliases(rawContent, name) {
+  const aliases = new Set();
+  const strict = new Set();
+
+  const fm = rawContent.match(/^---\n([\s\S]*?)\n---/);
+  if (fm) {
+    const block = fm[1];
+    const inline = block.match(/^aliases:\s*\[(.*?)\]/m);
+    if (inline) {
+      inline[1].split(',').forEach(a => {
+        const cleaned = a.trim().replace(/^["']|["']$/g, '').trim();
+        if (cleaned) aliases.add(cleaned);
+      });
+    } else {
+      // YAML list form: `aliases:` followed by indented `- item` lines.
+      const list = block.match(/^aliases:\s*\n((?:\s*-\s*.*\n?)+)/m);
+      if (list) {
+        list[1].split('\n').forEach(line => {
+          const m = line.match(/^\s*-\s*(.+?)\s*$/);
+          if (m) {
+            const cleaned = m[1].replace(/^["']|["']$/g, '').trim();
+            if (cleaned) aliases.add(cleaned);
+          }
+        });
+      }
+    }
+  }
+
+  const withoutParenthetical = name.replace(/\s*\([^)]*\)\s*$/, '').trim();
+  if (withoutParenthetical && withoutParenthetical !== name && !aliases.has(withoutParenthetical)) {
+    strict.add(withoutParenthetical);
+  }
+
+  aliases.delete(name); // the name itself is matched separately
+  strict.delete(name);
+  return { aliases: [...aliases], strict: [...strict] };
+}
+
 function processGlossaryCandidate(filePath, rawContent) {
   const name = path.basename(filePath, '.md')
     .replace(/^\d+[_ ]/, '')                                       // Obsidian sort-order prefixes ("01_", "02 ")
@@ -184,13 +242,20 @@ function processGlossaryCandidate(filePath, rawContent) {
   const summary = firstSentence(stripped);
   if (!summary) return; // nothing but a title/embed — not useful as a tooltip
   const relDir = path.relative(OBSIDIAN_PATH, path.dirname(filePath));
+  const { aliases, strict } = extractAliases(rawContent, name);
   glossaryMap[id] = {
     id,
     name,
+    aliases,
+    strict_aliases: strict,
     summary,
     category_path: relDir ? relDir.split(path.sep) : []
   };
-  console.log(`[GLOSSARY] Extracted: ${name}`);
+  const aliasNote = [
+    aliases.length ? `aliases: ${aliases.join(', ')}` : '',
+    strict.length ? `strict: ${strict.join(', ')}` : ''
+  ].filter(Boolean).join(' | ');
+  console.log(`[GLOSSARY] Extracted: ${name}${aliasNote ? ` (${aliasNote})` : ''}`);
 }
 
 // Process a single file to extract JSON

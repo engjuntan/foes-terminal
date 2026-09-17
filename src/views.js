@@ -100,22 +100,61 @@ function escapeRegex(text) {
 // never before — matching happens on the final markup, and the
 // matched (already-safe) text is what gets handed to renderWikiLink
 // as the visible name, so nothing unescaped ever gets inserted.
+// Every term contributes its name AND its aliases as matchable phrases
+// (see extractAliases in sync-obsidian.js — formal filenames like
+// "Federation of Malaya" almost never appear in real prose, "Federation"
+// does). Phrases are sorted longest-first so "Federation of Malaya" still
+// wins over a bare "Federation" alias at the same starting position.
+//
+// Priority when two terms claim the same phrase: a term's own NAME always
+// beats another term's alias (PosLaju lists "Riders" as an alias, but
+// "Riders" is also a term in its own right — it should mean Riders).
+// Built in two passes so that holds regardless of object order.
+//
+// strict_aliases are auto-derived ("Chosen" from "Chosen (Federation)")
+// and are common words, so they only link on an exact-case match.
 let glossaryPattern = null;
 function getGlossaryPattern() {
   if (glossaryPattern) return glossaryPattern;
-  const terms = Object.values(glossaryDatabase).sort((a, b) => b.name.length - a.name.length);
-  if (terms.length === 0) return null;
-  const alternation = terms.map(t => escapeRegex(t.name)).join('|');
-  glossaryPattern = { regex: new RegExp(`\\b(${alternation})\\b`, 'gi'), terms };
+  const phraseToEntry = new Map(); // lowercase phrase -> { term, original, strict }
+  const terms = Object.values(glossaryDatabase);
+  terms.forEach(term => {
+    phraseToEntry.set(term.name.toLowerCase(), { term, original: term.name, strict: false });
+  });
+  terms.forEach(term => {
+    (term.aliases || []).forEach(a => {
+      const key = a.toLowerCase();
+      if (!phraseToEntry.has(key)) phraseToEntry.set(key, { term, original: a, strict: false });
+    });
+    (term.strict_aliases || []).forEach(a => {
+      const key = a.toLowerCase();
+      if (!phraseToEntry.has(key)) phraseToEntry.set(key, { term, original: a, strict: true });
+    });
+  });
+  if (phraseToEntry.size === 0) return null;
+  const phrases = [...phraseToEntry.keys()].sort((a, b) => b.length - a.length);
+  const alternation = phrases.map(escapeRegex).join('|');
+  glossaryPattern = { regex: new RegExp(`\\b(${alternation})\\b`, 'gi'), phraseToEntry };
   return glossaryPattern;
 }
+// Only the FIRST mention of each term gets a tooltip, wiki-style. With
+// short aliases in play, linking every occurrence turns a log that says
+// "Federation" six times into a wall of underlines. Keyed by term id, so
+// "Federation" early on and "Federation of Malaya" later still count as
+// the same term and only the first one links.
+// Safe against re-matching inserted markup: String.replace scans the
+// original string only, never the tooltip HTML it inserts.
 function applyGlossaryTooltips(safeHtml) {
   const pattern = getGlossaryPattern();
   if (!pattern) return safeHtml;
+  const alreadyLinked = new Set();
   return safeHtml.replace(pattern.regex, (matchText) => {
-    const term = pattern.terms.find(t => t.name.toLowerCase() === matchText.toLowerCase());
-    if (!term) return matchText;
-    return renderWikiLink(matchText, term.summary);
+    const entry = pattern.phraseToEntry.get(matchText.toLowerCase());
+    if (!entry) return matchText;
+    if (entry.strict && matchText !== entry.original) return matchText;
+    if (alreadyLinked.has(entry.term.id)) return matchText;
+    alreadyLinked.add(entry.term.id);
+    return renderWikiLink(matchText, entry.term.summary);
   });
 }
 

@@ -3,6 +3,8 @@ export const glossaryDatabase = {
   abang_kopi: {
     "id": "abang_kopi",
     "name": "Abang Kopi",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "Once the smiling face of a pre-war beverage empire, Abang Kopi is now the ubiquitous mascot of a vanished age.",
     "category_path": [
       "01_World Details"
@@ -11,6 +13,8 @@ export const glossaryDatabase = {
   bursa_chips: {
     "id": "bursa_chips",
     "name": "Bursa Chips",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Bursa Chip is a rare and vital hardware cipher used to access BursaNet, the decentralized intranet maintained by the Bursa, a secretive sub-faction of the Chamber of Commerce.",
     "category_path": [
       "01_World Details"
@@ -19,6 +23,8 @@ export const glossaryDatabase = {
   economies_of_the_peninsula: {
     "id": "economies_of_the_peninsula",
     "name": "Economies of the Peninsula",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "In the world of Fallout: The Eastern Shores, currency is more than just barter, it represents political allegiance, cultural identity, and survival strategy.",
     "category_path": [
       "01_World Details"
@@ -27,6 +33,8 @@ export const glossaryDatabase = {
   foes_timeline: {
     "id": "foes_timeline",
     "name": "FOES Timeline",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "FOES Historical Timeline: The Road to 2242",
     "category_path": [
       "01_World Details"
@@ -35,6 +43,8 @@ export const glossaryDatabase = {
   protiga: {
     "id": "protiga",
     "name": "Protiga",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "Protiga was one of the largest pre-war megacorporations on the Peninsula, formed through the merger of Petrogas, ProCars Automotive, and Tenaga Nasional.",
     "category_path": [
       "01_World Details"
@@ -43,6 +53,8 @@ export const glossaryDatabase = {
   riders: {
     "id": "riders",
     "name": "Riders",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "Riders are the couriers of the wasteland, half-mad, dust-bitten individuals bound by oath to deliver packages, letters, and secrets across lawless terrain.",
     "category_path": [
       "01_World Details"
@@ -51,6 +63,8 @@ export const glossaryDatabase = {
   timeline_of_major_events: {
     "id": "timeline_of_major_events",
     "name": "Timeline of Major Events",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "2000s - 2020s - China aggressively attempts to wrest control of the South China Sea.",
     "category_path": [
       "01_World Details"
@@ -59,6 +73,8 @@ export const glossaryDatabase = {
   choo_family: {
     "id": "choo_family",
     "name": "Choo Family",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Choo Family is a violent, aggressive and fast-expanding criminal syndicate operating from the ruins of Kulim, locked in a bitter blood feud with the more traditionalist Tan Family.",
     "category_path": [
       "02_Factions",
@@ -68,6 +84,8 @@ export const glossaryDatabase = {
   haram_bazaar: {
     "id": "haram_bazaar",
     "name": "Haram Bazaar",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Haram Bazaar is a sprawling, clandestine market network that thrives in the ruins, jungles, and no-go zones between faction borders.",
     "category_path": [
       "02_Factions",
@@ -77,6 +95,13 @@ export const glossaryDatabase = {
   poslaju: {
     "id": "poslaju",
     "name": "PosLaju",
+    "aliases": [
+      "Laju",
+      "Postmen of Malaya",
+      "Courier Guild",
+      "Riders"
+    ],
+    "strict_aliases": [],
     "summary": "Known throughout the Peninsula as the Riders, PosLaju is a neutral, independent courier collective dedicated to reconnecting the fractured peoples and settlements of the Wastes.",
     "category_path": [
       "02_Factions",
@@ -86,6 +111,8 @@ export const glossaryDatabase = {
   tan_family: {
     "id": "tan_family",
     "name": "Tan Family",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Tan Family is a powerful, Kulim-based crime syndicate with deep cultural memory, wartime scars, and a legacy of violent pragmatism.",
     "category_path": [
       "02_Factions",
@@ -95,6 +122,8 @@ export const glossaryDatabase = {
   the_bar_association: {
     "id": "the_bar_association",
     "name": "The BAR Association",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The BAR Association is a bizarre yet legally recognized order of “warrior lawyers” who enforce arbitration by combat across the Peninsula.",
     "category_path": [
       "02_Factions",
@@ -104,6 +133,8 @@ export const glossaryDatabase = {
   chamber_of_commerce: {
     "id": "chamber_of_commerce",
     "name": "Chamber of Commerce 马来亚總商會",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Malayan Chamber of Commerce is a powerful, semi-autonomous trade syndicate that operates with but not under the Federation’s Ministry of Commerce.",
     "category_path": [
       "02_Factions",
@@ -113,6 +144,8 @@ export const glossaryDatabase = {
   pahlawan: {
     "id": "pahlawan",
     "name": "Pahlawan",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Pahlawan are spiritual pilgrims of the Caliphate who undertake a personal _Hajj_ in accordance with The Path.",
     "category_path": [
       "02_Factions",
@@ -122,6 +155,12 @@ export const glossaryDatabase = {
   the_caliphate: {
     "id": "the_caliphate",
     "name": "The Caliphate",
+    "aliases": [
+      "Caliphate of Malaya",
+      "The Path Society",
+      "Caliphate"
+    ],
+    "strict_aliases": [],
     "summary": "The Caliphate is the blanket name for the autonomous region of the 🏜️Chukai Desert where towns and villages are united but not necessarily governed under a new, evolved version of a pre-war religion known simply as The Path.",
     "category_path": [
       "02_Factions",
@@ -131,6 +170,12 @@ export const glossaryDatabase = {
   federation_of_malaya: {
     "id": "federation_of_malaya",
     "name": "Federation of Malaya",
+    "aliases": [
+      "The Federation",
+      "Malayan Federation",
+      "Federation"
+    ],
+    "strict_aliases": [],
     "summary": "The Federation of Malaya is a post-apocalyptic restorationist regime born from the pre-war Federated Malaya initiative.",
     "category_path": [
       "02_Factions",
@@ -140,6 +185,8 @@ export const glossaryDatabase = {
   bandawang_refugees: {
     "id": "bandawang_refugees",
     "name": "Bandawang Refugees",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "Refugees fleeing Bandawang, after an explosion expelled red smoke into the sky.",
     "category_path": [
       "02_Factions",
@@ -149,6 +196,10 @@ export const glossaryDatabase = {
   chosen_federation: {
     "id": "chosen_federation",
     "name": "Chosen (Federation)",
+    "aliases": [],
+    "strict_aliases": [
+      "Chosen"
+    ],
     "summary": "The Chosen are the ruling caste of the Federation of Malaya, descendants of those 'Chosen' to survive the Great War within 3 fortified bunkers.",
     "category_path": [
       "02_Factions",
@@ -158,6 +209,8 @@ export const glossaryDatabase = {
   federation_bunkers: {
     "id": "federation_bunkers",
     "name": "Federation Bunkers",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Wira Bunker is the primary industrial and military installation of the 01_Federation of Malaya, located beneath the ruins of the pre-war industrial hub of Shah Alam.",
     "category_path": [
       "02_Factions",
@@ -167,6 +220,8 @@ export const glossaryDatabase = {
   federation_protectorate_labor_exchange: {
     "id": "federation_protectorate_labor_exchange",
     "name": "Federation–Protectorate Labor Exchange",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "A labor exchange program proposed by the Federation for peace between them.",
     "category_path": [
       "02_Factions",
@@ -176,6 +231,8 @@ export const glossaryDatabase = {
   keturunans: {
     "id": "keturunans",
     "name": "Keturunans",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Keturunans are names for powerful families within the Federation, descended from bunker lineages, pre-war specialists, or families granted legacy privilege.",
     "category_path": [
       "02_Factions",
@@ -185,6 +242,10 @@ export const glossaryDatabase = {
   kosongs_federation: {
     "id": "kosongs_federation",
     "name": "Kosongs (Federation)",
+    "aliases": [],
+    "strict_aliases": [
+      "Kosongs"
+    ],
     "summary": "The Kosongs are a caste of Protectorate made lobotomized laborers, created as part of the Federation–Protectorate Labor Exchange deal.",
     "category_path": [
       "02_Factions",
@@ -194,6 +255,13 @@ export const glossaryDatabase = {
   polis_federation: {
     "id": "polis_federation",
     "name": "Polis (Federation)",
+    "aliases": [
+      "Federation Police",
+      "Polis Force"
+    ],
+    "strict_aliases": [
+      "Polis"
+    ],
     "summary": "The Polis is a combined paramilitary law enforcement force consisting of the Sword and the Sepuluh Ribu, the original ghoul protectors of Kuala Lumpur.",
     "category_path": [
       "02_Factions",
@@ -203,6 +271,10 @@ export const glossaryDatabase = {
   prime_minister_federation: {
     "id": "prime_minister_federation",
     "name": "Prime Minister (Federation)",
+    "aliases": [],
+    "strict_aliases": [
+      "Prime Minister"
+    ],
     "summary": "The Prime Minister of the Federation of Malaya is the supreme political figure, entrusted with steering the course of civilization's rebirth from the ashes of the Great War.",
     "category_path": [
       "02_Factions",
@@ -212,6 +284,14 @@ export const glossaryDatabase = {
   public_citizenship_initiative_pci: {
     "id": "public_citizenship_initiative_pci",
     "name": "Public Citizenship Initiative (PCI)",
+    "aliases": [
+      "PCI",
+      "Ghoul Integration Program",
+      "Federation PCI"
+    ],
+    "strict_aliases": [
+      "Public Citizenship Initiative"
+    ],
     "summary": "The Public Citizenship Initiative (PCI) is a Federation-run program aimed at the controlled integration of refugees and new citizens into Federation society.",
     "category_path": [
       "02_Factions",
@@ -221,6 +301,8 @@ export const glossaryDatabase = {
   rukun_persekutuan_malaya: {
     "id": "rukun_persekutuan_malaya",
     "name": "Rukun Persekutuan Malaya",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "WHERE the Federation of Malaya once stood as a beacon of strength and prosperity, revered across the world for its greatness and influence;",
     "category_path": [
       "02_Factions",
@@ -230,6 +312,10 @@ export const glossaryDatabase = {
   ruled_federation: {
     "id": "ruled_federation",
     "name": "Ruled (Federation)",
+    "aliases": [],
+    "strict_aliases": [
+      "Ruled"
+    ],
     "summary": "The Ruled are the countless, voiceless majority of the Federation those bound by bureaucratic debt, labor programs like the PCI, or simply by inferiority.",
     "category_path": [
       "02_Factions",
@@ -239,6 +325,8 @@ export const glossaryDatabase = {
   sepuluh_ribu: {
     "id": "sepuluh_ribu",
     "name": "Sepuluh Ribu",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Sepuluh Ribu — or _The Ten Thousand_ — are a secretive ghoul kongsi dedicated to the defense and sovereignty of Kuala Lumpur.",
     "category_path": [
       "02_Factions",
@@ -248,6 +336,10 @@ export const glossaryDatabase = {
   sword_federation: {
     "id": "sword_federation",
     "name": "Sword (Federation)",
+    "aliases": [],
+    "strict_aliases": [
+      "Sword"
+    ],
     "summary": "The Sword is the military arm of the Federation of Malaya, originally a part of the Chosen's security detachment in the Perdana Bunker.",
     "category_path": [
       "02_Factions",
@@ -257,6 +349,10 @@ export const glossaryDatabase = {
   ushers_federation: {
     "id": "ushers_federation",
     "name": "Ushers (Federation)",
+    "aliases": [],
+    "strict_aliases": [
+      "Ushers"
+    ],
     "summary": "The Ushers are crazed ghoul enforcers of the constitution and law.",
     "category_path": [
       "02_Factions",
@@ -266,6 +362,8 @@ export const glossaryDatabase = {
   wataniah: {
     "id": "wataniah",
     "name": "Wataniah",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Wataniah are a Federation of Malaya civilian paramilitary investigative force, essentially detectives and function as a replacement for the Polis in the Federation's hard times.",
     "category_path": [
       "02_Factions",
@@ -275,6 +373,11 @@ export const glossaryDatabase = {
   the_protectorate: {
     "id": "the_protectorate",
     "name": "The Protectorate",
+    "aliases": [
+      "Protectorate of Malaya",
+      "Protectorate"
+    ],
+    "strict_aliases": [],
     "summary": "The Protectorate is a hyper-technocratic, authoritarian city-state governing the northern reaches of the Peninsula from the fortified northern stronghold of the Fortress City of Penang.",
     "category_path": [
       "02_Factions",
@@ -284,6 +387,8 @@ export const glossaryDatabase = {
   directorate: {
     "id": "directorate",
     "name": "Directorate",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Directorate is the central deliberative body of the Protectorate, composed of Prime Functionaries from its five Divisions: Defense, Mercantilism, Energy, Infrastructure, and Education.",
     "category_path": [
       "02_Factions",
@@ -293,6 +398,8 @@ export const glossaryDatabase = {
   grand_architect: {
     "id": "grand_architect",
     "name": "Grand Architect",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Grand Architect is the elusive, technocratic ruler of the Protectorate, functioning as both a symbolic figurehead and a de facto dictator.",
     "category_path": [
       "02_Factions",
@@ -302,6 +409,8 @@ export const glossaryDatabase = {
   grand_project: {
     "id": "grand_project",
     "name": "Grand Project",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Grand Project is the foundational doctrine of the Protectorate, a sweeping infrastructure proposal meant to restore civilization through pure logic, engineering, and civic optimization.",
     "category_path": [
       "02_Factions",
@@ -311,6 +420,8 @@ export const glossaryDatabase = {
   prime_functionaries: {
     "id": "prime_functionaries",
     "name": "Prime Functionaries",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Prime Functionaries are the elected representatives of the Protectorate’s Five Divisions: Defense, Mercantilism, Energy, Infrastructure, and Education.",
     "category_path": [
       "02_Factions",
@@ -320,6 +431,8 @@ export const glossaryDatabase = {
   ucl: {
     "id": "ucl",
     "name": "UCL",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The United Communist League is a post-apocalyptic splinter faction rooted in the legacy of pre-war China, though separated by distance and time from its origins.",
     "category_path": [
       "02_Factions",
@@ -329,6 +442,8 @@ export const glossaryDatabase = {
   auto_docs: {
     "id": "auto_docs",
     "name": "Auto-Docs",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "An Auto-Doc (an abbreviation of \"Automatic Doctor\") is a miracle of pre-War medical technology - a device capable of performing even the most complex medical procedures without qualified medical personnel.",
     "category_path": [
       "Fallout Details"
@@ -337,6 +452,8 @@ export const glossaryDatabase = {
   brahmin: {
     "id": "brahmin",
     "name": "Brahmin",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "Brahmin, also called brahma,are a mutated species of cattle, recognizable by their signature two heads.",
     "category_path": [
       "Fallout Details"
@@ -345,6 +462,10 @@ export const glossaryDatabase = {
   ghouls: {
     "id": "ghouls",
     "name": "Ghouls",
+    "aliases": [
+      "Ghoul"
+    ],
+    "strict_aliases": [],
     "summary": "Ghouls are living creatures that have been mutated by exposure to radiation, rather than killed by it.",
     "category_path": [
       "Fallout Details"
@@ -353,6 +474,8 @@ export const glossaryDatabase = {
   great_war: {
     "id": "great_war",
     "name": "Great War",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Great War, also known as the Sino-American War, was a pivotal event in the setting of the Fallout series: a global thermonuclear exchange that took place on Saturday, October 23, 2077, as a result of the then-ongoing Sino-American War between China and the United States of…",
     "category_path": [
       "Fallout Details"
@@ -361,6 +484,8 @@ export const glossaryDatabase = {
   robco: {
     "id": "robco",
     "name": "RobCo",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "RobCo Industries was a multibillion-dollar robotics and software corporation founded by industrialist and technologist Robert House.",
     "category_path": [
       "Fallout Details"
@@ -369,6 +494,8 @@ export const glossaryDatabase = {
   robco_securitron: {
     "id": "robco_securitron",
     "name": "Robco Securitron",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The RobCo Securitron is a large monowheel security robot, with a voice module to synthesize human speech and a large CRT screen in the center for displaying static images and advertisements.",
     "category_path": [
       "Fallout Details"
@@ -377,6 +504,8 @@ export const glossaryDatabase = {
   stimpaks: {
     "id": "stimpaks",
     "name": "Stimpaks",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "A wonder of pre-War science, stimpaks are typically syringes filled with a mixture of healing agents and stimulants, allowing the user to boost their own body's natural regenerative functions.",
     "category_path": [
       "Fallout Details"
@@ -385,6 +514,8 @@ export const glossaryDatabase = {
   supermutan: {
     "id": "supermutan",
     "name": "Supermutan",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "Super mutant is a general term referring to large muscular humanoid mutants created by exposing a regular human to a variety of the Forced Evolutionary Virus (FEV).",
     "category_path": [
       "Fallout Details"
@@ -393,6 +524,8 @@ export const glossaryDatabase = {
   ghoulification: {
     "id": "ghoulification",
     "name": "Ghoulification",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "Ghoulification is the irreversible process by which intense, prolonged radiation exposure mutates human physiology, causing cellular decay, necrosis-resistant tissue regeneration, and near-immortality at the cost of appearance and sterility.",
     "category_path": [
       "Fallout Details"
@@ -401,6 +534,8 @@ export const glossaryDatabase = {
   batu_kapur: {
     "id": "batu_kapur",
     "name": "Batu Kapur",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "Batu Kapur today stands as a fractured jewel of the northern Peninsula as a city of art, historical ruins, and ash-covered hills.",
     "category_path": [
       "Locations"
@@ -409,6 +544,8 @@ export const glossaryDatabase = {
   frim: {
     "id": "frim",
     "name": "FRIM",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Forest Research Institute of Malaya (FRIM) is one of the last remaining bastions of ecological preservation and botanical knowledge in post-war Malaya.",
     "category_path": [
       "Locations"
@@ -417,6 +554,8 @@ export const glossaryDatabase = {
   federal_cultural_library: {
     "id": "federal_cultural_library",
     "name": "Federal Cultural Library",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Federal Cultural Library is the main library of the Federation, boasting the largest pre-war selection of media and entertainment as well as texts and manuals.",
     "category_path": [
       "Locations"
@@ -425,6 +564,10 @@ export const glossaryDatabase = {
   fortress_city_of_penang: {
     "id": "fortress_city_of_penang",
     "name": "Fortress City of Penang",
+    "aliases": [
+      "Penang"
+    ],
+    "strict_aliases": [],
     "summary": "The Fortress City of Penang is the impregnable capital of the Protectorate, a fortress encircled by a monumental coastal wall of rusted ships, pre-war vessels crane-lifted and embedded upright into the shoreline to form an impenetrable barrier and welded tight by time, tide, a…",
     "category_path": [
       "Locations"
@@ -433,6 +576,8 @@ export const glossaryDatabase = {
   great_jungle: {
     "id": "great_jungle",
     "name": "Great Jungle",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Great Jungle is an anomaly.",
     "category_path": [
       "Locations"
@@ -441,6 +586,11 @@ export const glossaryDatabase = {
   kuala_lumpur_baru: {
     "id": "kuala_lumpur_baru",
     "name": "Kuala Lumpur Baru",
+    "aliases": [
+      "KLB",
+      "City of the Dead"
+    ],
+    "strict_aliases": [],
     "summary": "Kuala Lumpur Baru, or KLB, stands as a smoldering echo of the old world — the irradiated heart of a dead empire.",
     "category_path": [
       "Locations"
@@ -449,6 +599,8 @@ export const glossaryDatabase = {
   kulim: {
     "id": "kulim",
     "name": "Kulim",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "At the outer edge of Protectorate artillery range lies Kulim, a town nestled at the boundary of civilization and rot.",
     "category_path": [
       "Locations"
@@ -457,6 +609,10 @@ export const glossaryDatabase = {
   perdana_bunker: {
     "id": "perdana_bunker",
     "name": "Perdana Bunker",
+    "aliases": [
+      "Perdana"
+    ],
+    "strict_aliases": [],
     "summary": "The Perdana Bunker is the primary residential and administrative heart of the 01_Federation of Malaya, located beneath the ruins of the pre-war transportation hub KL Sentral.",
     "category_path": [
       "Locations"
@@ -465,6 +621,10 @@ export const glossaryDatabase = {
   round_city: {
     "id": "round_city",
     "name": "Round City",
+    "aliases": [
+      "Bandar Bulat"
+    ],
+    "strict_aliases": [],
     "summary": "Built in the deep wound of a long-forgotten nuclear crater, the Round City is the spiritual and intellectual center of the Caliphate located in the 🏜️Chukai Desert.",
     "category_path": [
       "Locations"
@@ -473,6 +633,11 @@ export const glossaryDatabase = {
   the_free_city_of_bandawang: {
     "id": "the_free_city_of_bandawang",
     "name": "The Free City of Bandawang",
+    "aliases": [
+      "Bandawang",
+      "Free City"
+    ],
+    "strict_aliases": [],
     "summary": "Bandawang, once a glittering industrial jewel of the peninsula, now staggers forward as a broken empire of neon lights and rotting fortune.",
     "category_path": [
       "Locations"
@@ -481,6 +646,10 @@ export const glossaryDatabase = {
   wira_bunker: {
     "id": "wira_bunker",
     "name": "Wira Bunker",
+    "aliases": [
+      "Sword Home"
+    ],
+    "strict_aliases": [],
     "summary": "The Wira Bunker is the primary industrial and military installation of the 01_Federation of Malaya, located beneath the ruins of the pre-war industrial hub of Shah Alam.",
     "category_path": [
       "Locations"
@@ -489,6 +658,10 @@ export const glossaryDatabase = {
   chukai_desert: {
     "id": "chukai_desert",
     "name": "Chukai Desert",
+    "aliases": [
+      "Chukai"
+    ],
+    "strict_aliases": [],
     "summary": "The Chukai Desert is a vast, irradiated expanse along the East Coast of the Peninsula.",
     "category_path": [
       "Locations"
@@ -497,6 +670,8 @@ export const glossaryDatabase = {
   order_of_the_falling_gong: {
     "id": "order_of_the_falling_gong",
     "name": "Order of the Falling Gong",
+    "aliases": [],
+    "strict_aliases": [],
     "summary": "The Order of the Falling Gong is a spiritual cult that emerged in the aftermath of the Great War, spreading across the Peninsula with doctrines that blend mysticism, apocalyptic history, and philosophical obsession.",
     "category_path": [
       "Religions"
@@ -505,6 +680,11 @@ export const glossaryDatabase = {
   the_path: {
     "id": "the_path",
     "name": "The Path",
+    "aliases": [
+      "The Path of Survival",
+      "The Path Religion"
+    ],
+    "strict_aliases": [],
     "summary": "The Path is a living, evolving faith that guides the people of the Caliphate through the harsh realities of the post-apocalyptic world.",
     "category_path": [
       "Religions"

@@ -28,11 +28,51 @@ export const dataLogDatabase = {
       "Bandawang"
     ]
   },
+  a_bartender_s_notebook: {
+    "id": "a_bartender_s_notebook",
+    "name": "A Bartender's Notebook",
+    "type": "data_log",
+    "body": "Tuesday. Sam Lim's boys drank on credit again. Bakri paid it off before I could even write it down — didn't ask, didn't explain, just left the caps on the bar and walked out. That's the third time this month.\n\nI used to keep a ledger of who owes what. Now I just keep a ledger of who Bakri's already covered for. Different book, same handwriting, less honest with myself about why.\n\nWater's up two caps a bottle again. Nobody's said why out loud. Everybody knows why.",
+    "category_path": [
+      "Found Texts",
+      "Bandawang"
+    ]
+  },
+  an_old_town_household_diary: {
+    "id": "an_old_town_household_diary",
+    "name": "An Old Town Household Diary",
+    "type": "data_log",
+    "body": "The Choo Family collectors came by again — third time this cycle, always polite, always precise. Grandmother says the Lim Clan used to be different, back when it was just Sam Lim doing the rounds himself. Now it's men in clean shirts with a ledger, and the ledger is never wrong, and being never wrong is somehow worse than being cruel.\n\nRoof still leaks. Put it on the list. The list is longer than the roof.",
+    "category_path": [
+      "Found Texts",
+      "Bandawang"
+    ]
+  },
+  casino_floor_security_log: {
+    "id": "casino_floor_security_log",
+    "name": "Casino Floor Security Log",
+    "type": "data_log",
+    "body": "> FLOOR SECURITY — SHIFT LOG\n\n0200 — Baccarat table 3, dealer flagged a counter. Standard removal.\n0240 — Tan Family associate at the bar, no incident, noted per standing instruction.\n0315 — Camera 7 offline again. Third time this week. Maintenance ticket filed, again.\n0330 — Bakri on the floor. Didn't touch a table. Watched table 3 for eleven minutes, left. Logged per instruction — do not ask why.",
+    "category_path": [
+      "Found Texts",
+      "Bandawang"
+    ]
+  },
   domestic_water_entitlement: {
     "id": "domestic_water_entitlement",
     "name": "Domestic Water Entitlement",
     "type": "data_log",
     "body": "FEDERATION OF MALAYA\nDOMESTIC WATER ENTITLEMENT — CARD \nBearer: ................................\nHousehold size: ......\n\nDAILY ENTITLEMENT: 4 LITRES\nCollected in person. One collection per day. Card must be presented at the point of issue.\n\nCards are not transferable. A card lent is a card forfeited.\nA lost card is replaced at the bearer's own cost, following a review period of fourteen days.\nEntitlement may be adjusted without notice in accordance with supply.\n\nQueue times are not a matter for complaint.\n\n— printed small along the bottom edge —\nWater is a shared trust. Waste is theft from your neighbour.",
+    "category_path": [
+      "Found Texts",
+      "Bandawang"
+    ]
+  },
+  federation_public_notice_118: {
+    "id": "federation_public_notice_118",
+    "name": "Federation Public Notice №118",
+    "type": "data_log",
+    "body": "A CLEAN PENINSULA IS A SAFE PENINSULA\n\nCitizens of the Federation are reminded: unregistered water reclamation is a Class II infraction under the Public Order Statutes. Report unlicensed wells, filters, or catchment systems to your nearest Federal post.\n\nThe Federation provides. The Federation protects. The Federation does not forget who helped, and does not forget who didn't.\n\n— MINISTRY OF INFRASTRUCTURE",
     "category_path": [
       "Found Texts",
       "Bandawang"
@@ -58,11 +98,71 @@ export const dataLogDatabase = {
       "Bandawang"
     ]
   },
+  marked_in_chalk: {
+    "id": "marked_in_chalk",
+    "name": "Marked in Chalk",
+    "type": "data_log",
+    "body": "SAM LIM KEEPS\nHIS WORD",
+    "category_path": [
+      "Found Texts",
+      "Bandawang"
+    ]
+  },
+  protiga_maintenance_log_line_4: {
+    "id": "protiga_maintenance_log_line_4",
+    "name": "ProTiga Maintenance Log — Line 4",
+    "type": "data_log",
+    "body": "> PROTIGA INDUSTRIAL SYSTEMS — MAINTENANCE TERMINAL 4B\n> LOG ENTRIES 771-774 (FINAL)\n\n[771] Press housing temp nominal. Stamping cycle 40,412 complete.\n[772] Line 4 vibration outside tolerance. Flagged for inspection. Inspection not scheduled — staffing.\n[773] Vibration worsening. Recommend halt. Overridden by floor supervisor. Quota.\n[774] LINE 4 CATASTROPHIC FAILURE. EVACUATE FLOOR. THIS TERMINAL WILL NOT LOG FURTHER ENTRIES.\n\n> NO ENTRIES SINCE.",
+    "category_path": [
+      "Found Texts",
+      "Bandawang"
+    ]
+  },
+  rakan_watch_trade_ledger_partial: {
+    "id": "rakan_watch_trade_ledger_partial",
+    "name": "Rakan Watch Trade Ledger (Partial)",
+    "type": "data_log",
+    "body": "— 12 crates, marked \"bike parts,\" not bike parts\n— Payment: caps + 1 favor owed, favor undefined (Boss Bob's call, always)\n— Buyer asked no questions. Good buyer.\n— Next shipment delayed. Federation patrol pattern changed on the north road. Find out why before we find out the hard way.",
+    "category_path": [
+      "Found Texts",
+      "Bandawang"
+    ]
+  },
   requisition_88c: {
     "id": "requisition_88c",
     "name": "Requisition 88-C",
     "type": "data_log",
     "body": "To the Quartermaster, Bandawang Guard\nRe: Requisition 88-C — Construction-Grade Protectron units (x4)\n\nThe units arrived. The prison did not survive to receive them.\n\nI have four construction Protectrons standing in the salvage yard, powered down, still holding their original work order. The order reads: REPAIR PERIMETER WALL, BLOCK C.\n\nThere is no Block C. There is no perimeter. There is a crater, and there is a great deal of rebar, and there are four machines waiting to be told otherwise.\n\nThey will not take a new order from me. My clearance is Guard. The order was cut by Works, and Works no longer has an office in this district, because the office was in Block C.\n\nSo they stand there. I have stopped walking past them on my rounds. It is not that they are frightening. It is that they are patient, and I am not, and I find I cannot look at a thing that will outwait me.\n\nAdvise.",
+    "category_path": [
+      "Found Texts",
+      "Bandawang"
+    ]
+  },
+  scrapyard_wall: {
+    "id": "scrapyard_wall",
+    "name": "Scrapyard Wall",
+    "type": "data_log",
+    "body": "THE GONG DOESN'T RING\nFOR FREE",
+    "category_path": [
+      "Found Texts",
+      "Bandawang"
+    ]
+  },
+  shipment_manifest_0447: {
+    "id": "shipment_manifest_0447",
+    "name": "Shipment Manifest 0447",
+    "type": "data_log",
+    "body": "MANIFEST 0447 — FEDERATION WATER AUTHORITY\nORIGIN: Bandawang Treatment Facility\nDESTINATION: [REDACTED]\nCONTENTS: Purified water, 400 units\nAUTHORIZATION: [STAMP ILLEGIBLE]\nNOTES: Third redirect this cycle. Local ration quotas unchanged. Someone upstairs is skimming the district's own water past the district. Filed anyway. Filing it is the job.",
+    "category_path": [
+      "Found Texts",
+      "Bandawang"
+    ]
+  },
+  undelivered: {
+    "id": "undelivered",
+    "name": "Undelivered",
+    "type": "data_log",
+    "body": "If you're reading this I finally worked up the nerve to actually hand it over, which means either I'm braver than I was when I wrote it or you're going through my things after the fact, in which case — hi, sorry, I should have said this out loud.\n\nSign-up starts Monday. I'm doing it. Not because I believe everything they say, but because Boss Bob's crew fed us through the winter and the Federation's the only one offering me something to fill the summer.\n\nI hope that's a reason you can forgive.",
     "category_path": [
       "Found Texts",
       "Bandawang"
