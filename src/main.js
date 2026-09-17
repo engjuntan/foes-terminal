@@ -206,6 +206,11 @@ window.render = function() {
   const loginScreen = document.getElementById('login-screen');
   const appInterface = document.getElementById('app-interface');
   const viewport = document.getElementById('main-viewport');
+  // #main-viewport scrolls itself (overflow-y: auto), not the window —
+  // every re-render below replaces its innerHTML wholesale, which resets
+  // scrollTop to 0. Character creation hit this directly: allocating all
+  // 40 points meant scrolling back down after every single click.
+  const savedScrollTop = viewport ? viewport.scrollTop : 0;
 
   // 1. Handle Login Screen Visibility
   if (!window.currentUser) {
@@ -305,6 +310,8 @@ window.render = function() {
        viewport.innerHTML = Views.getRegistrationView(window.currentUser, window.liveData);
     }
   }
+
+  if (viewport) viewport.scrollTop = savedScrollTop;
 
   maybeAnnounceTurn();
 }
