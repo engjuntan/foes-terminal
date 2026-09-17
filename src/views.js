@@ -585,7 +585,7 @@ export function getCombatView(liveData, userRole, currentUser) {
           if (attackDef) attackerValue = attackDef.hit_percent;
         } else {
           const char = liveData.characters[currentActor.char_id];
-          const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
+          const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
           if (!draft.attackKey || draft.attackKey === 'unarmed') {
             attackerValue = derived.skills.unarmed;
           } else {
@@ -602,7 +602,7 @@ export function getCombatView(liveData, userRole, currentUser) {
           targetAC = target.ac;
         } else {
           const targetChar = liveData.characters[target.char_id];
-          const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0, {}, targetChar.needs || {});
+          const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0, {}, targetChar.needs || {}, targetChar.permanent_skill_bonuses || {});
           targetAC = targetDerived.armorClass;
         }
         if (attackerValue !== null && targetAC !== null) {
@@ -1166,7 +1166,8 @@ export function getPlayerView(charId, liveData) {
     equip,
     charData.rads || 0,
     charData.inventory || {},
-    charData.needs || {}
+    charData.needs || {},
+    charData.permanent_skill_bonuses || {}
   );
 
   // --- 1. LEVEL UP & PERKS STATE ---
@@ -1463,7 +1464,7 @@ export function getWorkshopView(charId, liveData) {
   const derived = calculateDerivedStats(
     charData.special, charData.level || 1, charData.traits || [], charData.perks || [],
     charData.race || 'human', charData.status_effects || [], charData.equipment || {},
-    charData.rads || 0, charData.inventory || {}, charData.needs || {}
+    charData.rads || 0, charData.inventory || {}, charData.needs || {}, charData.permanent_skill_bonuses || {}
   );
 
   // COMPONENTS — every item authored as type:"component", dimmed at 0.

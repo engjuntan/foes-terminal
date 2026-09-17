@@ -15,7 +15,7 @@ export const CARRY_OVERAGE_ALLOWANCE = 1.10;
 // Unlike traits/perks (looked up by id from a database), status effect
 // instances already carry their own resolved modifiers, ad-hoc or from
 // the status-effect library, so they need no lookup step here.
-export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [], activePerks = [], race = 'human', activeStatusEffects = [], equipment = {}, rads = 0, inventory = {}, needs = {}) {
+export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [], activePerks = [], race = 'human', activeStatusEffects = [], equipment = {}, rads = 0, inventory = {}, needs = {}, permanentSkillBonuses = {}) {
 
   // --- 0. RACE DATA ---
   const raceDef = RACE_RULES[race] || RACE_RULES['human'];
@@ -50,7 +50,13 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
     { modifiers: radModifiers },
     { modifiers: hungerTier.modifiers },
     { modifiers: thirstTier.modifiers },
-    { modifiers: sleepTier.modifiers }
+    { modifiers: sleepTier.modifiers },
+    // Skill books grant a flat, permanent skill_<name> bonus on first
+    // read (see useItem()) that has to persist after the book itself is
+    // consumed — so it lives on the character, not the inventory, and
+    // rides the exact same skill_<name> merge loop below that traits and
+    // perks already use. No new merge logic needed for this to work.
+    { modifiers: permanentSkillBonuses }
   ].filter(source => !source || !source.suppressed_by_item || !isItemEquipped(source.suppressed_by_item));
   let healingRateBonus = 0;
   let special = { ...baseSpecial };

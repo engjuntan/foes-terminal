@@ -547,7 +547,7 @@ export async function advanceTime(minutes, opts = {}) {
     // healingRateCap depends on EN, which the needs tiers themselves can
     // penalize (Famished/Starving hit END) — derive it from needs BEFORE
     // this tick's decay, since that's the state the character rested in.
-    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
+    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
     const healed = rollRestHealing(derived.healingRateCap, hoursElapsed, isLongRest);
     const totalDamage = damage.hunger + damage.thirst + damage.sleep;
 
@@ -617,14 +617,14 @@ export async function gmAdvanceTimeAction() {
 // mechanical effect it's authored with: rad_removed/rad_added (RadAway
 // and anything like it), stats.heal (Stimpak and every other direct-
 // heal consumable — a dice string like "1d10+10", rolled via the same
-// parser combat damage uses), and stats.hunger/thirst/sleep (food, water,
+// parser combat damage uses), stats.hunger/thirst/sleep (food, water,
 // and rest-adjacent items — see needs.js; clamped 0-100, so a negative
 // value like Ikan Masin Jerky's thirst cost just can't push a need below
-// zero on its own). Everything else a consumable can carry right now
-// (SPECIAL buffs/duration, addiction, skill-book bonuses,
-// cures_addiction/cures_status) has no tracked state to act on yet — no
-// duration timers, no addiction counter — so those stay reference-only
-// until that system exists.
+// zero on its own), and skill books (stats.permanent + any skill_<name>
+// key — see below). Everything else a consumable can carry right now
+// (SPECIAL buffs/duration, addiction, cures_addiction/cures_status) has
+// no tracked state to act on yet — no duration timers, no addiction
+// counter — so those stay reference-only until that system exists.
 // Callable by the character themselves or the GM on their behalf, same
 // permission shape as everything else here.
 export async function useItem(targetCharId, itemId) {
@@ -657,6 +657,33 @@ export async function useItem(targetCharId, itemId) {
     const newHp = Math.max(0, Math.min(maxHp, currentHp + healed));
     updatePayload[`characters.${targetCharId}.hp.current`] = newHp;
     msgParts.push(`healed ${healed} HP (${newHp}/${maxHp})`);
+  }
+
+  // Skill books — a flat, PERMANENT skill_<name> bonus, tracked so the
+  // same title can never grant it twice even across separate copies.
+  // read_skill_books is keyed by item id specifically because there are
+  // multiple distinct skill-book titles per skill (see the Skill Books
+  // folder) — reading all of them for one skill is meant to stack.
+  // The bonus itself lives in permanent_skill_bonuses and rides into
+  // calculateDerivedStats() untouched by the book being consumed here.
+  if (item.stats && item.stats.permanent) {
+    // Stored PRE-prefixed (skill_small_guns, not small_guns) — that's
+    // the exact key calculateDerivedStats()'s existing skill_<name>
+    // merge loop already reads for traits/perks, so permanent_skill_
+    // bonuses rides that loop with no transformation on either end.
+    const modKey = Object.keys(item.stats).find(k => k.startsWith('skill_'));
+    const skillKey = modKey && modKey.replace('skill_', '');
+    const alreadyRead = (char.read_skill_books || []).includes(itemId);
+    if (modKey && !alreadyRead) {
+      const bonus = Number(item.stats[modKey]) || 0;
+      const currentBonuses = { ...(char.permanent_skill_bonuses || {}) };
+      currentBonuses[modKey] = (currentBonuses[modKey] || 0) + bonus;
+      updatePayload[`characters.${targetCharId}.permanent_skill_bonuses`] = currentBonuses;
+      updatePayload[`characters.${targetCharId}.read_skill_books`] = [...(char.read_skill_books || []), itemId];
+      msgParts.push(`permanently gained +${bonus} ${skillKey.replace(/_/g, ' ')}`);
+    } else if (modKey && alreadyRead) {
+      msgParts.push(`already learned everything this book can teach`);
+    }
   }
 
   // Hunger/thirst/sleep — same clamp-and-report shape as radiation above.
@@ -704,7 +731,7 @@ export async function craftItem(recipeId) {
   const outputItem = getItem(recipe.produces && recipe.produces.item);
   if (!outputItem) { alert("THIS RECIPE'S OUTPUT ITEM IS MISSING — TELL YOUR GM"); return; }
 
-  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
+  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
   const { ok, reasons } = canCraft(recipe, char, derived.skills);
   if (!ok) { alert(reasons.join('\n')); return; }
 
@@ -800,7 +827,7 @@ export async function giveItem(itemId, qty, toCharId) {
 
   const itemWeight = typeof item.weight === 'number' ? item.weight : 0;
   if (itemWeight > 0) {
-    const toDerived = calculateDerivedStats(toChar.special, toChar.level || 1, toChar.traits || [], toChar.perks || [], toChar.race || 'human', toChar.status_effects || [], toChar.equipment || {}, toChar.rads || 0, toChar.inventory || {}, toChar.needs || {});
+    const toDerived = calculateDerivedStats(toChar.special, toChar.level || 1, toChar.traits || [], toChar.perks || [], toChar.race || 'human', toChar.status_effects || [], toChar.equipment || {}, toChar.rads || 0, toChar.inventory || {}, toChar.needs || {}, toChar.permanent_skill_bonuses || {});
     const projectedUsed = toDerived.carryUsed + (itemWeight * qty);
     if (projectedUsed > toDerived.carryCapacity * CARRY_OVERAGE_ALLOWANCE) {
       alert(`${toChar.name.toUpperCase()} CAN'T CARRY THAT MUCH — OVER CAPACITY`);
@@ -1155,7 +1182,7 @@ export async function startCombat() {
     if (!char.is_finalized) return;
     const derived = calculateDerivedStats(
       char.special, char.level || 1, char.traits || [], char.perks || [],
-      char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}
+      char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {}
     );
     const { roll, total } = rollInitiative(derived.sequenceBonus);
     initiative_order.push({
@@ -1322,7 +1349,7 @@ export async function resolveAttack() {
     attackerValue = attackDef.hit_percent;
   } else {
     const char = window.liveData.characters[attacker.char_id];
-    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
+    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
     const wantsMelee = !draft.attackKey || draft.attackKey === 'unarmed' || (() => {
       const wi = getItem(draft.attackKey);
       return !wi || !wi.stats || (wi.stats.range || 0) <= 1;
@@ -1375,7 +1402,7 @@ export async function resolveAttack() {
     targetName = target.name;
   } else {
     const targetChar = window.liveData.characters[target.char_id];
-    const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0, targetChar.inventory || {}, targetChar.needs || {});
+    const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0, targetChar.inventory || {}, targetChar.needs || {}, targetChar.permanent_skill_bonuses || {});
     targetAC = targetDerived.armorClass;
     // Crouching/prone/knocked-down caps how much of AC comes from AGI —
     // only meaningful for a PC, since AC's AGI component is what's being
@@ -1970,7 +1997,7 @@ export async function resolvePlayerCheck() {
   if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
 
   const char = window.liveData.characters[window.currentUser];
-  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
+  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
   const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
   const result = draft.kind === 'special' ? resolveSpecialCheck(value, draft.tier, roll, draft.useD20) : resolveSkillCheck(value, draft.tier, roll);
 
@@ -2060,7 +2087,7 @@ export async function resolveGmCheck() {
     // PC — that'd be a lot of typing for the GM).
     Object.entries(window.liveData.characters || {}).forEach(([charId, char]) => {
       if (!char.is_finalized) return;
-      const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
+      const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
       const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
       const roll = draft.kind === 'special' ? (draft.useD20 ? rollD20() : rollD10()) : rollPercentile();
       const result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
@@ -2086,7 +2113,7 @@ export async function resolveGmCheck() {
     const roll = Number(draft.roll);
     const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
     if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
-    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {});
+    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
     const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
     const result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
     results.push({ char_id: draft.targetCharId, name: char.name, roll, threshold: result.threshold, success: result.success, critType: result.critType || null });
