@@ -18,7 +18,8 @@ cripple system is the biggest new source of "why".
 |---|---|
 | **Cripple trigger** | **Manual-accurate.** Limb Resistance = EN/2 (round down) hits to cripple a limb. Crits still cripple instantly. |
 | **Cripple scope** | **Players and monsters both.** Every combatant tracks per-limb hits. |
-| **Cripple healing** | **Both routes** — a player-facing Medicine check (DC 20, manual p.652) *and* the GM's existing manual status removal. |
+| **Limb damage persistence** | **Persists until treated.** Never clears on rest, never clears between fights. |
+| **Cripple healing** | **Doctor's Bag (automatic) or a Medicine check (DC 20, can fail)** — plus the GM's existing manual removal. |
 | **Status detail** | **Full provenance.** Every modifier shown with its source and value, not just the net figure. |
 
 ### What already exists (do not rebuild)
@@ -201,41 +202,60 @@ Counters are per specific `BODY_PARTS` key (`left_arm` separate from
 `right_arm`), but the resulting status effect is the generic `crippled_arm`.
 That asymmetry is intentional: tracking is positional, consequence is not.
 
-### B.5 ⚠ OPEN DECISION — do counters reset?
+### B.5 Counters persist until treated — they never reset on their own
 
-The manual is silent. Two defensible readings, and this needs a GM call before
-build:
+**GM ruling: accumulated limb damage is an injury, not a per-fight tally.** It
+does not clear at the end of combat, and it does not clear on rest. The only
+thing that clears it is medical attention — a Doctor's Bag or the Medicine
+skill (see B.6).
 
-| Option | Behaviour | Consequence |
-|---|---|---|
-| **Per-fight** | Counters clear when combat ends | Cripples only happen inside one sustained fight. Simple, predictable, no between-session bookkeeping. |
-| **Persist until long rest** *(recommended)* | Counters carry between fights; a 6h+ rest clears accumulated hits but **never** an actual cripple | Injuries accumulate across a bad day. Matches the harsher tone already chosen for hunger/thirst, and gives rest a third job. |
+```
+advanceTime()  →  never touches limb_damage (same rule as cripples)
+endCombat()    →  never touches limb_damage for PCs
+               →  DOES discard it for monsters, which cease to exist
+```
 
-Recommended: persist until long rest. If chosen, `advanceTime()` clears
-`limb_damage` when `isLongRest` is true — and must *not* touch crippled status
-effects, per the manual.
+This is deliberately harsher than either alternative considered, and it has a
+knock-on worth understanding before tuning: with Limb Resistance at EN/2, a
+low-EN character walking around at 1/2 on three limbs is one bad exchange from
+three simultaneous cripples. **Medicine stops being a nice-to-have and becomes
+the skill the party cannot travel without** — which is the intent.
 
-### B.6 Healing — both routes
+### B.6 Treatment — the only thing that clears limb damage
 
-**Player route.** A TREAT action per crippled limb:
+Two routes, matching the two things a wasteland medic actually has: supplies, or
+skill. Both routes treat **one limb** per use.
 
-- Medicine check vs **DC 20** (the manual's "Average" tier — already in
-  `DIFFICULTY_TIERS`, reuse `resolvePlayerCheck()`'s machinery rather than
-  rolling fresh).
-- Success → remove the status effect, heal `1d6+4` (manual p.652).
-- Failure → no heal, limb stays crippled. No penalty for trying.
-- Holding a **Doctor's Bag** grants +15% to the check (manual p.1528). Note the
-  existing Doctor's Bag item was authored as a direct-heal instead, with a
-  comment flagging that departure — reconcile the two before wiring this.
-- **Eyes are the exception**: the manual says a crippled eye needs a replacement
-  eye, not a check. Out of scope here; `blinded` stays GM-cleared for now.
+| Route | Cost | Reliability | Clears |
+|---|---|---|---|
+| **Doctor's Bag** | Consumes the item | Automatic, no roll | Accumulated hits **and** an active cripple |
+| **Medicine check** | Free, repeatable | DC 20, can fail | Same on success; nothing on failure |
 
-**GM route.** `gmRemoveStatusEffect()` already does this. No work.
+**Doctor's Bag.** This resolves the conflict flagged in the item's own
+description. The Doctor's Bag was authored as a direct-heal (`2d10+10`) with a
+comment noting it departed from the manual's "+15% to treat crippled limbs".
+Under this ruling it becomes neither — it is **the reliable limb-treatment
+consumable**, which is a better job than either. Keep the heal as a secondary
+effect if you like the numbers; the limb treatment is now its reason to exist.
+
+**Medicine check.** DC 20 (the manual's "Average" tier, already in
+`DIFFICULTY_TIERS`). Reuse `resolvePlayerCheck()` rather than rolling fresh.
+- Success → clear that limb's counter; if crippled, remove the status and heal
+  `1d6+4` (manual p.652).
+- Failure → nothing changes. No penalty for trying, but the limb stays as it is.
+- Anyone can attempt it on anyone — a medic treating a teammate is the point.
+
+**Eyes are the exception.** The manual says a crippled eye needs a replacement
+eye, not a check. Out of scope; `blinded` stays GM-cleared.
+
+**GM route.** `gmRemoveStatusEffect()` already clears cripples. It will also
+need a way to clear `limb_damage` counters — see C.3.
 
 **Perk route.** `Cancerous Growth` (authored this session, Ghoul-only) promises
-"regenerate a crippled limb in 1 day". Hook into `advanceTime()`: if 24h+
-elapses and the character has that perk, clear one cripple. Cheap, and it makes
-an authored perk real.
+"regenerate a crippled limb in 1 day". Hook into `advanceTime()`: 24h+ elapsed
+and the character has that perk → clear one cripple *and* its counter. Cheap,
+and it makes an authored perk real — plus it gives Ghouls a genuine structural
+advantage in a system that otherwise taxes everyone equally.
 
 ---
 
@@ -326,7 +346,7 @@ debugging a hit counter you cannot see is the hard way to do it.
 | Monsters have no EN in the bestiary | B.2's fallback of 2. Verify against real bestiary entries before building, not after. |
 | Cripples feel random | B.4's near-miss message. A visible counter turns a random event into a resource the player is managing. |
 | Status screen becomes a wall of text | C.2's "only show rows with modifiers" rule. A healthy character should see almost nothing. |
-| Doctor's Bag has two conflicting definitions | Flagged in B.6. Reconcile the authored direct-heal against the manual's +15% before wiring the check. |
+| Untreated limb damage accumulates forever | Intended (B.5), but watch the first few sessions: if the party has no Medicine and no Doctor's Bags, this spirals fast. Doctor's Bags should appear in loot before the first serious fight. |
 | Tab key collision | C.1's rename, done first, as its own step. |
 
 ---
