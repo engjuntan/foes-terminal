@@ -79,5 +79,6 @@ export const SKILL_INFO = {
   engineering: "5 + INT×1.5 + AGI×0.5. Building, repairing, and fixing malfunctioning gear.",
   robotics: "INT + INT. Understanding and disabling robots and other programmed machines.",
   gunsmith: "PER + AGI + INT. Modifying, repairing, and crafting weapons or ammunition.",
+  repair: "INT × 3. Restoring worn weapons and armor — how many condition marks you can take off, and how often you manage it without using up parts.",
   instinct: "(All SPECIAL stats summed) ÷ 3, rounded down. Gut feeling — sensing something's off even if you can't prove it."
 };

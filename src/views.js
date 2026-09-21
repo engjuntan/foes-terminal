@@ -1211,7 +1211,7 @@ export function getPlayerView(charId, liveData) {
   const skillCategories = {
     "COMBAT SKILLS": ["small_guns", "big_guns", "energy_weapons", "melee_weapons", "throwing", "unarmed"],
     "COVERT SKILLS": ["sneak", "steal", "lockpick", "traps"],
-    "SCIENCE SKILLS": ["medicine", "science", "engineering", "robotics", "gunsmith"],
+    "SCIENCE SKILLS": ["medicine", "science", "engineering", "robotics", "gunsmith", "repair"],
     "SOFT SKILLS": ["speech", "survival", "instinct"]
   };
   

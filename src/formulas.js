@@ -213,6 +213,8 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
     engineering:    5 + (int * 1.5) + (agi * 0.5),
     robotics:       int + int,
     gunsmith:       per + agi + int,
+    // Not in the manual's skill list; Fallout 2's formula (GM ruling 2026-09-22).
+    repair:         int * 3,
 
     // Soft Skills
     speech:         5 + cha + cha,

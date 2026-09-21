@@ -28,3 +28,7 @@ VAULT_INDEX.tsv
 
 # Local copies of source material (rulebook text, GM PDFs)
 reference/
+
+# Item art pipeline: local images, ledger, and API keys
+art/
+.env

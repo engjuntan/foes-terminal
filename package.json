@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "sync": "node sync-obsidian.js"
+    "sync": "node sync-obsidian.js",
+    "art": "node --env-file-if-exists=.env tools/item-art.mjs"
   },
   "dependencies": {
     "chokidar": "^5.0.0",

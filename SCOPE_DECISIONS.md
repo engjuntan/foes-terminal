@@ -766,3 +766,28 @@ Answers to BALANCE_PROPOSAL.md §9 and changes to its proposals.
 - **Bestiary:** `slave` / `supermutant_slave` renamed to labourers.
 - **Skill books** grant +5 skill points each, and reading one advances
   game time.
+
+## Balance proposal — second round of GM rulings (2026-09-22)
+
+- **Win-rate ceiling:** no simulated matchup should exceed ~85%.
+- **Enemy tiers** (target win rate for a party of appropriate level):
+  - **T5** trash mobs and pests (giant ants, rats): 85%; with many
+    enemies, ~80%.
+  - **T4** low-level raiders, humanoids, villagers, feral ghouls, larger
+    creatures: ~85%.
+  - **T3** Federation and UCL regulars, gang members, Gergasi,
+    well-equipped raiders, mercenaries: ~80%.
+  - **T2** Protectorate regulars (effectively T2.5: always well-maintained
+    gear), Federation heavy soldiers: ~75%.
+  - **T1** elites — Federation commandos, Protectorate power-armored
+    soldiers, Pahlawans: a genuinely hard fight for higher-level PCs.
+- **Faction character:** the Caliphate has the most elite soldiers but no
+  real army. The Federation has solid elite commandos; its regulars are
+  poor. The Protectorate is technologically advanced with good equipment
+  but not well trained. (So Protectorate troops do NOT wear worn-down
+  armor — their gear is maintained; balance them some other way.)
+- **Skill books can't be shared** — each character reads their own copy.
+- **Prices:** each item has a baseline price in RMR; PD and Dinar prices
+  derive from it (1 PD = 100 RMR, 1 Dinar = 2,000 RMR).
+- **Repair skill is added back.** The manual has no formula for it, so
+  it uses Fallout 2's: Repair = 3 × INT. Repair governs repairing gear.

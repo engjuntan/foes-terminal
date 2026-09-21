@@ -6,6 +6,7 @@ export const itemDatabase = {
     "type": "accessory",
     "slot": "head",
     "icon": "",
+    "image_prompt": "A pair of wire-rimmed corrective glasses with two mismatched scavenged lenses, one temple arm bent and resoldered, brass wire binding a cracked hinge, faint smudges across the scratched glass.",
     "description": "A pair of corrective lenses, scavenged and re-fitted. It takes real skill to make these things. Hope you don't drop them. ",
     "weight": 0.05,
     "value": 10
@@ -16,6 +17,7 @@ export const itemDatabase = {
     "type": "accessory",
     "slot": "back",
     "icon": "",
+    "image_prompt": "A canvas-and-aluminum frame backpack, faded olive fabric patched with mismatched cloth squares, buckled straps worn shiny, an external steel frame dented at one corner, a faded Federation ration stencil on the flap.",
     "description": "A frame backpack — the standard answer to 'why can you carry all that.' Equip it to expand your carry capacity.",
     "stats": {
       "carry_bonus": 20
@@ -28,6 +30,7 @@ export const itemDatabase = {
     "name": "10mm",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A small torn cardboard box of 10mm brass cartridges, lid taped shut, a faded Malay supply stencil reading 'PELURU 10MM' on the side, a few loose rounds tarnished green at the rims.",
     "description": "Ammunition for 10mm Pistol and 10mm SMG.",
     "ammo_type": "10mm",
     "stackable": true,
@@ -39,6 +42,7 @@ export const itemDatabase = {
     "name": "14mm",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A dented steel ammo tin of 14mm cartridges, lid hinge rusted, brass casings visible through a torn label, a faded stencilled '14MM' marking and a Federation supply code stamped on the side.",
     "description": "Ammunition for 14mm Pistol.",
     "ammo_type": "14mm",
     "stackable": true,
@@ -50,6 +54,7 @@ export const itemDatabase = {
     "name": "2mm EC",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A small clear plastic sleeve of tiny metallic 2mm EC capsules, each casing etched with fine grooves, the sleeve's corner melted and resealed with tape, a faded manufacturer code printed along the edge.",
     "description": "Ammunition for Gauss-class weapons (Gauss Rifle, Gauss Pistol). Distinct from Energy Cell and Plasma Cartridge.",
     "ammo_type": "2mm_ec",
     "stackable": true,
@@ -61,6 +66,7 @@ export const itemDatabase = {
     "name": "40mm Grenade",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A single stubby 40mm grenade round, brass casing tarnished and scratched, a dull green-painted warhead with a faded yellow safety band, a worn stencilled batch number along its side.",
     "description": "Ordinance for Grenade Launcher.",
     "ammo_type": "40mm_grenade",
     "stackable": true,
@@ -72,6 +78,7 @@ export const itemDatabase = {
     "name": "5.56",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A crumpled cardboard box of 5.56 cartridges, corners split and taped, a faded printed label reading '5.56mm BALL', loose brass rounds spilling out with light rim corrosion.",
     "description": "Ammunition for Assault Rifle, Marksman Carbine, and .223 Pistol.",
     "ammo_type": "5.56",
     "stackable": true,
@@ -83,6 +90,7 @@ export const itemDatabase = {
     "name": "5mm",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A rusted metal ammo can holding stacked 5mm rounds on a torn cloth belt, the can's latch bent, a faded stencilled '5MM LINK' marking across its dented lid.",
     "description": "Ammunition for Minigun and Light Machine Gun.",
     "ammo_type": "5mm",
     "stackable": true,
@@ -94,6 +102,7 @@ export const itemDatabase = {
     "name": "7.62",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A worn canvas bandolier of 7.62 rounds, brass casings dulled and speckled with verdigris, stitched loops fraying, a faded Federation supply tag threaded through one strap.",
     "description": "Ammunition for Hunting Rifle, Sniper Rifle, Battle Rifle, and Gatling Gun.",
     "ammo_type": "7.62",
     "stackable": true,
@@ -105,6 +114,7 @@ export const itemDatabase = {
     "name": "9mm",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A small cardboard box of 9mm cartridges, corners crushed, a peeling label printed 'PELURU 9MM', a handful of tarnished brass rounds loose against the torn inner tray.",
     "description": "Ammunition for 9mm Pistol.",
     "ammo_type": "9mm",
     "stackable": true,
@@ -116,6 +126,7 @@ export const itemDatabase = {
     "name": "Energy Cell",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A palm-sized energy cell, a scuffed translucent casing over a faintly glowing blue core, one corner chipped exposing internal wiring, a worn serial sticker half peeled from its side.",
     "description": "Ammunition for laser-class energy weapons (Laser Pistol/Rifle, Gatling Laser, Tesla Cannon).",
     "ammo_type": "energy_cell",
     "stackable": true,
@@ -127,6 +138,7 @@ export const itemDatabase = {
     "name": "Flamer Fuel",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A dented metal fuel canister for a flamer, its red paint chipped to bare steel, a rusted nozzle valve, a faded stencilled flame-hazard symbol and Malay warning text across the body.",
     "description": "Fuel canister ammunition for Flamer and Shishkebab.",
     "ammo_type": "flamer_fuel",
     "stackable": true,
@@ -139,6 +151,7 @@ export const itemDatabase = {
     "type": "ammo",
     "ammo_type": "makeshift_rounds",
     "icon": "",
+    "image_prompt": "A handful of hand-loaded cartridges with mismatched brass casings and crudely crimped tips, uneven crimps and tool marks visible, stored loose in a torn cloth pouch tied with string.",
     "description": "Hand-loaded rounds, packed by whoever had the patience for it. Not pretty, but they go bang more often than not.",
     "weight": 0.015,
     "value": 2
@@ -148,6 +161,7 @@ export const itemDatabase = {
     "name": "Mini Nuke",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A squat, heavy warhead the size of a large drum, its dull olive casing dented and streaked with rust, fins bent at the tail, a faded radiation trefoil stencilled on its rounded nose.",
     "description": "Extremely rare ordinance for the Fat Man.",
     "ammo_type": "mini_nuke",
     "stackable": true,
@@ -159,6 +173,7 @@ export const itemDatabase = {
     "name": "Missile",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A long finned rocket the length of an adult's arm span, its grey casing scored and rust-streaked, a warhead nose painted with a chipped yellow band, a faded serial number along the shaft.",
     "description": "Ordinance for Missile Launcher and Rocket Launcher.",
     "ammo_type": "missile",
     "stackable": true,
@@ -182,6 +197,7 @@ export const itemDatabase = {
     "name": "Plasma Cartridge",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A squat cylindrical plasma cartridge, its metal casing scorched at one end, a small viewport showing a faint green glow, a worn hazard sticker peeling from the side.",
     "description": "Ammunition for plasma-class energy weapons (Plasma Pistol/Rifle, Plasma Caster).",
     "ammo_type": "plasma_cartridge",
     "stackable": true,
@@ -193,6 +209,7 @@ export const itemDatabase = {
     "name": "Shotgun Shells",
     "type": "ammo",
     "icon": "",
+    "image_prompt": "A handful of shotgun shells with cracked plastic hulls in mismatched red and green, brass bases dulled, one hull split at the crimp, loose inside a torn paper sleeve.",
     "description": "Ammunition for all shotgun-class weapons — unified bucket regardless of specific gauge, per campaign simplification.",
     "ammo_type": "shotgun_shells",
     "stackable": true,
@@ -206,6 +223,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A cheap gang-colored windbreaker jacket in faded red and black nylon, a cracked zipper, a hand-painted Rakan Watch emblem on the back peeling at the edges, frayed cuffs.",
     "description": "Cheap, gang-colored, instantly recognizable jacket of The Rakan Watch. Mapped to the manual's Clothes tier, barely above rags.",
     "stats": {
       "ac": 1,
@@ -221,6 +239,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A pair of grease-stained factory coveralls in faded blue cotton, torn at one knee and patched with mismatched fabric, a stitched ProTiga company patch on the chest, oil smudges throughout.",
     "description": "Factory-issue coveralls worn by ProTiga factory workers in North Bandawang. Light, cheap, common. Mapped to the manual's Ramshackle Armor tier.",
     "stats": {
       "ac": 8,
@@ -236,6 +255,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A plain worn shirt and trousers in faded grey cotton, threadbare at the elbows and knees, a few mismatched buttons, a small hand-stitched patch covering a tear near the hem.",
     "description": "From the manual — baseline tier, no combat value. May wear armor over it.",
     "stats": {
       "ac": 1,
@@ -259,6 +279,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A scuffed brown leather jacket with reinforced shoulder padding, cracked seams resewn with heavier thread, a broken zipper replaced with mismatched toggles, faded scratches across the back panel.",
     "description": "From the manual — grants CH+2.",
     "stats": {
       "ac": 20,
@@ -285,6 +306,7 @@ export const itemDatabase = {
     "slot": "head",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A battered rubber gas mask with two round scratched eye lenses, a corroded filter canister stamped 'ProTiga', cracked straps knotted where broken, a faded chemical-hazard symbol on the cheek.",
     "description": "Gas mask analogue sourced from ProTiga — ties into the existing gas resistance stat. Mapped to the manual's Clothes tier as a base, plus a gas resistance modifier for its actual function.",
     "stats": {
       "ac": 1,
@@ -303,6 +325,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "Layered strips of yellowed cloth bandage wound into a wrap, edges frayed and stained brown, a few loose pins holding the outer layer, a faded laundry-mark stitched into one strip.",
     "description": "Bandage wrappings covering exposed flesh — cosmetic/social race-flavor item, no mechanical DR intended.",
     "stats": {
       "dt": 0,
@@ -319,6 +342,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A sleeveless vest of stitched leather panels reinforced with metal studs, the hide cracked and sun-bleached, buckled straps worn shiny, one panel patched with a different shade of hide.",
     "description": "From the manual.",
     "stats": {
       "ac": 15,
@@ -342,6 +366,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A dark tailored suit jacket with narrow lapels, the fabric faded but pressed, gold thread embroidery of the Lim Clan crest worn thin at the breast pocket, cuffs slightly frayed.",
     "description": "Status armor worn by Tan/Choo subfamily members of the Lim Clan Association. Low DR, social value instead. Mapped to the manual's Protectorate Officers Uniform tier (status armor, not combat armor).",
     "stats": {
       "ac": 3,
@@ -360,6 +385,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A bulky riveted armor vest of layered grey plating over a padded jacket, scratched and dented across the chest, a faded Federation insignia stencilled on the shoulder, straps cinched with worn buckles.",
     "description": "From the manual — imposes -40 to Sneak, Steal, and Engineering while worn.",
     "stats": {
       "ac": 20,
@@ -388,6 +414,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A segmented olive-drab armor vest with overlapping metal plates, scuffed and scratched, a faded Federation star stencilled on the chest, frayed canvas straps and a scorch mark near one shoulder.",
     "description": "From the manual.",
     "stats": {
       "ac": 15,
@@ -411,6 +438,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A pressed olive uniform jacket with brass buttons, one missing and replaced with a mismatched button, faded rank insignia on the shoulder, a small tear stitched closed near the collar.",
     "description": "From the manual.",
     "stats": {
       "ac": 2,
@@ -434,6 +462,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A patchwork armor vest combining scavenged leather and riveted metal plates from different sources, scuffed and mismatched in colour, buckled straps worn shiny, a crude painted skull marking on one shoulder.",
     "description": "From the manual.",
     "stats": {
       "ac": 12,
@@ -457,6 +486,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "oversized",
     "icon": "",
+    "image_prompt": "An oversized suit of crudely welded metal plates sized for a massive frame, thick rusted steel sheets bolted over leather backing, deep dents and weld scars, chains reinforcing the joints.",
     "description": "From the manual — Gergasi/Supermutant-specific armor, needs metal and leather parts to craft.",
     "stats": {
       "ac": 2.5,
@@ -496,6 +526,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "oversized",
     "icon": "",
+    "image_prompt": "An oversized armor made from a stamped steel press housing plate, curved to fit a huge frame, rust streaks and hammer dents across the surface, a faded ProTiga part number stencilled on the back.",
     "description": "Addresses the race-size gap — Gergasi/Half-Mutant can't wear human-sized armor. Sized for larger frames, sourced from ProTiga's stamping press housing. Mapped between Studded Leather and Malayan Infantry tier: heavy but improvised, not manufactured.",
     "stats": {
       "ac": 15,
@@ -511,6 +542,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A drab grey jumpsuit with a stencilled number faded on the chest, coarse fabric worn thin at the knees and elbows, a frayed rope belt, dark stains along one sleeve.",
     "description": "From the manual — zero combat value. May wear armor over it.",
     "stats": {
       "ac": 0,
@@ -534,6 +566,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A heavy plated trooper armor in dark grey steel, thick shoulder guards scratched and scorched, a faded Protectorate eagle insignia on the chest, reinforced boots and gauntlets riveted to the frame.",
     "description": "From the manual — top tier of the faction-armor progression. Grants LR+2, imposes -20 to Sneak and Steal while worn.",
     "stats": {
       "ac": 25,
@@ -562,6 +595,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A segmented grey infantry armor vest, overlapping plates scuffed and dented, a small stencilled Protectorate insignia on the shoulder, buckled canvas straps worn at the edges.",
     "description": "From the manual — note: distinct from the existing 'Protectorate Infantry' bestiary/monster entry, which uses this armor implicitly but didn't have it as its own item note until now.",
     "stats": {
       "ac": 20,
@@ -585,6 +619,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A crisp dark uniform jacket with silver buttons, a faded Protectorate rank bar on the collar, sleeves slightly frayed at the cuffs, a small ink stain near one pocket.",
     "description": "From the manual.",
     "stats": {
       "ac": 3,
@@ -608,6 +643,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A crude armor vest of mismatched scrap plates lashed together with wire and leather straps, uneven rust patches, a dented chest plate patched with a flattened tin sheet.",
     "description": "From the manual — first real armor tier.",
     "stats": {
       "ac": 8,
@@ -647,6 +683,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A homemade vest of flattened scrap metal plates riveted over leather backing, strapped together with rusted rebar bands, dents and weld spatter across the surface, straps worn at the buckles.",
     "description": "Improvised DR armor built from scrap metal and rebar strapping. Mapped to the manual's Mercenary Armor tier, since unlike Coveralls this is purpose-built protection.",
     "stats": {
       "ac": 12,
@@ -730,6 +767,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A leather armor vest studded with rows of tarnished metal rivets, the hide cracked and darkened with age, straps worn shiny, one row of studs missing near the shoulder.",
     "description": "From the manual.",
     "stats": {
       "ac": 20,
@@ -753,6 +791,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "oversized",
     "icon": "",
+    "image_prompt": "An oversized set of roughly stitched clothing scaled for a massive frame, heavy canvas patched with mismatched fabric scraps, coarse stitching along the seams, a torn collar reinforced with rope.",
     "description": "From the manual — the Supermutant/Gergasi-sized clothing baseline, meaningfully tougher than human clothes.",
     "stats": {
       "ac": 10,
@@ -792,6 +831,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A tailored dark uniform jacket with UCL insignia on the collar, brass buttons tarnished, cuffs frayed, a small tear near the shoulder mended with contrasting thread.",
     "description": "From the manual.",
     "stats": {
       "ac": 2,
@@ -815,6 +855,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A segmented combat armor in muted grey-green plates, scuffed and scratched across the chest, a stencilled UCL emblem on the shoulder, canvas straps worn at the buckles.",
     "description": "From the manual.",
     "stats": {
       "ac": 15,
@@ -838,6 +879,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A heavily plated vanguard armor with reinforced shoulder guards and layered chest plating, deep scratches and scorch marks, a faded UCL crest stencilled prominently on the chest, riveted joints throughout.",
     "description": "From the manual — top UCL faction armor tier.",
     "stats": {
       "ac": 20,
@@ -861,6 +903,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
+    "image_prompt": "A long rubberized rain slicker in faded Federation blue, cracked at the folds, a hood with a torn drawstring, a small stencilled water-drop emblem on the chest, damp stains along the hem.",
     "description": "Worn by those who guard/control Federation water distribution. Mapped to the manual's UCL Officers Uniform tier: light, breathable rainwear rather than combat armor.",
     "stats": {
       "ac": 2,
@@ -874,6 +917,7 @@ export const itemDatabase = {
     "name": "Adhesive",
     "type": "component",
     "icon": "",
+    "image_prompt": "A dented tin of thick amber adhesive paste, the lid crusted with dried residue, a peeling label with faded Malay text, a wooden spatula stuck halfway into the opening.",
     "description": "Glue, resin, tape — the universal binder. Small amounts appear in almost every recipe.",
     "stackable": true,
     "weight": 0.1,
@@ -884,6 +928,7 @@ export const itemDatabase = {
     "name": "Chemicals",
     "type": "component",
     "icon": "",
+    "image_prompt": "A cluster of mismatched glass and plastic bottles holding cloudy chemical solvents, cracked caps, peeling handwritten labels, one bottle wrapped in tape to seal a hairline crack.",
     "description": "Solvents, reagents, propellant — chems, stims, and explosives crafting.",
     "stackable": true,
     "weight": 0.2,
@@ -894,6 +939,7 @@ export const itemDatabase = {
     "name": "Cloth & Hide",
     "type": "component",
     "icon": "",
+    "image_prompt": "A folded bundle of assorted fabric and cured hide scraps, frayed edges and patched holes, mismatched colours and textures stacked together, one strip stamped with a faded factory mark.",
     "description": "Fabric, leather, webbing — armor, bandages, and packs.",
     "stackable": true,
     "weight": 0.1,
@@ -904,6 +950,7 @@ export const itemDatabase = {
     "name": "Electronics",
     "type": "component",
     "icon": "",
+    "image_prompt": "A small tangle of salvaged electronics — coiled wiring, a cracked circuit board, and a couple of corroded battery cells — bundled together with a rubber band, solder points tarnished green.",
     "description": "Wiring, boards, cells — energy weapons, tech, and robotics crafting.",
     "stackable": true,
     "weight": 0.2,
@@ -914,6 +961,7 @@ export const itemDatabase = {
     "name": "Gun Parts",
     "type": "component",
     "icon": "",
+    "image_prompt": "A small tray of scavenged gun parts — bent springs, worn firing pins, a cracked receiver housing, and a pitted barrel segment — scattered together, metal dulled with light rust.",
     "description": "Springs, pins, receivers, barrels — weapons and ammo crafting only. The one component that's a gunsmith's alone.",
     "stackable": true,
     "weight": 0.3,
@@ -924,6 +972,7 @@ export const itemDatabase = {
     "name": "Hardened Alloy",
     "type": "component",
     "icon": "",
+    "image_prompt": "A heavy slab of dense military-grade alloy plate, its surface scarred with deep scratches and a few bullet dents, edges machined clean despite the wear, a faint stamped serial number.",
     "description": "Ballistic plate, military-grade steel — gates top-tier weapons and armor. Rare: the GM drops this deliberately, not as regular loot.",
     "stackable": true,
     "weight": 0.8,
@@ -934,6 +983,7 @@ export const itemDatabase = {
     "name": "Organics",
     "type": "component",
     "icon": "",
+    "image_prompt": "A small pile of assorted organic scraps — dried plant matter, a few bones, and strips of cured meat — bundled in a torn cloth sack tied with twine.",
     "description": "Plant matter, meat, bone — food, water purification, and primitive gear crafting.",
     "stackable": true,
     "weight": 0.2,
@@ -944,6 +994,7 @@ export const itemDatabase = {
     "name": "Pre-War Tech",
     "type": "component",
     "icon": "",
+    "image_prompt": "A compact block of intact pre-war circuitry, its casing pristine chrome compared to the wasteland's rust, dense internal wiring visible through a cracked viewport, a faded manufacturer logo etched on top.",
     "description": "Intact circuitry, military-grade electronics — gates energy weapons and advanced mods. Rare: the GM drops this deliberately, not as regular loot.",
     "stackable": true,
     "weight": 0.2,
@@ -954,6 +1005,7 @@ export const itemDatabase = {
     "name": "Scrap Metal",
     "type": "component",
     "icon": "",
+    "image_prompt": "A jagged pile of bent and rusted sheet metal fragments, edges curled and corroded, one piece bearing a faded stencilled factory mark, stacked loosely together.",
     "description": "Structural filler — weapon frames, armor plate, ammo casings. The most common crafting component in the Wastes.",
     "stackable": true,
     "weight": 0.5,
@@ -964,6 +1016,7 @@ export const itemDatabase = {
     "name": "Addictol",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A blister strip of six white pills, foil backing peeling and torn, a faded pharmaceutical label printed 'ADDICTOL' in small Malay and English text, one pill missing from the strip.",
     "description": "From the manual: cures addiction. One-time use pill, comes in a strip of 6. No duration, debuff, or addiction risk of its own.",
     "effect": "Cures addiction",
     "stats": {
@@ -978,6 +1031,7 @@ export const itemDatabase = {
     "name": "Ah Beng's Moonshine",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A cloudy glass bottle of homebrew liquor sealed with a cork and wax, a handwritten label reading Ah Beng's, the glass scratched and slightly discoloured, sediment settled at the bottom.",
     "description": "Homebrew liquor, staple of Lim Clan Association gambling dens.",
     "effect": "+2 CHA, -2 PER for 2 hours",
     "stats": {
@@ -995,6 +1049,7 @@ export const itemDatabase = {
     "name": "Anti-Venom",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A small glass vial of pale amber anti-venom serum, a rubber stopper and metal crimp cap, a peeling handwritten label, the glass scuffed with fine scratches.",
     "description": "Poison cure — ties into the existing poison_res stat. Poison is tracked as a status effect rather than a numeric level, so this clears the Poison status outright (same boolean pattern as Addictol's cures_addiction) rather than removing 'poison points.'",
     "effect": "Cures Poison status effect",
     "stats": {
@@ -1009,6 +1064,7 @@ export const itemDatabase = {
     "name": "Bear Trap",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A heavy steel bear trap with rusted serrated jaws sprung open, a thick chain bolted to an anchor stake, flaking orange rust across the hinge and springs.",
     "description": "From the manual: pressure-sensitive placed trap. Deals 2d20 True Damage and instantly cripples unless the target wears metal boots. Requires a ST-1 roll to remove.",
     "stats": {
       "dmg": "2d20",
@@ -1022,6 +1078,7 @@ export const itemDatabase = {
     "name": "Buffout",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A small orange pill bottle of Buffout capsules, the childproof cap cracked, a peeling label with faded muscle-icon artwork, a few loose capsules rattling inside.",
     "description": "STR/END buff, addictive — mainline 'Buffout.'",
     "effect": "ST +2, AG +2, EN +3",
     "stats": {
@@ -1040,6 +1097,7 @@ export const itemDatabase = {
     "name": "C4 Plastique",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A block of grey putty-like plastic explosive wrapped in waxed paper, a thin wire timer fuse pressed into one end, the paper torn at a corner revealing the claylike compound.",
     "description": "From the manual: shapeable explosive. Setting requires a successful Traps roll. Deals 2d20+20 damage in a small radius; target may roll AG-2 to dodge. Each additional plastique combined adds 1d20 damage.",
     "stats": {
       "dmg": "2d20+20",
@@ -1053,6 +1111,7 @@ export const itemDatabase = {
     "name": "Can of Food",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A dented tin can of preserved food, the paper label torn and faded showing a painted vegetable illustration, a rusted pull-ring lid, a thin smear of grease around the rim.",
     "description": "From the manual — the original baseline food item.",
     "effect": "Restores 30 Hunger",
     "stats": {
@@ -1082,6 +1141,7 @@ export const itemDatabase = {
     "name": "Cap Kilat Cola",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A glass soda bottle with a chipped crown cap, faded red-and-yellow Cap Kilat Cola label showing a lightning-bolt logo, condensation streaks down the dusty glass, a small dent near the base.",
     "description": "Fictional in-universe soda brand — Nuka-Cola-style icon/collectible. A rare 'Cap Kilat Emas' (Golden) variant could exist as a Quantum-equivalent (not authored as a separate item yet).",
     "effect": "+1 AGI for 30 minutes",
     "stats": {
@@ -1144,6 +1204,7 @@ export const itemDatabase = {
     "name": "Dirty Water",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A scavenged plastic bottle filled with murky brown water, sediment swirling near the bottom, a cracked cap resealed with tape, a torn label barely legible on the side.",
     "description": "Cheaper, riskier contamination counterpart to Purified Water.",
     "effect": "Restores 25 Thirst; risk of contamination",
     "stats": {
@@ -1159,6 +1220,7 @@ export const itemDatabase = {
     "name": "Doctor's Bag",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A worn leather medical satchel with a brass clasp, the leather cracked and scuffed, a faded red cross stitched on the flap, contents bulging slightly against strained stitching.",
     "description": "Larger heal than Stimpak, slower to use — the tradeoff for its stronger restore. Manual's Doctor's Bag item is a +15% Medicine skill-check bonus for treating crippled limbs/blindness/poison rather than a direct heal; this item follows the flavor text's own direct-heal design instead, a deliberate departure worth double-checking.",
     "effect": "Heals 2d10+10 HP, full action to use",
     "stats": {
@@ -1189,6 +1251,7 @@ export const itemDatabase = {
     "name": "Feral Suppressant",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A small auto-injector pen with a frosted plastic body, a faded warning label printed in Malay, the needle cap slightly bent, a green indicator light dulled with grime.",
     "description": "Not a mainline Fallout item — original to this campaign. Ghoul-specific: buys time before the feral roll at HIGH rad exposure, ties directly into the Ghoul is_radioactive flag and the manual's 600/1000 rad-threshold feral mechanic. The feral roll itself is GM-adjudicated narrative judgment, not a numeric formula, so this delay is a descriptive duration rather than a dice/percentage value.",
     "effect": "Delays the feral check by roughly one encounter",
     "stats": {
@@ -1218,6 +1281,7 @@ export const itemDatabase = {
     "name": "Healing Poultice",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A small drawstring cloth pouch stained with dried herbal residue, a faded hand-stitched symbol on the fabric, the pouch bulging with packed leaves and bandage strips.",
     "description": "From the manual: comes in a small pouch. No addiction risk at all — the safe, low-tech alternative to a Stimpak.",
     "effect": "Heals 1d10+5 HP",
     "stats": {
@@ -1232,6 +1296,7 @@ export const itemDatabase = {
     "name": "Ikan Masin Jerky",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "Strips of dark salted fish jerky wrapped in worn brown paper, the edges curled and glistening with cured oil, a few grains of coarse salt clinging to the surface, the paper stained translucent.",
     "description": "Salted fish jerky — real regional food culture reflavored as wasteland staple. Salt-cured, so it costs you water to eat.",
     "effect": "Heals 1d4 HP, restores 15 Hunger, costs 8 Thirst",
     "stats": {
@@ -1279,6 +1344,7 @@ export const itemDatabase = {
     "name": "Jet",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A small aerosol inhaler canister with a chipped plastic nozzle, faded red lettering spelling JET across a scratched metal body, a dented cap hanging loose on a thin chain.",
     "description": "AP/speed buff, highly addictive — mainline 'Jet.' Not in the manual's chem table and this game has no AP economy (one action per turn) — same caveat that already applies to Turbo's 'extra action' effect, which is also inert until an actions system exists. Numbered for consistency with the other chems; effect is reference-only for now.",
     "effect": "Slows perceived time, faster reactions",
     "stats": {
@@ -1297,6 +1363,7 @@ export const itemDatabase = {
     "name": "Kopi-O Stim Packet",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A small foil sachet of instant black coffee, the packaging creased and faded, printed Kopi-O in bold lettering over a steaming cup icon, one corner torn open.",
     "description": "Instant black coffee sachet, common across Bandawang. Mild caffeine-dependency flavor, non-mechanical — kept as a small, harmless alertness bump rather than a real ap_buff to match that 'non-mechanical' intent.",
     "effect": "+1 PER for 30 minutes",
     "stats": {
@@ -1312,6 +1379,7 @@ export const itemDatabase = {
     "name": "Med-Kit",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A compact metal med-kit box with a hinged lid, faded red cross painted on top, scratched and dented corners, a small latch bent slightly out of shape.",
     "description": "From the manual: acts as a successful Medicine skill use. Heals 1d10 HP over 1d10 minutes. Single use.",
     "effect": "Heals 1d10 HP over 1d10 minutes",
     "stats": {
@@ -1326,6 +1394,7 @@ export const itemDatabase = {
     "name": "Med-X",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A glass syringe of pale liquid analgesic, the plunger scuffed, a faded label reading MED-X wrapped around the barrel, the needle capped with a bent plastic sheath.",
     "description": "Analgesic — temporary damage resistance buff, addictive.",
     "effect": "+3 DT, +20% DR to all damage types",
     "stats": {
@@ -1344,6 +1413,7 @@ export const itemDatabase = {
     "name": "Mentats",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A small tin case of Mentats tablets, the hinged lid dented and the paint chipped, a faded brain-icon label, a few chalky tablets visible through a crack in the seam.",
     "description": "INT/PER/CHA buff, addictive — mainline 'Mentats.'",
     "effect": "PE +2, IN +2, CH +2",
     "stats": {
@@ -1362,6 +1432,7 @@ export const itemDatabase = {
     "name": "Nasi Lemak Ration Brick",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A compressed brick of dehydrated rice ration wrapped in waxed paper, a faded illustration of a banana-leaf parcel printed on the wrapper, grains of dried sambal visible through a torn corner.",
     "description": "Compressed dehydrated ration built from a real regional dish.",
     "effect": "Heals 1d6 HP, restores 25 Hunger",
     "stats": {
@@ -1392,6 +1463,7 @@ export const itemDatabase = {
     "name": "Psycho",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A syringe filled with a murky red chemical, the plunger stained, a peeling label printed PSYCHO in jagged lettering, the needle tip slightly bent.",
     "description": "Damage buff, addictive — mainline 'Psycho.'",
     "effect": "ST +3, AG +3, DT +2, IN -3",
     "stats": {
@@ -1410,6 +1482,7 @@ export const itemDatabase = {
     "name": "Purified Water",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A dented metal canteen with a screw cap on a frayed strap, condensation beading on the clean-looking water inside, a faded Federation water-authority stamp on the side.",
     "description": "Direct mechanical link to the hunger/thirst system. Federation-controlled — narrative lever for the water-scarcity arc.",
     "effect": "Heals 1d4 HP, restores 30 Thirst",
     "stats": {
@@ -1425,6 +1498,7 @@ export const itemDatabase = {
     "name": "Rad-X",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A small orange pill bottle labelled RAD-X, the cap cracked, a faded radiation trefoil printed beneath the text, a few chalky tablets visible through the scratched plastic.",
     "description": "Preventative counterpart to RadAway — buffs rad resistance before exposure, doesn't touch existing accumulated rads. Not in the manual's chem table; sized using the classic Fallout Rad-X convention (a flat percentage rad-resistance buff for a few hours) since the manual doesn't cover it.",
     "effect": "+25% Radiation Resistance for 4 hours",
     "stats": {
@@ -1440,6 +1514,7 @@ export const itemDatabase = {
     "name": "RadAway",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A hanging IV bag of pale yellow fluid attached to a coiled tube and needle, the plastic bag slightly clouded, a faded label reading RADAWAY printed near the top seal.",
     "description": "IV-drip rad cure. Highest value for non-Ghoul races given the Ghoul race's innate 80% RR. Sized against the manual's rad scale (600 = feral-check threshold, 1000 = full feral).",
     "effect": "Removes 300 rads",
     "stats": {
@@ -1706,6 +1781,22 @@ export const itemDatabase = {
     "weight": 0.3,
     "value": 240
   },
+  federation_field_maintenance_handbook: {
+    "id": "federation_field_maintenance_handbook",
+    "name": "Federation Field Maintenance Handbook",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — Federation-issue field maintenance manual.",
+    "image_prompt": "A pocket-sized olive field manual with a stencilled Federation crest, pages of exploded equipment diagrams, missing pages and a bootlace tied around it",
+    "effect": "Permanently grants +5 Repair skill",
+    "stats": {
+      "skill_repair": 5,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 240
+  },
   bedil_peluru: {
     "id": "bedil_peluru",
     "name": "Guns and Bullets",
@@ -1834,11 +1925,28 @@ export const itemDatabase = {
     "weight": 0.4,
     "value": 150
   },
+  kemahiran_hidup: {
+    "id": "kemahiran_hidup",
+    "name": "Kemahiran Hidup",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — Kemahiran Hidup primary-school workbook.",
+    "image_prompt": "A dog-eared primary-school workbook titled Kemahiran Hidup, cover showing a cartoon child holding a screwdriver, pencil answers in the margins, water-stained corners",
+    "effect": "Permanently grants +5 Repair skill",
+    "stats": {
+      "skill_repair": 5,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 220
+  },
   loceng_kunci: {
     "id": "loceng_kunci",
     "name": "Loceng & Kunci",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A worn paperback magazine with a curling cover showing a padlock and tumbler diagram, the title Loceng & Kunci printed in bold, dog-eared pages and a coffee-ring stain on the cover.",
     "description": "Skill book — lockpick trade magazine, mainline 'Tumblers Today' analogue. One-time use, permanent bonus. Uses the same skill_<name> key convention formulas.js already reads for trait/perk modifiers.",
     "effect": "Permanently grants +5 Lockpick skill",
     "stats": {
@@ -2094,6 +2202,7 @@ export const itemDatabase = {
     "name": "Sains Untuk Semua",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A tattered children's science magazine with a faded illustrated cover of an atom diagram, the title Sains Untuk Semua printed across the top, pages yellowed and corners torn.",
     "description": "Skill book — pre-war children's science magazine, mainline 'Big Book of Science' analogue. One-time use, permanent bonus. Uses the same skill_<name> key convention formulas.js already reads for trait/perk modifiers.",
     "effect": "Permanently grants +5 Science skill",
     "stats": {
@@ -2157,6 +2266,7 @@ export const itemDatabase = {
     "name": "Stolen Keturunan Manual",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A leather-bound manual with a cracked spine, the cover embossed with a faded family crest, torn pages sticking out unevenly, a smudged ink stamp marking it as stolen property.",
     "description": "Skill book — ties to the knowledge-scarcity theme. One-time use, permanent small skill bonus on read. No target skill was specified in the original flavor text; guessed Speech (a lineage/heritage document trading on social standing) rather than leaving it unresolved — worth confirming or retargeting.",
     "effect": "Permanently grants +5 Speech skill",
     "stats": {
@@ -2311,6 +2421,22 @@ export const itemDatabase = {
     "weight": 0.4,
     "value": 220
   },
+  uncle_fix_its_monthly: {
+    "id": "uncle_fix_its_monthly",
+    "name": "Uncle Fix-It's Monthly",
+    "type": "consumable",
+    "icon": "",
+    "description": "Skill book — pre-War repair-shop trade magazine.",
+    "image_prompt": "A faded pre-War repair trade magazine, cover photo of a smiling shopkeeper uncle behind a counter piled with radios and fans, torn price sticker, curled pages",
+    "effect": "Permanently grants +5 Repair skill",
+    "stats": {
+      "skill_repair": 5,
+      "permanent": true
+    },
+    "addictive": false,
+    "weight": 0.3,
+    "value": 230
+  },
   understanding_gut_instincts: {
     "id": "understanding_gut_instincts",
     "name": "Understanding Gut Instincts",
@@ -2363,6 +2489,7 @@ export const itemDatabase = {
     "name": "Stimpak",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A syringe of glowing red liquid housed in a scratched clear plastic casing, a metal plunger cap, a faded label reading STIMPAK wrapped around the barrel.",
     "description": "Standard pre-war combat medical syringe — mainline 'Stimpak.' Baseline healing item; can_use_stimpaks flag already exists in RACE_RULES (Robots cannot use).",
     "effect": "Heals 1d10+10 HP",
     "stats": {
@@ -2377,6 +2504,7 @@ export const itemDatabase = {
     "name": "Teh Tarik Concentrate",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A small dented tin can of tea concentrate, a faded label showing a pulled-tea pouring illustration, a rusted pull-tab lid, condensation streaks on the metal.",
     "description": "Canned 'pulled tea' concentrate, sold in Bandawang Lama by street vendors.",
     "effect": "+1 CHA, +1 PER for 1 hour",
     "stats": {
@@ -2393,6 +2521,7 @@ export const itemDatabase = {
     "name": "Toddy",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "A hollowed bamboo container sealed with a carved wooden stopper, fermented palm sap visible through a crack near the seam, a frayed rope handle, sap residue crusted around the opening.",
     "description": "Fermented palm sap, traditional Southeast Asian drink reflavored as a Bandawang Lama wasteland staple. Mild buff/debuff, low addiction.",
     "effect": "+1 CHA, -1 AGI for 1 hour",
     "stats": {
@@ -2410,6 +2539,7 @@ export const itemDatabase = {
     "name": "Turbo",
     "type": "consumable",
     "icon": "",
+    "image_prompt": "An aerosol spray canister with a chipped nozzle cap, faded lettering spelling TURBO over a scratched racing-stripe graphic, a dented body and a rattling valve.",
     "description": "From the manual: grants an extra action and +20% hit chance for 1 hour. Addiction rate 70 — one of the steepest in the chem list. Requires aerosol delivery.",
     "effect": "Gain another action, +20% Hit Chance",
     "stats": {
@@ -2428,6 +2558,7 @@ export const itemDatabase = {
     "name": "Bobby Pin",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A single bent piece of thin scrap wire shaped into a makeshift lockpick, the metal dulled and slightly rusted at one end, a small kink where it was reshaped by hand.",
     "description": "Lockpicking resource — mainline staple item, functions almost as its own currency in most Fallout games. Not much to it once you look closely: just bent scrap.",
     "scrap_yield": {
       "scrap_metal": 1
@@ -2441,6 +2572,7 @@ export const itemDatabase = {
     "name": "Circuit Board Fragment",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A broken fragment of a green circuit board, snapped copper traces and a few desoldered component pads, one corner scorched black, edges jagged where it was pried loose.",
     "description": "Robotics/science crafting component, sourced from North Bandawang factory equipment.",
     "scrap_yield": {
       "electronics": 2
@@ -2454,6 +2586,7 @@ export const itemDatabase = {
     "name": "Copper Wire Spool",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A small wooden spool wound with tarnished copper wire, several strands unraveling loose, the wood cracked and stained, a faded factory tag tied to the spindle.",
     "description": "Electronics crafting component, sourced from North Bandawang factory wiring.",
     "scrap_yield": {
       "electronics": 2,
@@ -2468,6 +2601,7 @@ export const itemDatabase = {
     "name": "Duct Tape",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A half-used roll of grey duct tape, the outer layer peeling and curled at the edge, adhesive residue crusted along the torn strip, the cardboard core slightly crushed.",
     "description": "Universal crafting binder — mainline staple.",
     "scrap_yield": {
       "adhesive": 3
@@ -2481,6 +2615,7 @@ export const itemDatabase = {
     "name": "ProTiga Factory Scrap",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A jagged chunk of stamped sheet metal factory scrap, edges sheared and curled, a partial ProTiga logo stencil visible across a rust-streaked surface.",
     "description": "Core local salvage pool — the ProTiga factory site is the obvious crafting-component source for North Bandawang/Axe Town.",
     "scrap_yield": {
       "scrap_metal": 3
@@ -2494,6 +2629,7 @@ export const itemDatabase = {
     "name": "Rusted Pipe Segment",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A short length of corroded metal pipe, threaded ends chewed by rust, flaking orange scale along the body, a dented section near the middle from old impact.",
     "description": "Dual-purpose: crafting component or reflavored into the Water Pipe Cudgel weapon, from Bandawang Lama.",
     "scrap_yield": {
       "scrap_metal": 2
@@ -2507,6 +2643,7 @@ export const itemDatabase = {
     "name": "Caliphate Dinar",
     "type": "currency",
     "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
+    "image_prompt": "A trinitite-glazed ceramic token stamped with a mosque motif, its glassy surface faintly iridescent, edges chipped, a worn inscription in Arabic script circling the rim.",
     "description": "A trinitite-infused library token, granting temporary access to the Grand Library. Often treated as spiritual relics or symbols of honor ",
     "weight": 0,
     "value": 1,
@@ -2517,6 +2654,7 @@ export const itemDatabase = {
     "name": "Protectorate Dollar",
     "type": "currency",
     "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
+    "image_prompt": "A crisp rectangular banknote printed in green ink, a portrait of a Protectorate official at its centre, a holographic security strip catching the light, corners slightly worn.",
     "description": "A tightly controlled currency distributed by the Protectorate.",
     "weight": 0,
     "value": 1,
@@ -2527,6 +2665,7 @@ export const itemDatabase = {
     "name": "Reformed Malayan Ringgit",
     "type": "currency",
     "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
+    "image_prompt": "A worn paper banknote overstamped with a red Federation seal atop the original pre-war Malaysian ringgit printing, creased and soft from handling, a serial number faded along one edge.",
     "description": "Also called RMR, it is the most common currency in the Wastes. It consists of salvaged pre-war Malayan Ringgit that have been stamped and marked for day to day use.",
     "weight": 0,
     "value": 1,
@@ -2537,6 +2676,7 @@ export const itemDatabase = {
     "name": "Broken Ceiling Fan Blade",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A single snapped ceiling fan blade, curved aluminum scarred with scratches and a bent tip, mounting screws still lodged in the base, paint chipped to bare metal along the edge.",
     "description": "A snapped-off blade from a household ceiling fan — common indoor scavenge across Bandawang.",
     "scrap_yield": {
       "scrap_metal": 2
@@ -2550,6 +2690,7 @@ export const itemDatabase = {
     "name": "Broken Pressure Cooker",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A dented aluminum pressure cooker with a cracked gauge and a missing handle, the lid seal perished and peeling, soot staining the underside, a faded enamel floral pattern on the body.",
     "description": "A dented kitchen pressure cooker — a kampung kitchen staple before the bombs.",
     "scrap_yield": {
       "scrap_metal": 2,
@@ -2564,6 +2705,7 @@ export const itemDatabase = {
     "name": "Broken Radio Set",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A household radio set with a cracked wooden-veneer casing, dial glass shattered, exposed tubes and wiring visible through a broken panel, a tuning knob missing.",
     "description": "A household radio set, casing cracked, innards mostly intact.",
     "scrap_yield": {
       "electronics": 3,
@@ -2578,6 +2720,7 @@ export const itemDatabase = {
     "name": "Broken Streetlamp Fixture",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A fallen streetlamp head, its metal casing dented and rust-streaked, the bulb socket empty and corroded, a cracked glass lens hanging loose on bent brackets.",
     "description": "A fallen streetlamp head, casing dented, bulb long gone.",
     "scrap_yield": {
       "scrap_metal": 2,
@@ -2592,6 +2735,7 @@ export const itemDatabase = {
     "name": "Cracked LCD Panel",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A shattered flat display panel with a spiderweb crack across dark glass, a bent metal bezel, exposed ribbon cable dangling from one edge, a faded shopfront brand logo in the corner.",
     "description": "A shattered display panel, scavenged from a pre-War shopfront or office.",
     "scrap_yield": {
       "electronics": 2
@@ -2605,6 +2749,7 @@ export const itemDatabase = {
     "name": "Cracked Motorbike Mirror",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A snapped-off motorbike wing mirror on its mounting arm, the glass spiderwebbed with cracks, chrome housing pitted with rust, a strip of faded reflective tape along the edge.",
     "description": "A snapped-off wing mirror, still on its mounting arm.",
     "scrap_yield": {
       "scrap_metal": 1,
@@ -2619,6 +2764,7 @@ export const itemDatabase = {
     "name": "Cracked Motorcycle Helmet",
     "type": "junk",
     "icon": "",
+    "image_prompt": "An open-face motorcycle helmet with a shattered grey fiberglass shell cracked clean through, foam padding and a frayed nylon chin strap still buckled on, a faded kapcai dealer sticker peeling near the visor line.",
     "description": "A shattered helmet shell, padding and strap still attached.",
     "scrap_yield": {
       "scrap_metal": 1,
@@ -2633,6 +2779,7 @@ export const itemDatabase = {
     "name": "Cracked Rain Barrel",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A tall blue plastic rain-collection barrel split down one side, sun-bleached to a chalky white along the crack, streaked with algae and mineral crust, a molded Bahasa Malaysia capacity marking worn illegible near the rim.",
     "description": "A plastic rain-collection barrel, split down one side.",
     "scrap_yield": {
       "scrap_metal": 1,
@@ -2647,6 +2794,7 @@ export const itemDatabase = {
     "name": "Dead Car Battery",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A rectangular lead-acid car battery encased in cracked black plastic, corroded green-white crust crusted around the terminals, one post snapped off, the brand label long peeled away, acid stains crusting down one side.",
     "description": "A spent lead-acid battery, pulled from a wreck long since stripped of everything else.",
     "scrap_yield": {
       "chemicals": 2,
@@ -2661,6 +2809,7 @@ export const itemDatabase = {
     "name": "Dried Fish Bones",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A small heap of dried salted fish bones and papery skin, ikan masin remains bleached pale grey-white, curling and brittle, a few grains of coarse salt still clinging to the spine.",
     "description": "The remains of a salted-fish meal — ikan masin's leftovers, everywhere along the coast.",
     "scrap_yield": {
       "organics": 2
@@ -2674,6 +2823,7 @@ export const itemDatabase = {
     "name": "Empty Kerosene Tin",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A rectangular tin kerosene container with a narrow pour spout, dented sides blooming with orange-brown rust through worn red paint, a faded Malay-script minyak tanah label stenciled across one face.",
     "description": "A rusted kerosene tin, the kind kampung households kept for the stove.",
     "scrap_yield": {
       "scrap_metal": 2,
@@ -2688,6 +2838,7 @@ export const itemDatabase = {
     "name": "Federation Ration Tin",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A dented steel ration tin, olive-drab paint chipped to bare metal, a stenciled Federation eagle insignia and lot number faded on the lid, pull-ring long snapped off, rust freckling the seams.",
     "description": "A discarded Federation-issue ration tin. Common wherever Federation patrols have passed through.",
     "scrap_yield": {
       "scrap_metal": 1,
@@ -2702,6 +2853,7 @@ export const itemDatabase = {
     "name": "Jammed Sewing Machine",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A cast-iron treadle sewing machine on its wooden base, black lacquer flaking to rust across the arm, spoked flywheel seized solid, gold scrollwork worn thin, bobbin thread still strung through a bent needle.",
     "description": "An old treadle sewing machine, mechanism mostly intact under the rust.",
     "scrap_yield": {
       "gun_parts": 2,
@@ -2716,6 +2868,7 @@ export const itemDatabase = {
     "name": "Moth-Eaten Prayer Mat",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A woven prayer mat riddled with moth holes, once-green pile faded to dull khaki, fringed edges frayed and unraveling, a geometric mihrab pattern still visible through the wear and grime.",
     "description": "A woven prayer mat, faded and holed through but still real fabric.",
     "scrap_yield": {
       "cloth": 3
@@ -2729,6 +2882,7 @@ export const itemDatabase = {
     "name": "Rubber Sandal Strap",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A single snapped rubber sandal strap, moulded dark brown and cracked with age, the Y-shaped thong torn free of its post, a sole fragment still attached, gritty with dried mud.",
     "description": "A snapped rubber sandal strap — the most common footwear in the pre-War Peninsula, still lying everywhere.",
     "scrap_yield": {
       "cloth": 1,
@@ -2743,6 +2897,7 @@ export const itemDatabase = {
     "name": "Rusted Kapcai Carburettor",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A small motorcycle carburettor stripped off a wrecked kapcai, aluminium body pitted and rusted orange-brown, float bowl cracked, throttle cable snapped short, dried fuel residue crusted around the intake.",
     "description": "Scavenged straight off a wrecked kapcai — Bandawang's old commuter bike of choice.",
     "scrap_yield": {
       "scrap_metal": 2,
@@ -2757,6 +2912,7 @@ export const itemDatabase = {
     "name": "Rusty Bicycle Chain",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A corroded bicycle chain coiled in a loose loop, links fused orange-brown with rust, a few stiff or missing links, dried chain oil turned to black grime in the grooves.",
     "description": "A corroded bicycle chain, common enough scrap wherever there used to be a bike rack.",
     "scrap_yield": {
       "scrap_metal": 2,
@@ -2771,6 +2927,7 @@ export const itemDatabase = {
     "name": "Shredded Tarpaulin",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A torn sheet of blue plastic tarpaulin, shredded edges fraying into ribbons, sun-bleached patches gone pale and brittle, a faded warung stall's printed logo still legible across one corner.",
     "description": "Blue plastic tarp, the kind every stall and stockroom in Bandawang used to have rolls of.",
     "scrap_yield": {
       "cloth": 3
@@ -2784,6 +2941,7 @@ export const itemDatabase = {
     "name": "Spoiled Coconut Husk Sack",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A burlap sack stuffed with coarse coconut husk fibre, the weave stained dark and mildewed, one corner split and spilling brown fibre, a faded plantation stencil mark on the fabric.",
     "description": "A burlap sack of coconut husk fibre — old plantation waste, still tough as rope.",
     "scrap_yield": {
       "organics": 2,
@@ -2798,6 +2956,7 @@ export const itemDatabase = {
     "name": "Spool of Fishing Line",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A small plastic spool wound with tangled nylon fishing line, the line yellowed and brittle, salt crust caked around the edges, a faded brand label peeling off the hub.",
     "description": "Nylon fishing line off a broken reel — common salvage near Bandawang's waterfront.",
     "scrap_yield": {
       "cloth": 1,
@@ -2812,6 +2971,7 @@ export const itemDatabase = {
     "name": "Tangled Barbed Wire Coil",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A tangled coil of barbed wire pulled from a perimeter fence, thick rust flaking off in scales, several barbs snapped or bent flat, the coil roughly the size of a car tyre.",
     "description": "A rusted coil of barbed wire, pulled off an old perimeter fence.",
     "scrap_yield": {
       "scrap_metal": 3
@@ -2825,6 +2985,7 @@ export const itemDatabase = {
     "name": "Torn Umbrella Frame",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A collapsed umbrella reduced to its bent metal ribs, black fabric torn away in ragged strips clinging to a few spokes, the central shaft dented and the folding hinge seized with rust.",
     "description": "A collapsed umbrella's metal ribs — useless as shelter, useful as scrap.",
     "scrap_yield": {
       "scrap_metal": 1,
@@ -2839,6 +3000,7 @@ export const itemDatabase = {
     "name": "Warung Signboard",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A rectangular tin signboard from a roadside warung, enamel paint chipped down to rusted metal, faded Jawi and Rumi lettering advertising nasi lemak and kopi, one corner bent from being pried off its nails.",
     "description": "A roadside stall's old tin signboard — every Bandawang street had a dozen of these once.",
     "scrap_yield": {
       "scrap_metal": 2,
@@ -2853,6 +3015,7 @@ export const itemDatabase = {
     "name": "Withered Herb Bundle",
     "type": "junk",
     "icon": "",
+    "image_prompt": "A small bundle of dried kitchen herbs tied with string, brittle pandan and serai stalks curled and browned, leaves crumbling to dust, a faded twine loop for hanging still knotted at the top.",
     "description": "A bundle of dried kitchen herbs, found hanging in an abandoned stall.",
     "scrap_yield": {
       "organics": 2
@@ -2870,6 +3033,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A length of motorcycle chain wound tight and wrapped in layers of black electrical tape for a grip, links rusted at the exposed ends, a small strip of red cloth tied near the handle marking it Rakan Watch.",
     "description": "Bicycle chain wrapped in tape, The Rakan Watch's signature improvised flail.",
     "stats": {
       "dmg": "TBA",
@@ -2907,6 +3071,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A broad meat cleaver forged from a repurposed factory press blade, thick steel edge notched and dulled, handle wrapped in worn cord, faded red paint marking the spine with a crude axe symbol.",
     "description": "Signature weapon of the Axe Gang, an oversized meat cleaver forged from repurposed factory press blades.",
     "stats": {
       "dmg": "TBA",
@@ -2944,6 +3109,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
+    "image_prompt": "A belt-fed .50 calibre machine gun with a heavy finned barrel, matte-black finish worn silver at the edges, an ammo belt hanging half-fed from the receiver, its bulk long and heavy enough to need a sling and both hands.",
     "description": "Big Guns tier heavy weapon, highest per-round damage in the class. Burst-capable.",
     "stats": {
       "dmg": "TBA",
@@ -2964,6 +3130,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
+    "image_prompt": "A squat mini-nuke launcher with a wide barrel drum and a stubby targeting scope, chipped Federation-yellow paint over dented steel, a faded radiation trefoil stenciled on the side, bulky enough to brace against the shoulder with both arms.",
     "description": "Unique/Quest-leaning Big Guns tier weapon — mini-nuke launcher, extremely rare ordinance. Tier 4 (Unique) — deliberately exceeds the standard tier ceiling given its rarity and narrative weight, but bounded rather than an automatic kill against high-DR targets.",
     "stats": {
       "dmg": "6d10+20",
@@ -2983,6 +3150,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
+    "image_prompt": "A nozzle gun linked by a scorched rubber hose to a dented fuel tank meant for a shoulder harness, soot blackening the barrel, faded stenciled warning letters peeling off the tank's flank, bulky and heavy across both arms.",
     "description": "Big Guns tier fuel-based weapon, short range, area denial. Tier 2. Short range, area denial with lingering fire field.",
     "stats": {
       "dmg": "2d6+3",
@@ -3002,6 +3170,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
+    "image_prompt": "A rotary multi-barrel gatling gun with six thick steel barrels bundled around a central spindle, pitted with rust and old scorch marks, a hand-crank housing bolted to one side, its bulk heavy enough to need bracing with both arms.",
     "description": "Big Guns tier heavy ballistic weapon, alternative to the Minigun. Burst/sustained-fire capable. Tier 2, per-bullet damage.",
     "stats": {
       "dmg": "1d8+3",
@@ -3022,6 +3191,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
+    "image_prompt": "A rotary multi-barrel energy weapon with six slender crystal-tipped barrels bundled around a humming central core, chipped blue focusing lenses, scorched vents along the housing, cabling trailing to a bulky battery pack too heavy to fire one-handed.",
     "description": "Big Guns tier heavy energy weapon. Burst/sustained-fire capable. Tier 2, per-bullet damage.",
     "stats": {
       "dmg": "1d8+4",
@@ -3042,6 +3212,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
+    "image_prompt": "A belt-fed light machine gun with a long finned barrel and a folding bipod, worn matte-green paint chipped to bare steel, a dangling half-empty ammo belt, its length and weight needing both hands to level.",
     "description": "Big Guns tier sustained-fire weapon. Burst-capable.",
     "stats": {
       "dmg": "TBA",
@@ -3062,6 +3233,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
+    "image_prompt": "A multi-barrel rotary minigun with six thick barrels bundled around a central spindle, worn matte-black finish scratched to bare steel, an ammo belt trailing from a side feed, a motor housing bolted beneath, heavy enough to need both arms.",
     "description": "Big Guns tier heavy automatic weapon, high ammo consumption. Burst/sustained-fire capable. Tier 2, per-bullet damage kept modest since sustained fire + the burst AC/DR debuff carries this weapon's real power.",
     "stats": {
       "dmg": "1d8+3",
@@ -3082,6 +3254,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
+    "image_prompt": "A tube-shaped missile launcher slung over one shoulder, dull olive paint scratched and dented along the length, a cracked sighting scope mounted on top, a stenciled warning arrow pointing toward the muzzle, long enough to need both arms to aim.",
     "description": "Rare Big Guns tier weapon, single-target high explosive damage.",
     "stats": {
       "dmg": "TBA",
@@ -3141,6 +3314,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "energy_weapons",
     "icon": "",
+    "image_prompt": "A compact electromagnetic pistol with an exposed coil barrel wound in copper wire, brushed steel casing scorched at the muzzle, a small crystal capacitor glowing faintly blue-green through a cracked housing panel.",
     "description": "Rare tier electromagnetic sidearm.",
     "stats": {
       "dmg": "TBA",
@@ -3160,6 +3334,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "energy_weapons",
     "icon": "",
+    "image_prompt": "An electromagnetic rifle with a long coil-wrapped barrel and an exposed capacitor bank along the stock, brushed steel dulled with handling, a faint blue-green glow leaking from a cracked casing seam near the trigger guard.",
     "description": "Rare/Signature tier electromagnetic rifle, distinct ammo type from laser/plasma.",
     "stats": {
       "dmg": "TBA",
@@ -3179,6 +3354,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "energy_weapons",
     "icon": "",
+    "image_prompt": "A compact energy pistol with a stubby crystal-focusing barrel, worn chrome housing scratched down to grey metal, a small charge indicator dial cracked on the grip, faded Federation-issue serial numbers stamped along the frame.",
     "description": "Normal-to-Faction-Issued tier energy sidearm, real pre-war tech, rarer than ballistic pistols.",
     "stats": {
       "dmg": "TBA",
@@ -3198,6 +3374,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "energy_weapons",
     "icon": "",
+    "image_prompt": "A long-barreled energy rifle with a crystal focusing lens set into a boxy receiver, faded Federation olive-drab paint chipped along the stock, a small battery gauge cracked on the side, wear polishing the grip to bare metal.",
     "description": "Faction-Issued tier energy rifle, standard Federation-grade tech.",
     "stats": {
       "dmg": "TBA",
@@ -3217,6 +3394,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "energy_weapons",
     "icon": "",
+    "image_prompt": "A heavy plasma weapon with a bulbous glass containment chamber bolted to a thick steel barrel, faint green plasma residue crusted around the muzzle, cabling looping to a bulky backpack power cell, its weight demanding both arms to raise.",
     "description": "Top-tier Rare/Signature energy weapon, heaviest plasma option before Unique tier.",
     "stats": {
       "dmg": "TBA",
@@ -3236,6 +3414,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "energy_weapons",
     "icon": "",
+    "image_prompt": "A stubby plasma pistol with a small glass containment bulb glowing faint green at its core, scorched steel casing pitted around the muzzle, a cracked charge dial set into the worn grip.",
     "description": "Rare/Signature tier energy sidearm, higher damage than laser equivalents.",
     "stats": {
       "dmg": "TBA",
@@ -3255,6 +3434,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "energy_weapons",
     "icon": "",
+    "image_prompt": "A long plasma rifle with a glass containment chamber running along the barrel, faint green residue crusted at the muzzle, scorched steel housing worn to bare metal at the grip, a cracked charge gauge set near the trigger.",
     "description": "Rare/Signature tier energy rifle, top of the energy weapon bracket short of Unique.",
     "stats": {
       "dmg": "TBA",
@@ -3274,6 +3454,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "energy_weapons",
     "icon": "",
+    "image_prompt": "A boxy energy cannon ringed with exposed copper coils and small arcing prongs at the muzzle, scorched black housing pitted with old arc burns, cabling trailing to a humming backpack cell, heavy enough to need both arms to brace.",
     "description": "Rare/Signature tier energy weapon, arc-damage across multiple targets.",
     "stats": {
       "dmg": "TBA",
@@ -3293,6 +3474,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "throwing",
     "icon": "",
+    "image_prompt": "A bundle of three waxy paper-wrapped dynamite sticks bound with twine, a short fuse coiled and taped at one end, the paper stained and curling with age, a faded demolition warning stencil barely legible.",
     "description": "Thrown/placed explosive, pre-war construction demolition stock.",
     "stats": {
       "dmg": "TBA",
@@ -3311,6 +3493,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "throwing",
     "icon": "",
+    "image_prompt": "A hand-sized fragmentation grenade with a ribbed cast-iron shell, dull olive paint chipped to rust at the seams, a pull-ring pin dangling from a bent safety lever, faded stenciled lot numbers along one side.",
     "description": "Standard thrown explosive, self-contained — no separate ammo type needed.",
     "stats": {
       "dmg": "TBA",
@@ -3329,6 +3512,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
+    "image_prompt": "A break-action grenade launcher with a short stubby barrel and a wide flip-up sight, worn matte-black finish scratched to grey steel, a single fat shell loaded in the open breech, a cracked rubber shoulder pad on the stock.",
     "description": "Rare tier launcher weapon, area damage at range.",
     "stats": {
       "dmg": "TBA",
@@ -3348,6 +3532,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "throwing",
     "icon": "",
+    "image_prompt": "A hand grenade with a scorched matte-red shell, fins of dried fire-gel residue crusted around the seams, a bent pull-pin dangling from the safety lever, a faded flame-warning stencil peeling on one side.",
     "description": "Thrown fire explosive, self-contained, damage-over-time.",
     "stats": {
       "dmg": "TBA",
@@ -3366,6 +3551,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "throwing",
     "icon": "",
+    "image_prompt": "A flat disc-shaped land mine with a corroded olive-drab casing, a pressure plate dented and rust-streaked across the top, a faded stenciled skull-and-crossbones warning barely visible through the grime.",
     "description": "Placed explosive, triggered rather than thrown.",
     "stats": {
       "dmg": "TBA",
@@ -3384,6 +3570,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "throwing",
     "icon": "",
+    "image_prompt": "A glass bottle stuffed with a soot-stained rag wick, dried petrol residue crusting the neck, a peeling label from some long-gone kopitiam soft drink still faintly legible beneath the grime.",
     "description": "Scrap tier thrown fire weapon, improvised, self-contained.",
     "stats": {
       "dmg": "TBA",
@@ -3402,6 +3589,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "throwing",
     "icon": "",
+    "image_prompt": "A round hand grenade with a segmented glass shell glowing faint green at its seams, dented metal banding around the equator, a scorched pull-pin dangling loose, faint plasma residue crusted near the fuse housing.",
     "description": "Rare thrown energy explosive, self-contained.",
     "stats": {
       "dmg": "TBA",
@@ -3420,6 +3608,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
+    "image_prompt": "A long tube-shaped rocket launcher with a flared muzzle and a folding shoulder stock, dull olive paint scratched through to bare steel, a cracked optical sight mounted on top, its length needing both arms to shoulder and aim.",
     "description": "Rare Big Guns tier launcher, single-target high explosive damage.",
     "stats": {
       "dmg": "TBA",
@@ -3460,6 +3649,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "https://i.imgur.com/ejIIJM5.png",
+    "image_prompt": "A crude pistol welded and bolted together from mismatched scrap pipe and sheet metal, held together with wire and rivets, bare metal pitted with rust, a rubber band wound around the grip for purchase.",
     "description": "The Homemade Pistol is a weapon of the enterprising survivor. Cobbled out of junk and stuck together on nothing but willpower and faith, the Homemade Pistol is certainly a weapon of sorts. Some use gunpowder, some use pressure, but all of them have one thing in common: injecting lead into whatever it's pointed at.",
     "stats": {
       "dmg": "1d6",
@@ -3480,6 +3670,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "https://i.imgur.com/48WviQB.png",
+    "image_prompt": "A plain kitchen knife with a stained stainless blade nicked along the edge, a cracked wooden handle bound with tape, faint scratches where a brand stamp has worn away near the bolster.",
     "description": "The knife of the willing, the chefs, the housewife under duress and the knife you find under scraps of salvage. Is it sharp? Can it slice? Who cares? It's a knife.",
     "stats": {
       "dmg": "1d6",
@@ -3498,6 +3689,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A folding straight razor with a polished steel blade kept honed sharp despite its age, a dark lacquered wood handle worn smooth, a small engraved character mark near the hinge identifying its owner's clan.",
     "description": "Quiet, close-range blade favored by the Tan/Choo subfamilies of the Lim Clan Association for discreet business.",
     "stats": {
       "dmg": "TBA",
@@ -3516,6 +3708,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A wooden baseball bat scarred with dents and deep gouges, the once-glossy varnish worn to bare grain along the grip, a faded brand stamp near the handle, dark stains streaking the barrel.",
     "description": "Normal tier blunt weapon. Tier 1 (Normal).",
     "stats": {
       "dmg": "1d8+MD",
@@ -3534,6 +3727,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A heavy bowie knife with a broad clip-point blade pitted with rust spots, a worn leather-wrapped handle, a brass hilt guard tarnished green, the edge still keeping a rough working sharpness.",
     "description": "Normal tier bladed weapon, heavier than the standard Combat Knife. Tier 1 (Normal).",
     "stats": {
       "dmg": "1d8+2+MD",
@@ -3552,6 +3746,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "unarmed",
     "icon": "",
+    "image_prompt": "A pair of padded boxing gloves, cracked red leather peeling at the seams, foam stuffing poking through a split knuckle, the laces frayed and knotted, a faded gym stamp barely visible on the cuff.",
     "description": "Normal tier unarmed weapon. Intentionally low tier; padded gloves deal less damage by design — the manual's own number, kept as-is.",
     "stats": {
       "dmg": "1d2+MD",
@@ -3570,6 +3765,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "unarmed",
     "icon": "",
+    "image_prompt": "A set of brass knuckles worn smooth and dull with handling, the finger holes lined with grime, one edge nicked and bent slightly out of shape, faint scratches where an engraved maker's mark has worn away.",
     "description": "Scrap tier unarmed weapon, common and concealable. Tier 0/1 border — the manual's exact number fit well, kept as-is.",
     "stats": {
       "dmg": "1d10+MD",
@@ -3588,6 +3784,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A pre-war military officer's sword with a slightly curved steel blade dulled and speckled with rust, a wrapped cord grip faded and frayed, a brass hilt tarnished dark, faint engraved characters worn shallow along the spine.",
     "description": "Rare/Signature tier bladed weapon, pre-war military relic. Tier 3 (Rare/Signature).",
     "stats": {
       "dmg": "1d10+6+MD",
@@ -3606,6 +3803,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A plain steel meat cleaver with a wide rectangular blade nicked along the edge, a worn wooden handle darkened with grease and age, faint rust freckling the flat of the blade near the spine.",
     "description": "Generic Normal tier bladed weapon — smaller than the custom Axe Gang Cleaver signature item. Tier 1 (Normal).",
     "stats": {
       "dmg": "1d8+MD",
@@ -3624,6 +3822,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A military-issue combat knife with a matte-black coated blade worn silver along the edge, a ridged rubber grip cracked with age, a small fuller groove running the spine, faded unit markings stamped near the guard.",
     "description": "Normal tier bladed weapon, military-issue design. Tier 1 (Normal). Stats assigned via 7-10 round combat framework (target avg ~6-10).",
     "stats": {
       "dmg": "1d8+MD",
@@ -3642,6 +3841,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "unarmed",
     "icon": "",
+    "image_prompt": "A heavy leather gauntlet studded with three curved deathclaw talons lashed on with sinew and wire, the claws yellowed and chipped at the tips, dried dark stains crusted into the leather straps.",
     "description": "Unique/Quest-leaning unarmed weapon, made from a deathclaw's actual claws. Tier 4 (Unique/Quest) — slightly above the Tier 3 ceiling, appropriate for its rarity.",
     "stats": {
       "dmg": "2d8+8+MD",
@@ -3660,6 +3860,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A fire axe with a wide flat blade balanced by a spike on the reverse head, chipped red paint worn to bare rusted steel, a wooden handle scarred and darkened, a faded fire-service stencil near the eye.",
     "description": "Normal tier bladed/blunt hybrid weapon. Tier 1 (Normal).",
     "stats": {
       "dmg": "1d8+2+MD",
@@ -3678,6 +3879,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A bent golf club with a scuffed metal head and a torn rubber grip unraveling down the shaft, the steel shaft dented mid-length, a faded club-face brand stamp worn nearly smooth.",
     "description": "Scrap tier improvised blunt weapon. Tier 0 (Scrap).",
     "stats": {
       "dmg": "1d6+MD",
@@ -3696,6 +3898,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "An imported katana with a slightly curved steel blade showing a faint hamon line beneath a film of surface rust, a frayed cord-wrapped hilt, a worn brass guard, the scabbard long since lost.",
     "description": "Rare/Signature tier bladed weapon, imported relic. Tier 3 (Rare/Signature) — scaled down from the manual's Claymore-tier numbers to fit the 7-10 round target.",
     "stats": {
       "dmg": "2d8+6+MD",
@@ -3714,6 +3917,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A wavy-bladed Malay keris with a pattern-welded pamor finish dulled by age, a carved wooden hilt worn smooth by handling, a plain sarung sheath scuffed at the tip, the blade's waves still sharp-edged.",
     "description": "From the manual — a real Malaysian ceremonial dagger, already statted. Smithed tier. Special Move: Lithe Thrust — -20% Hit Chance, ignores DT and DR, inflicts 2d4 bleed damage until the wound is closed. Takes 1 turn to prepare.",
     "stats": {
       "dmg": "2d6+4",
@@ -3733,6 +3937,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A plain steel machete with a long straight blade dulled and speckled with rust spots, a worn wooden handle bound with a strip of frayed cord, faint nicks along the cutting edge from heavy use.",
     "description": "Normal tier bladed weapon. Note: overlaps thematically with the existing custom Parang item — both fill a similar niche, kept separate since Parang is the Malaysian-flavor version and this is the generic Fallout-derived import. Tier 1 (Normal).",
     "stats": {
       "dmg": "1d8+MD",
@@ -3751,6 +3956,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A Federation-issue nightstick, black polymer worn matte-grey along the grip, a looped wrist strap frayed and graying, faint scuff marks and a chipped stenciled unit number near the base.",
     "description": "Normal tier blunt weapon, Federation crowd-control issue. Tier 1 (Normal). Stats assigned via 7-10 round combat framework.",
     "stats": {
       "dmg": "1d8+MD",
@@ -3769,6 +3975,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A cracked pool cue with chalk dust ground into the worn wooden shaft, the tip's leather cap peeling away, a faded felt-and-brass joint at the midpoint, splintering visible along one broken edge.",
     "description": "Scrap tier improvised blunt weapon. Tier 0 (Scrap). Stats assigned via 7-10 round combat framework (target avg ~4-6).",
     "stats": {
       "dmg": "1d4+MD",
@@ -3787,6 +3994,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "unarmed",
     "icon": "",
+    "image_prompt": "A powered gauntlet bristling with small pneumatic pistons along the knuckles, dull steel plating scorched and dented, exposed wiring trailing from a cracked power cell strapped to the forearm, servo housing caked in grime.",
     "description": "Rare/Signature tier unarmed weapon, powered gauntlet. Tier 3 (Rare/Signature). Heavily scaled down from the manual's 4d4+20+MD, which ran far too hot for the 7-10 round target.",
     "stats": {
       "dmg": "2d6+6+MD",
@@ -3805,6 +4013,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A vibro-blade weapon with a serrated chainsaw-style edge housed along a stubby steel bar, a small motor housing rattling loose at the grip, chipped orange safety paint, chain links caked with old rust and grime.",
     "description": "Rare/Signature tier bladed weapon, powered vibro-blade. Tier 3 (Rare/Signature). Scaled down from the manual's Chain Weapons numbers, which ran hot across the whole family.",
     "stats": {
       "dmg": "2d8+6+MD",
@@ -3823,6 +4032,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "An improvised fire sword built from a car leaf-spring blade welded to a fuel canister and hose running along the hilt, scorched black soot streaking the edge, a small igniter valve set into the guard.",
     "description": "Rare/Signature tier bladed weapon, improvised fire sword, uses Flamer Fuel. Tier 3 (Rare/Signature). Not in the manual — fresh numbers built to fit the 7-10 round target.",
     "stats": {
       "dmg": "2d8+6+MD",
@@ -3842,6 +4052,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A flat-bladed shovel with a dented and rust-pitted steel head, a wooden shaft worn smooth and split near the collar, dried mud caked along the blade's edge from heavy digging use.",
     "description": "Scrap tier improvised blunt weapon, dual-purpose tool. Tier 0 (Scrap). Stats assigned via 7-10 round combat framework.",
     "stats": {
       "dmg": "1d6+MD",
@@ -3860,6 +4071,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A heavy sledgehammer with a broad flat steel head chipped and pitted with rust, a long wooden handle worn smooth and cracked near the grip, the head's mass and shaft length needing both hands to swing.",
     "description": "Normal tier heavy blunt weapon. Tier 2 (Faction-Issued). Scaled down significantly from the manual's flat bonus, which ran far too hot for the 7-10 round target.",
     "stats": {
       "dmg": "2d6+3+MD",
@@ -3878,6 +4090,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A reinforced motorized sledgehammer with a bulky steel head wrapped in scorched metal plating, small exposed pistons along the haft, a thick rubber-wrapped grip worn and split, its bulk and weight demanding both hands.",
     "description": "Rare/Signature tier heavy blunt weapon, reinforced/motorized variant of the Sledgehammer. Tier 3 (Rare/Signature). Heavily scaled down from the manual's 6d4+20+MD, which would have one-shot even a level-10 character.",
     "stats": {
       "dmg": "2d8+6+MD",
@@ -3896,6 +4109,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A small switchblade with a slim steel blade folded into a scratched aluminium housing, a worn thumb-stud release, faint corrosion pitting along the spine, the handle scales cracked and yellowed with age.",
     "description": "Normal tier concealable bladed weapon. Tier 1 (Normal), light/concealable. Stats assigned via 7-10 round combat framework.",
     "stats": {
       "dmg": "1d6+MD",
@@ -3914,6 +4128,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A straight steel tire iron with a flattened pry end and a lug-wrench socket at the other, dull grey metal pitted with rust spots, a faded ProTiga factory stamp worn shallow near the middle.",
     "description": "Normal tier blunt weapon, ProTiga factory-tool origin. Tier 1 (Normal). Stats assigned via 7-10 round combat framework.",
     "stats": {
       "dmg": "1d8+MD",
@@ -3951,6 +4166,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A real Malay jungle blade with a broad slightly curved steel edge honed from daily use, a plain worn wooden handle darkened with sweat and oil, a simple leather sheath scuffed along the seams.",
     "description": "A real Malay jungle blade, functioning as the setting's everyday tool-turned-survival-weapon.",
     "stats": {
       "dmg": "TBA",
@@ -3969,6 +4185,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A rifle-caliber conversion pistol with a long thick barrel and an oversized cylinder cut for rifle rounds, worn blued steel scratched to bare metal, a checkered grip panel cracked down the middle.",
     "description": "High-end Normal-tier pistol, rifle-caliber conversion. Tier 2 (Faction-Issued), top of the pistol bracket.",
     "stats": {
       "dmg": "2d8+4",
@@ -3988,6 +4205,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A small .32 revolver with a short thin barrel, worn blued finish gone silver-grey at the edges, a plain wooden grip scratched and darkened, the cylinder release stiff with dried grime.",
     "description": "Normal tier revolver — light caliber, common starter sidearm. Tier 1 (Normal), low end.",
     "stats": {
       "dmg": "1d6+3",
@@ -4007,6 +4225,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A heavy .44 revolver with a thick barrel and a wide-bored cylinder, worn nickel plating flaking to reveal steel beneath, a checkered wooden grip chipped at one corner, faint holster wear along the frame.",
     "description": "Normal tier heavy revolver, higher stopping power than the .32. Tier 1 (Normal), high end.",
     "stats": {
       "dmg": "2d6+3",
@@ -4026,6 +4245,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A pre-war factory-made 10mm pistol with a boxy slide and squared trigger guard, worn matte-black finish rubbed to bare metal at the edges, a faded serial number stamped along the frame near the grip.",
     "description": "Standard-issue pre-war sidearm, Normal tier — a real factory firearm, not a scrap improvisation. Tier 1 (Normal). Ranged weapons don't get an MD bonus (no ST scaling per the manual).",
     "stats": {
       "dmg": "2d6+2",
@@ -4045,6 +4265,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "An oversized-caliber pistol with a thick wide barrel and a bulky slide, worn parkerized finish scratched through to bright steel, a scuffed grip panel loose at one screw, its heft visibly larger than a standard sidearm.",
     "description": "Rare oversized pistol caliber, sits at the top of the Normal-tier pistol bracket. Tier 2 (Faction-Issued).",
     "stats": {
       "dmg": "2d8+3",
@@ -4064,6 +4285,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A compact 9mm pistol with a slim slide and a short barrel, worn matte finish scratched along the edges, a cracked polymer grip panel, a faded factory proof mark stamped near the muzzle.",
     "description": "Normal tier factory sidearm, easily concealed. Tier 1 (Normal), low end.",
     "stats": {
       "dmg": "1d8+3",
@@ -4083,6 +4305,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "TBA",
     "icon": "",
+    "image_prompt": "A repurposed pneumatic nail gun converted into a weapon, its steel housing scorched and dented, a coiled rubber air hose trailing from the grip, a stenciled ProTiga factory serial plate riveted to the side.",
     "description": "Repurposed ProTiga factory tool-turned-weapon, North Bandawang.",
     "stats": {
       "dmg": "TBA",
@@ -4102,6 +4325,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A length of rebar hammered flat at one end and studded with bent nails driven through the shaft, rust bleeding down the metal, a strip of cloth wound around the grip end, sourced from ProTiga stock.",
     "description": "Salvage bludgeon, sourced from ProTiga factory rebar stock. North Bandawang / neutral.",
     "stats": {
       "dmg": "TBA",
@@ -4120,6 +4344,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A massive long-barreled rifle with a thick bull barrel and a bipod folded beneath the stock, worn matte-black finish scratched to bare steel, a scoped sight mounted along the top rail, its length and weight needing both arms to level.",
     "description": "Top-of-Normal-tier rifle, highest single-shot damage in the class. Tier 4 (Unique-leaning) — runs slightly above the Tier 3 ceiling by design, the single hardest-hitting standard rifle in the game.",
     "stats": {
       "dmg": "3d10+8",
@@ -4139,6 +4364,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A faction-issue automatic rifle with a ribbed handguard and a curved magazine, worn olive-drab finish chipped to bare metal along the receiver, a scratched optical sight mounted on top, a faded Federation stencil near the stock.",
     "description": "Normal tier automatic rifle. Burst-fire capable — see the campaign's burst mechanic (single roll, AC/DR debuff). Tier 2 (Faction-Issued).",
     "stats": {
       "dmg": "2d6+4",
@@ -4159,6 +4385,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A hard-hitting semi-automatic rifle with a long wooden stock and a heavy steel receiver, worn varnish cracked and faded, a scratched iron sight mounted along the barrel, a straight box magazine seated beneath.",
     "description": "Rare/Signature-leaning Normal tier rifle, harder-hitting than the Assault or Combat Rifle. Tier 3 (Rare/Signature).",
     "stats": {
       "dmg": "2d10+6",
@@ -4178,6 +4405,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A faction-standard semi-automatic rifle with a ribbed polymer handguard and a straight magazine, worn matte-green finish scuffed to bare metal, a scratched optical sight mounted on the rail, a faded serial stamp near the receiver.",
     "description": "Normal tier semi-automatic rifle, faction-standard issue. Tier 2 (Faction-Issued).",
     "stats": {
       "dmg": "2d8+3",
@@ -4197,6 +4425,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A crude rifle cobbled from scrap pipe and salvaged wood, bound together with wire, tape and rivets, bare metal pitted with rust, a makeshift sight welded on from bent scrap, the stock roughly carved and unfinished.",
     "description": "Scrap tier — the rifle-length sibling to the Homemade Pistol. Improvised, no real ammo standard, no mod system. Tier 0 (Scrap). Stats assigned via 7-10 round combat framework.",
     "stats": {
       "dmg": "1d8+1",
@@ -4216,6 +4445,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A bolt-action hunting rifle with a long slim barrel and a wooden stock worn smooth with handling, faded varnish cracked along the grip, a scratched iron sight, a small brass shell casing lodged in the open bolt.",
     "description": "Normal tier bolt-action rifle, common pre-war hunting/utility weapon. Tier 1 (Normal).",
     "stats": {
       "dmg": "2d8+2",
@@ -4235,6 +4465,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A lightweight carbine with a shortened barrel and a simple wooden stock, worn matte finish scratched along the receiver, a plain iron sight, a faded factory proof mark stamped near the trigger guard.",
     "description": "Lower-end Normal tier carbine, common early rifle option. Tier 1 (Normal).",
     "stats": {
       "dmg": "2d6+3",
@@ -4254,6 +4485,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A long-range rifle with a heavy bull barrel and a scoped sight mounted along the top rail, worn matte-black finish scratched to bare steel, a bipod folded beneath the stock, a faded unit marking near the grip.",
     "description": "Rare/Signature-leaning Normal tier rifle, long range and high single-shot damage. Tier 3 (Rare/Signature).",
     "stats": {
       "dmg": "2d10+7",
@@ -4273,6 +4505,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A light, worn bolt-action rifle with a slim barrel and a scuffed wooden stock, faded varnish chipped along the grip, a simple iron sight, a small magazine tube running beneath the barrel, common and unremarkable.",
     "description": "Bottom-of-Normal-tier rifle, weak but common and cheap to feed. Tier 0/1 border, weakest rifle.",
     "stats": {
       "dmg": "1d6+2",
@@ -4292,6 +4525,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A compact automatic SMG with a stubby barrel and a curved magazine jutting forward of the trigger guard, worn matte-black finish scratched to bare metal, a folding wire stock, a faded serial stamp near the ejection port.",
     "description": "Normal tier automatic SMG. Burst-fire capable. Tier 1 (Normal), per-round damage — burst mode applies the AC/DR debuff convention.",
     "stats": {
       "dmg": "1d8+2",
@@ -4312,6 +4546,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A pre-war automatic Tommy Gun with a distinctive drum magazine and finned barrel, worn blued steel scratched and pitted with age, a wooden foregrip darkened with handling, a faded manufacturer stamp along the receiver.",
     "description": "Normal tier automatic SMG, pre-war antique still in circulation. Burst-fire capable. Tier 2 (Faction-Issued), per-round damage.",
     "stats": {
       "dmg": "2d6+3",
@@ -4351,6 +4586,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A faction-standard combat shotgun with a ribbed pump handguard and a short barrel, worn matte-green finish scuffed to bare metal, a sling loop riveted to the stock, a faded serial stamp near the receiver.",
     "description": "Normal tier shotgun, faction-standard close-range weapon. Tier 2 (Faction-Issued).",
     "stats": {
       "dmg": "2d8+4",
@@ -4370,6 +4606,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A break-action double-barrel shotgun with twin side-by-side barrels, worn blued steel scratched and freckled with rust, a scarred wooden stock, a simple hinge action stiff with grime, a faded proof mark near the breech.",
     "description": "Normal tier shotgun, simple break-action design. Tier 1/2 border.",
     "stats": {
       "dmg": "2d8+2",
@@ -4389,6 +4626,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A tube-fed lever-action shotgun with a long barrel and a worn wooden stock, blued steel scratched to bare metal along the receiver, a stiff lever loop worn smooth, a faded brand stamp near the chamber.",
     "description": "Normal tier shotgun, tube-fed lever mechanism. Tier 1 (Normal).",
     "stats": {
       "dmg": "2d6+3",
@@ -4408,6 +4646,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A common pump-action shotgun with a ribbed foregrip and a short barrel, worn matte finish scuffed to bare metal, a scarred polymer stock, a faded serial number stamped near the receiver, the most ordinary shotgun around.",
     "description": "Normal tier shotgun, the most common variant in circulation. Tier 1 (Normal), most common variant.",
     "stats": {
       "dmg": "2d6+4",
@@ -4427,6 +4666,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A Federation crowd-control shotgun with a short barrel and a folding wire stock, worn matte-black finish scratched along the receiver, a stenciled Federation crest near the pump, a sling loop riveted to the side.",
     "description": "Faction-Issued leaning Normal tier shotgun, Federation crowd-control standard. Tier 2 (Faction-Issued).",
     "stats": {
       "dmg": "2d8+4",
@@ -4446,6 +4686,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
+    "image_prompt": "A shortened shotgun with both barrels hacksawed down to stubs, worn blued steel scratched and pitted, a sawn-off wooden stock cut roughly to a pistol grip, a faded proof mark near the breech.",
     "description": "Concealable Normal tier shotgun, very short range, high close-quarters damage. Tier 1 (Normal), very short range.",
     "stats": {
       "dmg": "2d6+3",
@@ -4465,6 +4706,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
+    "image_prompt": "A length of salvaged metal water pipe repurposed as a cudgel, one end wrapped in frayed cloth for a grip, dented and streaked with rust, a corroded threaded joint still fused at the base.",
     "description": "Salvaged plumbing, Bandawang Lama. Thematically tied to water-rights disputes.",
     "stats": {
       "dmg": "TBA",

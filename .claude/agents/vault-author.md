@@ -49,8 +49,14 @@ A batch brief with, for each entry:
 
 ## Templates
 
-Every item gets an `image_prompt` ending in `isolated on dark background,
-game icon style`. `value` is in RMR. Weight is in kg.
+Every item gets an `image_prompt`: one sentence describing **the object
+only** — what it is, its materials, wear and damage, colours, markings,
+and one detail that places it on the Peninsula (a faded Malay label, a
+Federation stencil, a kopitiam logo). Scale cues for large/oversized
+items. **No style words, no background, no framing** — the art script
+adds the shared style (post-apocalyptic retropunk meets dieselpunk) at
+generation time, so the look can change without rewriting prompts.
+`value` is the baseline price in RMR. Weight is in kg.
 
 **Weapon**
 ```json
