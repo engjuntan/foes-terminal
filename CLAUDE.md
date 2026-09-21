@@ -19,6 +19,9 @@ into `src/*.js` by the sync script.
 - **Code:** `src/controllers.js` (actions, Firestore writes), `src/views.js`
   (HTML rendering), `src/formulas.js` (`calculateDerivedStats`),
   `src/main.js` (bindings, render loop).
+- **Rulebook:** `reference/manual.txt` — text of the 150-page manual
+  (gitignored). `grep` it; don't read it whole. `RULES_AUDIT.md` maps
+  its rules to the code.
 - **Design records:** `SCOPE_DECISIONS.md` (rulings log), `*_SPEC.md`
   (one per system), `CHANGELOG.md`.
 
@@ -68,3 +71,5 @@ under `99_Backend Engine` is ever player-visible — it holds GM secrets.
 - Bulk vault writing goes to the `vault-author` agent
   (`.claude/agents/vault-author.md`); the main session plans the batches,
   runs the sync, reviews, and commits.
+- Game-math proposals come from the `balance-auditor` agent, which writes
+  `BALANCE_PROPOSAL.md` and changes nothing else.
