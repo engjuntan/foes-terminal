@@ -22,6 +22,9 @@ into `src/*.js` by the sync script.
 - **Rulebook:** `reference/manual.txt` — text of the 150-page manual
   (gitignored). `grep` it; don't read it whole. `RULES_AUDIT.md` maps
   its rules to the code.
+- **GM's campaign plan:** `reference/org-map.md` — text of the FOES
+  Organization Map PDF (gitignored; regenerate from the PDF). Newest
+  source for story, NPCs, locations and to-dos.
 - **Design records:** `SCOPE_DECISIONS.md` (rulings log), `*_SPEC.md`
   (one per system), `CHANGELOG.md`.
 

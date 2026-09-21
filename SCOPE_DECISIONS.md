@@ -791,3 +791,25 @@ Answers to BALANCE_PROPOSAL.md §9 and changes to its proposals.
   derive from it (1 PD = 100 RMR, 1 Dinar = 2,000 RMR).
 - **Repair skill is added back.** The manual has no formula for it, so
   it uses Fallout 2's: Repair = 3 × INT. Repair governs repairing gear.
+
+## Organization Map intake — rulings (2026-09-22)
+
+- **Source:** the GM's FOES Organization Map PDF, extracted to
+  `reference/org-map.md` (boxes A1–L119, grouped by the map's sections).
+  Its "Overarching Story" supersedes older timelines.
+- **Renames (map box B2):** Khoo family → Peng. Lim Clan → 1414 Triad.
+- **Inflation multiplier** is a GM setting adjusted from the shop tab,
+  not a dice roll.
+- **T1 elites** get special rules, written by the GM later (open to
+  suggestions that fit the ruleset). Don't balance them as HP sponges.
+- **Balance sims** must account for movement and cover, or state how
+  their absence skews the results.
+- **Bestiary to write:** the map's 10 (Giant Ants, Tenggiling Besar,
+  Giant Centipede, Raider Protectron, Construction Protectron, Raider
+  Ghoul, Vicious Dog, Sumatran Rhino, Giant Vicious Dog, three-headed
+  Ayam) plus the balance agent's tier-fillers.
+- **Lore agent** also audits the GM's own timelines and notes
+  (inconsistencies, redundancies, gaps) and flags explicit real-world
+  Malaysian names for replacement.
+- **Map to-dos not yet built:** a player **notes** section on the
+  dashboard; special abilities; reroll; reputation.
