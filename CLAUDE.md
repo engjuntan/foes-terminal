@@ -73,5 +73,8 @@ under `99_Backend Engine` is ever player-visible — it holds GM secrets.
   runs the sync, reviews, and commits.
 - Item icons: `npm run art` (`tools/item-art.mjs`, guide in
   `tools/ITEM_ART.md`). Plain script, no Claude tokens; hard-capped runs.
+- Lore and aesthetic checks come from the `lore-keeper` agent (DIRECTION
+  before writing, REVIEW after); it writes to `reviews/` and changes
+  nothing else.
 - Game-math proposals come from the `balance-auditor` agent, which writes
   `BALANCE_PROPOSAL.md` and changes nothing else.

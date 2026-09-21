@@ -1,36 +1,44 @@
-# FOES Balance Proposal (rev. 2)
+# FOES Balance Proposal (rev. 3)
 
-Written by the `balance-auditor` agent. The first version was 2026-09-21. This
-revision (2026-09-22) applies the GM rulings in `SCOPE_DECISIONS.md` ("Balance
-proposal — GM rulings (2026-09-22)") and the two new Method rules: five item tiers,
-and RMR prices at early hyperinflation. Nothing in `src/`, the vault or the specs was
-changed. Everything here is a proposal unless it is marked **RULED**.
+Written by the `balance-auditor` agent.
 
-**Tags.** **CHANGE** means an existing number or formula changes, and every affected
-item is listed. **NEW** fills a gap. **BUG** means the code does not match a ruling or
-the manual. **RULED** means the GM has already decided it; the section only works out
-the numbers.
+| Revision | Date | What it applied |
+|---|---|---|
+| rev. 1 | 2026-09-21 | First proposal |
+| rev. 2 | 2026-09-22 | First round of GM rulings |
+| rev. 3 | 2026-09-22 | **Second round of GM rulings** (win-rate ceiling, enemy tiers, faction character, Repair skill, RMR baseline prices, skill books not shared) |
 
-**Sources.** The GM rulings, then `reference/manual.txt`, then `src/`, then the
-generated data. The simulations import the real `src/combat.js`, `items.js` and
-`bestiary.js` and run 4,000 to 20,000 times each. The scripts are in the session
-scratchpad (`…/scratchpad/balance/`: `party4.mjs`/`party5.mjs` for encounters,
-`sim3.mjs` for attacks-to-kill, `wear2.mjs` for wear, `tiers.mjs` for the appendix).
-Every simulation assumes the tag / `skill_ranks` bug is **fixed**, since the main
-session is fixing it in parallel.
+Nothing in `src/`, the vault or the specs was changed. Everything here is a proposal
+unless it is marked **RULED**.
 
-### Price convention used throughout
+**Tags.** **CHANGE** alters an existing number or formula, and every affected item is
+listed. **NEW** fills a gap. **BUG** means the code does not match a ruling or the
+manual. **RULED** means the GM has already decided it; the section only works out the
+numbers.
 
-An item's **`value` is a stable base value.** The vault numbers need no bulk rewrite.
+**Sources and method.**
+- Sources, in order of authority: the GM rulings in `SCOPE_DECISIONS.md`, then
+  `reference/manual.txt`, then `src/`, then the generated data.
+- The simulations import the real `src/combat.js`, `items.js` and `bestiary.js`.
+- Scripts are in the session scratchpad (`…/scratchpad/balance/`):
 
-- **RMR price = value × the RMR index.** The index starts at **10**, which is the
-  GM's "×10 across the board", and it drifts upward (§4.3).
-- **PD price = value ÷ 10.** This never drifts.
-- **Dinar price = value ÷ 200.** This never drifts either.
+  | Script | What it produces |
+  |---|---|
+  | `tier.mjs` | The encounter engine |
+  | `final.mjs` | The tuned stat lines and the per-tier verification |
+  | `fix*.mjs` | The last adjustments |
+  | `wear2.mjs` | Wear rates |
+  | `tiers.mjs` | Appendix A |
 
-So a Stimpak (value 75) costs **750 RMR = 7.5 PD** today. Every value in this file is
-a base value unless it is written in RMR. The alternative of multiplying every vault
-`value` by 10 is open question N1.
+- Every simulation assumes the tag / `skill_ranks` bug is fixed.
+
+### Prices (RULED)
+
+- **An item's `value` is its baseline price in RMR.** CHANGE: every vault `value` is
+  multiplied by 10 (for example, Stimpak 75 → 750).
+- **PD price = value ÷ 100. Dinar price = value ÷ 2,000.**
+- All values in this file are the new RMR values unless marked otherwise.
+- Inflation is a GM-moved multiplier on top of the baseline (§4.3).
 
 ---
 
@@ -38,33 +46,29 @@ a base value unless it is written in RMR. The alternative of multiplying every v
 
 | # | Tag | Change | Why it matters |
 |---|---|---|---|
-| 1 | **BUG** (being fixed) | Combat, checks and crafting ignored the +20 tag bonus and `skill_ranks`. | As coded, a level-1 party wins 2% of fights against 3 raiders. Every figure below assumes the fix. |
-| 2 | **NEW** | Durability shape: `characters.<id>.condition = { inv: { itemId: [marks…] }, worn: { slot: marks } }`. `inventory` stays `{itemId: qty}`. | This is the smallest shape that holds per-copy condition. It is unchanged from rev. 1 (§2.1). |
-| 3 | **RULED** | Linear wear from the first mark: weapon damage ×(1 − 0.05 × marks), −1 to hit per mark, armor potency ×(1 − 0.05 × marks), and 10 marks = Broken. | §2.2. The new curve does not reopen the repair-arbitrage guard (§2.5). |
-| 4 | **RULED** | Repair is instant and capped by skill. A higher skill gives up to a **30% chance not to consume the components**. The cost is **ceil**(10% of value) per mark. | The guard needs the chance kept at 30% or below (§2.5). |
-| 5 | **RULED** | Currency: 1 PD = 100 RMR and 1 Dinar = 2,000 RMR (20 PD) at index 10. RMR carries the inflation, PD is the stable middle tier, and the Dinar is rare and valuable. The RMR index drifts about **+5% a week** (a 1d10 roll each week). | §4. PD and Dinar are fixed against each other, and only RMR floats. |
-| 6 | **NEW** | Five tiers (T5 Homemade to T1 Pre-War/Pristine) with damage, protection and value bands for each. All 119 weapons and armor pieces are placed (Appendix A). Six items sit outside their band. | §3.1. "Tier sets the ceiling; condition wears it down": salvaged power armor and the fractured laser rifle become full-spec items with high `base_marks`. |
-| 7 | **RULED** | Humanoid NPCs are built like PCs from a generic 40-point SPECIAL. Their faction armor is worn down with condition marks so that **no NPC's AC goes above its current value**. | Level-1 party vs 3 raiders: 11% wins today, 97% with the rebuilt raider. Protectorate at level 5 (mortar): 27% today, 99% (§6). |
-| 8 | **CHANGE** | Revalue 29 junk items so that value = the value of their scrap yield. | This money printer is unaffected by the ×10, because it is a ratio (§8.3). |
-| 9 | **NEW** | Barter limits stay: **buy ≥ 1.05, sell ≤ 0.65**. Reputation re-banded to 6 tiers with Antipathy removed. | §5. |
-| 10 | **RULED** | Skill books give +5 skill points and take **2 hours** to read on the shared clock. Nails ammo: value 1, weight 0.005. The Nail Driver becomes a T4 Salvaged sidearm (1d6+3, range 6, 30-nail strip). | §7.2, §3.3. |
+| 1 | **RULED** + NEW | **Enemy tiers T5 to T1**, each with a target party level and win rate: T5 at level 1 (85%), T4 at level 2 (85%), T3 at level 3 (80%), T2 at level 5 (75%), T1 at level 7 (about 55%, a hard fight). Every bestiary entry is placed and tuned, and 10 new entries are proposed (§6). | Every tuned matchup lands between **75% and 89%** of its target. **None exceeds 89%**, against 97–100% in rev. 2. |
+| 2 | **NEW finding** | **Win rate falls off a cliff with encounter size.** One enemy fewer than standard gives 94–100% wins. One more gives 2–63%. | Stats can only hit a target at one group size. The GM has to hold the **standard group sizes** in §6.2. Adding a single enemy is a tier jump. |
+| 3 | **RULED** | Faction character: the **Caliphate** has the best-trained elites (Pahlawan, 120% to hit). The **Federation** has poor regulars (65%) and elite commandos (110%). The **Protectorate** has the best gear (AC 26 and 31, pristine armor) but poor training (65–70% to hit), and makes up for it with numbers and toughness. | Protectorate troops no longer wear worn armor. Only raiders do. |
+| 4 | **NEW** | Durability shape: `condition = { inv: { itemId: [marks…] }, worn: { slot: marks } }`. `inventory` stays `{itemId: qty}`. | Unchanged from rev. 2 (§2.1). |
+| 5 | **RULED** | Linear wear from the first mark: weapon damage ×(1 − 0.05 × marks), −1 to hit per mark, armor potency ×(1 − 0.05 × marks), and 10 marks = Broken. | Unchanged from rev. 2 (§2.2). |
+| 6 | **RULED** | **The Repair skill (3 × INT, the Fallout 2 formula)** governs repair. The floor is `6 − floor(Repair / 20)`. There is a chance not to use up components: 10% at Repair 60, 20% at 80, **30% at 100 (the cap)**. | The arbitrage guard still holds after the ×10 price change (§2.5). |
+| 7 | **RULED** | 1 PD = 100 RMR and 1 Dinar = 2,000 RMR. Inflation is a GM-moved **market multiplier** on RMR prices, suggested at +5% a week. PD and Dinar prices don't move. | §4 |
+| 8 | **NEW** | Five item tiers (T5 Homemade to T1 Pre-War) with bands per tier, and all 119 weapons and armor pieces placed (Appendix A, now in RMR). | §3 |
+| 9 | **CHANGE** | Junk values = the value of their scrap yield, which removes the money printer. The barter limits stay at buy ≥ 1.05 and sell ≤ 0.65. | §5, §8 |
+| 10 | **RULED** | Skill books: each character reads their **own copy** (+5 skill points, 2 hours on the shared clock per book). Nails: 10 RMR each. The Nail Driver is 700 RMR. | §7.2, §3.3 |
 
-These bugs from rev. 1 are still open: burst never triggers (`burst_capable` vs
-`burst_shots`), head armor is ignored, Gergasi DR is unused, armor `modifiers` and
-Heavy Handed's crit penalty do nothing, and Rad Child applies to everyone everywhere
-(§6.4, §7).
+These bugs from earlier revisions are still open: burst never triggers (`burst_capable`
+vs `burst_shots`), head armor is ignored, Gergasi DR is unused, armor `modifiers` and
+Heavy Handed's crit penalty do nothing, and Rad Child applies to everyone everywhere.
 
 ---
 
 ## 2. Durability
 
-### 2.1 Data shape (**NEW**, unchanged from rev. 1)
+### 2.1 Data shape (**NEW**, unchanged)
 
 ```js
-// Unchanged — every existing reader (carry weight, give, equip, craft, scrap) keeps working.
-characters.<id>.inventory = { "10mm_pistol": 2, "leather_armor": 1, "stimpak": 3 }
-
-// New sibling field. Durable items only.
+characters.<id>.inventory = { "10mm_pistol": 2, "leather_armor": 1, "stimpak": 3 }   // unchanged
 characters.<id>.condition = {
   inv:  { "10mm_pistol": [2, 7], "leather_armor": [5] }, // one integer 0–10 (marks) per copy, sorted ascending
   worn: { "right_hand": 3, "body": 4 }                   // marks on the copy in each equipment slot
@@ -74,33 +78,27 @@ characters.<id>.condition = {
 | Rule | Detail |
 |---|---|
 | Durable items | `(type === 'weapon' && skill !== 'throwing') \|\| type === 'armor'`. Everything else stays a plain count. |
-| Invariant | `condition.inv[id].length === inventory[id]` for every durable id. |
-| Missing data | `normalizeCondition(char)` fills in missing copies with `item.base_marks ?? 0` and trims extra entries. A missing `worn[slot]` also means `base_marks ?? 0`. Legacy characters upgrade silently. |
-| Writes | Replace `condition.inv` whole, in the same `updateDoc` as `inventory`. Wear during combat is a single dot-path field (`…condition.worn.<slot>`) inside the attack's existing `updateDoc`. No extra writes. |
-| Default copy choice | Equip takes the lowest-marks copy. Scrap and sell default to the highest-marks copy. Give moves the copy the player picks. One UI row per copy. |
-| Vault field | **CHANGE:** `"condition": "disrepair"` → `"base_marks"`. Values are in the tier notes (§3.2). |
+| Invariant | `condition.inv[id].length === inventory[id]` |
+| Missing data | `normalizeCondition(char)` fills in missing copies with `item.base_marks ?? 0` and trims extra entries, so legacy characters upgrade silently. |
+| Writes | Replace `condition.inv` whole, in the same `updateDoc` as `inventory`. Combat wear is one dot-path field inside the attack's existing write. |
+| Default copy choice | Equip takes the lowest-marks copy. Scrap and sell take the highest-marks copy. Give moves the copy the player picks. One UI row per copy. |
+| Vault field | **CHANGE:** `"condition": "disrepair"` → `"base_marks": 8` on the salvaged power armor pieces and the fractured laser rifle. |
 
-A per-copy instance id (`gear: { g_ab12: {…} }`) was considered and rejected: every
-inventory reader would have to read two stores. If mods ever arrive, integers can be
-upgraded to `{ m: 3 }` inside `normalizeCondition`.
-
-**Pure helpers** (a new `src/condition.js` with no Firestore import): `isDurable`,
-`normalizeCondition`, `takeCopy`, `putCopy`, `weaponCondition(marks)`,
-`armorMult(marks)`, `conditionValue(item, marks)`, `scrapYieldFor(item, marks)`,
-`repairCostPerMark(item)`, `repairFloor(skill, atBench, hasTools)`,
-`repairSaveChance(skill)`.
+**Pure helpers** (a new `src/condition.js`): `isDurable`, `normalizeCondition`,
+`takeCopy`, `putCopy`, `weaponCondition(marks)`, `armorMult(marks)`,
+`conditionValue(item, marks)`, `scrapYieldFor(item, marks)`, `repairCostPerMark(item)`,
+`repairFloor(repair, atBench, hasTools)`, `repairSaveChance(repair)`.
 
 **Code that must use the new shape:** `equipItem`, `unequipItem`, `gmUnequipItem`,
 `giveItem`, `gmGrantItem` (add a marks input), `craftItem`, `scrapItem`,
 `resolveAttack` (including `destroyOrDropAttackerWeapon`), `gmFactoryReset`,
-`calculateDerivedStats` (add a `condition` parameter for armor AC), `parseArmorDtdr`,
-and the inventory and hit-preview views.
+`calculateDerivedStats` (armor AC), `parseArmorDtdr`, and the inventory and
+hit-preview views.
 
 ### 2.2 Condition scale (**RULED**: linear from 1 mark)
 
-Every multiplier is **1 − 0.05 × marks**, rounded to the nearest whole number (.5
-rounds up). Rounding to nearest instead of the manual's round-down stops DT 2 from
-dropping to 1 at the very first mark.
+Every multiplier is 1 − 0.05 × marks, rounded to the nearest whole number (.5 rounds
+up).
 
 | Marks | Label | Weapon damage | Weapon hit | Fumble save (91–99) | Armor AC/DT/DR | Value | Scrap yield |
 |---|---|---|---|---|---|---|---|
@@ -114,449 +112,448 @@ dropping to 1 at the very first mark.
 | 7 | Damaged | ×0.65 | −7 | LK − 3 | ×0.65 | ×0.3 | ×0.65 |
 | 8 | Damaged | ×0.60 | −8 | LK − 4 | ×0.60 | ×0.2 | ×0.60 |
 | 9 | Damaged | ×0.55 | −9 | LK − 4 | ×0.55 | ×0.1 | ×0.55 |
-| 10 | **Broken** | cannot be used (the attack is blocked and the turn not spent, like out of ammo) | — | — | ×0.50 ("held on with tape") | ×0.1 | ×0.50 |
+| 10 | **Broken** | cannot be used (blocked, turn not spent) | — | — | ×0.50 | ×0.1 | ×0.50 |
 
-**Why these numbers**
-- **Damage:** the GM ruling (×0.95 per mark).
-- **Hit:** −1 per mark ends at −9, which keeps the manual's ceiling of "−10% hit
-  chance" for worn weapons. Damage carries most of the penalty.
-- **Fumble save:** −1 per 2 marks. This is the "jam chance" rising with wear. At LK 5
-  the fumble rate climbs smoothly: **5.5% → 6.3% (2) → 7.4% (4) → 8.2% (6) → 9.2% (8)**
-  (simulated).
-- **Armor:** the same 5% line. At 10 marks armor keeps half its potency, where the
-  manual gave 30%, so worn armor still matters.
-- **Value:** stays at 10% per mark, because the repair price is built on it (§2.5).
-  Broken is priced as 9 marks.
-- **Scrap:** the same 5% line, rounded down, with at least 1 of the first component.
+**Reasons.**
+- Damage follows the GM ruling.
+- Hit ends at −9, which keeps the manual's ceiling of "−10% hit chance" for worn
+  weapons.
+- The fumble rate at LK 5 rises smoothly: 5.5% → 6.3% (2 marks) → 7.4% (4) → 8.2% (6)
+  → 9.2% (8).
+- Value drops 10% per mark, because the repair price is built on it.
 
-**How condition feeds combat**
+**Combat hooks.**
+- Hit: `skill − AC − marks`.
+- Damage: `round(rolled × (1 − 0.05m))`, before DT/DR.
+- Fumble save: succeeds on `d10 ≤ LK − floor(m/2)`.
+- Armor: `AGI + round(ac × (1 − 0.05m))`, and the same multiplier on every DT and DR.
 
-| Quantity | Formula | Where |
-|---|---|---|
-| Weapon hit | `skill − AC − marks + …` | `resolveAttack`, PC branch, next to `burstPenalty` |
-| Weapon damage | `round(rolled × (1 − 0.05m))` **before** DT/DR | beside the aimed-shot `damageMultiplier` |
-| Fumble | the 91–99 save succeeds on `d10 ≤ LK − floor(m/2)` | `resolveCrit(…, marks)` |
-| Armor AC | `AGI + round(armor.ac × (1 − 0.05m))` | `calculateDerivedStats(…, condition)` |
-| Armor DT/DR | the same multiplier on every damage type | `parseArmorDtdr(armorItem, marks)` |
-
-**Worked example: Leather Armor (AC 15, Normal 2/25)**
+**Worked example: Leather Armor (AC 15, 2/25)**
 
 | Marks | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | AC | 15 | 14 | 14 | 13 | 12 | 11 | 11 | 10 | 9 | 8 | 8 |
 | DT/DR | 2/25 | 2/24 | 2/23 | 2/21 | 2/20 | 2/19 | 1/18 | 1/16 | 1/15 | 1/14 | 1/13 |
 
-**Worked example: 10mm Pistol (2d6+2, average 9, value 110 = 1,100 RMR)**
+**Worked example: 10mm Pistol (2d6+2, value 1,100 RMR)**
 
-| Marks | 0 | 2 | 4 | 6 | 8 | 9 | 10 |
-|---|---|---|---|---|---|---|---|
-| Average damage | 9.0 | 8.1 | 7.2 | 6.3 | 5.4 | 5.0 | Broken |
-| Hit | ±0 | −2 | −4 | −6 | −8 | −9 | — |
-| RMR value (index 10) | 1,100 | 880 | 660 | 440 | 220 | 110 | 110 |
+| Marks | 0 | 2 | 4 | 6 | 8 | 10 |
+|---|---|---|---|---|---|---|
+| Average damage | 9.0 | 8.1 | 7.2 | 6.3 | 5.4 | Broken |
+| Hit | ±0 | −2 | −4 | −6 | −8 | — |
+| Value (RMR) | 1,100 | 880 | 660 | 440 | 220 | 110 |
 
-### 2.3 Wear: how marks are gained
+### 2.3 Wear
 
 | Source | Marks | Basis |
 |---|---|---|
-| Weapon: any critical failure | +1 | Manual: "on critical failures". **NEW:** every fumble counts. |
-| Weapon: crit-fail table entries 6 and 7 | **+1d3** in place of the +1 | **RULED.** Entries 6 and 7 in `CRIT_FAIL_TABLE` get `effect: 'condition'` and the label "Weapon condition — takes 1d3 condition marks". |
-| Weapon: crit-fail entry 2 (Backfire) | **set to 10 (Broken)**. The attacker's arm is still crippled. | **RULED.** `destroyOrDropAttackerWeapon(false)` changes: the weapon stays in the slot and `worn[slot] = 10`. The log reads "… is Broken". |
-| Melee: Block or Deflect (GM adjudicated) | +1d2 / +1 | Manual special moves |
-| Armor: a hit on you whose attack roll ends in 0 | +1 | The manual's "every 10 successful hits, one mark", using a roll the app already makes |
-| Armor: explosive hit | +floor(raw damage / 10) | Manual: marks by "the first digit of the damage" |
-| Optional: `improvised: true` weapons | Roll LK after each attack. On a failure, +1 mark. | The manual's "roll luck after attack… it breaks", softened |
+| Weapon: any critical failure | +1 | Manual ("on critical failures") |
+| Weapon: crit-fail entries 6 and 7 | **+1d3** in place of the +1 | **RULED** |
+| Weapon: crit-fail entry 2 (Backfire) | set to **10 (Broken)**. The arm is still crippled. | **RULED** |
+| Melee: Block or Deflect | +1d2 / +1 | Manual special moves |
+| Armor: a hit on you whose attack roll ends in 0 | +1 | The manual's "every 10 hits, one mark" |
+| Armor: explosive hit | +floor(raw / 10) | Manual |
+| Optional: `improvised: true` weapons | LK roll after each attack. On a failure, +1 mark. | Manual, softened |
 
-**Simulated weapon wear under the new rules** (`wear2.mjs`, 20,000 runs):
+Simulated wear (`wear2.mjs`): at LK 5 a weapon gains 1 mark per 18 attacks, takes 59
+attacks to go from 0 to 5 marks, and 87 to reach Broken. At LK 3 those figures are 14,
+46 and 69. At LK 8 they are 36, 110 and 149.
 
-| LK | Attacks per mark | 0 → 5 marks | 3 → 6 marks | 0 → Broken |
-|---|---|---|---|---|
-| 3 | 14 | 46 | 28 | 69 |
-| 5 | 18 | 59 | 35 | 87 |
-| 8 | 36 | 110 | 58 | 149 |
+### 2.4 Found and stocked condition (by item tier)
 
-A level-1 fight is 12 to 19 rounds (§6), so a PC with LK 5 picks up about one mark per
-fight. Because penalties now start at 1 mark, a weapon picks up small penalties along
-the way instead of hitting a wall at 7 marks. Repair becomes routine upkeep every few
-fights rather than an emergency.
-
-### 2.4 Condition of found and stocked gear (**CHANGE**: now by tier, not value)
-
-| Tier | Marks when found |
+| Where the item comes from | Marks |
 |---|---|
 | T5 Homemade | 1d4 |
 | T4 Salvaged | 1 + 1d4 |
 | T3 Baseline | 2 + 1d4 |
 | T2 Improved | 4 + 1d4 |
-| T1 Pre-War/Pristine | 6 + 1d4 (often Damaged or Broken) |
-| Vendor stock | the vendor's repair floor (2) |
+| T1 Pre-War | 6 + 1d4 |
+| Vendor stock | 2 |
 | Crafted | 0 |
+| **NPC gear** | raiders and gangs: by tier as above. **Protectorate: always 0** (RULED: well-maintained). Federation and UCL regulars: 1d4. |
 
-`base_marks` (the fixed starting condition, which overrides the roll):
-`salvaged_power_armor_chestplate` 8, `salvaged_power_armor_helmet` 8,
-`fractured_laser_rifle` 8.
+### 2.5 Repair (**RULED**: instant, capped by the **Repair** skill)
 
-### 2.5 Repair (**RULED**: instant and capped by skill, with a chance to save parts)
+**The skill.** **Repair = 3 × INT** (Fallout 2 formula, RULED). It is taggable like
+any other skill: +20 when tagged, and 2 per point spent. Every repair uses Repair,
+whatever the item.
 
-**Skill.** FOES has no Repair skill. "Repair skill" here means the item's skill:
-**Gunsmith** for guns and all melee or unarmed weapons (matching the recipes),
-**Science** for energy weapons and power armor (manual: "science power armor"), and
-**Engineering** for other armor. See N2.
+**At level 1:**
 
-**How far a character can repair (the floor).** Unchanged:
-`floor = max(0, 6 − floor(skill / 20))`. A matching bench lowers it by 1. A Tool Set
-adds +25 to the repair skill (manual). Gunsmith's Tools add +25 for weapons.
+| INT | Untagged | Tagged |
+|---|---|---|
+| 4 | 12 | 32 |
+| 6 | 18 | 38 |
+| 8 | 24 | 44 |
 
-| Skill | 0–19 | 20–39 | 40–59 | 60–79 | 80–99 | 100–119 | 120+ |
+**Floor, bench and tools.** The floor is `max(0, 6 − floor(Repair / 20))`. A bench
+matching the item (Weapons Bench for weapons, Armour Bench for armor) lowers it by 1
+more. A Tool Set adds +25 to Repair (manual: "Adds 25% to repair skill"). Gunsmith's
+Tools add +25 when repairing guns.
+
+| Repair | 0–19 | 20–39 | 40–59 | 60–79 | 80–99 | 100–119 | 120+ |
 |---|---|---|---|---|---|---|---|
 | Field floor (lowest marks reachable) | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
-| At the matching bench | 5 | 4 | 3 | 2 | 1 | 0 | 0 |
-| **Chance not to consume components** (one d100 roll per repair job) | 0% | 0% | 0% | 10% | 20% | 30% | 30% (cap) |
+| At a bench | 5 | 4 | 3 | 2 | 1 | 0 | 0 |
+| **Chance not to consume components** (one d100 per repair job) | 0% | 0% | 0% | 10% | 20% | 30% | 30% (cap) |
 
-**Cost per mark removed (CHANGE: `round` → `ceil`).**
+Example: a level-1 PC with INT 6 and Repair tagged has 38, so their floor is 5 in the
+field and 4 at a bench. With a Tool Set (63) the floor is 3 in the field and 2 at a
+bench, with a 10% chance of saving the parts.
+
+**Cost per mark removed.**
 `primary × max(1, ceil(0.10 × value / primary.value))` + 1 secondary, plus 1 rare per
-2 marks for energy weapons and power armor. Categories are as in rev. 1: guns use Gun
-Parts + Scrap Metal, energy weapons Electronics + Gun Parts (+ Pre-War Tech), melee
-Scrap Metal + Adhesive, light armor Cloth + Adhesive, heavy armor Scrap Metal + Cloth,
-and power armor Scrap Metal + Electronics (+ Hardened Alloy). **NEW:** for heavy armor,
-1 Hardened Alloy may stand in for 10 Scrap Metal. That trades value for weight.
+2 marks for energy weapons and power armor. For heavy armor, 1 Hardened Alloy may
+stand in for 10 Scrap Metal.
 
-| Item (value) | Per mark | Base value | RMR (index 10) |
+| Category | Primary | Secondary | Rare |
 |---|---|---|---|
-| Homemade Pistol (50) | 1 Gun Parts + 1 Scrap | 7 | 70 |
-| 10mm Pistol (110) | 3 Gun Parts + 1 Scrap | 17 | 170 |
-| Assault Rifle (200) | 4 Gun Parts + 1 Scrap | 22 | 220 |
-| Machete (85) | 5 Scrap + 1 Adhesive | 13 | 130 |
-| Sledgehammer (150) | 8 Scrap + 1 Adhesive | 19 | 190 |
-| Leather Armor (55) | 3 Cloth + 1 Adhesive | 9 | 90 |
-| Laser Pistol (240) | 4 Electronics + 1 Gun Parts + 1 Pre-War Tech per 2 marks | about 42 | about 415 |
-| Salvaged PA Chestplate (300, §3.2) | 15 Scrap + 1 Electronics + 1 Hardened Alloy per 2 marks | about 51 | about 510 |
+| Guns | Gun Parts | Scrap Metal | — |
+| Energy weapons | Electronics | Gun Parts | Pre-War Tech |
+| Melee | Scrap Metal | Adhesive | — |
+| Light armor | Cloth | Adhesive | — |
+| Heavy armor | Scrap Metal | Cloth | — |
+| Power armor | Scrap Metal | Electronics | Hardened Alloy |
 
-**Re-check of the arbitrage guard** (buy damaged, repair, sell). Buying at a marks, repairing to b and selling pays
-`V/10 × [sell × (10 − b) − buy × (10 − a)] − c × (1 − p) × (a − b)`.
-The worst case is a = 9, b = 0, at the barter limits (buy 1.05, sell 0.65). That gives
-`0.545 V − 9 c (1 − p)`, which only makes a profit if **c (1 − p) < 0.061 V**.
+Component values in RMR: Scrap Metal 20, Cloth 20, Organics 20, Adhesive 30, Gun Parts
+50, Chemicals 50, Electronics 60, Pre-War Tech 250, Hardened Alloy 300.
 
-- With `ceil`, the cost per mark c is always at least 0.10 V plus a secondary
-  component. At the 30% cap, c (1 − p) ≥ 0.07 V, so the loop **loses money for every
-  item.**
-- A 40% save chance would bring the worst case down to 0.06 V, right at the line.
-  **Keep the cap at 30%.**
-- The linear penalty curve does not affect this guard. It changes combat, not prices.
-- The ×10 RMR index cancels out, because buying, repairing and selling are all
-  priced at the same index.
-- During a *drifting* index there is one gap: a player who repairs with components
-  bought last week is paying old prices. That gain is 5–20%, which is below the loop's
-  margin.
+| Item (value) | Per mark | RMR per mark |
+|---|---|---|
+| Homemade Pistol (500) | 1 Gun Parts + 1 Scrap | 70 |
+| 10mm Pistol (1,100) | 3 Gun Parts + 1 Scrap | 170 |
+| Assault Rifle (2,000) | 4 Gun Parts + 1 Scrap | 220 |
+| Machete (850) | 5 Scrap + 1 Adhesive | 130 |
+| Sledgehammer (1,500) | 8 Scrap + 1 Adhesive | 190 |
+| Leather Armor (550) | 3 Cloth + 1 Adhesive | 90 |
+| Laser Pistol (2,400) | 4 Electronics + 1 Gun Parts + 1 Pre-War Tech per 2 marks | about 415 |
+| Salvaged PA Chestplate (3,000) | 15 Scrap + 1 Electronics + 1 Hardened Alloy per 2 marks | about 510 |
+
+**Re-check of the arbitrage guard** (buy damaged, repair, sell). The worst case is
+buying at 9 marks and repairing to 0 at the barter limits (buy 1.05, sell 0.65). That
+pays `0.545 V − 9c(1 − p)`, which only makes a profit if **c(1 − p) < 0.061 V**, where
+c is the cost per mark and p the chance to save parts.
+
+- Because the cost rounds up (`ceil`), c ≥ 0.10 V. At the 30% cap, c(1 − p) ≥ 0.07 V,
+  so every item loses money. **Keep the cap at 30%.**
+- The ×10 price change multiplies both sides equally, so it doesn't matter.
+- The market multiplier (§4.3) only opens a gap of 5–20% (repairing with parts bought
+  at an older, lower multiplier). That is below the margin.
 
 **Time (optional):** 10 in-game minutes per mark in the field, 5 at a bench.
-**Vendor repair (later):** `0.10 × value × index × buyMult` per mark, down to 2 marks.
 
-### 2.6 Scrap yield from weapons and armor (**NEW**)
+### 2.6 Scrap yield from weapons and armor
 
-The default comes from the item's recipe: **50% of each input, rounded down, minimum
-1**. For items without a recipe, author a yield worth **≤ 40% of the item's value**.
-Condition then applies the ×(1 − 0.05m) column in §2.2. The loops (craft then scrap,
-buy then scrap) still lose money.
+The default comes from the recipe: 50% of each input, rounded down, minimum 1. For
+items without a recipe, author a yield worth ≤ 40% of the item's value. Condition then
+applies the §2.2 multiplier.
 
 ---
 
-## 3. Item tiers and values
+## 3. Item tiers and values (all values in RMR)
 
-### 3.1 Tier bands (**NEW**, following the Method rule)
+### 3.1 Tier bands
 
-Weapon damage is the average per roll. Melee and unarmed are measured **before MD**,
-which adds 1 to 5 on top, so their band sits 2 points lower. Big guns, launchers and
-explosives are banded on value only, because their burst or area damage doesn't
-compare roll for roll. Armor uses `score = AC + 3 × DT(normal) + DR(normal)/2`. Head
-pieces are tiered by origin and not banded. Values are base; RMR is ×10.
+Damage is the average per roll. Melee is measured **before MD**, so its band sits 2
+lower. Big guns, launchers and explosives are banded on value only. Armor uses
+`score = AC + 3 × DT + DR/2` (normal damage). Head pieces are tiered by origin.
 
 | Tier | Guns: damage | Melee: damage | Weapon value | Armor score | Armor value | Found at |
 |---|---|---|---|---|---|---|
-| **T5 Homemade** | 2–6 | 0–5.5 | 5–60 | 0–16 | 1–30 | 1d4 marks |
-| **T4 Salvaged** | 4–9 | 2–8 | 40–120 | 15–30 | 25–70 | 1 + 1d4 |
-| **T3 Baseline** | 8–12 | 6–10 | 90–220 | 30–45 | 55–130 | 2 + 1d4 |
-| **T2 Improved** | 11–18 | 9–16 | 200–500 | 45–60 | 120–250 | 4 + 1d4 |
-| **T1 Pre-War/Pristine** | 15+ | 13+ | 400+ | 60+ | 250+ | 6 + 1d4 |
+| **T5 Homemade** | 2–6 | 0–5.5 | 50–600 | 0–16 | 10–300 | 1d4 marks |
+| **T4 Salvaged** | 4–9 | 2–8 | 400–1,200 | 15–30 | 250–700 | 1 + 1d4 |
+| **T3 Baseline** | 8–12 | 6–10 | 900–2,200 | 30–45 | 550–1,300 | 2 + 1d4 |
+| **T2 Improved** | 11–18 | 9–16 | 2,000–5,000 | 45–60 | 1,200–2,500 | 4 + 1d4 |
+| **T1 Pre-War/Pristine** | 15+ | 13+ | 4,000+ | 60+ | 2,500+ | 6 + 1d4 |
 
-**How many items land in each tier:** T5 29, T4 22, T3 25, T2 26, T1 17 (119 weapons
-and armor pieces). The full list is Appendix A. The bands overlap deliberately:
-condition decides where a particular copy actually sits.
+Counts per tier: T5 29, T4 22, T3 25, T2 26, T1 17 (Appendix A).
 
-**Value formulas inside a tier.** Weapons: `value ≈ K × average damage`, with K = 5
-for homemade, 12–15 for standard, 18–20 for military, 22 for energy and 45 for big
-guns. Armor: `value ≈ score × (1.5 clothing, 2 scavenged, 3 military, 4 elite)`. These
-are unchanged from rev. 1, and each tier's value band is simply what these formulas
-produce for its damage band.
+The value formulas are unchanged in shape and now in RMR:
+- Weapons: `value ≈ K × average damage`, with K = 50 for homemade, 120–150 for
+  standard, 180–200 for military, 220 for energy and 450 for big guns.
+- Armor: `score × (15 clothing, 20 scavenged, 30 military, 40 elite)`.
 
-### 3.2 Outliers: items outside their tier's band
+### 3.2 Outliers
 
-| Item | Tier | Problem | Proposal |
-|---|---|---|---|
-| angkasa_wrench | T4 | 2d6+2 (9) is T3 melee damage at a value of 45 | **CHANGE** dmg → 2d4+2 (7) |
-| salvaged_rebar_greatsword | T4 | 2d8 (9) | **CHANGE** dmg → 2d6+1 (8) |
-| corroded_minigun_barrel_club | T4 | 2d6+4 (11) outdoes the T3 Sledgehammer | **CHANGE** dmg → 2d6+1 (8) |
-| 10mm_smg | T3 | 1d8+2 (6.5) is below the band | **Accept.** Burst rolls twice, so its real output is T3. |
-| protectorate_officers_uniform, lim_clan_tailored_suit | T5 | 35 and 150 are above the T5 value band | **Accept** as a social premium (CHA or authority). |
-| salvaged_power_armor_chestplate | T1 by origin | AC 14, 3/28 (score 37) is only T3 | **CHANGE** to real T1 stats: AC 22, Normal 6/40, Laser 3/30, Explosive 5/35, value 300, `base_marks: 8`. At 8 marks it plays as AC 13, 4/24, close to today's piece, and it can be restored. |
-| salvaged_power_armor_helmet | T1 by origin | AC 4, 1/10 | **CHANGE** → AC 6, 2/15, value 80, `base_marks: 8`. Head armor also needs the head-armor bug fixed (§6.4). |
-| fractured_laser_rifle | T2 (it is a Laser Rifle) | Authored as its own 1d6 weapon | **CHANGE** → Laser Rifle stats (2d10+6, range 30, value 375) with `base_marks: 8`. At 8 marks it averages 10.2. |
-| combat_leather_jacket | T3 | Value 60 is too low for AC 20 and CHA +2 | **CHANGE** value → 110 (rev. 1) |
-| supermutant_clothes | T3 | Value 45 is below the band | **CHANGE** value → 60 |
-| axe_town_coveralls | T4 | Ramshackle stats at 1.5 kg | Flag, as in rev. 1: AC 4, 1/10 (T5), value 12 |
-| Skill books, med_kit, homemade_pistol, cracked_pvc_pipe_gun | — | Covered elsewhere | §7.2, §8.2, §6.4 |
+| Item | Tier | Proposal |
+|---|---|---|
+| angkasa_wrench, salvaged_rebar_greatsword, corroded_minigun_barrel_club | T4 | **CHANGE** damage → 2d4+2 / 2d6+1 / 2d6+1. Each hits harder than its tier allows. |
+| salvaged_power_armor_chestplate | T1 | **CHANGE** → AC 22, Normal 6/40, Laser 3/30, Explosive 5/35, value **3,000**, `base_marks: 8`. At 8 marks it plays like today's piece. |
+| salvaged_power_armor_helmet | T1 | **CHANGE** → AC 6, 2/15, value **800**, `base_marks: 8` |
+| fractured_laser_rifle | T2 | **CHANGE** → Laser Rifle stats (2d10+6, value 3,750) with `base_marks: 8` |
+| combat_leather_jacket / supermutant_clothes | T3 | **CHANGE** value → 1,100 / 600 |
+| axe_town_coveralls | T4 | Flag: Ramshackle stats at 1.5 kg. Suggest AC 4, 1/10, value 120. |
+| 10mm_smg | T3 | Accept: below the band per roll, but burst rolls twice. |
+| protectorate_officers_uniform, lim_clan_tailored_suit | T5 | Accept as a social premium. |
 
-### 3.3 Proposed stats for every TBA
-
-Unchanged from rev. 1 unless noted. The energy and heavy weapons are converted from
-the manual's scale (about 1.8× the vault's) using manual average × 0.55. Every row is
-placed in Appendix A.
+### 3.3 Stats for every TBA (values in RMR)
 
 | Item | Tier | dmg | range | value | Item | Tier | dmg | range | value |
 |---|---|---|---|---|---|---|---|---|---|
-| laser_pistol | T2 | 2d6+4 | 15 | 240 | frag_grenade | T3 | 2d8+9 | 8 | 35 |
-| laser_rifle | T2 | 2d10+6 | 30 | 375 | dynamite | T4 | 2d10+8 | 8 | 30 |
-| plasma_pistol | T2 | 2d8+4 | 15 | 285 | incendiary_grenade | T3 | 2d6+6 fire | 8 | 30 |
-| plasma_rifle | T1 | 3d8+6 | 28 | 430 | molotov_cocktail | T5 | 1d10+4 fire | 8 | 15 |
-| plasma_caster | T1 | 4d8+10 | 25 | 615 | plasma_grenade | T1 | 4d10+15 | 8 | 90 |
-| gauss_pistol | T1 | 3d8+9 | 20 | 495 | land_mine | T2 | 2d10+15 | 1 | 55 |
-| gauss_rifle | T1 | 3d10+18 | 50 | 760 | 1414_chain_whip | T5 | 1d6+1 | 1 | 20 |
-| tesla_cannon | T1 | 3d10+20 | 25 | 805 | axe_gang_cleaver | T4 | 1d10+2 | 1 | 110 |
-| 50_cal_machine_gun | T1 | 2d8+8 | 30 | 765 | lim_clan_straight_razor | T4 | 1d6+1 | 1 | 65 |
-| light_machine_gun | T2 | 1d8+3 | 25 | 340 | parang | T4 | 1d8+1 | 1 | 85 |
-| rocket_launcher | T1 | 4d10+5 | 30 | 675 | rebar_nail_club | T5 | 1d6+2 | 1 | 25 |
-| missile_launcher | T1 | 4d10+8 | 40 | 750 | water_pipe_cudgel | T5 | 1d6+1 | 1 | 20 |
-| grenade_launcher | T2 | 2d10+12 | 25 | 460 | keris (dmg exists) | T2 | — | — | 250 |
+| laser_pistol | T2 | 2d6+4 | 15 | 2,400 | frag_grenade | T3 | 2d8+9 | 8 | 350 |
+| laser_rifle | T2 | 2d10+6 | 30 | 3,750 | dynamite | T4 | 2d10+8 | 8 | 300 |
+| plasma_pistol | T2 | 2d8+4 | 15 | 2,850 | incendiary_grenade | T3 | 2d6+6 fire | 8 | 300 |
+| plasma_rifle | T1 | 3d8+6 | 28 | 4,300 | molotov_cocktail | T5 | 1d10+4 fire | 8 | 150 |
+| plasma_caster | T1 | 4d8+10 | 25 | 6,150 | plasma_grenade | T1 | 4d10+15 | 8 | 900 |
+| gauss_pistol | T1 | 3d8+9 | 20 | 4,950 | land_mine | T2 | 2d10+15 | 1 | 550 |
+| gauss_rifle | T1 | 3d10+18 | 50 | 7,600 | 1414_chain_whip | T5 | 1d6+1 | 1 | 200 |
+| tesla_cannon | T1 | 3d10+20 | 25 | 8,050 | axe_gang_cleaver | T4 | 1d10+2 | 1 | 1,100 |
+| 50_cal_machine_gun | T1 | 2d8+8 | 30 | 7,650 | lim_clan_straight_razor | T4 | 1d6+1 | 1 | 650 |
+| light_machine_gun | T2 | 1d8+3 | 25 | 3,400 | parang | T4 | 1d8+1 | 1 | 850 |
+| rocket_launcher | T1 | 4d10+5 | 30 | 6,750 | rebar_nail_club | T5 | 1d6+2 | 1 | 250 |
+| missile_launcher | T1 | 4d10+8 | 40 | 7,500 | water_pipe_cudgel | T5 | 1d6+1 | 1 | 200 |
+| grenade_launcher | T2 | 2d10+12 | 25 | 4,600 | keris (dmg exists) | T2 | — | — | 2,500 |
 
-**Pneumatic Nail Driver and Nails (RULED: `nails` ammo)**
+**Nail Driver and Nails (RULED: `nails` ammo)**
 
 | Item | Proposal | Reason |
 |---|---|---|
-| pneumatic_nail_driver | **T4 Salvaged.** `skill: small_guns`, 1H, `dmg: 1d6+3`, range **6**, `ammo_type: nails`, **`clip_size: 30`**, no burst, value **70** | 6.5 average sits mid-band for T4 guns. The manual's Weak pistol on light ammo converts to about 4.7, and an industrial driver hits harder at point-blank. Range 6 matches the Sawed-off (5). A 30-nail strip is the real-world capacity. |
-| ammo_nails | value **1** (10 RMR), weight **0.005** (keep the authored value) | The cheapest round in the game, below makeshift_rounds (2). A 5–6 g framing nail. |
-| Recovery (**NEW**) | After a fight, recover half the nails fired, rounded down | The item text says "Easy to straighten and reuse". This makes the driver the thrifty choice. |
-| Recipe (**NEW**) | `recipe_nails`: 2 Scrap Metal + 1 Adhesive → 10 Nails, Weapons Bench, Gunsmith 10 | Inputs 7 → output 10 (1.43×, inside the 1.5 rule) |
+| pneumatic_nail_driver | **T4.** `skill: small_guns`, 1H, dmg **1d6+3**, range **6**, `ammo_type: nails`, **`clip_size: 30`**, value **700** | Mid-band T4 gun damage. Point-blank range, like the Sawed-off. A 30-nail strip. |
+| ammo_nails | value **10**, weight **0.005** (keep) | The cheapest round, below makeshift rounds (20) |
+| Recovery | Recover half the nails fired after a fight, rounded down | The item text: "easy to straighten and reuse" |
+| `recipe_nails` | 2 Scrap + 1 Adhesive (70) → 10 Nails (100). Weapons Bench, Gunsmith 10. | 1.43×, inside the 1.5 rule |
 
-**Ammo per round (base; RMR is ×10):** 9mm 2, 10mm 3, 5.56 4, 5mm 2, 7.62 5,
-14mm 5, shotgun shells 4, energy cell 6, plasma cartridge 10, 2mm EC 15, flamer fuel 3,
-40mm 40, missile 120, mini nuke 500, **nails 1**. The missing calibers (.22 / .32 /
-.44 / .45 / .50) should be 2 / 2 / 4 / 4 / 10. Armor TBA values are unchanged from
-rev. 1 and listed in Appendix A (for example Mercenary 85, Protectorate Infantry 150,
-Frontliner 255, prison_labourer_clothes 1).
+**Ammo per round (RMR):**
+
+| Ammo | Value | Ammo | Value |
+|---|---|---|---|
+| nails | 10 | makeshift rounds | 20 |
+| 9mm | 20 | 5mm | 20 |
+| 10mm | 30 | 5.56 | 40 |
+| shotgun shells | 40 | 7.62 | 50 |
+| 14mm | 50 | energy cell | 60 |
+| plasma cartridge | 100 | 2mm EC | 150 |
+| flamer fuel | 30 | 40mm grenade | 400 |
+| missile | 1,200 | mini nuke | 5,000 |
+
+The missing calibers (.22 / .32 / .44 / .45 / .50) should be 20 / 20 / 40 / 40 / 100.
+Armor TBA values are in Appendix A (for example Mercenary 850, Protectorate Infantry
+1,500, Frontliner 2,550).
 
 ---
 
-## 4. Currency exchange: early hyperinflation
+## 4. Currency: early hyperinflation
 
-### 4.1 Official rates (**RULED**)
+### 4.1 Official rates and roles (**RULED**)
 
-| At index 10 | RMR | PD | Dinar |
+| | RMR | PD | Dinar |
 |---|---|---|---|
 | 1 RMR | 1 | 0.01 | 0.0005 |
 | 1 PD | **100** | 1 | 0.05 |
 | 1 Dinar | **2,000** | **20** | 1 |
 
-**The three roles (RULED).**
-- **RMR** is the inflated everyday currency and carries the hyperinflation story.
+- **RMR** is the inflated everyday currency and carries the inflation story.
 - **PD** is the stable middle tier: "most stable" in the vault.
-- **Dinar** is rare and valuable: "most sacred… immense value" in the vault.
+- **Dinar** is rare and valuable: "most sacred… immense value" in the vault. A Dinar
+  is worth about 2.7 Stimpaks or one T2 weapon (Assault Rifle 2,000).
 
-**Anchoring (NEW).** PD and Dinar are the stable stores of value (the Method rule).
-Their rate against *each other* is fixed at **1 Dinar = 20 PD**. RMR floats against
-both: `1 PD = 10 × index RMR` and `1 Dinar = 200 × index RMR`. The GM's numbers are
-exactly the picture at index 10.
+**CHANGE (currency `value` fields):** `rmr` 1, `pd` 1 → **100**, `dinar` 1 →
+**2,000**. The official rates are consistent with each other, so they leave no
+arbitrage.
 
-**Scale check.** One Dinar is worth 200 base, about **2.7 Stimpaks, a T2 weapon
-(assault rifle 200, 14mm pistol 220), or about 4½ days of food and water for one PC**.
-That is a real relic for a low-level party, and it fits the vault ("a store of value",
-"village wealth is measured in Dinars"). The official rates are consistent with each
-other, so they leave no arbitrage.
+### 4.2 The Bursa and regions (market multiplier at 1.0)
 
-**CHANGE (currency `value` fields):** `rmr` 1 → **0.1**, `pd` 1 → **10**, `dinar`
-1 → **200**, all in base value. This puts every item and currency on one scale.
-Wallet displays keep showing counts.
+The Bursa's spread is ±10%, or ±15% in a shock week.
 
-### 4.2 Official channels and the Bursa, by region
-
-The Bursa quotes buy/sell **in RMR at the current index** (at index 10 below). The
-normal spread is ±10%. In a shock week (§4.3) it widens to ±15%. The lore says
-dealers "inflate exchange rates for RMR", so every conversion out of RMR loses the
-spread.
-
-| Region | PD (Bursa buys / sells) | Dinar (buys / sells) | Local RMR price level | Vendor behaviour |
+| Region | PD (Bursa buys / sells) | Dinar (buys / sells) | Regional price level | Vendor behaviour |
 |---|---|---|---|---|
-| Federation towns and bunkers | 90 / 110 | 1,800 / 2,200 | index × 1.0 | RMR is the legal tender. Only validated notes are taken at full value. |
-| Border towns (Bandawang, the lake) | 90 / 115 | 1,750 / 2,250 | index × 1.1 | All three currencies are posted. Prices "adjust based on the ruling garrison". |
-| Protectorate (Penang) | licensed: 100 plus a 10% licence fee. Bursa: 80 / 130 (risk of confiscation) | 1,700 / 2,300 | index × 1.25, or RMR refused | Prices are in PD. "Smuggling PD is punishable by confiscation or death." |
-| Caliphate (Round City) | 90 / 110 | House of Syed buyback **20 PD**. Cults and scholars pay a **premium of 25–50 PD** | index × 1.0 | RMR is the daily money (vault), so the Caliphate *feels* the inflation too. |
-| KLB | 85 / 120 | 1,600 / 2,400 | index × 1.0 | Ghoul vendors take **old unstamped Ringgit at par** (the Sepuluh Ribu identity hook). |
+| Federation towns and bunkers | 90 / 110 | 1,800 / 2,200 | ×1.0 | Only validated notes are taken at full value. |
+| Border towns (Bandawang, the lake) | 90 / 115 | 1,750 / 2,250 | ×1.1 | All three currencies are posted, "adjusted by the ruling garrison". |
+| Protectorate (Penang) | licensed: 100 + 10% fee. Bursa: 80 / 130 (risk of confiscation) | 1,700 / 2,300 | ×1.25 in RMR, or RMR refused | Prices are in PD. |
+| Caliphate (Round City) | 90 / 110 | House of Syed buyback 20 PD. Cults and scholars pay a premium (trade hook). | ×1.0 | RMR is the daily money. |
+| KLB | 85 / 120 | 1,600 / 2,400 | ×1.0 | Old unstamped Ringgit taken at par by ghoul vendors. |
 
-### 4.3 How fast prices drift (**NEW**)
+### 4.3 Inflation as a GM-moved market multiplier
 
-**Weekly index roll.** At the start of each in-game week (or each session, if the GM
-prefers), the GM rolls 1d10. The result is posted on the Bursa sheet.
+**The rule.** RMR price = `value × market multiplier × regional level`. The multiplier
+starts at **1.0**. PD and Dinar prices (value ÷ 100 and value ÷ 2,000) **never move**,
+so the RMR cost of 1 PD is 100 × the multiplier. The GM moves the multiplier. A
+suggested weekly roll:
 
-| 1d10 | Index change | What players see |
+| 1d10 | Multiplier change | What players see |
 |---|---|---|
 | 1–4 | none | "Prices holding." |
-| 5–8 | +0.5 (+5%) | Posted prices creep up. "Water's up two RMR a bottle again." |
-| 9 | +1 (+10%) | Vendors re-mark their stock. |
-| 10 | **Shock:** +2 (+20%) | The Bursa spread widens to ±15% for the week. Vendors refuse RMR for T2+ goods and meds (below). |
+| 5–8 | +0.05 | "Water's up two RMR a bottle again." |
+| 9 | +0.10 | Vendors re-mark their stock. |
+| 10 | **+0.20, a shock week** | The spread widens to ±15%. Vendors sell T2+ goods and meds only for hard currency or barter. |
 
-- **Expected drift:** +0.5 index points a week. That is about +5% a week, or +20–25% a
-  month at the start. Classic hyperinflation is 50% a month, so this is the *onset*.
-  After 3 months the index is around 16: a Stimpak costs about 1,200 RMR but is still
-  7.5 PD.
-- **Escalation lever:** when the story calls for it (a Federation crisis, the
-  counterfeit ring exposed), double every step. That is the "full hyperinflation" row.
-- **Table friendliness:** the index is always a multiple of 0.5. Prices are value ×
-  index, rounded to 5 RMR, because small notes are gone.
+The expected drift is about +5% a week, or +20–25% a month. That is the onset of
+hyperinflation (the classic threshold is 50% a month). A doubled-step "full
+hyperinflation" row is available for story beats.
 
-**How vendors behave**
-
-| Behaviour | Rule |
+| Vendor behaviour | Rule |
 |---|---|
-| Sticky prices | Vendors only re-price when the index moves. Nothing changes mid-week. |
-| Hard-currency discount | Paying in PD or Dinar gets **−10%** off the vendor's buy price. When buying from players, vendors pay in RMR by default. They pay PD only at an extra −10%. |
-| Hoarding in shock weeks | T2+ goods, Stimpaks, RadAway and ammo are sold **only for PD, Dinar or barter goods** (ammo, meds, components, the Bursa's "trade goods"). |
-| Rewards lag | A job quoted in RMR is paid at the same RMR *number* when it is completed, not adjusted to the index. The longer a job takes, the more it loses (at +5% a week). A Speech check (Kind of Tricky) can get the fee quoted in PD instead. |
-| Savings | RMR held for a month loses about 20% of what it buys. PD and Dinar lose nothing. Players who save should convert, and pay the Bursa spread to do it. |
+| Sticky prices | Vendors re-price only when the multiplier moves. |
+| Hard-currency discount | −10% when paying in PD or Dinar. Vendors pay players in RMR, or in PD at an extra −10%. |
+| Rewards lag | A job quoted in RMR pays the same *number* on completion. A Speech check (Kind of Tricky) gets the fee in PD instead. |
+| Savings | RMR loses about 20% a month in purchasing power. PD and Dinar lose nothing. |
 
 ### 4.4 Counterfeits and unstamped notes (no Bond Slips)
 
 | Item | Worth | Mechanic |
 |---|---|---|
-| `rmr_unstamped`, "Old Ringgit" (unvalidated) | 0.5 RMR (Federation), 0.4 (Bursa), **1.0 in KLB and ghoul markets** | Vault: "only officially validated notes carry full value" |
-| `rmr_suspect`, "Ringgit (unverified)" (counterfeit) | 0 if caught, 0.3 at the Bursa | Spending it prompts the GM to roll the vendor's Instinct or PER. If caught, the note is refused and reputation with that town drops by 5. |
-| Active counterfeit ring (vault hook) | — | That region's price level rises by ×0.1, vendors inspect notes (−10 Speech for barter), and the next weekly roll is treated as at least a 9. Counterfeits **accelerate** the inflation, which is the lore. |
-
-**Trade hook.** Cults and scholars in the Caliphate pay above the official rate for
-Dinars (market trends in the vault). Selling there is a trade quest: it needs travel,
-a buyer who can be found, and the risk of carrying relics. It is a one-off sale, not a
-loop.
+| `rmr_unstamped`, "Old Ringgit" | 0.5 RMR (Federation), 0.4 (Bursa), 1.0 (KLB and ghoul markets) | Vault: only validated notes carry full value |
+| `rmr_suspect`, "Ringgit (unverified)" | 0 if caught, 0.3 at the Bursa | The vendor makes an Instinct or PER check. If caught, the note is refused and reputation with the town drops by 5. |
+| An active counterfeit ring | — | Regional price level +0.1, vendors inspect notes (−10 Speech), and the next weekly roll counts as at least a 9 |
 
 ---
 
 ## 5. Barter (proposal: no shop yet)
-
-This is unchanged from rev. 1. Speech stands in for Barter.
 
 | Speech | 0–24 | 25–49 | 50–74 | 75–99 | 100+ |
 |---|---|---|---|---|---|
 | Buy × | 1.25 | 1.20 | 1.15 | 1.10 | 1.05 |
 | Sell × | 0.45 | 0.50 | 0.55 | 0.60 | 0.65 |
 
-CHA ≤ 3 adds +0.05 to buy, and CHA ≥ 8 takes 0.05 off. **Hard limits: buy ≥ 1.05,
-sell ≤ 0.65**, the line that kills the craft-and-sell and repair-and-flip loops (1.5 ×
-0.65 / 1.05 = 0.93). The price is
-`round(value × conditionMult × index × regionLevel × mult, to 5 RMR)`.
+- CHA ≤ 3 adds +0.05 to buy. CHA ≥ 8 takes 0.05 off.
+- **Hard limits: buy ≥ 1.05, sell ≤ 0.65.** At those limits, buying inputs, crafting
+  (up to 1.5× the input value) and selling returns 1.5 × 0.65 / 1.05 = 0.93, so the
+  loop always loses money.
+- `price = round(value × conditionMult × multiplier × region × mult, to 5 RMR)`.
 
-Worked example at index 10, in a Federation town: a level-1 PC with CHA 4 and Speech
-13 buys a Stimpak for 75 × 10 × 1.25 = **940 RMR**, or 7.5 × 1.25 × 0.9 = **8.4 PD**
-with the hard-currency discount. They sell a 10mm Pistol at 5 marks for 110 × 0.5 ×
-10 × 0.45 = **245 RMR**.
+Worked example: a Speech 13 PC buys a Stimpak for 750 × 1.25 = **940 RMR** (or **8.4
+PD** with the hard-currency discount). They sell a 10mm Pistol at 5 marks for 1,100 ×
+0.5 × 0.45 = **245 RMR**.
 
-**Reputation hook (CHANGE: Antipathy removed, re-banded).** GM slider from −100 to
-+100.
+**Reputation (six tiers, Antipathy removed)**
 
 | Tier | Slider | Buy | Sell | Other |
 |---|---|---|---|---|
-| Idolized | 70+ | −0.15 | +0.10 | Hidden stock. Sells T2+ for RMR even in shock weeks. |
-| Liked | 40–69 | −0.10 | +0.05 | Uses the official exchange rate, not the Bursa's |
+| Idolized | 70+ | −0.15 | +0.10 | Hidden stock. Sells T2+ goods for RMR even in shock weeks. |
+| Liked | 40–69 | −0.10 | +0.05 | Uses the official exchange rate |
 | Accepted | 15–39 | −0.05 | 0 | — |
 | Neutral | −14 to 14 | 0 | 0 | — |
 | Hated | −15 to −49 | +0.20 | −0.10 | May refuse to trade |
 | Vilified | −50 or less | refuses | — | Black market only |
 
-Six tiers, following the Fallout 2 names minus Antipathy. Neutral is ±14, so one or
-two deeds don't move a town. The negative side is shorter, because one bad act should
-hurt faster than one good act helps. Karma has no effect on price; it only controls
-access.
-
 ---
 
-## 6. Combat
+## 6. Combat: enemy tiers (**RULED** targets)
 
-### 6.1 NPCs built like PCs (**RULED**: generic SPECIAL, not harder to hit)
+### 6.1 Method and assumptions
 
-**Generic SPECIAL, 40 points like a PC:**
+- **Party:** four 40-point humans. Two gunners (tagged Small Guns 41) and two
+  melee/pistol characters (35, MD 3). Main skill +20 per level. HP follows the Phase 0
+  formula.
+- **Gear by level:** Ramshackle armor at levels 1–2, Leather at 3–4, Mercenary at 5–6,
+  Malayan Infantry at 7. Weapons: 10mm, Hunting Rifle and Machete (level 1–2);
+  Assault Rifle, Combat Shotgun and Sledgehammer (3–4); Battle Rifle, Riot Shotgun and
+  Super Sledge (5–6); Sniper and Battle Rifle (7).
+- **Assumed away:** PC gear is pristine, and nobody uses stimpaks, cover, stances or
+  aimed shots.
+- **Win** means every enemy goes down before every PC does, within 60 rounds. Enemy
+  HP is varied ±30% (the bestiary rule). 4,000 fights per line.
+- **The simulation is harsher than a real table.** Real players have tactics and
+  stimpaks, so the table will run a little easier than these numbers.
+- **Humanoid NPCs** are built like PCs. HP = `15 + ST + 2×EN + (NPC level − 1) × (3 +
+  EN/2)`, from a generic 40-point SPECIAL (Grunt 6/6/6/5/5/6/6, Soldier 6/7/6/4/5/6/6,
+  Elite AG 8 LK 7). AC = AG + their armor. DT/DR = their armor. **Training is their
+  hit %**, which is the faction's character.
 
-| Profile | ST | PE | EN | CH | IN | AG | LK |
-|---|---|---|---|---|---|---|---|
-| **Grunt** (raider, labourer, thug) | 6 | 6 | 6 | 5 | 5 | 6 | 6 |
-| **Soldier** (UCL, Protectorate, Federation) | 6 | 7 | 6 | 4 | 5 | 6 | 6 |
+### 6.2 Tiers, target level and standard group size
 
-**Derivation:**
-- HP = `15 + ST + 2×EN + (level − 1) × (3 + EN/2)`.
-- Hit = the tagged combat skill + 10 per level after the first. NPCs spread their
-  points, so they gain less per level than a PC's +20.
-- Crit = LK.
-- AC = AG + the armor they wear.
-- DT/DR = that armor's.
-
-**The "not harder to hit" rule:** an NPC wears the armor its faction would issue, but
-at enough condition marks that **AG + worn armor AC ≤ its current bestiary AC**. The
-GM gets the "built like a PC" consistency without the Protectorate becoming AC 26. It
-also carries out the world rule that everything the party meets is worn.
-
-| NPC | Level / profile | HP | AC | DT/DR (normal) | Hit | Weapon | Now |
-|---|---|---|---|---|---|---|---|
-| **Raider** | L1 Grunt | **33** | **14** (AG 6 + Ramshackle 8, pristine) | 2/25 | **37** | 1d8+3 (9mm Pistol) | 50 HP, AC 18, 3/20, 60%, 1d8+6 |
-| UCL Regular | L3 Soldier | 45 | 16 (AG 6 + UCL Soldier Armor at **7 marks** → 10) | 1/16 | 59 | 2d6+6 (unchanged) | 45, AC 16, 3/30, 60% |
-| **Protectorate Infantry** | L4 Soldier | 51 | 20 (AG 6 + Protectorate Infantry Armor at **6 marks** → 14) | 3/25 | 69 | Rifle 2d6+8. **Mortar 2d10+17** (one-turn setup). **Grenade 2d8+9** | 50, AC 20, 5/40. Mortar 2d12+60, Grenade 2d12+20 |
-| Labourer (renamed from slave) | L1 Grunt | 33 | 6 (AG 6, clothes 0 to 1) | 0/5 | 25 (untagged Melee 12, +13 GM choice) | 1d4+1 | 35, AC 5 |
-| Supermutant Labourer | L2, ST 9 variant | 60 (unchanged) | 5 | 1/25 | 60 | Sledgehammer **2d6+7** (vault 2d6+3 plus MD 4) | Sledgehammer 1d6+15+3 |
-
-**Every AC is ≤ its current value** (raider 18 → 14, UCL 16 → 16, Protectorate 20 →
-20). Elite units, such as a Heavy Trooper in pristine armor, are the deliberate
-exception: that is where AC 30+ belongs.
-
-### 6.2 Attacks to kill one rebuilt NPC (sheet skills, `sim3.mjs`)
-
-| Lvl | Weapon (skill) | Raider | UCL Regular | Prot. Infantry |
+| Tier | Target party level | Target win rate | Standard group vs 4 PCs | Contents |
 |---|---|---|---|---|
-| 1 | 10mm Pistol (41) | 21.4 (27% hit) | 24.4 (25%) | 41.7 (21%) |
-| 1 | Hunting Rifle (41) | 17.6 (26%) | 21.1 (25%) | 34.1 (21%) |
-| 1 | Machete + MD 3 (35) | 30.4 (21%) | 35.9 (19%) | 59.6 (16%) |
-| 3 | Assault Rifle (81) | 7.6 (67%) | 8.6 (64%) | 13.4 (61%) |
-| 3 | Sledgehammer + MD 3 (75) | 6.9 (61%) | 8.0 (59%) | 11.9 (55%) |
-| 5 | Battle Rifle (121) | 3.5 (94%) | 4.0 (94%) | 5.4 (94%) |
-| 5 | Super Sledge + MD 3 (115) | 3.2 (95%) | 3.8 (96%) | 5.2 (93%) |
+| **T5** Pests | 1 | 85% | 6 rats or ants, 5 soldier ants, 4 of anything else | giant_rat, giant_ant, soldier_ant, lesser_panguling, liberator_robot_mk1 |
+| **T4** Low humanoids and larger creatures | 2 | 85% | 4 (5 feral ghouls). Boss: 1 Rat King + 3 rats | raider, labourer, feral_ghoul (NEW), monyet_sakai, panguling, ibu_sakai, liberator_robot_follower, rat_king |
+| **T3** Regulars, gangs, Gergasi | 3–4 | 80% | 4 | ucl_regular, supermutant_labourer, federation_regular (NEW), rakan_watch_enforcer (NEW), raider_veteran (NEW), mercenary (NEW) |
+| **T2** Protectorate regulars (T2.5), Federation heavies | 5–6 | 75% | 4 Protectorate (they fight in numbers), 3 heavies. Turret: 1 turret + 2 Protectorate. | protectorate_infantry, federation_heavy (NEW), automated_turret |
+| **T1** Elites | 7+ | about 55% (a hard fight) | 2 | federation_commando (NEW), protectorate_power_armor (NEW), pahlawan (NEW) |
 
-For the old raider, a level-1 10mm Pistol needed 37.7 attacks. Monster-only tables
-(rats, ants, pangulings) are unchanged from rev. 1: a level-1 10mm Pistol kills a
-Giant Rat in 4.4 attacks, a Soldier Ant in 10.4 and a Lesser Panguling in 15.1.
+**Encounter-size warning (NEW finding).** The "−1 / +1" columns in §6.4 show that
+**one enemy more or fewer moves the win rate far more than any stat change** (for
+example raider ×3 = 99%, ×4 = 84%, ×5 = 33%). This is the Lanchester effect: extra
+attackers multiply damage and also soak the party's attacks. Table rule: **every enemy
+above the standard group is roughly a tier jump.** Either hold the group size, or swap
+in a weaker type to add bodies.
 
-### 6.3 Encounters: 4 PCs against a group (`party4.mjs` / `party5.mjs`, 4,000 fights each)
+### 6.3 Proposed stat lines
 
-| Encounter | Current: win % / rounds / PCs downed | Proposed: win % / rounds / PCs downed |
+Changes from the current bestiary are in **bold**. An NPC level applies only to
+humanoids.
+
+| Tier | Entry | NPC level | HP | AC | DT/DR | Hit | Attack | Character |
+|---|---|---|---|---|---|---|---|---|
+| T5 | giant_rat | — | **14** | 5 | 0/0 | 75 | Bite **1d6+4** | Dog-sized. Only dangerous in a pack. |
+| T5 | giant_ant | — | 15 | 2 | 0/0 | 60 | Mandibles **2d6+3** | |
+| T5 | soldier_ant | — | 25 | 5 | 1/10 | 70 | Mandibles **1d8+2** | |
+| T5 | lesser_panguling | — | 20 | **12** | **2/0** | 80 | Roll 2d6 | It was AC 15 and DT 4, which made it nearly immune to level-1 guns. |
+| T5 | liberator_robot_mk1 | — | 25 | **14** | 2/20 | 70 | Claw **1d4+3** | |
+| T4 | raider | L2 Grunt | **39** | **13** (Ramshackle, 2 marks) | **2/23** | **70** | **1d8+3** (9mm) | Worn gear, as the ruling allows |
+| T4 | labourer | L4 Grunt | **51** | **6** | **0/5** | **60** | **Sledgehammer 2d6+4** | Only fights when forced, but hits hard when it does |
+| T4 | feral_ghoul **(NEW)** | — | 30 | 8 | 0/0 | 65 | Claw 1d6+8 | Group of 5 |
+| T4 | monyet_sakai | — | 40 | 15 | 1/25 | 75 | Swipe **1d6+4** | |
+| T4 | panguling | — | 30 | **16** | **4/20** | **85** | Roll **2d4+1** | Was 2d8. That killed a level-2 party in 99% of fights. |
+| T4 | ibu_sakai | — | **40** | **16** | **2/30** | 70 | Claw **1d4+4** | |
+| T4 | liberator_robot_follower | — | 30 | 15 | 3/25 | **78** | Claw **1d4+5** | |
+| T4 boss | rat_king | — | **36** | 14 | 4/25 | 90 | Claw **2d6+2**, 2 attacks a turn | With 3 giant rats |
+| T3 | ucl_regular | L4 Soldier | **51** | **20** (UCL Soldier Armor, 2 marks) | **2/23** | **80** | Assault Rifle **2d6+4** | Basic training, drilled teamwork |
+| T3 | federation_regular **(NEW)** | L5 Soldier | 57 | 19 (Malayan Infantry, 3 marks) | 3/30 | **65** | Hunting Rifle 2d8+2 | **Poor regulars** (RULED) |
+| T3 | rakan_watch_enforcer **(NEW)** | L4 Grunt | 51 | 26 (Combat Leather Jacket) | 2/30 | 75 | 10mm-class 2d6+3 | Gang. Rank-and-file in the 1414 Windbreaker use raider stats. |
+| T3 | raider_veteran **(NEW)** | L3 Grunt | 45 | 21 (Leather) | 2/25 | 75 | Combat Shotgun 2d8+4 | "Well-equipped raiders" |
+| T3 | mercenary **(NEW)** | L3 Soldier | 45 | 18 (Mercenary) | 3/25 | 85 | Assault Rifle 2d6+4 | |
+| T3 | supermutant_labourer | L2 Gergasi (ST 9, EN 8) | **50** | 5 | **1/35** (+10% Gergasi DR) | **78** | Sledgehammer **2d6+7** | |
+| T2 | protectorate_infantry | L10 Soldier | **87** | **26** (Protectorate Infantry Armor, **pristine**) | **4/35** | **65** | **Laser rifle 2d10+6**. Mortar 2d10+17 (1-turn setup). Grenade 2d8+9. | **Best gear, poor training** (RULED). Tough and numerous, but they miss. |
+| T2 | federation_heavy **(NEW)** | L9 Soldier | 81 | 26 (Frontliner) | 7/45 | 80 | LMG 2d8+6 (burst) | |
+| T2 | automated_turret | — | **130** | 28 | 5/40 | 75 | Heavy Fire 2d8+15 | Support piece. Pair it with a squad. |
+| T1 | federation_commando **(NEW)** | L15 Elite | 133 | 28 | 7/45 | **110** | 3d10+8 | **Solid elite commandos** (RULED) |
+| T1 | protectorate_power_armor **(NEW)** | L19 Soldier | 141 | 31 (full T1 power armor) | 10/50 | **70** | Plasma 4d8+10 | **Top gear, still poor training** |
+| T1 | pahlawan **(NEW)** | L14 Elite | 126 | 28 (Caliphate armor) | 6/40 | **120** | 3d10+10 | **The best-trained soldiers on the Peninsula** (RULED) |
+
+### 6.4 Simulation results by tier (win % / rounds / PCs downed per win; −1 and +1 are one enemy fewer or more)
+
+| Tier | Encounter | vs party level | Target | **Win** | Rounds | Downed | −1 | +1 |
+|---|---|---|---|---|---|---|---|---|
+| T5 | 6 giant rats | 1 | 85 | **87%** | 9.7 | 0.43 | 98% | 63% |
+| T5 | 6 giant ants | 1 | 85 | **82%** | 9.5 | 0.57 | 96% | 55% |
+| T5 | 5 soldier ants | 1 | 85 | **83%** | — | — | 98% | 45% |
+| T5 | 4 lesser pangulings | 1 | 85 | **86%** | 12.5 | 0.44 | 99% | 49% |
+| T5 | 4 Liberator Mk1s | 1 | 85 | **85%** | 19.0 | 0.49 | 99% | 44% |
+| T4 | 4 raiders | 2 | 85 | **84%** | 16.8 | 0.60 | 99% | 33% |
+| T4 | 4 labourers | 2 | 85 | **87%** | 12.7 | 0.61 | 99% | 42% |
+| T4 | 5 feral ghouls | 2 | 85 | **83%** | 10.2 | 0.64 | 98% | 43% |
+| T4 | 4 monyet sakai | 2 | 85 | **86%** | 16.0 | 0.55 | 100% | 35% |
+| T4 | 4 pangulings | 2 | 85 | **83%** | — | — | 99% | 34% |
+| T4 | 4 ibu sakai | 2 | 85 | **83%** | 19.6 | 0.59 | 99% | 35% |
+| T4 | 4 Liberator Followers | 2 | 85 | **80%** | — | — | 99% | 28% |
+| T4 | Rat King + 3 giant rats | 2 | 85 | **85%** | 8.1 | 0.42 | — | — |
+| T3 | 4 UCL regulars | 3 | 80 | **81%** | 12.9 | 0.74 | 100% | 25% |
+| T3 | 4 Federation regulars | 3 | 80 | **80%** | 16.8 | 0.75 | 99% | 25% |
+| T3 | 4 Rakan Watch enforcers | 3 | 80 | **80%** | 15.2 | 0.70 | 100% | 26% |
+| T3 | 4 raider veterans | 3 | 80 | **78%** | 11.9 | 0.77 | 99% | 27% |
+| T3 | 4 mercenaries | 3 | 80 | **77%** | 12.3 | 0.79 | 100% | 21% |
+| T3 | 4 Gergasi labourers | 3 | 80 | **80%** | — | — | 99% | 20% |
+| T2 | 4 Protectorate infantry | 5 | 75 | **75%** | 14.4 | 0.94 | 99% | 17% |
+| T2 | 3 Federation heavies | 5 | 75 | **78%** | 15.0 | 0.85 | 100% | 12% |
+| T2 | 1 turret + 2 Protectorate | 5 | 75 | **77%** | 13.3 | 0.85 | — | — |
+| T1 | 2 Federation commandos | 7 | ~55 | **55%** | 12.2 | 1.14 | 100% | 2% |
+| T1 | 2 Protectorate power armor | 7 | ~55 | **55%** | 17.7 | 1.00 | 100% | 3% |
+| T1 | 2 Pahlawans | 7 | ~55 | **58%** | 10.1 | 1.17 | 100% | 2% |
+
+A dash means that line came from a later re-tune run that only recorded the win rate.
+For comparison, the current bestiary at the same levels and group sizes:
+
+| Encounter | Win today |
+|---|---|
+| 4 rats | 100% |
+| 4 raiders (level 1) | 1% |
+| 4 pangulings (level 1) | 1% |
+| 4 UCL regulars | 93% |
+| 3 Protectorate infantry (level 5) | 100% |
+| Turret alone (level 7) | 100% |
+
+### 6.5 Other combat notes and bugs
+
+| Item | Tag | Note |
 |---|---|---|
-| L1 vs 3 raiders | **11%** / 21.0 / 1.01 | **97%** / 19.2 / 0.33 |
-| L1 vs 2 raiders | — | 100% / 12.5 / 0.14 |
-| L1 vs 3 UCL (level-3 content) | 6% / 18.6 / 1.13 | 21% / 17.5 / 1.12 |
-| L3 vs 3 raiders | 98% / 13.7 / 0.29 | 100% / 8.0 / 0.09 |
-| L3 vs 3 UCL | 95% / 13.5 / 0.43 | 100% / 9.0 / 0.21 |
-| L3 vs 2 Protectorate, rifle | 76% / 15.6 / 0.68 | 99% / 9.8 / 0.27 |
-| L3 vs 2 Protectorate, **mortar every turn** (worst case) | **6%** / 12.2 / 1.53 | 70% / 9.9 / 0.93 |
-| L5 vs 2 Protectorate, mortar | **27%** / 11.5 / 1.46 | 99% / 6.6 / 0.32 |
-| L5 vs 3 UCL | 100% / 9.1 / 0.12 | 100% / 6.1 / 0.07 |
-
-**Encounter sizing (NEW guidance):** at level 1, **1 grunt per 2 PCs**, because 3
-raiders still take about 19 rounds. At level 3, 1 soldier per PC. The Protectorate
-mortar needs its one-turn setup enforced. Fired every turn, it is still the deadliest
-thing a level-3 party meets (70% win rate).
-
-### 6.4 Over- and under-tuned, and the remaining bugs
-
-| Target | Tag | Change |
-|---|---|---|
-| Raider, UCL Regular, Protectorate Infantry, Labourers | CHANGE | As in §6.1 |
-| Automated Turret | Flag | Anti-Tank 7d8+30 and Flame 3d10+30: a "hack it, don't fight it" set piece. Set `is_boss`. |
-| Homemade Pistol / PVC Pipe Gun | CHANGE | 1d6 → 1d6+2 and 1d4 → 1d4+1. Both stay inside the T5 band. |
-| Level 5 and up | Note | Main-skill hit reaches the 95% ceiling. New level-5+ enemies need pristine T1 armor (AC 30+) or real DT. |
-| **Burst fire** | **BUG** | Items carry `burst_capable`, but the code reads `burst_shots`. None of the 8 weapons can burst. |
-| **Head armor** | **BUG** | Only `equipment.body` is read. **RULED:** the head slot stays shared with Glasses, which is part of Short-Sighted's cost. Proposal: head armor's AC adds to total AC, and its DT/DR applies to Head and Eyes aimed shots. |
-| Gergasi +10% DR | **BUG** | `derived.damageRes` is never applied |
-| Crit chance | Minor BUG | It reads raw base LK, not the derived value |
+| Protectorate mortar | CHANGE | 2d12+60 → 2d10+17, and the one-turn setup is enforced |
+| Homemade Pistol / PVC Pipe Gun | CHANGE | 1d6+2 / 1d4+1 |
+| Level 5 and up | Note | PC main-skill hit reaches the 95% ceiling. From T2 upward, balance comes from HP, DT and enemy hit, not AC. |
+| Bestiary text | Flag | ibu_sakai, monyet_sakai and liberator_robot_follower carry each other's descriptions (copy-paste from the manual; their own notes already say so) |
+| Burst fire | **BUG** | `burst_capable` vs `burst_shots`. None of the 8 weapons can burst. |
+| Head armor | **BUG** | Only `body` is read. The slot stays shared with Glasses (RULED). |
+| Gergasi +10% DR | **BUG** | Never applied. The Gergasi labourer line above already includes it. |
+| Crit chance | Minor BUG | Reads raw base LK |
 
 ---
 
@@ -564,234 +561,239 @@ thing a level-3 party meets (70% win rate).
 
 ### 7.1 Traits and perks
 
-| Entry | Current effect | Proposal |
-|---|---|---|
-| Heavy Handed | +4 melee damage (works; +53% on a 1d8+3 machete). The −25% crit damage does nothing. | **RULED** (rev. 1's reading): the +300% entry becomes ×3, and Artery does 15 true damage. |
-| Short-Sighted | −1 PER without Glasses | Keep. The shared head slot is the real cost (**RULED**). |
-| Faster Healing / Rad Child / Cancerous Growth | They add to the healing *cap*. At EN 8, Faster Healing adds +0.3 HP per hour; at EN 10, nothing. | **CHANGE** (still a proposal): the bonus becomes flat HP per hour *after* the cap. Add ranks. Rad Child: `race_requirement: ghoul`, and only while rads > 0. Healing on every clock advance stays (**RULED**). |
-| Triad Ties | TBA. Rev. 1 referred to the removed Antipathy tier. | **CHANGE:** Lim-affiliated vendors: buy −0.10, sell +0.05 (inside the barter limits). At character creation, **−10 on one rival faction's reputation slider** (GM's choice). That is still Neutral, but one bad deed away from Hated. |
-| Water Sense | TBA | +20 Survival to find water. Dirty Water contamination drops from 20% to 10%. |
-| Border Rat | TBA | +15 Speech with smugglers and the Bursa, −15 with Federation officials. The Bursa spread shrinks from ±10% to ±5% for this character. |
-| Feral Blood | TBA | +1 STR. Feral checks start at 500 rads instead of 600. |
-| Armor `modifiers` | **BUG:** never applied (CHA +2 jackets, the Frontliner's −40 Sneak) | Add equipped items' modifiers to `modifierSources`. |
+| Entry | Proposal |
+|---|---|
+| Heavy Handed | **RULED:** the +300% crit entry becomes ×3 and Artery does 15 true damage. The +4 melee damage works. The crit penalty is a BUG (never read). |
+| Short-Sighted | Keep. The shared head slot is part of its cost (RULED). |
+| Faster Healing / Rad Child / Cancerous Growth | **CHANGE** (proposal): the bonus becomes flat HP per hour after the EN cap, with ranks. Rad Child: Ghoul-only, and only while rads > 0. Healing on every clock advance stays (RULED). |
+| Triad Ties | Lim-affiliated vendors: buy −0.10, sell +0.05. At character creation, −10 on one rival faction's reputation slider (still Neutral, but one bad deed from Hated). |
+| Water Sense | +20 Survival to find water. Dirty Water contamination 20% → 10%. |
+| Border Rat | +15 Speech with smugglers and the Bursa, −15 with Federation officials. Bursa spread ±5% for this character. |
+| Feral Blood | +1 STR. Feral checks start at 500 rads instead of 600. |
+| Armor `modifiers` | **BUG:** never applied |
 
-### 7.2 Skill books (**RULED**: +5 skill points each and reading advances time)
+### 7.2 Skill books (**RULED**: +5 skill points, own copy, reading takes time)
 
-| Question | Proposal | Reason |
-|---|---|---|
-| Effect | +5 **skill points** into the book's skill: +10% if tagged, +5% if not | Following the ruling. It works like a quarter of a level-up (11 to 29 points), so a book is worth reading for anyone. |
-| **Read time** | **2 hours** on the shared party clock (`advanceTime(120)`, not a rest) | Long enough to cost something without eating a day. At the settled rates, every PC pays **−6 thirst, −4 hunger and −3 sleep**, and gets 2 natural-healing rolls (not the long-rest ×1.5). The whole party waits together. |
-| Several readers | PCs can read **at the same time**: one 2-hour advance covers every character reading one book each | The clock is shared. Charging the party 2 hours per book per person would punish splitting the loot. |
-| During a rest | A rest of at least 2 hours can include reading at no extra time, but that character gets no sleep recovery for those 2 hours | Stops "read for free while resting" without extra bookkeeping. |
-| Value | Keep 145–250 base (1,450–2,500 RMR) | About 3 to 5 PC-days of food and water. That fits a quarter-level. |
+| Question | Proposal |
+|---|---|
+| Effect | +5 skill points into the book's skill (+10% tagged, +5% untagged). The book is consumed by its reader and **cannot be shared** (RULED). |
+| Read time | **2 hours per book** on the shared party clock (`advanceTime(120)`, not a rest). Every PC pays −6 thirst, −4 hunger and −3 sleep, and gets 2 natural-healing rolls. Three PCs each reading their own book is three separate 2-hour advances. The shared clock makes that the real cost. |
+| During a rest | A rest of at least 2 hours can include reading, but the reader gets no sleep recovery for those 2 hours. |
+| Value | Keep the authored values ×10: **1,450–2,500 RMR** (15–25 PD) |
 
 ---
 
-## 8. Survival and crafting
+## 8. Survival and crafting (RMR)
 
-### 8.1 Cost of staying fed (RMR at index 10)
+### 8.1 Cost of staying fed
 
-| Need (settled rates) | Cheapest clean option | Base per point | RMR per day |
+| Need | Cheapest clean options | RMR per point | RMR per day |
 |---|---|---|---|
-| Thirst, 72 per day | Soyabean Milk 8 / Purified Water 15 / Winter Melon 12 | 0.40–0.50 | about **300** |
-| Thirst, using Dirty Water 3/25 | about a 49% chance a day of at least one contamination | 0.12 | 90 |
-| Hunger, 48 per day | Cicak 6 / Instant Mee 8 / Can of Food 10 | 0.30–0.33 | about **160** |
-| **Per PC per day** | | | **about 450 RMR** (4.5 PD), or 1,800 for the party |
+| Thirst, 72 per day | Soyabean Milk 80, Purified Water 150, Winter Melon 120 | 4–5 | about **300** |
+| Thirst, using Dirty Water 30 (per 25 thirst) | about a 49% chance a day of at least one contamination | 1.2 | 90 |
+| Hunger, 48 per day | Cicak 60, Instant Mee 80, Can of Food 100 | 3–3.3 | about **160** |
+| **Per PC per day** | | | **about 450 RMR (4.5 PD)** |
 
-Weight is unchanged: about 10 kg for a 5-day trip against 68 kg capacity at STR 5.
-**Job rewards at level 1:** 50–150 base, which is **500–1,500 RMR or 5–15 PD**. Paying
-in PD is safer for the players (§4.3). **NEW recipe, Boil & Strain:** 2 Dirty Water + 1
-Chemicals → 1 Purified Water (1.36×).
+- **Job rewards at level 1:** 500–1,500 RMR, or 5–15 PD. PD protects the players from
+  the multiplier.
+- **Boil & Strain (NEW recipe):** 2 Dirty Water + 1 Chemicals → 1 Purified Water
+  (1.36×).
 
 ### 8.2 Healing value
 
-| Item | Average HP | Base per HP | RMR per HP |
-|---|---|---|---|
-| Healing Poultice | 10.5 | 3.8 | 38 |
-| Stimpak | 15.5 | 4.8 | 48 |
-| Doctor's Bag | 21 | 6.2 | 62 |
-| Med Kit | 5.5 | 10.0 → **5.5 at value 30 (CHANGE)** | 100 → 55 |
+| Item | Average HP | RMR per HP |
+|---|---|---|
+| Healing Poultice | 10.5 | 38 |
+| Stimpak | 15.5 | 48 |
+| Doctor's Bag | 21 | 62 |
+| Med Kit | 5.5 | 100 → **55 at the proposed value of 300 (CHANGE)** |
 
 ### 8.3 Recipes and junk
 
-The ×10 index doesn't change any of these, since they are ratios. As in rev. 1:
+- All 25 recipes pass the 1.5× rule. The ×10 doesn't change any ratio.
+- **Studded Leather** inputs → 8 Cloth + 10 Scrap + 6 Adhesive (1.39×).
+- **Med Kit** inputs → 3 Chemicals + 3 Organics.
+- **CHANGE: 29 junk values now equal the value of their scrap yield** (the money
+  printer):
 
-- All 25 recipes pass the 1.5× rule.
-- **Studded Leather** inputs → 8 Cloth + 10 Scrap + 6 Adhesive (1.39×). Its current
-  recipe needs rare Hardened Alloy, so nobody will craft it.
-- **Med Kit** inputs → 3 Chemicals + 3 Organics, to go with the new value of 30.
-- Gun Parts in the melee recipes breaks the spec's "a gunsmith's alone" rule. Flagged
-  only.
-- **CHANGE: 29 junk values** now equal the value of their yield: Broken Radio Set 6 →
-  20, Copper Wire Spool 4 → 14, Circuit Board Fragment, Cracked LCD Panel, Dead Car
-  Battery and Jammed Sewing Machine 4 → 12, Broken Streetlamp Fixture 3 → 10, Duct
-  Tape, Broken Pressure Cooker, Empty Kerosene Tin and Rusty Bicycle Chain → 9,
-  Cracked Motorbike Mirror 2 → 8, Rusted Kapcai Carburettor 3 → 7, Moth-Eaten Prayer
-  Mat, ProTiga Factory Scrap, Shredded Tarpaulin, Spoiled Coconut Husk Sack, Tangled
-  Barbed Wire Coil and Warung Signboard → 6, Rubber Sandal Strap and Spool of Fishing
-  Line → 5, and every other junk item → 4 (Rusted Pipe Segment, Broken Ceiling Fan
-  Blade, Cracked Motorcycle Helmet, Cracked Rain Barrel, Dried Fish Bones, Federation
-  Ration Tin, Torn Umbrella Frame, Withered Herb Bundle). Bobby Pin is already correct.
+| Junk | New value (RMR) |
+|---|---|
+| Broken Radio Set | 200 |
+| Copper Wire Spool | 140 |
+| Circuit Board Fragment, Cracked LCD Panel, Dead Car Battery, Jammed Sewing Machine | 120 |
+| Broken Streetlamp Fixture | 100 |
+| Duct Tape, Broken Pressure Cooker, Empty Kerosene Tin, Rusty Bicycle Chain | 90 |
+| Cracked Motorbike Mirror | 80 |
+| Rusted Kapcai Carburettor | 70 |
+| Moth-Eaten Prayer Mat, ProTiga Factory Scrap, Shredded Tarpaulin, Spoiled Coconut Husk Sack, Tangled Barbed Wire Coil, Warung Signboard | 60 |
+| Rubber Sandal Strap, Spool of Fishing Line | 50 |
+| All other junk | 40 |
+| Bobby Pin | 20 (already correct) |
 
 ---
 
 ## 9. Questions for the GM
 
-### Resolved (2026-09-22 rulings)
+### Resolved
 
 | # | Question | Ruling |
 |---|---|---|
-| Q1 | Is `value` in RMR? | **RESOLVED:** RMR prices are ×10 in early hyperinflation. Implemented here as value × index (10). See N1. |
-| Q2 | UCL currency? | **RESOLVED:** none. The UCL row is removed. |
-| Q3 | Bond Slips? | **RESOLVED:** no Bond Slips. Removed everywhere. |
-| Q4 | Crit-fail entries 6/7 and Backfire? | **RESOLVED:** 6/7 add 1d3 marks. Backfire sets Broken (repairable). |
-| Q5 | Repair: roll or cap? | **RESOLVED:** instant and capped by skill, with a skill-scaled chance to save components (§2.5). |
-| Q6 | Heavy Handed reading? | **RESOLVED:** rev. 1's reading stands. |
-| Q7 | Healing on every clock advance? | **RESOLVED:** it stays. Hunger and thirst are the attrition. |
-| Q8 | Separate face slot for Glasses? | **RESOLVED:** no. The shared head slot is intended. |
-| Q9 | What does the Nail Driver fire? | **RESOLVED:** new `nails` ammo (§3.3). |
-| Q10 | Humanoid NPCs built like PCs? | **RESOLVED:** yes, generic SPECIAL, not harder to hit (§6.1). |
-| Q11 | Rename the slave entries? | **RESOLVED:** renamed to labourers. |
-| Q12 | Skill books? | **RESOLVED:** +5 skill points plus read time (§7.2). |
+| Q1 | Is `value` in RMR? | **RESOLVED:** `value` is the baseline RMR price (vault values ×10). PD = ÷100, Dinar = ÷2,000. |
+| Q2 | UCL currency? | **RESOLVED:** none |
+| Q3 | Bond Slips? | **RESOLVED:** none |
+| Q4 | Crit-fail entries 6/7 and Backfire? | **RESOLVED:** 1d3 marks. Backfire sets Broken. |
+| Q5 | Repair: roll or cap? | **RESOLVED:** instant, capped by skill, with a chance to save components |
+| Q6 | Heavy Handed reading? | **RESOLVED:** rev. 1's reading stands |
+| Q7 | Healing on every clock advance? | **RESOLVED:** it stays |
+| Q8 | Separate face slot? | **RESOLVED:** no, the head slot stays shared |
+| Q9 | What does the Nail Driver fire? | **RESOLVED:** `nails` ammo |
+| Q10 | Humanoid NPCs built like PCs? | **RESOLVED:** yes, balanced per tier (§6) |
+| Q11 | Rename the slave entries? | **RESOLVED:** renamed to labourers |
+| Q12 | Skill books? | **RESOLVED:** +5 skill points, own copy, read time |
+| N1 (rev. 2) | Base value × index, or vault ×10? | **RESOLVED:** vault ×10. Inflation stays as a GM-moved multiplier. |
+| N2 (rev. 2) | A new Repair skill? | **RESOLVED:** yes. Repair = 3 × INT (Fallout 2). |
+| N3 (rev. 2) | Worn Protectorate gear? | **RESOLVED:** no. Protectorate gear is always maintained; they are balanced through training and numbers. |
+| — | Win-rate ceiling | **RESOLVED:** ~85%, with the per-tier targets met in §6.4 |
+| — | Skill books shared? | **RESOLVED:** no |
 
 ### Still open
 
 | # | Question | Why it needs a call |
 |---|---|---|
-| N1 | Keep vault `value` as a base with RMR = value × index (my proposal: no bulk rewrite, and drift is one number), or multiply every vault `value` by 10? | If the vault stores RMR, every drift step means rewriting prices. |
-| N2 | Does "Repair skill" mean a **new 19th skill**, or the item's Gunsmith / Science / Engineering (my assumption)? | A new skill would change character creation and the skill-point budget. |
-| N3 | Is it acceptable in the lore that Protectorate and UCL line troops wear kit worn to 6–7 marks? The alternative is NPC AC = AG + half the armor's AC. | The Protectorate is the high-tech power. Worn gear is how this proposal keeps them from being harder to hit. |
-| N4 | Weekly index roll: at the start of each in-game week or at each session? And who can see the index: every player, or only those who check a Bursa board? | This sets how visible the inflation is. |
+| O1 | **What counts as a "loss"?** The simulation counts a party wipe (or 60 rounds) as a loss. So "85% against pests" means 15% of standard T5 fights wipe the party, if nobody uses stimpaks or tactics. The alternative is to count "at least one PC downed" as the failure; then at the same stats the clean-win rate is lower. Which one is the target? | It decides whether T5 and T4 creatures should be as dangerous as tuned here. Giant rats now bite for 1d6+4. |
+| O2 | **Are the standard group sizes (§6.2) acceptable as a GM rule?** No stat line can keep 80–85% across different group sizes (the ±1 columns). | The alternative is a threat-point encounter budget, which is more complex to run at the table. |
+| O3 | **T1 elites need 126–141 HP** (NPC levels 14–19) to be a hard fight for a level-7 party with its 95% hit rate. Is a bullet-sponge elite fine, or should elites get special rules instead (cover, stimpaks, an extra action)? | This is a design choice, not a numbers one. |
+| O4 | Should the 10 new bestiary entries (§6.3) be written to the vault by `vault-author`? feral_ghoul, federation_regular, rakan_watch_enforcer, raider_veteran, mercenary, federation_heavy, federation_commando, protectorate_power_armor and pahlawan are proposals only. | They don't exist yet. |
+| O5 | Market multiplier: rolled weekly or per session, and can every player see it or only those who check a Bursa board? | This sets how visible the inflation is. |
 
 ---
 
-## Appendix A: every weapon and armor piece by tier
+## Appendix A: every weapon and armor piece by tier (values in RMR)
 
 The damage column is the average per roll, with MD not included for melee. Protection
-is `AC + 3 × DT + DR/2`, using normal damage. Value is base value (RMR = ×10 at index 10),
-with the proposed numbers already in for TBAs and changes (§3.2, §3.3). "/unit" marks
-a single-use item priced per piece. The note column lists items outside their tier's
-band. Big guns, explosives and head pieces are not banded on damage or protection
-(§3.1). Generated by `tiers.mjs`.
+is `AC + 3 × DT + DR/2` (normal damage). Values include the proposed numbers for TBAs
+and changes. "/unit" marks a single-use item priced per piece. The note column lists
+items outside their tier's band. Big guns, explosives and head pieces are not banded
+on damage or protection. Generated by `tiers.mjs`.
 
-| Item | Kind | Tier | Damage / AC, DT/DR | Average damage / protection | Value | Note |
+| Item | Kind | Tier | Damage / AC, DT/DR | Average damage / protection | Value (RMR) | Note |
 |---|---|---|---|---|---|---|
-| malayan_frontliner_armor | Armor | T1 | AC 20, 7/45 | 63.5 | 255 |  |
-| protectorate_heavy_trooper_armor | Armor | T1 | AC 25, 8/45 | 71.5 | 285 |  |
-| salvaged_power_armor_chestplate | Armor | T1 | proposed AC 22, 6/40 (base_marks 8) | 60 | 300 |  |
-| salvaged_power_armor_helmet | Armor (head) | T1 | proposed AC 6, 2/15 (base_marks 8) | — | 80 | |
-| 50_cal_machine_gun | Weapon | T1 | 2d8+8 (burst) | 17.0 | 765 |  |
-| anti_materiel_rifle | Weapon | T1 | 3d10+8 | 24.5 | 500 |  |
-| deathclaw_gauntlet | Weapon | T1 | 2d8+8+MD | 17.0 | 450 |  |
-| fat_man | Weapon | T1 | 6d10+20 | 53.0 | 2000 |  |
-| gatling_laser | Weapon | T1 | 1d8+4 (burst) | 8.5 | 450 |  |
-| gauss_pistol | Weapon | T1 | 3d8+9 | 22.5 | 495 |  |
-| gauss_rifle | Weapon | T1 | 3d10+18 | 34.5 | 760 |  |
-| missile_launcher | Weapon | T1 | 4d10+8 | 30.0 | 750 |  |
-| plasma_caster | Weapon | T1 | 4d8+10 | 28.0 | 615 |  |
-| plasma_grenade | Weapon | T1 | 4d10+15 | 37.0 | 90 /unit |  |
-| plasma_rifle | Weapon | T1 | 3d8+6 | 19.5 | 430 |  |
-| rocket_launcher | Weapon | T1 | 4d10+5 | 27.0 | 675 |  |
-| tesla_cannon | Weapon | T1 | 3d10+20 | 36.5 | 805 |  |
-| protectorate_infantry_armor | Armor | T2 | AC 20, 4/35 | 49.5 | 150 |  |
-| ucl_vanguard_armor | Armor | T2 | AC 20, 5/40 | 55 | 220 |  |
-| 14mm_pistol | Weapon | T2 | 2d8+3 | 12.0 | 220 |  |
-| 223_pistol | Weapon | T2 | 2d8+4 | 13.0 | 240 |  |
-| battle_rifle | Weapon | T2 | 2d10+6 | 17.0 | 330 |  |
-| chinese_officers_sword | Weapon | T2 | 1d10+6+MD | 11.5 | 250 |  |
-| combat_rifle | Weapon | T2 | 2d8+3 | 12.0 | 210 |  |
-| combat_shotgun | Weapon | T2 | 2d8+4 | 13.0 | 200 |  |
-| flamer | Weapon | T2 | 2d6+3 | 10.0 | 260 |  |
-| fractured_laser_rifle | Weapon | T2 | 2d10+6 | 17.0 | 375 |  |
-| gatling_gun | Weapon | T2 | 1d8+3 (burst) | 7.5 | 380 |  |
-| grenade_launcher | Weapon | T2 | 2d10+12 | 23.0 | 460 |  |
-| katana | Weapon | T2 | 2d8+6+MD | 15.0 | 300 |  |
-| keris | Weapon | T2 | 2d6+4 | 11.0 | 250 |  |
-| land_mine | Weapon | T2 | 2d10+15 | 26.0 | 55 /unit |  |
-| laser_pistol | Weapon | T2 | 2d6+4 | 11.0 | 240 |  |
-| laser_rifle | Weapon | T2 | 2d10+6 | 17.0 | 375 |  |
-| light_machine_gun | Weapon | T2 | 1d8+3 (burst) | 7.5 | 340 |  |
-| minigun | Weapon | T2 | 1d8+3 (burst) | 7.5 | 400 |  |
-| plasma_pistol | Weapon | T2 | 2d8+4 | 13.0 | 285 |  |
-| power_fist | Weapon | T2 | 2d6+6+MD | 13.0 | 300 |  |
-| riot_shotgun | Weapon | T2 | 2d8+4 | 13.0 | 210 |  |
-| ripper | Weapon | T2 | 2d8+6+MD | 15.0 | 280 |  |
-| shishkebab | Weapon | T2 | 2d8+6+MD | 15.0 | 290 |  |
-| sniper_rifle | Weapon | T2 | 2d10+7 | 18.0 | 350 |  |
-| super_sledge | Weapon | T2 | 2d8+6+MD | 15.0 | 320 |  |
-| combat_leather_jacket | Armor | T3 | AC 20, 2/30 | 41 | 110 |  |
-| leather_armor | Armor | T3 | AC 15, 2/25 | 33.5 | 55 |  |
-| malayan_infantry_armor | Armor | T3 | AC 15, 3/35 | 41.5 | 125 |  |
-| mercenary_armor | Armor | T3 | AC 12, 3/25 | 33.5 | 85 |  |
-| press_plate_armor_oversized | Armor | T3 | AC 15, 3/30 | 39 | 80 |  |
-| rebar_plate_vest | Armor | T3 | AC 12, 3/25 | 33.5 | 65 |  |
-| studded_leather_armor | Armor | T3 | AC 20, 3/25 | 41.5 | 75 |  |
-| supermutant_clothes | Armor | T3 | AC 10, 3/25 | 31.5 | 60 |  |
-| ucl_soldier_armor | Armor | T3 | AC 15, 2/25 | 33.5 | 100 |  |
-| 10mm_pistol | Weapon | T3 | 2d6+2 | 9.0 | 110 |  |
-| 10mm_smg | Weapon | T3 | 1d8+2 (burst) | 6.5 | 140 | dmg out of band: accept (burst) |
-| 44_revolver | Weapon | T3 | 2d6+3 | 10.0 | 130 |  |
-| assault_rifle | Weapon | T3 | 2d6+4 (burst) | 11.0 | 200 |  |
-| bowie_knife | Weapon | T3 | 1d8+2+MD | 6.5 | 100 |  |
-| double_barrel_shotgun | Weapon | T3 | 2d8+2 | 11.0 | 160 |  |
-| fire_axe | Weapon | T3 | 1d8+2+MD | 6.5 | 90 |  |
-| frag_grenade | Weapon | T3 | 2d8+9 | 18.0 | 35 /unit |  |
-| hunting_rifle | Weapon | T3 | 2d8+2 | 11.0 | 130 |  |
-| incendiary_grenade | Weapon | T3 | 2d6+6 | 13.0 | 30 /unit |  |
-| lever_action_shotgun | Weapon | T3 | 2d6+3 | 10.0 | 150 |  |
-| marksman_carbine | Weapon | T3 | 2d6+3 | 10.0 | 150 |  |
-| pump_action_shotgun | Weapon | T3 | 2d6+4 | 11.0 | 155 |  |
-| sawed_off_shotgun | Weapon | T3 | 2d6+3 | 10.0 | 130 |  |
-| sledgehammer | Weapon | T3 | 2d6+3+MD | 10.0 | 150 |  |
-| tommy_gun | Weapon | T3 | 2d6+3 (burst) | 10.0 | 190 |  |
-| axe_town_coveralls | Armor | T4 | AC 8, 2/25 | 26.5 | 40 |  |
-| ramshackle_armor | Armor | T4 | AC 8, 2/25 | 26.5 | 35 |  |
-| rusted_riot_shield_harness | Armor | T4 | AC 10, 4/15 | 29.5 | 50 |  |
-| 32_revolver | Weapon | T4 | 1d6+3 | 6.5 | 70 |  |
-| 9mm_pistol | Weapon | T4 | 1d8+3 | 7.5 | 90 |  |
-| angkasa_wrench | Weapon | T4 | 2d6+2 | 9.0 | 45 | dmg out of band: dmg → 2d4+2 |
-| axe_gang_cleaver | Weapon | T4 | 1d10+2 | 7.5 | 110 |  |
-| baseball_bat | Weapon | T4 | 1d8+MD | 4.5 | 80 |  |
-| brass_knuckles | Weapon | T4 | 1d10+MD | 5.5 | 40 |  |
-| cleaver | Weapon | T4 | 1d8+MD | 4.5 | 75 |  |
-| combat_knife | Weapon | T4 | 1d8+MD | 4.5 | 75 |  |
-| corroded_minigun_barrel_club | Weapon | T4 | 2d6+4 | 11.0 | 55 | dmg out of band: dmg → 2d6+1 |
-| dynamite | Weapon | T4 | 2d10+8 | 19.0 | 30 /unit |  |
-| lim_clan_straight_razor | Weapon | T4 | 1d6+1 | 4.5 | 65 |  |
-| machete | Weapon | T4 | 1d8+MD | 4.5 | 85 |  |
-| nightstick | Weapon | T4 | 1d8+MD | 4.5 | 65 |  |
-| parang | Weapon | T4 | 1d8+1 | 5.5 | 85 |  |
-| pneumatic_nail_driver | Weapon | T4 | 1d6+3 | 6.5 | 70 |  |
-| salvaged_rebar_greatsword | Weapon | T4 | 2d8 | 9.0 | 60 | dmg out of band: dmg → 2d6+1 |
-| switchblade | Weapon | T4 | 1d6+MD | 3.5 | 60 |  |
-| tire_iron | Weapon | T4 | 1d8+MD | 4.5 | 70 |  |
-| varmint_rifle | Weapon | T4 | 1d6+2 | 5.5 | 60 |  |
-| 1414_windbreaker | Armor | T5 | AC 1, 0/5 | 3.5 | 10 |  |
-| clothes | Armor | T5 | AC 1, 0/5 | 3.5 | 5 |  |
-| ghoul_wrap | Armor | T5 | AC —, — | 0 | 3 |  |
-| lim_clan_tailored_suit | Armor | T5 | AC 3, 1/10 | 11 | 150 | value out of band: accept (social premium) |
-| malayan_officers_uniform | Armor | T5 | AC 2, 1/7 | 8.5 | 25 |  |
-| metal_plates | Armor | T5 | AC 2.5, 1/5 | 8 | 15 |  |
-| padded_coveralls | Armor | T5 | AC 3, 0/8 | 7 | 8 |  |
-| prison_labourer_clothes | Armor | T5 | AC 0, 0/0 | 0 | 1 |  |
-| protectorate_officers_uniform | Armor | T5 | AC 3, 1/10 | 11 | 35 | value out of band: accept (social premium) |
-| rattan_basket_armor | Armor | T5 | AC 4, 1/10 | 12 | 12 |  |
-| reinforced_tarpaulin_wrap | Armor | T5 | AC 5, 1/15 | 15.5 | 25 |  |
-| tarp_poncho | Armor | T5 | AC 2, 0/5 | 4.5 | 5 |  |
-| ucl_officers_uniform | Armor | T5 | AC 2, 0/7 | 5.5 | 15 |  |
-| water_wardens_slicker | Armor | T5 | AC 2, 0/7 | 5.5 | 15 |  |
-| factory_respirator | Armor (head) | T5 | AC 1, 0/5 | 3.5 | 30 |  |
-| 1414_chain_whip | Weapon | T5 | 1d6+1 | 4.5 | 20 |  |
-| bent_rebar_spear | Weapon | T5 | 1d6 | 3.5 | 8 |  |
-| boxing_gloves | Weapon | T5 | 1d2+MD | 1.5 | 15 |  |
-| cracked_pvc_pipe_gun | Weapon | T5 | 1d4+1 | 3.5 | 12 |  |
-| golf_club | Weapon | T5 | 1d6+MD | 3.5 | 25 |  |
-| homemade_pistol | Weapon | T5 | 1d6+2 | 5.5 | 50 |  |
-| homemade_rifle | Weapon | T5 | 1d8+1 | 5.5 | 55 |  |
-| kitchen_knife | Weapon | T5 | 1d6 | 3.5 | 10 |  |
-| molotov_cocktail | Weapon | T5 | 1d10+4 | 9.5 | 15 /unit |  |
-| nail_board | Weapon | T5 | 1d6+1 | 4.5 | 10 |  |
-| pool_cue | Weapon | T5 | 1d4+MD | 2.5 | 20 |  |
-| rebar_nail_club | Weapon | T5 | 1d6+2 | 5.5 | 25 |  |
-| shovel | Weapon | T5 | 1d6+MD | 3.5 | 20 |  |
-| water_pipe_cudgel | Weapon | T5 | 1d6+1 | 4.5 | 20 |  |
+| malayan_frontliner_armor | Armor | T1 | AC 20, 7/45 | 63.5 | 2,550 |  |
+| protectorate_heavy_trooper_armor | Armor | T1 | AC 25, 8/45 | 71.5 | 2,850 |  |
+| salvaged_power_armor_chestplate | Armor | T1 | proposed AC 22, 6/40 (base_marks 8) | 60 | 3,000 |  |
+| salvaged_power_armor_helmet | Armor (head) | T1 | proposed AC 6, 2/15 (base_marks 8) | — | 800 |  |
+| 50_cal_machine_gun | Weapon | T1 | 2d8+8 (burst) | 17.0 | 7,650 |  |
+| anti_materiel_rifle | Weapon | T1 | 3d10+8 | 24.5 | 5,000 |  |
+| deathclaw_gauntlet | Weapon | T1 | 2d8+8+MD | 17.0 | 4,500 |  |
+| fat_man | Weapon | T1 | 6d10+20 | 53.0 | 20,000 |  |
+| gatling_laser | Weapon | T1 | 1d8+4 (burst) | 8.5 | 4,500 |  |
+| gauss_pistol | Weapon | T1 | 3d8+9 | 22.5 | 4,950 |  |
+| gauss_rifle | Weapon | T1 | 3d10+18 | 34.5 | 7,600 |  |
+| missile_launcher | Weapon | T1 | 4d10+8 | 30.0 | 7,500 |  |
+| plasma_caster | Weapon | T1 | 4d8+10 | 28.0 | 6,150 |  |
+| plasma_grenade | Weapon | T1 | 4d10+15 | 37.0 | 900 /unit |  |
+| plasma_rifle | Weapon | T1 | 3d8+6 | 19.5 | 4,300 |  |
+| rocket_launcher | Weapon | T1 | 4d10+5 | 27.0 | 6,750 |  |
+| tesla_cannon | Weapon | T1 | 3d10+20 | 36.5 | 8,050 |  |
+| protectorate_infantry_armor | Armor | T2 | AC 20, 4/35 | 49.5 | 1,500 |  |
+| ucl_vanguard_armor | Armor | T2 | AC 20, 5/40 | 55 | 2,200 |  |
+| 14mm_pistol | Weapon | T2 | 2d8+3 | 12.0 | 2,200 |  |
+| 223_pistol | Weapon | T2 | 2d8+4 | 13.0 | 2,400 |  |
+| battle_rifle | Weapon | T2 | 2d10+6 | 17.0 | 3,300 |  |
+| chinese_officers_sword | Weapon | T2 | 1d10+6+MD | 11.5 | 2,500 |  |
+| combat_rifle | Weapon | T2 | 2d8+3 | 12.0 | 2,100 |  |
+| combat_shotgun | Weapon | T2 | 2d8+4 | 13.0 | 2,000 |  |
+| flamer | Weapon | T2 | 2d6+3 | 10.0 | 2,600 |  |
+| fractured_laser_rifle | Weapon | T2 | 2d10+6 | 17.0 | 3,750 |  |
+| gatling_gun | Weapon | T2 | 1d8+3 (burst) | 7.5 | 3,800 |  |
+| grenade_launcher | Weapon | T2 | 2d10+12 | 23.0 | 4,600 |  |
+| katana | Weapon | T2 | 2d8+6+MD | 15.0 | 3,000 |  |
+| keris | Weapon | T2 | 2d6+4 | 11.0 | 2,500 |  |
+| land_mine | Weapon | T2 | 2d10+15 | 26.0 | 550 /unit |  |
+| laser_pistol | Weapon | T2 | 2d6+4 | 11.0 | 2,400 |  |
+| laser_rifle | Weapon | T2 | 2d10+6 | 17.0 | 3,750 |  |
+| light_machine_gun | Weapon | T2 | 1d8+3 (burst) | 7.5 | 3,400 |  |
+| minigun | Weapon | T2 | 1d8+3 (burst) | 7.5 | 4,000 |  |
+| plasma_pistol | Weapon | T2 | 2d8+4 | 13.0 | 2,850 |  |
+| power_fist | Weapon | T2 | 2d6+6+MD | 13.0 | 3,000 |  |
+| riot_shotgun | Weapon | T2 | 2d8+4 | 13.0 | 2,100 |  |
+| ripper | Weapon | T2 | 2d8+6+MD | 15.0 | 2,800 |  |
+| shishkebab | Weapon | T2 | 2d8+6+MD | 15.0 | 2,900 |  |
+| sniper_rifle | Weapon | T2 | 2d10+7 | 18.0 | 3,500 |  |
+| super_sledge | Weapon | T2 | 2d8+6+MD | 15.0 | 3,200 |  |
+| combat_leather_jacket | Armor | T3 | AC 20, 2/30 | 41 | 1,100 |  |
+| leather_armor | Armor | T3 | AC 15, 2/25 | 33.5 | 550 |  |
+| malayan_infantry_armor | Armor | T3 | AC 15, 3/35 | 41.5 | 1,250 |  |
+| mercenary_armor | Armor | T3 | AC 12, 3/25 | 33.5 | 850 |  |
+| press_plate_armor_oversized | Armor | T3 | AC 15, 3/30 | 39 | 800 |  |
+| rebar_plate_vest | Armor | T3 | AC 12, 3/25 | 33.5 | 650 |  |
+| studded_leather_armor | Armor | T3 | AC 20, 3/25 | 41.5 | 750 |  |
+| supermutant_clothes | Armor | T3 | AC 10, 3/25 | 31.5 | 600 |  |
+| ucl_soldier_armor | Armor | T3 | AC 15, 2/25 | 33.5 | 1,000 |  |
+| 10mm_pistol | Weapon | T3 | 2d6+2 | 9.0 | 1,100 |  |
+| 10mm_smg | Weapon | T3 | 1d8+2 (burst) | 6.5 | 1,400 | dmg out of band: accept (burst) |
+| 44_revolver | Weapon | T3 | 2d6+3 | 10.0 | 1,300 |  |
+| assault_rifle | Weapon | T3 | 2d6+4 (burst) | 11.0 | 2,000 |  |
+| bowie_knife | Weapon | T3 | 1d8+2+MD | 6.5 | 1,000 |  |
+| double_barrel_shotgun | Weapon | T3 | 2d8+2 | 11.0 | 1,600 |  |
+| fire_axe | Weapon | T3 | 1d8+2+MD | 6.5 | 900 |  |
+| frag_grenade | Weapon | T3 | 2d8+9 | 18.0 | 350 /unit |  |
+| hunting_rifle | Weapon | T3 | 2d8+2 | 11.0 | 1,300 |  |
+| incendiary_grenade | Weapon | T3 | 2d6+6 | 13.0 | 300 /unit |  |
+| lever_action_shotgun | Weapon | T3 | 2d6+3 | 10.0 | 1,500 |  |
+| marksman_carbine | Weapon | T3 | 2d6+3 | 10.0 | 1,500 |  |
+| pump_action_shotgun | Weapon | T3 | 2d6+4 | 11.0 | 1,550 |  |
+| sawed_off_shotgun | Weapon | T3 | 2d6+3 | 10.0 | 1,300 |  |
+| sledgehammer | Weapon | T3 | 2d6+3+MD | 10.0 | 1,500 |  |
+| tommy_gun | Weapon | T3 | 2d6+3 (burst) | 10.0 | 1,900 |  |
+| axe_town_coveralls | Armor | T4 | AC 8, 2/25 | 26.5 | 400 |  |
+| ramshackle_armor | Armor | T4 | AC 8, 2/25 | 26.5 | 350 |  |
+| rusted_riot_shield_harness | Armor | T4 | AC 10, 4/15 | 29.5 | 500 |  |
+| 32_revolver | Weapon | T4 | 1d6+3 | 6.5 | 700 |  |
+| 9mm_pistol | Weapon | T4 | 1d8+3 | 7.5 | 900 |  |
+| angkasa_wrench | Weapon | T4 | 2d6+2 | 9.0 | 450 | dmg out of band: dmg → 2d4+2 |
+| axe_gang_cleaver | Weapon | T4 | 1d10+2 | 7.5 | 1,100 |  |
+| baseball_bat | Weapon | T4 | 1d8+MD | 4.5 | 800 |  |
+| brass_knuckles | Weapon | T4 | 1d10+MD | 5.5 | 400 |  |
+| cleaver | Weapon | T4 | 1d8+MD | 4.5 | 750 |  |
+| combat_knife | Weapon | T4 | 1d8+MD | 4.5 | 750 |  |
+| corroded_minigun_barrel_club | Weapon | T4 | 2d6+4 | 11.0 | 550 | dmg out of band: dmg → 2d6+1 |
+| dynamite | Weapon | T4 | 2d10+8 | 19.0 | 300 /unit |  |
+| lim_clan_straight_razor | Weapon | T4 | 1d6+1 | 4.5 | 650 |  |
+| machete | Weapon | T4 | 1d8+MD | 4.5 | 850 |  |
+| nightstick | Weapon | T4 | 1d8+MD | 4.5 | 650 |  |
+| parang | Weapon | T4 | 1d8+1 | 5.5 | 850 |  |
+| pneumatic_nail_driver | Weapon | T4 | 1d6+3 | 6.5 | 700 |  |
+| salvaged_rebar_greatsword | Weapon | T4 | 2d8 | 9.0 | 600 | dmg out of band: dmg → 2d6+1 |
+| switchblade | Weapon | T4 | 1d6+MD | 3.5 | 600 |  |
+| tire_iron | Weapon | T4 | 1d8+MD | 4.5 | 700 |  |
+| varmint_rifle | Weapon | T4 | 1d6+2 | 5.5 | 600 |  |
+| 1414_windbreaker | Armor | T5 | AC 1, 0/5 | 3.5 | 100 |  |
+| clothes | Armor | T5 | AC 1, 0/5 | 3.5 | 50 |  |
+| ghoul_wrap | Armor | T5 | AC —, — | 0 | 30 |  |
+| lim_clan_tailored_suit | Armor | T5 | AC 3, 1/10 | 11 | 1,500 | value out of band: accept (social premium) |
+| malayan_officers_uniform | Armor | T5 | AC 2, 1/7 | 8.5 | 250 |  |
+| metal_plates | Armor | T5 | AC 2.5, 1/5 | 8 | 150 |  |
+| padded_coveralls | Armor | T5 | AC 3, 0/8 | 7 | 80 |  |
+| prison_labourer_clothes | Armor | T5 | AC 0, 0/0 | 0 | 10 |  |
+| protectorate_officers_uniform | Armor | T5 | AC 3, 1/10 | 11 | 350 | value out of band: accept (social premium) |
+| rattan_basket_armor | Armor | T5 | AC 4, 1/10 | 12 | 120 |  |
+| reinforced_tarpaulin_wrap | Armor | T5 | AC 5, 1/15 | 15.5 | 250 |  |
+| tarp_poncho | Armor | T5 | AC 2, 0/5 | 4.5 | 50 |  |
+| ucl_officers_uniform | Armor | T5 | AC 2, 0/7 | 5.5 | 150 |  |
+| water_wardens_slicker | Armor | T5 | AC 2, 0/7 | 5.5 | 150 |  |
+| factory_respirator | Armor (head) | T5 | AC 1, 0/5 | 3.5 | 300 |  |
+| 1414_chain_whip | Weapon | T5 | 1d6+1 | 4.5 | 200 |  |
+| bent_rebar_spear | Weapon | T5 | 1d6 | 3.5 | 80 |  |
+| boxing_gloves | Weapon | T5 | 1d2+MD | 1.5 | 150 |  |
+| cracked_pvc_pipe_gun | Weapon | T5 | 1d4+1 | 3.5 | 120 |  |
+| golf_club | Weapon | T5 | 1d6+MD | 3.5 | 250 |  |
+| homemade_pistol | Weapon | T5 | 1d6+2 | 5.5 | 500 |  |
+| homemade_rifle | Weapon | T5 | 1d8+1 | 5.5 | 550 |  |
+| kitchen_knife | Weapon | T5 | 1d6 | 3.5 | 100 |  |
+| molotov_cocktail | Weapon | T5 | 1d10+4 | 9.5 | 150 /unit |  |
+| nail_board | Weapon | T5 | 1d6+1 | 4.5 | 100 |  |
+| pool_cue | Weapon | T5 | 1d4+MD | 2.5 | 200 |  |
+| rebar_nail_club | Weapon | T5 | 1d6+2 | 5.5 | 250 |  |
+| shovel | Weapon | T5 | 1d6+MD | 3.5 | 200 |  |
+| water_pipe_cudgel | Weapon | T5 | 1d6+1 | 4.5 | 200 |  |

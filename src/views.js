@@ -3,6 +3,16 @@ import { calculateDerivedStats, deriveCharacter, RACE_RULES, getRadiationTier, R
 import { getItem, itemDatabase } from './items.js';
 import { normalizeInventory, getInventoryQuantity } from './inventory.js';
 import { SPECIAL_INFO, SPECIAL_ORDER, SPECIAL_FLAVOR, SKILL_INFO } from './goatContent.js';
+
+// Every skill, grouped the way the dashboard shows them. Character
+// creation's tag picker reads this too, so a new skill only needs adding
+// here (plus its formula and SKILL_INFO line).
+const SKILL_CATEGORIES = {
+  "COMBAT SKILLS": ["small_guns", "big_guns", "energy_weapons", "melee_weapons", "throwing", "unarmed"],
+  "COVERT SKILLS": ["sneak", "steal", "lockpick", "traps"],
+  "SCIENCE SKILLS": ["medicine", "science", "engineering", "robotics", "gunsmith", "repair"],
+  "SOFT SKILLS": ["speech", "survival", "instinct"]
+};
 import { DIFFICULTY_TIERS } from './checks.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
@@ -290,7 +300,7 @@ export function getRegistrationView(charId, liveData) {
   const flavor = SPECIAL_FLAVOR[focusedStat];
 
   // Render Skills
-  const allSkills = ["small_guns", "big_guns", "energy_weapons", "melee_weapons", "unarmed", "throwing", "medicine", "science", "lockpick", "sneak", "speech", "survival"];
+  const allSkills = Object.values(SKILL_CATEGORIES).flat();
   const skillGrid = allSkills.map(skill => {
     const isSelected = draft.tags.includes(skill);
     const style = isSelected ? "border-color:cyan; color:cyan; background:rgba(0,255,255,0.1);" : "border-color:#333; color:#555;";
@@ -1208,12 +1218,7 @@ export function getPlayerView(charId, liveData) {
   const perksAvailable = derived.perksAllowed - perksOwned;
 
   // --- 2. SKILLS GENERATION ---
-  const skillCategories = {
-    "COMBAT SKILLS": ["small_guns", "big_guns", "energy_weapons", "melee_weapons", "throwing", "unarmed"],
-    "COVERT SKILLS": ["sneak", "steal", "lockpick", "traps"],
-    "SCIENCE SKILLS": ["medicine", "science", "engineering", "robotics", "gunsmith", "repair"],
-    "SOFT SKILLS": ["speech", "survival", "instinct"]
-  };
+  const skillCategories = SKILL_CATEGORIES;
   
   let skillsHtml = "";
   
