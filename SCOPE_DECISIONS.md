@@ -740,7 +740,7 @@ Final formulas to implement in `formulas.js`:
 
 Answers to BALANCE_PROPOSAL.md §9 and changes to its proposals.
 
-- **Currency:** 1 PD = 100 RMR, 1 Dinar = 200 RMR. RMR prices are
+- **Currency:** 1 PD = 100 RMR, 1 Dinar = 2,000 RMR (Dinar also ×10, 2026-09-22 follow-up). Tiers: RMR inflated (carries the inflation story), PD the stable middle currency, Dinar rare and valuable. RMR prices are
   ×10 across the board. The RMR economy is at the *start of
   hyperinflation*, and prices and exchange rates should read that way.
   No UCL currency. No Bond Slips.
