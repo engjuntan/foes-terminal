@@ -165,6 +165,18 @@ export const itemDatabase = {
     "weight": 15,
     "value": "TBA"
   },
+  ammo_nails: {
+    "id": "ammo_nails",
+    "name": "Nails",
+    "type": "ammo",
+    "icon": "",
+    "description": "Framing nails for the Pneumatic Nail Driver. Easy to find, easy to straighten and reuse.",
+    "image_prompt": "A dented tin of loose steel framing nails, some bent and hand-straightened, rust spots, isolated on dark background, game icon style",
+    "ammo_type": "nails",
+    "stackable": true,
+    "weight": 0.005,
+    "value": "TBA"
+  },
   plasma_cartridge: {
     "id": "plasma_cartridge",
     "name": "Plasma Cartridge",
@@ -492,9 +504,9 @@ export const itemDatabase = {
     "weight": 16,
     "value": "TBA"
   },
-  prison_slave_clothes: {
-    "id": "prison_slave_clothes",
-    "name": "Prison/Slave Clothes",
+  prison_labourer_clothes: {
+    "id": "prison_labourer_clothes",
+    "name": "Prison/Labourer Clothes",
     "type": "armor",
     "slot": "body",
     "size": "medium",
@@ -1477,9 +1489,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — field notes on charge weapons by a ghoul engineer.",
     "image_prompt": "Loose technical notes on capacitors and charge weapons, faintly scorched at the edges, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Energy Weapons skill",
+    "effect": "Permanently grants +5 Energy Weapons skill",
     "stats": {
-      "skill_energy_weapons": 1,
+      "skill_energy_weapons": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1493,9 +1505,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a working thief's private notes on lifting.",
     "image_prompt": "A cramped little notebook in tight shorthand, hidden binding, no title, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Steal skill",
+    "effect": "Permanently grants +5 Steal skill",
     "stats": {
-      "skill_steal": 1,
+      "skill_steal": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1509,9 +1521,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a wanderer's running log of water, forage and terrain.",
     "image_prompt": "A travel-worn log book with hand-drawn water maps, string-tied covers, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Survival skill",
+    "effect": "Permanently grants +5 Survival skill",
     "stats": {
-      "skill_survival": 1,
+      "skill_survival": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1525,9 +1537,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a raider's crude primer on thrown explosives.",
     "image_prompt": "A crude hand-stapled pamphlet on grenade handling, scrawled warnings in the margins, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Throwing skill",
+    "effect": "Permanently grants +5 Throwing skill",
     "stats": {
-      "skill_throwing": 1,
+      "skill_throwing": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1541,9 +1553,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a salvager's hard-won notes on disabled robots.",
     "image_prompt": "A salvager's notebook with robot schematics and warning annotations, oil-smudged, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Robotics skill",
+    "effect": "Permanently grants +5 Robotics skill",
     "stats": {
-      "skill_robotics": 1,
+      "skill_robotics": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1557,9 +1569,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a scout's field diary on moving unseen.",
     "image_prompt": "A weathered field diary with terrain sketches and movement notes, elastic band closure, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Sneak skill",
+    "effect": "Permanently grants +5 Sneak skill",
     "stats": {
-      "skill_sneak": 1,
+      "skill_sneak": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1573,9 +1585,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a working thief's practical notes on locks.",
     "image_prompt": "A slim pocket notebook of lock diagrams and timings, pencil smudges throughout, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Lockpick skill",
+    "effect": "Permanently grants +5 Lockpick skill",
     "stats": {
-      "skill_lockpick": 1,
+      "skill_lockpick": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1589,9 +1601,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a merchant's collected techniques of persuasion.",
     "image_prompt": "A merchant's leather-bound book of sales patter, ribbon bookmark, worn edges, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Speech skill",
+    "effect": "Permanently grants +5 Speech skill",
     "stats": {
-      "skill_speech": 1,
+      "skill_speech": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1605,9 +1617,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a trapper's hand-bound field guide.",
     "image_prompt": "A hand-bound field guide of trap diagrams drawn in ink, twine binding, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Traps skill",
+    "effect": "Permanently grants +5 Traps skill",
     "stats": {
-      "skill_traps": 1,
+      "skill_traps": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1621,9 +1633,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a field medic's working log.",
     "image_prompt": "A field medic's log book with a faded red cross on the cover, tabbed pages, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Medicine skill",
+    "effect": "Permanently grants +5 Medicine skill",
     "stats": {
-      "skill_medicine": 1,
+      "skill_medicine": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1637,9 +1649,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a loan shark's euphemistic handbook. No formal subject exists for this.",
     "image_prompt": "A cheaply printed handbook with a smiling businessman on the cover, red and gold design, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Steal skill",
+    "effect": "Permanently grants +5 Steal skill",
     "stats": {
-      "skill_steal": 1,
+      "skill_steal": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1653,9 +1665,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — school Bahasa Malaysia textbook, speech and debate module.",
     "image_prompt": "A school language textbook open to a public speaking chapter with podium illustrations, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Speech skill",
+    "effect": "Permanently grants +5 Speech skill",
     "stats": {
-      "skill_speech": 1,
+      "skill_speech": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1669,9 +1681,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — pre-War spy serial, unexpectedly instructive.",
     "image_prompt": "A pulp spy novel with a shadowed figure on the cover, cheap paper yellowed, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Sneak skill",
+    "effect": "Permanently grants +5 Sneak skill",
     "stats": {
-      "skill_sneak": 1,
+      "skill_sneak": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1685,9 +1697,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — pre-War regional medical journal.",
     "image_prompt": "A pre-war medical journal with a clinical cover design, water-damaged corner, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Medicine skill",
+    "effect": "Permanently grants +5 Medicine skill",
     "stats": {
-      "skill_medicine": 1,
+      "skill_medicine": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1701,9 +1713,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — small arms trade magazine, the Peninsula's edition of the pre-War standard. One-time read, permanent bonus.",
     "image_prompt": "A worn pre-war firearms trade magazine, cover showing a rifle diagram, creased and water-stained, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Small Guns skill",
+    "effect": "Permanently grants +5 Small Guns skill",
     "stats": {
-      "skill_small_guns": 1,
+      "skill_small_guns": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1717,9 +1729,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — heavy weapons trade quarterly.",
     "image_prompt": "A heavy-stock trade magazine with a minigun on the cover, corner torn off, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Big Guns skill",
+    "effect": "Permanently grants +5 Big Guns skill",
     "stats": {
-      "skill_big_guns": 1,
+      "skill_big_guns": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1733,9 +1745,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — pre-War outdoors magazine, now read very differently.",
     "image_prompt": "A pre-war outdoor recreation magazine, jungle photograph cover, heavily thumbed, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Survival skill",
+    "effect": "Permanently grants +5 Survival skill",
     "stats": {
-      "skill_survival": 1,
+      "skill_survival": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1749,9 +1761,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — pre-War regional engineering journal.",
     "image_prompt": "A dense technical engineering journal, structural diagrams, institutional cover design, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Engineering skill",
+    "effect": "Permanently grants +5 Engineering skill",
     "stats": {
-      "skill_engineering": 1,
+      "skill_engineering": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1765,9 +1777,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — school local studies textbook, environment module.",
     "image_prompt": "A school local studies textbook open to a regional map and rainfall chart, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Survival skill",
+    "effect": "Permanently grants +5 Survival skill",
     "stats": {
-      "skill_survival": 1,
+      "skill_survival": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1781,9 +1793,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — the surviving first lesson of a mail-order course. No formal subject exists for this.",
     "image_prompt": "A single mail-order correspondence lesson in a torn envelope, official-looking letterhead, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Instinct skill",
+    "effect": "Permanently grants +5 Instinct skill",
     "stats": {
-      "skill_instinct": 1,
+      "skill_instinct": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1797,9 +1809,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — primary school Living Skills textbook, metalcraft module.",
     "image_prompt": "A school Living Skills textbook open to a metalwork module with hand-tool diagrams, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Melee Weapons skill",
+    "effect": "Permanently grants +5 Melee Weapons skill",
     "stats": {
-      "skill_melee_weapons": 1,
+      "skill_melee_weapons": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1813,9 +1825,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — school Living Skills textbook, simple mechanisms module.",
     "image_prompt": "A school textbook open to a simple mechanisms chapter showing levers and pin diagrams, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Lockpick skill",
+    "effect": "Permanently grants +5 Lockpick skill",
     "stats": {
-      "skill_lockpick": 1,
+      "skill_lockpick": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1828,9 +1840,9 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — lockpick trade magazine, mainline 'Tumblers Today' analogue. One-time use, permanent bonus. Uses the same skill_<name> key convention formulas.js already reads for trait/perk modifiers.",
-    "effect": "Permanently grants +1 Lockpick skill",
+    "effect": "Permanently grants +5 Lockpick skill",
     "stats": {
-      "skill_lockpick": 1,
+      "skill_lockpick": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1844,9 +1856,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a sentimental story collection about trusting your gut.",
     "image_prompt": "A sentimental inspirational story collection with a warm homely cover illustration, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Instinct skill",
+    "effect": "Permanently grants +5 Instinct skill",
     "stats": {
-      "skill_instinct": 1,
+      "skill_instinct": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1860,9 +1872,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a pit fighter's personal diary.",
     "image_prompt": "A small battered diary, bloodstained thumbprint on the cover, terse handwritten entries, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Unarmed skill",
+    "effect": "Permanently grants +5 Unarmed skill",
     "stats": {
-      "skill_unarmed": 1,
+      "skill_unarmed": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1876,9 +1888,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — pre-War athletics manual on throwing events.",
     "image_prompt": "A pre-war athletics manual with a javelin thrower on the cover, olympic rings faded, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Throwing skill",
+    "effect": "Permanently grants +5 Throwing skill",
     "stats": {
-      "skill_throwing": 1,
+      "skill_throwing": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1892,9 +1904,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — school PE textbook, handball unit.",
     "image_prompt": "A school PE textbook open to a handball unit, throwing-motion illustrations, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Throwing skill",
+    "effect": "Permanently grants +5 Throwing skill",
     "stats": {
-      "skill_throwing": 1,
+      "skill_throwing": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1908,9 +1920,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — school PE textbook, silat unit.",
     "image_prompt": "A school physical education textbook open to a silat unit with stance photographs, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Unarmed skill",
+    "effect": "Permanently grants +5 Unarmed skill",
     "stats": {
-      "skill_unarmed": 1,
+      "skill_unarmed": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1924,9 +1936,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — illustrated silat form manual, blade chapter included.",
     "image_prompt": "An illustrated martial arts form manual showing sequential stances, traditional Southeast Asian design, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Melee Weapons skill",
+    "effect": "Permanently grants +5 Melee Weapons skill",
     "stats": {
-      "skill_melee_weapons": 1,
+      "skill_melee_weapons": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1940,9 +1952,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — school health education textbook, first aid module.",
     "image_prompt": "A school health education textbook open to a first aid module with bandaging diagrams, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Medicine skill",
+    "effect": "Permanently grants +5 Medicine skill",
     "stats": {
-      "skill_medicine": 1,
+      "skill_medicine": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1956,9 +1968,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — pre-War trapping quarterly.",
     "image_prompt": "A trapping trade magazine with a snare diagram cover, damp-warped pages, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Traps skill",
+    "effect": "Permanently grants +5 Traps skill",
     "stats": {
-      "skill_traps": 1,
+      "skill_traps": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1972,9 +1984,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a student's tongue-in-cheek guide to truancy. No formal subject exists for this.",
     "image_prompt": "A crudely photocopied student zine about skipping class, hand-drawn school map on the cover, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Sneak skill",
+    "effect": "Permanently grants +5 Sneak skill",
     "stats": {
-      "skill_sneak": 1,
+      "skill_sneak": 5,
       "permanent": true
     },
     "addictive": false,
@@ -1988,9 +2000,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — school Design & Technology textbook, metal workshop module.",
     "image_prompt": "A school workshop textbook open to metalworking techniques with tool photographs, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Gunsmith skill",
+    "effect": "Permanently grants +5 Gunsmith skill",
     "stats": {
-      "skill_gunsmith": 1,
+      "skill_gunsmith": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2004,9 +2016,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — school Design & Technology textbook, mechanisms module.",
     "image_prompt": "A school design and technology textbook open to a mechanisms chapter with lever diagrams, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Traps skill",
+    "effect": "Permanently grants +5 Traps skill",
     "stats": {
-      "skill_traps": 1,
+      "skill_traps": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2020,9 +2032,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — school Design & Technology textbook, complete.",
     "image_prompt": "A thick school design and technology textbook, bright cover, annotated margins, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Engineering skill",
+    "effect": "Permanently grants +5 Engineering skill",
     "stats": {
-      "skill_engineering": 1,
+      "skill_engineering": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2036,9 +2048,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — pre-War robotics magazine.",
     "image_prompt": "A retro-futurist robotics magazine with a friendly robot on the cover, optimistic design, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Robotics skill",
+    "effect": "Permanently grants +5 Robotics skill",
     "stats": {
-      "skill_robotics": 1,
+      "skill_robotics": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2052,9 +2064,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — primary school science textbook, Year 5.",
     "image_prompt": "A primary school science textbook, bright cover with cartoon scientists, worn corners, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Science skill",
+    "effect": "Permanently grants +5 Science skill",
     "stats": {
-      "skill_science": 1,
+      "skill_science": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2068,9 +2080,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — primary school science textbook, electricity chapter.",
     "image_prompt": "A primary school science textbook open to an electricity chapter, child's colouring on the diagram, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Energy Weapons skill",
+    "effect": "Permanently grants +5 Energy Weapons skill",
     "stats": {
-      "skill_energy_weapons": 1,
+      "skill_energy_weapons": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2083,9 +2095,9 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — pre-war children's science magazine, mainline 'Big Book of Science' analogue. One-time use, permanent bonus. Uses the same skill_<name> key convention formulas.js already reads for trait/perk modifiers.",
-    "effect": "Permanently grants +1 Science skill",
+    "effect": "Permanently grants +5 Science skill",
     "stats": {
-      "skill_science": 1,
+      "skill_science": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2099,9 +2111,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — school science textbook, future technology chapter.",
     "image_prompt": "A school science textbook open to a cheerful future-technology chapter with robot illustrations, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Robotics skill",
+    "effect": "Permanently grants +5 Robotics skill",
     "stats": {
-      "skill_robotics": 1,
+      "skill_robotics": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2115,9 +2127,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a scrapyard's running log of heavy weapons salvage.",
     "image_prompt": "A thick ledger of handwritten heavy-weapon salvage notes, many entries struck through, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Big Guns skill",
+    "effect": "Permanently grants +5 Big Guns skill",
     "stats": {
-      "skill_big_guns": 1,
+      "skill_big_guns": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2131,9 +2143,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — pre-War energy weapons weekly.",
     "image_prompt": "A glossy pre-war energy weapons magazine, laser rifle on the cover, sun-bleached, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Energy Weapons skill",
+    "effect": "Permanently grants +5 Energy Weapons skill",
     "stats": {
-      "skill_energy_weapons": 1,
+      "skill_energy_weapons": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2146,9 +2158,9 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — ties to the knowledge-scarcity theme. One-time use, permanent small skill bonus on read. No target skill was specified in the original flavor text; guessed Speech (a lineage/heritage document trading on social standing) rather than leaving it unresolved — worth confirming or retargeting.",
-    "effect": "Permanently grants +1 Speech skill",
+    "effect": "Permanently grants +5 Speech skill",
     "stats": {
-      "skill_speech": 1,
+      "skill_speech": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2162,9 +2174,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a bench gunsmith's running modification log.",
     "image_prompt": "A workshop log book of weapon modifications, tick marks and crossings-out, oil stains, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Gunsmith skill",
+    "effect": "Permanently grants +5 Gunsmith skill",
     "stats": {
-      "skill_gunsmith": 1,
+      "skill_gunsmith": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2178,9 +2190,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a hand-bound field notebook on improvised firearms.",
     "image_prompt": "A hand-bound notebook stuffed with loose diagrams of improvised guns, grease-stained pages, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Small Guns skill",
+    "effect": "Permanently grants +5 Small Guns skill",
     "stats": {
-      "skill_small_guns": 1,
+      "skill_small_guns": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2194,9 +2206,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a pocket-sized trade guide to lifting.",
     "image_prompt": "A tiny pocket-sized guidebook, comically small, worn cloth cover, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Steal skill",
+    "effect": "Permanently grants +5 Steal skill",
     "stats": {
-      "skill_steal": 1,
+      "skill_steal": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2210,9 +2222,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a working journal of post-collapse experiments.",
     "image_prompt": "A thick handwritten research journal, taped spine, pressed samples between pages, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Science skill",
+    "effect": "Permanently grants +5 Science skill",
     "stats": {
-      "skill_science": 1,
+      "skill_science": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2226,9 +2238,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a working engineer's scrapyard workbook.",
     "image_prompt": "A grease-stained workbook full of repair schematics, metal clip binding, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Engineering skill",
+    "effect": "Permanently grants +5 Engineering skill",
     "stats": {
-      "skill_engineering": 1,
+      "skill_engineering": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2242,9 +2254,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a scrapyard smith's primer on improvised blades.",
     "image_prompt": "A grubby workshop primer on improvised blade-making, metal shavings in the spine, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Melee Weapons skill",
+    "effect": "Permanently grants +5 Melee Weapons skill",
     "stats": {
-      "skill_melee_weapons": 1,
+      "skill_melee_weapons": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2258,9 +2270,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — pre-War weaponsmithing trade journal.",
     "image_prompt": "A weaponsmithing trade journal with exploded gun diagrams on the cover, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Gunsmith skill",
+    "effect": "Permanently grants +5 Gunsmith skill",
     "stats": {
-      "skill_gunsmith": 1,
+      "skill_gunsmith": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2274,9 +2286,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — pre-War fighting magazine.",
     "image_prompt": "A pulp fighting magazine with two boxers on the cover, dog-eared and taped, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Unarmed skill",
+    "effect": "Permanently grants +5 Unarmed skill",
     "stats": {
-      "skill_unarmed": 1,
+      "skill_unarmed": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2290,9 +2302,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — bound university lecture notes on heavy weapon systems.",
     "image_prompt": "Bound university lecture notes, faded institutional crest on the cover, technical diagrams, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Big Guns skill",
+    "effect": "Permanently grants +5 Big Guns skill",
     "stats": {
-      "skill_big_guns": 1,
+      "skill_big_guns": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2306,9 +2318,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — a study of intuition and threat perception.",
     "image_prompt": "A sober academic-looking paperback on intuition, plain typographic cover, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Instinct skill",
+    "effect": "Permanently grants +5 Instinct skill",
     "stats": {
-      "skill_instinct": 1,
+      "skill_instinct": 5,
       "permanent": true
     },
     "addictive": false,
@@ -2322,9 +2334,9 @@ export const itemDatabase = {
     "icon": "",
     "description": "Skill book — pre-War military training pamphlet, relentlessly cheerful.",
     "image_prompt": "A thin pre-war military training pamphlet with a smiling cartoon soldier on the cover, isolated on dark background, game icon style",
-    "effect": "Permanently grants +1 Small Guns skill",
+    "effect": "Permanently grants +5 Small Guns skill",
     "stats": {
-      "skill_small_guns": 1,
+      "skill_small_guns": 5,
       "permanent": true
     },
     "addictive": false,
@@ -4075,7 +4087,8 @@ export const itemDatabase = {
     "stats": {
       "dmg": "TBA",
       "dmgType": "normal",
-      "range": "TBA"
+      "range": "TBA",
+      "ammo_type": "nails"
     },
     "weight": 3,
     "value": "TBA"

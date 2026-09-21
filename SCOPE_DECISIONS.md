@@ -735,3 +735,34 @@ Final formulas to implement in `formulas.js`:
   Dollar). Some data logs say "caps" — to reconcile.
 - **Order:** statuses panel → reroll → durability → repair/salvage →
   reputation → shop → special skills (details in the GM's PDF).
+
+## Balance proposal — GM rulings (2026-09-22)
+
+Answers to BALANCE_PROPOSAL.md §9 and changes to its proposals.
+
+- **Currency:** 1 PD = 100 RMR, 1 Dinar = 200 RMR. RMR prices are
+  ×10 across the board. The RMR economy is at the *start of
+  hyperinflation*, and prices and exchange rates should read that way.
+  No UCL currency. No Bond Slips.
+- **Durability penalties start at 1 mark:** weapon damage ×0.95 per
+  mark (×0.95 at 1, ×0.90 at 2, …), same linear progression for the
+  other penalties.
+- **Item tiers:** every item balanced into five tiers — T5 Homemade →
+  T4 Salvaged → T3 Baseline → T2 Improved → T1 Pre-War/Pristine.
+- **Reputation:** drop the Antipathy tier.
+- **Crit-fail entries 6 and 7** go back to adding condition marks: 1d3.
+- **Backfire** sets the weapon Broken (repairable); it no longer
+  destroys it.
+- **Repair** is instant and capped by skill (like crafting). Higher
+  Repair skill adds a chance not to consume the components.
+- **Heavy Handed:** the proposal's reading stands.
+- **Healing on every clock advance** stays: no day-to-day HP attrition.
+  Hunger and thirst are the attrition.
+- **Head slot** stays shared by glasses and helmets, intentionally —
+  that's part of Short-Sighted's cost.
+- **Pneumatic Nail Driver** fires a new `nails` ammo.
+- **Humanoid NPCs** are built like PCs (generic SPECIAL). If that makes
+  them harder to hit, rebalance so it doesn't.
+- **Bestiary:** `slave` / `supermutant_slave` renamed to labourers.
+- **Skill books** grant +5 skill points each, and reading one advances
+  game time.

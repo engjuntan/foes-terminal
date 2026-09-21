@@ -1,5 +1,5 @@
 // src/views.js
-import { calculateDerivedStats, RACE_RULES, getRadiationTier, RAD_THRESHOLDS, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
+import { calculateDerivedStats, deriveCharacter, RACE_RULES, getRadiationTier, RAD_THRESHOLDS, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
 import { getItem, itemDatabase } from './items.js';
 import { normalizeInventory, getInventoryQuantity } from './inventory.js';
 import { SPECIAL_INFO, SPECIAL_ORDER, SPECIAL_FLAVOR, SKILL_INFO } from './goatContent.js';
@@ -624,7 +624,7 @@ export function getCombatView(liveData, userRole, currentUser) {
           if (attackDef) attackerValue = attackDef.hit_percent;
         } else {
           const char = liveData.characters[currentActor.char_id];
-          const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
+          const derived = deriveCharacter(char);
           if (!draft.attackKey || draft.attackKey === 'unarmed') {
             attackerValue = derived.skills.unarmed;
           } else {
@@ -641,7 +641,7 @@ export function getCombatView(liveData, userRole, currentUser) {
           targetAC = target.ac;
         } else {
           const targetChar = liveData.characters[target.char_id];
-          const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0, {}, targetChar.needs || {}, targetChar.permanent_skill_bonuses || {});
+          const targetDerived = deriveCharacter(targetChar);
           targetAC = targetDerived.armorClass;
         }
         if (attackerValue !== null && targetAC !== null) {
@@ -1195,19 +1195,7 @@ export function getPlayerView(charId, liveData) {
   const activeStatusEffects = charData.status_effects || [];
 
   // PASS RACE + STATUS EFFECTS + EQUIPMENT TO FORMULAS
-  const derived = calculateDerivedStats(
-    charData.special,
-    charData.level || 1,
-    charData.traits || [],
-    charData.perks || [],
-    charData.race || 'human', // Default to human if missing
-    activeStatusEffects,
-    equip,
-    charData.rads || 0,
-    charData.inventory || {},
-    charData.needs || {},
-    charData.permanent_skill_bonuses || {}
-  );
+  const derived = deriveCharacter(charData);
 
   // --- 1. LEVEL UP & PERKS STATE ---
   const availablePoints = charData.skill_points || 0;
@@ -1250,7 +1238,7 @@ export function getPlayerView(charId, liveData) {
       const addedSteps = draft.allocation[key] || 0;
       const addedValue = isTagged ? (addedSteps * 2) : addedSteps; 
       
-      const baseVal = derived.skills[key] + (charData.skill_ranks?.[key] || 0) + (isTagged ? 20 : 0);
+      const baseVal = derived.skills[key]; // ranks + tag bonus already included (deriveCharacter)
       const totalVal = baseVal + addedValue;
 
       let controls = "";
@@ -1500,11 +1488,7 @@ export function getWorkshopView(charId, liveData) {
   const inventory = normalizeInventory(charData.inventory);
   const stations = charData.stations || {};
 
-  const derived = calculateDerivedStats(
-    charData.special, charData.level || 1, charData.traits || [], charData.perks || [],
-    charData.race || 'human', charData.status_effects || [], charData.equipment || {},
-    charData.rads || 0, charData.inventory || {}, charData.needs || {}, charData.permanent_skill_bonuses || {}
-  );
+  const derived = deriveCharacter(charData);
 
   // COMPONENTS — every item authored as type:"component", dimmed at 0.
   // Not hardcoded to the 9 ids CRAFTING_SPEC.md proposes, so a newly

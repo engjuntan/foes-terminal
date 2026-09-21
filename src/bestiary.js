@@ -290,6 +290,68 @@ export const bestiaryDatabase = {
       }
     ]
   },
+  labourer: {
+    "id": "labourer",
+    "name": "Labourer",
+    "type": "monster",
+    "creature_type": "Human/Ghoul/Mutant",
+    "icon": "",
+    "description": "A labourer, worn down by hard manual work. Hungry and tired. May carry a sledgehammer. Won't fight unless their foreman orders it, and stops once the foreman is down. Killing a labourer costs the PC -10 Karma.",
+    "notes": "Has 1 attack and 1 move. Not interested in fighting, unless forced.",
+    "stats": {
+      "hp": 35,
+      "variance_bias": "normal",
+      "sequence": 10,
+      "crit_chance": 5,
+      "ac": 5,
+      "dtdr": {
+        "normal": {
+          "dt": 0,
+          "dr": 0
+        },
+        "laser": {
+          "dt": 0,
+          "dr": 0
+        },
+        "fire": {
+          "dt": 0,
+          "dr": 0
+        },
+        "plasma": {
+          "dt": 0,
+          "dr": 0
+        },
+        "explosive": {
+          "dt": 0,
+          "dr": 0
+        }
+      },
+      "resistances": {
+        "energy": 0,
+        "poison": 0,
+        "rad": 0,
+        "gas": 0
+      },
+      "special": {
+        "str": 4,
+        "per": 4,
+        "end": 3,
+        "cha": 4,
+        "int": 5,
+        "agi": 4,
+        "luk": 4
+      }
+    },
+    "attacks": [
+      {
+        "name": "Melee",
+        "hit_percent": 55,
+        "action": "Attack",
+        "damage": "1d4+1",
+        "effect": "none"
+      }
+    ]
+  },
   lesser_panguling: {
     "id": "lesser_panguling",
     "name": "Lesser Panguling",
@@ -940,68 +1002,6 @@ export const bestiaryDatabase = {
       }
     ]
   },
-  slave: {
-    "id": "slave",
-    "name": "Slave",
-    "type": "monster",
-    "creature_type": "Human/Ghoul/Mutant",
-    "icon": "",
-    "description": "A slave. Forced to do manual labor. Are hungry and tired. May have a sledgehammer with him. Will only fight if Master commands him to, and will stop if the Master/Binding is finished. If slaves are slayed PC takes -10 Karma.",
-    "notes": "Has 1 attack and 1 move. Not interested in fighting, unless forced.",
-    "stats": {
-      "hp": 35,
-      "variance_bias": "normal",
-      "sequence": 10,
-      "crit_chance": 5,
-      "ac": 5,
-      "dtdr": {
-        "normal": {
-          "dt": 0,
-          "dr": 0
-        },
-        "laser": {
-          "dt": 0,
-          "dr": 0
-        },
-        "fire": {
-          "dt": 0,
-          "dr": 0
-        },
-        "plasma": {
-          "dt": 0,
-          "dr": 0
-        },
-        "explosive": {
-          "dt": 0,
-          "dr": 0
-        }
-      },
-      "resistances": {
-        "energy": 0,
-        "poison": 0,
-        "rad": 0,
-        "gas": 0
-      },
-      "special": {
-        "str": 4,
-        "per": 4,
-        "end": 3,
-        "cha": 4,
-        "int": 5,
-        "agi": 4,
-        "luk": 4
-      }
-    },
-    "attacks": [
-      {
-        "name": "Melee",
-        "hit_percent": 55,
-        "action": "Attack",
-        "damage": "1d4+1",
-        "effect": "none"
-      }
-    ]
-  },
   soldier_ant: {
     "id": "soldier_ant",
     "name": "Soldier Ant (Semut Askar)",
@@ -1064,13 +1064,13 @@ export const bestiaryDatabase = {
       }
     ]
   },
-  supermutant_slave: {
-    "id": "supermutant_slave",
-    "name": "Supermutant Slave",
+  supermutant_labourer: {
+    "id": "supermutant_labourer",
+    "name": "Supermutant Labourer",
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
-    "description": "A supermutant slave. Forced to do manual labor. Are hungry and tired. May have a sledgehammer with him. Will only fight if Master commands him to, and will stop if the Master/Binding is finished.",
+    "description": "A supermutant labourer, worn down by hard manual work. Hungry and tired. May carry a sledgehammer. Won't fight unless their foreman orders it, and stops once the foreman is down.",
     "notes": "Has 1 attack and 1 move. Not interested in fighting, unless forced.",
     "stats": {
       "hp": 60,

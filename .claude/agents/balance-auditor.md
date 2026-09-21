@@ -48,6 +48,13 @@ Never edit `src/`, the vault, or the specs. The GM decides what's adopted.
 - Mark each recommendation **CHANGE** (alters an existing number or
   formula — list every item/trait affected) or **NEW** (fills a gap).
 - Where items say `"TBA"` for value or damage, propose a number.
+- **Balance items in five tiers**, weakest to best: **T5 Homemade → T4
+  Salvaged → T3 Baseline → T2 Improved → T1 Pre-War/Pristine.** Place
+  every weapon and armor piece in a tier, give each tier a band for
+  damage/protection and value, and flag items that sit outside their
+  tier's band. Tier sets the ceiling; condition marks wear it down.
+- **Prices reflect early hyperinflation in RMR.** RMR prices are
+  high and unstable; PD and Dinar are the stable stores of value.
 
 ## Report structure
 
@@ -63,7 +70,7 @@ Write the proposal file with these sections (skip any the brief excludes):
 4. **Currency exchange** — official and black-market rates between RMR,
    Dinar and Protectorate Dollar, grounded in each currency's vault page
    (`Items/Currency/`). Include how the rate shifts by region/faction
-   and what counterfeits and Federation Bond Slips do to it.
+   and what counterfeits do to it (no Bond Slips).
 5. **Barter** — buy/sell price modifiers from Barter skill and Charisma,
    and a hook for reputation (tiers are specced in SCOPE_DECISIONS).
 6. **Combat** — hit chance, damage vs DT/DR, crit rates, turns-to-kill

@@ -3,7 +3,7 @@ import { doc, updateDoc, setDoc, getDoc, deleteField } from "firebase/firestore"
 import { db } from './firebase.js'; // Imports the connection we made in File 1
 import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
-import { RACE_RULES, calculateDerivedStats, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
+import { RACE_RULES, calculateDerivedStats, deriveCharacter, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
 import { getMonster } from './bestiary.js';
 import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
@@ -518,7 +518,7 @@ export async function gmSetNeed(targetCharId, needKey, value) {
 // needs over what's fictionally a few minutes. Blocked below for that
 // reason, not just as a courtesy.
 export async function advanceTime(minutes, opts = {}) {
-  const { isRest = false, initiatedBy = 'GM' } = opts;
+  const { isRest = false, initiatedBy = 'GM', reason = '' } = opts;
   if (!window.liveData) return;
   // active_combat is never cleared after combat ends, only its is_active
   // flag flips false (see endCombat()) — checking the object's mere
@@ -547,7 +547,7 @@ export async function advanceTime(minutes, opts = {}) {
     // healingRateCap depends on EN, which the needs tiers themselves can
     // penalize (Famished/Starving hit END) — derive it from needs BEFORE
     // this tick's decay, since that's the state the character rested in.
-    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
+    const derived = deriveCharacter(char);
     const healed = rollRestHealing(derived.healingRateCap, hoursElapsed, isLongRest);
     const totalDamage = damage.hunger + damage.thirst + damage.sleep;
 
@@ -575,7 +575,9 @@ export async function advanceTime(minutes, opts = {}) {
   const fromLabel = formatGameTime(currentMinutes).label;
   const toLabel = formatGameTime(currentMinutes + mins).label;
   const hoursLabel = Number.isInteger(hoursElapsed) ? `${hoursElapsed}h` : `${hoursElapsed.toFixed(1)}h`;
-  const header = isRest ? `${initiatedBy} calls for a rest (${hoursLabel}).` : `${initiatedBy} advances time by ${hoursLabel}.`;
+  const header = isRest ? `${initiatedBy} calls for a rest (${hoursLabel}).`
+    : reason ? `${initiatedBy} ${reason} (${hoursLabel}).`
+    : `${initiatedBy} advances time by ${hoursLabel}.`;
   const body = `${header}\n${fromLabel} → ${toLabel}${reportLines.length ? '\n' + reportLines.join('\n') : ''}`;
 
   const currentMessages = window.liveData.messages || [];
@@ -627,6 +629,11 @@ export async function gmAdvanceTimeAction() {
 // counter — so those stay reference-only until that system exists.
 // Callable by the character themselves or the GM on their behalf, same
 // permission shape as everything else here.
+// Reading a skill book takes in-game time (GM ruling, 2026-09-22). The
+// clock is shared, so a read advances it for the whole party — hunger and
+// thirst tick for everyone. A book can override this with `read_minutes`.
+const SKILL_BOOK_READ_MINUTES = 60;
+
 export async function useItem(targetCharId, itemId) {
   const char = window.liveData.characters[targetCharId];
   if (!char) return;
@@ -634,6 +641,13 @@ export async function useItem(targetCharId, itemId) {
   if (owned < 1) { alert(`${(char.name || 'THIS CHARACTER').toUpperCase()} DOESN'T HAVE THAT ITEM`); return; }
   const item = getItem(itemId);
   if (!item) return;
+  const isSkillBook = !!(item.stats && item.stats.permanent);
+  // advanceTime() refuses during combat, so a book read mid-fight would
+  // grant the bonus without the time cost — refuse the read instead.
+  if (isSkillBook && window.liveData.active_combat && window.liveData.active_combat.is_active) {
+    alert("NO TIME TO READ DURING COMBAT"); return;
+  }
+  let readMinutes = 0;
 
   const updatePayload = {};
   updatePayload[`characters.${targetCharId}.inventory`] = removeFromInventory(char.inventory, itemId, 1);
@@ -681,6 +695,7 @@ export async function useItem(targetCharId, itemId) {
       updatePayload[`characters.${targetCharId}.permanent_skill_bonuses`] = currentBonuses;
       updatePayload[`characters.${targetCharId}.read_skill_books`] = [...(char.read_skill_books || []), itemId];
       msgParts.push(`permanently gained +${bonus} ${skillKey.replace(/_/g, ' ')}`);
+      readMinutes = Number(item.read_minutes) || SKILL_BOOK_READ_MINUTES;
     } else if (modKey && alreadyRead) {
       msgParts.push(`already learned everything this book can teach`);
     }
@@ -710,7 +725,8 @@ export async function useItem(targetCharId, itemId) {
   try {
     await updateDoc(charRef, updatePayload);
     alert(usedMsg);
-  } catch (err) { alert("ERROR: " + err.message); }
+  } catch (err) { alert("ERROR: " + err.message); return; }
+  if (readMinutes) await advanceTime(readMinutes, { initiatedBy: char.name || targetCharId, reason: `reads ${item.name}` });
 }
 
 // --- CRAFTING ---
@@ -731,7 +747,7 @@ export async function craftItem(recipeId) {
   const outputItem = getItem(recipe.produces && recipe.produces.item);
   if (!outputItem) { alert("THIS RECIPE'S OUTPUT ITEM IS MISSING — TELL YOUR GM"); return; }
 
-  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
+  const derived = deriveCharacter(char);
   const { ok, reasons } = canCraft(recipe, char, derived.skills);
   if (!ok) { alert(reasons.join('\n')); return; }
 
@@ -827,7 +843,7 @@ export async function giveItem(itemId, qty, toCharId) {
 
   const itemWeight = typeof item.weight === 'number' ? item.weight : 0;
   if (itemWeight > 0) {
-    const toDerived = calculateDerivedStats(toChar.special, toChar.level || 1, toChar.traits || [], toChar.perks || [], toChar.race || 'human', toChar.status_effects || [], toChar.equipment || {}, toChar.rads || 0, toChar.inventory || {}, toChar.needs || {}, toChar.permanent_skill_bonuses || {});
+    const toDerived = deriveCharacter(toChar);
     const projectedUsed = toDerived.carryUsed + (itemWeight * qty);
     if (projectedUsed > toDerived.carryCapacity * CARRY_OVERAGE_ALLOWANCE) {
       alert(`${toChar.name.toUpperCase()} CAN'T CARRY THAT MUCH — OVER CAPACITY`);
@@ -1180,10 +1196,7 @@ export async function startCombat() {
   const characters = window.liveData.characters || {};
   Object.entries(characters).forEach(([charId, char]) => {
     if (!char.is_finalized) return;
-    const derived = calculateDerivedStats(
-      char.special, char.level || 1, char.traits || [], char.perks || [],
-      char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {}
-    );
+    const derived = deriveCharacter(char);
     const { roll, total } = rollInitiative(derived.sequenceBonus);
     initiative_order.push({
       combatant_id: `pc_${charId}`,
@@ -1349,7 +1362,7 @@ export async function resolveAttack() {
     attackerValue = attackDef.hit_percent;
   } else {
     const char = window.liveData.characters[attacker.char_id];
-    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
+    const derived = deriveCharacter(char);
     const wantsMelee = !draft.attackKey || draft.attackKey === 'unarmed' || (() => {
       const wi = getItem(draft.attackKey);
       return !wi || !wi.stats || (wi.stats.range || 0) <= 1;
@@ -1402,7 +1415,7 @@ export async function resolveAttack() {
     targetName = target.name;
   } else {
     const targetChar = window.liveData.characters[target.char_id];
-    const targetDerived = calculateDerivedStats(targetChar.special, targetChar.level || 1, targetChar.traits || [], targetChar.perks || [], targetChar.race || 'human', targetChar.status_effects || [], targetChar.equipment || {}, targetChar.rads || 0, targetChar.inventory || {}, targetChar.needs || {}, targetChar.permanent_skill_bonuses || {});
+    const targetDerived = deriveCharacter(targetChar);
     targetAC = targetDerived.armorClass;
     // Crouching/prone/knocked-down caps how much of AC comes from AGI —
     // only meaningful for a PC, since AC's AGI component is what's being
@@ -1997,7 +2010,7 @@ export async function resolvePlayerCheck() {
   if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
 
   const char = window.liveData.characters[window.currentUser];
-  const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
+  const derived = deriveCharacter(char);
   const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
   const result = draft.kind === 'special' ? resolveSpecialCheck(value, draft.tier, roll, draft.useD20) : resolveSkillCheck(value, draft.tier, roll);
 
@@ -2087,7 +2100,7 @@ export async function resolveGmCheck() {
     // PC — that'd be a lot of typing for the GM).
     Object.entries(window.liveData.characters || {}).forEach(([charId, char]) => {
       if (!char.is_finalized) return;
-      const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
+      const derived = deriveCharacter(char);
       const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
       const roll = draft.kind === 'special' ? (draft.useD20 ? rollD20() : rollD10()) : rollPercentile();
       const result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
@@ -2113,7 +2126,7 @@ export async function resolveGmCheck() {
     const roll = Number(draft.roll);
     const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
     if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
-    const derived = calculateDerivedStats(char.special, char.level || 1, char.traits || [], char.perks || [], char.race || 'human', char.status_effects || [], char.equipment || {}, char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {});
+    const derived = deriveCharacter(char);
     const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
     const result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
     results.push({ char_id: draft.targetCharId, name: char.name, roll, threshold: result.threshold, success: result.success, critType: result.critType || null });

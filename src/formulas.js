@@ -379,3 +379,19 @@ export const RACE_RULES = {
     }
   }
 };
+// A character doc's full derived stats, including the two skill sources
+// calculateDerivedStats() doesn't see: points spent at level-up
+// (skill_ranks) and the +20 tag bonus. Every roll, check, crafting
+// requirement and display goes through here, so the number a player
+// reads on their sheet is the number they roll against.
+export function deriveCharacter(char) {
+  const derived = calculateDerivedStats(
+    char.special, char.level || 1, char.traits || [], char.perks || [],
+    char.race || 'human', char.status_effects || [], char.equipment || {},
+    char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {}
+  );
+  Object.keys(derived.skills).forEach(key => {
+    derived.skills[key] += (char.skill_ranks?.[key] || 0) + (char.tags?.[key] ? 20 : 0);
+  });
+  return derived;
+}
