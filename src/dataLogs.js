@@ -32,7 +32,7 @@ export const dataLogDatabase = {
     "id": "a_bartender_s_notebook",
     "name": "A Bartender's Notebook",
     "type": "data_log",
-    "body": "Tuesday. Sam Lim's boys drank on credit again. Bakri paid it off before I could even write it down — didn't ask, didn't explain, just left the caps on the bar and walked out. That's the third time this month.\n\nI used to keep a ledger of who owes what. Now I just keep a ledger of who Bakri's already covered for. Different book, same handwriting, less honest with myself about why.\n\nWater's up two caps a bottle again. Nobody's said why out loud. Everybody knows why.",
+    "body": "Tuesday. Sam Lim's boys drank on credit again. Bakri paid it off before I could even write it down — didn't ask, didn't explain, just left the RMR on the bar and walked out. That's the third time this month.\n\nI used to keep a ledger of who owes what. Now I just keep a ledger of who Bakri's already covered for. Different book, same handwriting, less honest with myself about why.\n\nWater's up two RMR a bottle again. Nobody's said why out loud. Everybody knows why.",
     "category_path": [
       "Found Texts",
       "Bandawang"
@@ -92,7 +92,7 @@ export const dataLogDatabase = {
     "id": "ishtars_grand_opening",
     "name": "Ishtar's — Grand Opening",
     "type": "data_log",
-    "body": "⚓ GRAND OPENING ⚓\nISHTAR'S — DROP ANCHOR IN NEW TOWN\n\nBaccarat. Dice. The deepest pour on the lake.\n\nOur dealers wear the coat. Our floor is a deck. Our doors open at dusk and do not close until the last hand is played out or the last guest is carried out, whichever the night decides.\n\nNo colours at the door. No blades past the rail. No exceptions, and the management wishes to note that this has been explained to everyone who needed it explained.\n\n⚓ WANTED: AN OPENING ACT ⚓\n\nSingers. Dancers. Fire-eaters. Anyone who can hold a room that has already been drinking for an hour.\n\nAuditions Thursday, after dusk. Bring your own instrument.\nIshtar pays in caps, not in promises.",
+    "body": "⚓ GRAND OPENING ⚓\nISHTAR'S — DROP ANCHOR IN NEW TOWN\n\nBaccarat. Dice. The deepest pour on the lake.\n\nOur dealers wear the coat. Our floor is a deck. Our doors open at dusk and do not close until the last hand is played out or the last guest is carried out, whichever the night decides.\n\nNo colours at the door. No blades past the rail. No exceptions, and the management wishes to note that this has been explained to everyone who needed it explained.\n\n⚓ WANTED: AN OPENING ACT ⚓\n\nSingers. Dancers. Fire-eaters. Anyone who can hold a room that has already been drinking for an hour.\n\nAuditions Thursday, after dusk. Bring your own instrument.\nIshtar pays in RMR, not in promises.",
     "category_path": [
       "Found Texts",
       "Bandawang"
@@ -122,7 +122,7 @@ export const dataLogDatabase = {
     "id": "rakan_watch_trade_ledger_partial",
     "name": "Rakan Watch Trade Ledger (Partial)",
     "type": "data_log",
-    "body": "— 12 crates, marked \"bike parts,\" not bike parts\n— Payment: caps + 1 favor owed, favor undefined (Boss Bob's call, always)\n— Buyer asked no questions. Good buyer.\n— Next shipment delayed. Federation patrol pattern changed on the north road. Find out why before we find out the hard way.",
+    "body": "— 12 crates, marked \"bike parts,\" not bike parts\n— Payment: RMR + 1 favor owed, favor undefined (Boss Bob's call, always)\n— Buyer asked no questions. Good buyer.\n— Next shipment delayed. Federation patrol pattern changed on the north road. Find out why before we find out the hard way.",
     "category_path": [
       "Found Texts",
       "Bandawang"
