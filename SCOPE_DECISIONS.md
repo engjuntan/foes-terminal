@@ -717,3 +717,21 @@ Final formulas to implement in `formulas.js`:
   after, but whatever Kong actually owned before the test is not
   recoverable from this session — flagged to the user in case it
   mattered, rather than left unmentioned.
+
+## Next systems — rulings so far (2026-09-21, NOT BUILT)
+
+- **Reroll:** a GM-only button that rerolls the last resolved roll,
+  combat or skill check. Because resolution already applies damage, AP
+  and ammo, each resolution must save a "before" snapshot of the fields
+  it touched; reroll restores it and resolves again with a new roll.
+- **Reputation:** modelled on Fallout 2 (per-town/faction reputation
+  with named tiers such as Vilified…Idolized, plus karma). GM sets each
+  value with a slider. Every tier shows a brief description, what it
+  does, and a small square image slot the GM will supply art for.
+- **Durability** comes before the shop and before bulk item writing:
+  weapons and armor need per-copy condition, which the `{itemId: qty}`
+  inventory can't hold. Schema to be specced first.
+- **Currency** already exists as items (RMR, Dinar, Protectorate
+  Dollar). Some data logs say "caps" — to reconcile.
+- **Order:** statuses panel → reroll → durability → repair/salvage →
+  reputation → shop → special skills (details in the GM's PDF).

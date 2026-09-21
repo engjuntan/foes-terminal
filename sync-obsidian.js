@@ -20,6 +20,7 @@ const MAPS_TARGET = path.join(__dirname, 'src', 'maps.js');
 const QUESTS_TARGET = path.join(__dirname, 'src', 'quests.js');
 const RECIPES_TARGET = path.join(__dirname, 'src', 'recipes.js');
 const GLOSSARY_TARGET = path.join(__dirname, 'src', 'glossary.js');
+const INDEX_TARGET = path.join(__dirname, 'VAULT_INDEX.tsv');
 
 // Folders whose plain-prose pages (no ```json block at all) become
 // implicit glossary entries — filename is the term, first sentence of
@@ -382,6 +383,7 @@ function runSync() {
   fs.writeFileSync(QUESTS_TARGET, generateFileContent('quest', questsMap));
   fs.writeFileSync(RECIPES_TARGET, generateFileContent('recipe', recipesMap));
   fs.writeFileSync(GLOSSARY_TARGET, generateFileContent('glossary', glossaryMap));
+  writeVaultIndex(allFiles);
 
   if (duplicateIds.length > 0) {
     console.warn(`\n[!] ${duplicateIds.length} DUPLICATE ID(S) — these files did NOT make it into the app:`);
@@ -392,7 +394,38 @@ function runSync() {
   console.log(`[SYNC] Complete. Items: ${Object.keys(itemsMap).length} | Traits: ${Object.keys(traitsMap).length} | Status Effects: ${Object.keys(statusEffectsMap).length} | Bestiary: ${Object.keys(bestiaryMap).length} | Data Logs: ${Object.keys(dataLogsMap).length} | Maps: ${Object.keys(mapsMap).length} | Quests: ${Object.keys(questsMap).length} | Recipes: ${Object.keys(recipesMap).length} | Glossary: ${Object.keys(glossaryMap).length}`);
 }
 
+// --- VAULT INDEX ---
+// One line per vault file: path, the id/type it syncs as (if any), and its
+// name. Content work compares new material against this instead of opening
+// hundreds of vault files — it's the cheap way to answer "does this exist?".
+function writeVaultIndex(allFiles) {
+  const typedMaps = [itemsMap, traitsMap, statusEffectsMap, bestiaryMap, dataLogsMap, mapsMap, questsMap, recipesMap];
+  const byPath = {};
+  Object.entries(idOwners).forEach(([id, filePath]) => {
+    const entry = typedMaps.map(m => m[id]).find(Boolean);
+    byPath[filePath] = entry ? `${id}\t${entry.type || ''}\t${entry.name || ''}` : `${id}\t\t`;
+  });
+  const glossaryNames = new Set(Object.values(glossaryMap).map(g => g.name));
+  const rows = allFiles
+    .filter(f => f.endsWith('.md'))
+    .map(f => {
+      const rel = path.relative(OBSIDIAN_PATH, f);
+      if (byPath[f]) return `${rel}\t${byPath[f]}`;
+      const base = path.basename(f, '.md');
+      return `${rel}\t\t${glossaryNames.has(base) ? 'glossary' : 'prose'}\t${base}`;
+    })
+    .sort();
+  fs.writeFileSync(INDEX_TARGET, `path\tid\ttype\tname\n${rows.join('\n')}\n`);
+}
+
 // --- WATCHER START ---
+// `--once` syncs and exits — for scripts and helper agents, which can't
+// run a watcher that never returns.
+if (process.argv.includes('--once')) {
+  runSync();
+  process.exit(0);
+}
+
 const watcher = chokidar.watch(OBSIDIAN_PATH, {
   ignored: /(^|[\/\\])\../, // ignore hidden files
   persistent: true,
