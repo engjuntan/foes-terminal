@@ -605,7 +605,10 @@ export async function gmSetReputation(entityId, value) {
 
   const entities = normalizeReputationEntities(window.liveData.reputation_entities);
   const entity = entities.find(e => e.id === entityId);
-  const entityName = entity ? entity.name : entityId;
+  if (!entity) return; // only tracked entities; a stray id would create an orphan value
+  // Names already carry their own article where they need one ("The
+  // Federation"), so don't add "the" in front.
+  const entityName = /^the\s/i.test(entity.name) ? entity.name : `the ${entity.name}`;
 
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
@@ -617,7 +620,7 @@ export async function gmSetReputation(entityId, value) {
     const currentMessages = window.liveData.messages || [];
     updatePayload.messages = [...currentMessages, {
       id: `msg_${Date.now()}`, from: 'GM', target: 'all',
-      body: `Your standing with the ${entityName} is now: ${afterTier.name}.`,
+      body: `Your standing with ${entityName} is now: ${afterTier.name}.`,
       timestamp: Date.now()
     }];
   }

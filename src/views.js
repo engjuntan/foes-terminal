@@ -333,7 +333,7 @@ export function getReputationView(charId, liveData) {
 
   return `
     <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto; padding-top:10px;">
-      <div class="panel" style="margin-bottom:16px;">
+      <div class="panel" style="height:auto; margin-bottom:16px;">
         <h2 style="color:var(--pip-dim);">KARMA</h2>
         <div style="display:flex; gap:14px; align-items:center;">
           <div style="width:80px; height:80px; flex-shrink:0; border:1px solid var(--pip-dim); overflow:hidden;">
@@ -346,7 +346,7 @@ export function getReputationView(charId, liveData) {
         </div>
       </div>
 
-      <div class="panel">
+      <div class="panel" style="height:auto;">
         <h2 style="color:var(--pip-dim);">REPUTATION</h2>
         <p style="font-size:11px; color:#666; margin:-6px 0 10px;">How each faction and town actually treats you. The exact standing is known only to the GM — this is what it looks like from where you're standing.</p>
         ${entityCardsHtml}
