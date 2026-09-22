@@ -40,7 +40,8 @@ export const bestiaryDatabase = {
         "energy": -50,
         "poison": 100,
         "rad": 100,
-        "gas": 100
+        "gas": 100,
+        "emp": -50
       },
       "special": {
         "str": 0,
@@ -58,35 +59,40 @@ export const bestiaryDatabase = {
         "hit_percent": 75,
         "action": "Attack",
         "damage": "2d6+15",
-        "effect": "Burst fire of 15 rounds. -5 AC and -15 DR. 800 shots."
+        "effect": "Burst fire of 15 rounds. -5 AC and -15 DR. 800 shots.",
+        "dmgType": "normal"
       },
       {
         "name": "Heavy Fire",
         "hit_percent": 75,
         "action": "Attack",
         "damage": "2d8+15",
-        "effect": "Burst fire of 15 rounds. -10 AC and -20 DR. 800 shots."
+        "effect": "Burst fire of 15 rounds. -10 AC and -20 DR. 800 shots.",
+        "dmgType": "normal"
       },
       {
         "name": "Flame",
         "hit_percent": 80,
         "action": "Flame",
         "damage": "3d10+30",
-        "effect": "Medium range flame. 5 shots."
+        "effect": "Medium range flame. 5 shots.",
+        "dmgType": "fire"
       },
       {
         "name": "Laser",
         "hit_percent": 75,
         "action": "Laser",
         "damage": "5d4+15",
-        "effect": "Burst fire of 15 rounds. 800 shots."
+        "effect": "Burst fire of 15 rounds. 800 shots.",
+        "dmgType": "laser"
       },
       {
         "name": "Anti-Tank Cannon",
         "hit_percent": 80,
         "action": "Attack",
         "damage": "7d8+30",
-        "effect": "-20 AC and -50 DR. 1 shot. May not fire and adjust."
+        "effect": "-20 AC and -50 DR. 1 shot. May not fire and adjust.",
+        "dmgType": "explosive"
       }
     ]
   },
@@ -130,7 +136,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 10,
         "rad": 10,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 3,
@@ -148,21 +155,24 @@ export const bestiaryDatabase = {
         "hit_percent": 65,
         "action": "Attack",
         "damage": "1d4+1",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       },
       {
         "name": "Centre Head Peck",
         "hit_percent": 65,
         "action": "Attack",
         "damage": "1d4+1",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       },
       {
         "name": "Right Head Peck",
         "hit_percent": 65,
         "action": "Attack",
         "damage": "1d4+1",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       }
     ]
   },
@@ -206,7 +216,8 @@ export const bestiaryDatabase = {
         "energy": -50,
         "poison": 100,
         "rad": 100,
-        "gas": 100
+        "gas": 100,
+        "emp": -50
       },
       "special": {
         "str": 8,
@@ -224,7 +235,8 @@ export const bestiaryDatabase = {
         "hit_percent": 74,
         "action": "Attack",
         "damage": "2d6+4",
-        "effect": "Pneumatic construction tool repurposed as a weapon."
+        "effect": "Pneumatic construction tool repurposed as a weapon.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -268,7 +280,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 0,
         "rad": 0,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 6,
@@ -286,7 +299,8 @@ export const bestiaryDatabase = {
         "hit_percent": 110,
         "action": "Attack",
         "damage": "3d10+8",
-        "effect": "Has 20 shots. Relentless: may take a second full attack this turn at -30 hit."
+        "effect": "Has 20 shots. Relentless: may take a second full attack this turn at -30 hit.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -330,7 +344,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 0,
         "rad": 0,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 7,
@@ -348,7 +363,8 @@ export const bestiaryDatabase = {
         "hit_percent": 80,
         "action": "Attack",
         "damage": "2d8+6",
-        "effect": "Has 30 shots. Burst of 8 rounds. -10 AC and -15 DR."
+        "effect": "Has 30 shots. Burst of 8 rounds. -10 AC and -15 DR.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -392,7 +408,8 @@ export const bestiaryDatabase = {
         "energy": -10,
         "poison": 0,
         "rad": 0,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 5,
@@ -410,7 +427,8 @@ export const bestiaryDatabase = {
         "hit_percent": 63,
         "action": "Attack",
         "damage": "2d8+2",
-        "effect": "Has 5 shots."
+        "effect": "Has 5 shots.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -454,7 +472,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 0,
         "rad": 100,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 6,
@@ -472,7 +491,8 @@ export const bestiaryDatabase = {
         "hit_percent": 65,
         "action": "Attack",
         "damage": "1d6+8",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       }
     ]
   },
@@ -516,7 +536,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 100,
         "rad": 60,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 5,
@@ -534,7 +555,8 @@ export const bestiaryDatabase = {
         "hit_percent": 60,
         "action": "Attack",
         "damage": "1d6",
-        "effect": "Poison 1 damage for 1d8 hours"
+        "effect": "Poison 1 damage for 1d8 hours",
+        "dmgType": "poison"
       }
     ]
   },
@@ -578,7 +600,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 100,
         "rad": 50,
-        "gas": 50
+        "gas": 50,
+        "emp": 0
       },
       "special": {
         "str": 5,
@@ -596,7 +619,8 @@ export const bestiaryDatabase = {
         "hit_percent": 70,
         "action": "Poison",
         "damage": "1d8+3",
-        "effect": "Foe makes an EN check or takes 1d4 damage a turn for 2 turns."
+        "effect": "Foe makes an EN check or takes 1d4 damage a turn for 2 turns.",
+        "dmgType": "poison"
       }
     ]
   },
@@ -640,7 +664,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 50,
         "rad": 20,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 2,
@@ -658,14 +683,16 @@ export const bestiaryDatabase = {
         "hit_percent": 75,
         "action": "Attack",
         "damage": "1d4",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       },
       {
         "name": "Bite",
         "hit_percent": 70,
         "action": "Attack",
         "damage": "1d4",
-        "effect": "Poison 1 damage for 1d8 hours"
+        "effect": "Poison 1 damage for 1d8 hours",
+        "dmgType": "poison"
       }
     ]
   },
@@ -709,7 +736,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 20,
         "rad": 20,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 6,
@@ -727,7 +755,8 @@ export const bestiaryDatabase = {
         "hit_percent": 75,
         "action": "Attack",
         "damage": "2d6+3",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       }
     ]
   },
@@ -771,7 +800,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 100,
         "rad": 100,
-        "gas": 0
+        "gas": 0,
+        "emp": -50
       },
       "special": {
         "str": 6,
@@ -789,14 +819,16 @@ export const bestiaryDatabase = {
         "hit_percent": 50,
         "action": "Attack",
         "damage": "1d6+2",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "laser"
       },
       {
         "name": "Claw",
         "hit_percent": 70,
         "action": "Attack",
         "damage": "1d4+4",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       }
     ]
   },
@@ -840,7 +872,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 0,
         "rad": 0,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 4,
@@ -858,7 +891,8 @@ export const bestiaryDatabase = {
         "hit_percent": 55,
         "action": "Attack",
         "damage": "1d4+1",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       }
     ]
   },
@@ -902,7 +936,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 100,
         "rad": 50,
-        "gas": 100
+        "gas": 100,
+        "emp": 0
       },
       "special": {
         "str": 2,
@@ -920,28 +955,32 @@ export const bestiaryDatabase = {
         "hit_percent": 60,
         "action": "Poison",
         "damage": "1d8",
-        "effect": "Foe makes EN roll. On success the opponent loses small action."
+        "effect": "Foe makes EN roll. On success the opponent loses small action.",
+        "dmgType": "poison"
       },
       {
         "name": "Spray",
         "hit_percent": 70,
         "action": "Gas",
         "damage": "1d4",
-        "effect": "Sprays small area around itself with gas. Enemies suffer -3 PE and take 1d4 while crossing or inside."
+        "effect": "Sprays small area around itself with gas. Enemies suffer -3 PE and take 1d4 while crossing or inside.",
+        "dmgType": "poison"
       },
       {
         "name": "Curl Up",
         "hit_percent": 100,
         "action": "Defend",
         "damage": "0",
-        "effect": "Gain +5 AC and -10% hit. Takes an action."
+        "effect": "Gain +5 AC and -10% hit. Takes an action.",
+        "dmgType": "normal"
       },
       {
         "name": "Roll",
         "hit_percent": 80,
         "action": "SM",
         "damage": "2d6",
-        "effect": "Must be curled up first."
+        "effect": "Must be curled up first.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -985,7 +1024,8 @@ export const bestiaryDatabase = {
         "energy": -50,
         "poison": 100,
         "rad": 100,
-        "gas": 100
+        "gas": 100,
+        "emp": -50
       },
       "special": {
         "str": 4,
@@ -1003,21 +1043,24 @@ export const bestiaryDatabase = {
         "hit_percent": 50,
         "action": "Attack",
         "damage": "1d6+3",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "laser"
       },
       {
         "name": "Headbutt",
         "hit_percent": 60,
         "action": "Attack",
         "damage": "1d4+4",
-        "effect": "Foe rolls an EN check of +1. On failure knock the opponent down."
+        "effect": "Foe rolls an EN check of +1. On failure knock the opponent down.",
+        "dmgType": "normal"
       },
       {
         "name": "Claw",
         "hit_percent": 70,
         "action": "Attack",
         "damage": "1d4+4",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       }
     ]
   },
@@ -1061,7 +1104,8 @@ export const bestiaryDatabase = {
         "energy": -100,
         "poison": 100,
         "rad": 100,
-        "gas": 100
+        "gas": 100,
+        "emp": -100
       },
       "special": {
         "str": 3,
@@ -1079,14 +1123,16 @@ export const bestiaryDatabase = {
         "hit_percent": 50,
         "action": "Attack",
         "damage": "1d6+2",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "laser"
       },
       {
         "name": "Claw",
         "hit_percent": 70,
         "action": "Attack",
         "damage": "1d4+4",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       }
     ]
   },
@@ -1130,7 +1176,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 0,
         "rad": 0,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 5,
@@ -1148,7 +1195,8 @@ export const bestiaryDatabase = {
         "hit_percent": 77,
         "action": "Attack",
         "damage": "2d6+4",
-        "effect": "Has 25 shots. Burst of 5 rounds. -5 AC and -10 DR."
+        "effect": "Has 25 shots. Burst of 5 rounds. -5 AC and -10 DR.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -1192,7 +1240,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 100,
         "rad": 100,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 5,
@@ -1210,21 +1259,24 @@ export const bestiaryDatabase = {
         "hit_percent": 75,
         "action": "Attack",
         "damage": "1d6+3",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       },
       {
         "name": "Bite",
         "hit_percent": 70,
         "action": "Attack",
         "damage": "1d4+4",
-        "effect": "Foe rolls an EN check of +1. On failure knock the opponent down."
+        "effect": "Foe rolls an EN check of +1. On failure knock the opponent down.",
+        "dmgType": "normal"
       },
       {
         "name": "Throw",
         "hit_percent": 60,
         "action": "Attack",
         "damage": "1d4+4",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       }
     ]
   },
@@ -1268,7 +1320,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 0,
         "rad": 0,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 8,
@@ -1286,7 +1339,8 @@ export const bestiaryDatabase = {
         "hit_percent": 120,
         "action": "Attack",
         "damage": "3d10+10",
-        "effect": "Relentless: may take a second full attack this turn at -30 hit."
+        "effect": "Relentless: may take a second full attack this turn at -30 hit.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -1330,7 +1384,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 100,
         "rad": 60,
-        "gas": 100
+        "gas": 100,
+        "emp": 0
       },
       "special": {
         "str": 3,
@@ -1348,28 +1403,32 @@ export const bestiaryDatabase = {
         "hit_percent": 60,
         "action": "Poison",
         "damage": "1d8+2",
-        "effect": "Foe makes EN roll. On success the opponent loses small action."
+        "effect": "Foe makes EN roll. On success the opponent loses small action.",
+        "dmgType": "poison"
       },
       {
         "name": "Spray",
         "hit_percent": 70,
         "action": "Gas",
         "damage": "1d4",
-        "effect": "Sprays small area around itself with gas. Enemies suffer -3 PE and take 1d4 while crossing or inside."
+        "effect": "Sprays small area around itself with gas. Enemies suffer -3 PE and take 1d4 while crossing or inside.",
+        "dmgType": "poison"
       },
       {
         "name": "Curl Up",
         "hit_percent": 100,
         "action": "Defend",
         "damage": "0",
-        "effect": "Gain +5 AC and -10% hit. Small action."
+        "effect": "Gain +5 AC and -10% hit. Small action.",
+        "dmgType": "normal"
       },
       {
         "name": "Roll",
         "hit_percent": 80,
         "action": "SM",
         "damage": "2d8+4",
-        "effect": "Must be curled up first."
+        "effect": "Must be curled up first.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -1393,16 +1452,16 @@ export const bestiaryDatabase = {
           "dr": 40
         },
         "laser": {
-          "dt": 1,
-          "dr": 30
+          "dt": 3,
+          "dr": 45
         },
         "fire": {
           "dt": 1,
           "dr": 20
         },
         "plasma": {
-          "dt": 1,
-          "dr": 30
+          "dt": 3,
+          "dr": 45
         },
         "explosive": {
           "dt": 1,
@@ -1413,7 +1472,8 @@ export const bestiaryDatabase = {
         "energy": 30,
         "poison": 0,
         "rad": 0,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 5,
@@ -1431,35 +1491,40 @@ export const bestiaryDatabase = {
         "hit_percent": 70,
         "action": "Attack",
         "damage": "2d6+8",
-        "effect": "Has 20 shots. -10 AC and -15 DR. Burst of 5 rounds."
+        "effect": "Has 20 shots. -10 AC and -15 DR. Burst of 5 rounds.",
+        "dmgType": "normal"
       },
       {
         "name": "Throw Grenade",
         "hit_percent": 60,
         "action": "Frag",
         "damage": "2d12+20",
-        "effect": "Affects small radius. Foes AG DC, fails take 1d6 bleed damage."
+        "effect": "Affects small radius. Foes AG DC, fails take 1d6 bleed damage.",
+        "dmgType": "explosive"
       },
       {
         "name": "Pistol",
         "hit_percent": 70,
         "action": "Attack",
         "damage": "1d8+4",
-        "effect": "Has 5 shots. For shield users."
+        "effect": "Has 5 shots. For shield users.",
+        "dmgType": "normal"
       },
       {
         "name": "Medium Shield",
         "hit_percent": 80,
         "action": "SM",
         "damage": "1d8+1",
-        "effect": "Infantry with shields gain medium cover."
+        "effect": "Infantry with shields gain medium cover.",
+        "dmgType": "normal"
       },
       {
         "name": "Mortar",
         "hit_percent": 50,
         "action": "SM",
         "damage": "2d12+60",
-        "effect": "Takes one turn to setup. 3 rounds per squad of infantry. Mortar carrier has no other weapons."
+        "effect": "Takes one turn to setup. 3 rounds per squad of infantry. Mortar carrier has no other weapons.",
+        "dmgType": "explosive"
       }
     ]
   },
@@ -1503,7 +1568,8 @@ export const bestiaryDatabase = {
         "energy": -50,
         "poison": 0,
         "rad": 0,
-        "gas": 0
+        "gas": 0,
+        "emp": -50
       },
       "special": {
         "str": 9,
@@ -1521,7 +1587,8 @@ export const bestiaryDatabase = {
         "hit_percent": 70,
         "action": "Attack",
         "damage": "4d8+10",
-        "effect": "Plasma damage. Has 10 shots."
+        "effect": "Plasma damage. Has 10 shots.",
+        "dmgType": "plasma"
       }
     ]
   },
@@ -1565,7 +1632,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 30,
         "rad": 80,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 5,
@@ -1583,7 +1651,8 @@ export const bestiaryDatabase = {
         "hit_percent": 61,
         "action": "Attack",
         "damage": "1d8+3",
-        "effect": "Armed like a Raider — pipe, knife, or whatever else was lying around."
+        "effect": "Armed like a Raider — pipe, knife, or whatever else was lying around.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -1627,7 +1696,8 @@ export const bestiaryDatabase = {
         "energy": -50,
         "poison": 100,
         "rad": 100,
-        "gas": 100
+        "gas": 100,
+        "emp": -50
       },
       "special": {
         "str": 6,
@@ -1645,7 +1715,8 @@ export const bestiaryDatabase = {
         "hit_percent": 56,
         "action": "Attack",
         "damage": "1d6+4",
-        "effect": "Laser damage."
+        "effect": "Laser damage.",
+        "dmgType": "laser"
       }
     ]
   },
@@ -1689,7 +1760,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 0,
         "rad": 0,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 6,
@@ -1707,7 +1779,8 @@ export const bestiaryDatabase = {
         "hit_percent": 69,
         "action": "Attack",
         "damage": "2d8+4",
-        "effect": "Has 8 shots. -5 AC and -10 DR."
+        "effect": "Has 8 shots. -5 AC and -10 DR.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -1751,7 +1824,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 0,
         "rad": 0,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 5,
@@ -1769,42 +1843,48 @@ export const bestiaryDatabase = {
         "hit_percent": 60,
         "action": "Attack",
         "damage": "1d8+4",
-        "effect": "Has 6 shots."
+        "effect": "Has 6 shots.",
+        "dmgType": "normal"
       },
       {
         "name": "Rifle",
         "hit_percent": 60,
         "action": "Attack",
         "damage": "1d8+6",
-        "effect": "Has 5 or 20 shots. -5AC and -10 DR. Burst of 10 shots."
+        "effect": "Has 5 or 20 shots. -5AC and -10 DR. Burst of 10 shots.",
+        "dmgType": "normal"
       },
       {
         "name": "Sub Machine",
         "hit_percent": 60,
         "action": "Attack",
         "damage": "1d8+4",
-        "effect": "Has 20 shots. Burst of 10 shots."
+        "effect": "Has 20 shots. Burst of 10 shots.",
+        "dmgType": "normal"
       },
       {
         "name": "Shield",
         "hit_percent": 70,
         "action": "Defend",
         "damage": "2d6",
-        "effect": "Grants small cover bonus."
+        "effect": "Grants small cover bonus.",
+        "dmgType": "normal"
       },
       {
         "name": "Knife",
         "hit_percent": 70,
         "action": "Attack",
         "damage": "1d8+1",
-        "effect": "Mutant raiders +10"
+        "effect": "Mutant raiders +10",
+        "dmgType": "normal"
       },
       {
         "name": "Melee",
         "hit_percent": 70,
         "action": "Attack",
         "damage": "1d4+1",
-        "effect": "Mutant raiders use 2d4+10."
+        "effect": "Mutant raiders use 2d4+10.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -1848,7 +1928,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 0,
         "rad": 0,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 6,
@@ -1866,7 +1947,8 @@ export const bestiaryDatabase = {
         "hit_percent": 70,
         "action": "Attack",
         "damage": "2d6+3",
-        "effect": "Has 8 shots. -5 AC and -10 DR."
+        "effect": "Has 8 shots. -5 AC and -10 DR.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -1910,7 +1992,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 0,
         "rad": 0,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 5,
@@ -1928,7 +2011,8 @@ export const bestiaryDatabase = {
         "hit_percent": 72,
         "action": "Attack",
         "damage": "1d8+3",
-        "effect": "Has 12 shots."
+        "effect": "Has 12 shots.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -1972,7 +2056,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 70,
         "rad": 45,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 5,
@@ -1990,21 +2075,24 @@ export const bestiaryDatabase = {
         "hit_percent": 90,
         "action": "Attack",
         "damage": "2d6",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       },
       {
         "name": "Bite",
         "hit_percent": 75,
         "action": "Attack",
         "damage": "2d6",
-        "effect": "Poison 2 damage for 1d8 hours"
+        "effect": "Poison 2 damage for 1d8 hours",
+        "dmgType": "poison"
       },
       {
         "name": "Tail Swipe",
         "hit_percent": 50,
         "action": "Attack",
         "damage": "1d6",
-        "effect": "Knockdown on hit"
+        "effect": "Knockdown on hit",
+        "dmgType": "normal"
       }
     ]
   },
@@ -2033,7 +2121,7 @@ export const bestiaryDatabase = {
         },
         "fire": {
           "dt": 0,
-          "dr": 0
+          "dr": -20
         },
         "plasma": {
           "dt": 0,
@@ -2048,7 +2136,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 100,
         "rad": 70,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 6,
@@ -2066,7 +2155,8 @@ export const bestiaryDatabase = {
         "hit_percent": 70,
         "action": "Attack",
         "damage": "1d8",
-        "effect": "Poison 1 damage for 1d8 hours"
+        "effect": "Poison 1 damage for 1d8 hours",
+        "dmgType": "poison"
       }
     ]
   },
@@ -2110,7 +2200,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 20,
         "rad": 30,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 9,
@@ -2128,14 +2219,16 @@ export const bestiaryDatabase = {
         "hit_percent": 75,
         "action": "Attack",
         "damage": "3d8+6",
-        "effect": "Forces an AG check on hit or the target is Knocked Down."
+        "effect": "Forces an AG check on hit or the target is Knocked Down.",
+        "dmgType": "normal"
       },
       {
         "name": "Gore",
         "hit_percent": 75,
         "action": "Attack",
         "damage": "3d8+6",
-        "effect": "Second attack of its turn, used after the Charge."
+        "effect": "Second attack of its turn, used after the Charge.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -2179,7 +2272,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 20,
         "rad": 50,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 8,
@@ -2197,28 +2291,32 @@ export const bestiaryDatabase = {
         "hit_percent": 60,
         "action": "Attack",
         "damage": "2d4+1",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       },
       {
         "name": "Kick",
         "hit_percent": 55,
         "action": "Attack",
         "damage": "2d4+2",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       },
       {
         "name": "Overhead Smash",
         "hit_percent": 50,
         "action": "SM",
         "damage": "2d4+3",
-        "effect": "Foe makes EN throw. Knockdown on hit."
+        "effect": "Foe makes EN throw. Knockdown on hit.",
+        "dmgType": "normal"
       },
       {
         "name": "Sledgehammer",
         "hit_percent": 60,
         "action": "Attack",
         "damage": "1d6+15+3",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       }
     ]
   },
@@ -2262,7 +2360,8 @@ export const bestiaryDatabase = {
         "energy": 10,
         "poison": 100,
         "rad": 10,
-        "gas": 100
+        "gas": 100,
+        "emp": 0
       },
       "special": {
         "str": 5,
@@ -2280,28 +2379,32 @@ export const bestiaryDatabase = {
         "hit_percent": 60,
         "action": "Attack",
         "damage": "2d6+6",
-        "effect": "Has 5 shots. -5 AC and -15 DR."
+        "effect": "Has 5 shots. -5 AC and -15 DR.",
+        "dmgType": "normal"
       },
       {
         "name": "Machete",
         "hit_percent": 70,
         "action": "Attack",
         "damage": "1d10+5",
-        "effect": "Used after charge."
+        "effect": "Used after charge.",
+        "dmgType": "normal"
       },
       {
         "name": "Melee",
         "hit_percent": 60,
         "action": "Attack",
         "damage": "1d4+1",
-        "effect": "When no other options are left."
+        "effect": "When no other options are left.",
+        "dmgType": "normal"
       },
       {
         "name": "Bayonet",
         "hit_percent": 75,
         "action": "SM",
         "damage": "2d6+2",
-        "effect": "Must charge into enemy."
+        "effect": "Must charge into enemy.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -2345,7 +2448,8 @@ export const bestiaryDatabase = {
         "energy": 0,
         "poison": 20,
         "rad": 10,
-        "gas": 0
+        "gas": 0,
+        "emp": 0
       },
       "special": {
         "str": 4,
@@ -2363,7 +2467,8 @@ export const bestiaryDatabase = {
         "hit_percent": 70,
         "action": "Attack",
         "damage": "1d6+3",
-        "effect": "none"
+        "effect": "none",
+        "dmgType": "normal"
       }
     ]
   }

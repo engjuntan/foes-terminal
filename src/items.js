@@ -227,7 +227,11 @@ export const itemDatabase = {
     "description": "Status armor worn by Tan/Choo subfamily members of the 1414 Triad. Low DR, social value instead. Mapped to the manual's Protectorate Officers Uniform tier (status armor, not combat armor).",
     "stats": {
       "ac": 3,
-      "dt_dr_normal": "1/10"
+      "dt_dr_normal": "1/10",
+      "dt_dr_laser": "0/5",
+      "dt_dr_fire": "0/0",
+      "dt_dr_plasma": "0/5",
+      "dt_dr_explosive": "0/5"
     },
     "modifiers": {
       "special_cha": 2
@@ -297,7 +301,11 @@ export const itemDatabase = {
     "description": "Gas mask analogue sourced from ProTiga — ties into the existing gas resistance stat. Mapped to the manual's Clothes tier as a base, plus a gas resistance modifier for its actual function.",
     "stats": {
       "ac": 1,
-      "dt_dr_normal": "0/5"
+      "dt_dr_normal": "0/5",
+      "dt_dr_laser": "0/0",
+      "dt_dr_fire": "0/0",
+      "dt_dr_plasma": "0/0",
+      "dt_dr_explosive": "0/0"
     },
     "modifiers": {
       "gas_res": "TBA"
@@ -482,7 +490,11 @@ export const itemDatabase = {
     "description": "Factory-issue coveralls worn by ProTiga factory workers in North Bandawang. Light, cheap, common. Mapped to the manual's Ramshackle Armor tier.",
     "stats": {
       "ac": 8,
-      "dt_dr_normal": "2/25"
+      "dt_dr_normal": "2/25",
+      "dt_dr_laser": "0/20",
+      "dt_dr_fire": "0/0",
+      "dt_dr_plasma": "0/12",
+      "dt_dr_explosive": "0/20"
     },
     "weight": 1.5,
     "value": "TBA"
@@ -498,7 +510,11 @@ export const itemDatabase = {
     "image_prompt": "Worn blue factory coveralls with visible hand-stitched padding lining, patched knees and elbows, wasteland workwear, isolated on dark background, game icon style",
     "stats": {
       "ac": 3,
-      "dt_dr_normal": "0/8"
+      "dt_dr_normal": "0/8",
+      "dt_dr_laser": "0/3",
+      "dt_dr_fire": "0/0",
+      "dt_dr_plasma": "0/4",
+      "dt_dr_explosive": "0/3"
     },
     "weight": 1,
     "value": 8
@@ -514,7 +530,11 @@ export const itemDatabase = {
     "description": "Addresses the race-size gap — Gergasi/Half-Mutant can't wear human-sized armor. Sized for larger frames, sourced from ProTiga's stamping press housing. Mapped between Studded Leather and Malayan Infantry tier: heavy but improvised, not manufactured.",
     "stats": {
       "ac": 15,
-      "dt_dr_normal": "3/30"
+      "dt_dr_normal": "3/30",
+      "dt_dr_laser": "3/30",
+      "dt_dr_fire": "2/15",
+      "dt_dr_plasma": "0/15",
+      "dt_dr_explosive": "3/30"
     },
     "weight": 16,
     "value": "TBA"
@@ -584,9 +604,9 @@ export const itemDatabase = {
     "stats": {
       "ac": 20,
       "dt_dr_normal": "4/35",
-      "dt_dr_laser": "1/30",
+      "dt_dr_laser": "6/50",
       "dt_dr_fire": "1/20",
-      "dt_dr_plasma": "1/30",
+      "dt_dr_plasma": "5/50",
       "dt_dr_explosive": "1/20",
       "er": 30,
       "rr": 0,
@@ -631,7 +651,11 @@ export const itemDatabase = {
     "description": "Cheap, gang-colored, instantly recognizable jacket of The Rakan Watch. Mapped to the manual's Clothes tier, barely above rags.",
     "stats": {
       "ac": 1,
-      "dt_dr_normal": "0/5"
+      "dt_dr_normal": "0/5",
+      "dt_dr_laser": "0/0",
+      "dt_dr_fire": "0/0",
+      "dt_dr_plasma": "0/2",
+      "dt_dr_explosive": "0/0"
     },
     "weight": 0.6,
     "value": "TBA"
@@ -671,7 +695,11 @@ export const itemDatabase = {
     "image_prompt": "Armor made of tightly woven rattan cane panels lashed to a wooden frame with rope, traditional Southeast Asian basketweave pattern, isolated on dark background, game icon style",
     "stats": {
       "ac": 4,
-      "dt_dr_normal": "1/10"
+      "dt_dr_normal": "1/10",
+      "dt_dr_laser": "0/5",
+      "dt_dr_fire": "0/0",
+      "dt_dr_plasma": "0/5",
+      "dt_dr_explosive": "0/5"
     },
     "weight": 2,
     "value": 12
@@ -687,7 +715,11 @@ export const itemDatabase = {
     "description": "Improvised DR armor built from scrap metal and rebar strapping. Mapped to the manual's Mercenary Armor tier, since unlike Coveralls this is purpose-built protection.",
     "stats": {
       "ac": 12,
-      "dt_dr_normal": "3/25"
+      "dt_dr_normal": "3/25",
+      "dt_dr_laser": "3/25",
+      "dt_dr_fire": "2/12",
+      "dt_dr_plasma": "0/12",
+      "dt_dr_explosive": "3/25"
     },
     "weight": 10,
     "value": "TBA"
@@ -703,7 +735,11 @@ export const itemDatabase = {
     "image_prompt": "Torso wrapped in multiple layers of blue and grey tarpaulin bound with rope and cargo straps, bulky improvised padded armor, wasteland aesthetic, isolated on dark background, game icon style",
     "stats": {
       "ac": 5,
-      "dt_dr_normal": "1/15"
+      "dt_dr_normal": "1/15",
+      "dt_dr_laser": "0/10",
+      "dt_dr_fire": "0/0",
+      "dt_dr_plasma": "0/7",
+      "dt_dr_explosive": "0/10"
     },
     "weight": 8,
     "value": 25
@@ -719,7 +755,11 @@ export const itemDatabase = {
     "image_prompt": "A large rusted riot shield with Federation crowd-control markings, converted with leather straps into wearable chest armor, scratched polycarbonate window, oversized and bulky, isolated on dark background, game icon style",
     "stats": {
       "ac": 10,
-      "dt_dr_normal": "4/15"
+      "dt_dr_normal": "4/15",
+      "dt_dr_laser": "4/15",
+      "dt_dr_fire": "3/7",
+      "dt_dr_plasma": "0/7",
+      "dt_dr_explosive": "4/15"
     },
     "weight": 10,
     "value": 50
@@ -738,7 +778,10 @@ export const itemDatabase = {
       "ac": 14,
       "dt_dr_normal": "3/28",
       "dt_dr_laser": "1/15",
-      "dt_dr_explosive": "2/20"
+      "dt_dr_explosive": "2/20",
+      "dt_dr_fire": "2/20",
+      "dt_dr_plasma": "1/15",
+      "emp": -20
     },
     "weight": 14,
     "value": 140
@@ -755,7 +798,12 @@ export const itemDatabase = {
     "condition": "disrepair",
     "stats": {
       "ac": 4,
-      "dt_dr_normal": "1/10"
+      "dt_dr_normal": "1/10",
+      "dt_dr_laser": "1/10",
+      "dt_dr_fire": "1/12",
+      "dt_dr_plasma": "0/8",
+      "dt_dr_explosive": "1/10",
+      "emp": -15
     },
     "weight": 5,
     "value": 60
@@ -819,7 +867,11 @@ export const itemDatabase = {
     "image_prompt": "A simple poncho cut from blue plastic market tarpaulin, rope drawstring, weathered and patched, isolated on dark background, game icon style",
     "stats": {
       "ac": 2,
-      "dt_dr_normal": "0/5"
+      "dt_dr_normal": "0/5",
+      "dt_dr_laser": "0/0",
+      "dt_dr_fire": "0/0",
+      "dt_dr_plasma": "0/2",
+      "dt_dr_explosive": "0/0"
     },
     "weight": 0.4,
     "value": 5
@@ -907,7 +959,11 @@ export const itemDatabase = {
     "description": "Worn by those who guard/control Federation water distribution. Mapped to the manual's UCL Officers Uniform tier: light, breathable rainwear rather than combat armor.",
     "stats": {
       "ac": 2,
-      "dt_dr_normal": "0/7"
+      "dt_dr_normal": "0/7",
+      "dt_dr_laser": "0/2",
+      "dt_dr_fire": "0/0",
+      "dt_dr_plasma": "0/3",
+      "dt_dr_explosive": "0/2"
     },
     "weight": 1,
     "value": "TBA"
