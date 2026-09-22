@@ -1059,6 +1059,22 @@ export const itemDatabase = {
     "weight": 0.1,
     "value": 50
   },
+  ayam_goreng: {
+    "id": "ayam_goreng",
+    "name": "Ayam Goreng",
+    "type": "consumable",
+    "icon": "",
+    "image_prompt": "A plate of golden crispy fried chicken pieces arranged neatly, three small fried chicken heads placed deliberately at the plate's edge, garnished with fried curry leaves, otherwise a picture-perfect presentation.",
+    "description": "Crispy fried chicken, picture-perfect on the plate — aside from the three heads plated neatly beside it.",
+    "effect": "Heals 1d6 HP, restores 30 Hunger",
+    "stats": {
+      "hunger": 30,
+      "heal": "1d6"
+    },
+    "addictive": false,
+    "weight": 0.4,
+    "value": 25
+  },
   bear_trap: {
     "id": "bear_trap",
     "name": "Bear Trap",
@@ -1427,6 +1443,23 @@ export const itemDatabase = {
     "weight": 0.05,
     "value": 50
   },
+  nasi_goreng_cicak: {
+    "id": "nasi_goreng_cicak",
+    "name": "Nasi Goreng Cicak",
+    "type": "consumable",
+    "icon": "",
+    "image_prompt": "A steaming plate of fried rice glistening with oil, flecks of golden fried garlic and onion scattered across the top, small crisped lizard tails and legs mixed through the grains, served on a chipped enamel plate.",
+    "description": "Aromatic garlic-and-onion fried rice, cooked with fried house lizard mixed through the grains. Filling, cheap, and better than it sounds.",
+    "effect": "Heals 1d4 HP, restores 25 Hunger, costs 5 Thirst",
+    "stats": {
+      "hunger": 25,
+      "thirst": -5,
+      "heal": "1d4"
+    },
+    "addictive": false,
+    "weight": 0.35,
+    "value": 15
+  },
   nasi_lemak_ration_brick: {
     "id": "nasi_lemak_ration_brick",
     "name": "Nasi Lemak Ration Brick",
@@ -1442,6 +1475,23 @@ export const itemDatabase = {
     "addictive": false,
     "weight": 0.3,
     "value": 20
+  },
+  nasi_lemak: {
+    "id": "nasi_lemak",
+    "name": "Nasi Lemak",
+    "type": "consumable",
+    "icon": "",
+    "image_prompt": "A folded banana leaf parcel opened flat to show coconut-glossed white rice, a dollop of dark red sambal, a scattering of roasted peanuts and fried anchovies, a hard-boiled egg cut in half beside it, faint steam rising.",
+    "description": "A proper plate of coconut rice with sambal, peanuts and egg — fresh-cooked, not the ration brick that shares its name.",
+    "effect": "Heals 1d6 HP, restores 30 Hunger, costs 5 Thirst",
+    "stats": {
+      "hunger": 30,
+      "thirst": -5,
+      "heal": "1d6"
+    },
+    "addictive": false,
+    "weight": 0.5,
+    "value": 28
   },
   pak_kopis_kopi: {
     "id": "pak_kopis_kopi",
@@ -1554,6 +1604,22 @@ export const itemDatabase = {
     "addictive": false,
     "weight": 0.3,
     "value": 10
+  },
+  roasted_semut_satay: {
+    "id": "roasted_semut_satay",
+    "name": "Roasted Semut Satay",
+    "type": "consumable",
+    "icon": "",
+    "image_prompt": "Several bamboo skewers of charred, marinated meat chunks glistening from the grill, a small dish of peanut sauce beside them, a few segmented insect legs still visible on one skewer, laid on a banana leaf.",
+    "description": "Skewered Giant Ant meat, marinated and grilled satay-style. There's never a shortage of the stuff.",
+    "effect": "Heals 1d4 HP, restores 20 Hunger",
+    "stats": {
+      "hunger": 20,
+      "heal": "1d4"
+    },
+    "addictive": false,
+    "weight": 0.2,
+    "value": 12
   },
   salvaged_birds_nest_broth: {
     "id": "salvaged_birds_nest_broth",
@@ -2995,6 +3061,21 @@ export const itemDatabase = {
     "weight": 1,
     "value": 2
   },
+  ishtar_device: {
+    "id": "ishtar_device",
+    "name": "The Ishtar Device",
+    "type": "junk",
+    "icon": "",
+    "image_prompt": "A palm-sized plastic device with a small speaker grille and a single blinking status light, moulded casing scuffed and yellowed with age, a peeling sticker printed with a roaring animal crossed out in red, a hand-written price tag tied on with string.",
+    "description": "A boxy unit that supposedly emits an ultrasonic screech to scare off dangerous creatures. Reads like a scam — but anyone with real Science knowledge can tell the internals are genuine pre-War hardware, even if nobody can say whether it ever worked.",
+    "scrap_yield": {
+      "electronics": 3,
+      "pre_war_tech": 1
+    },
+    "stackable": true,
+    "weight": 1.2,
+    "value": 35
+  },
   torn_umbrella_frame: {
     "id": "torn_umbrella_frame",
     "name": "Torn Umbrella Frame",
@@ -3076,6 +3157,85 @@ export const itemDatabase = {
     },
     "weight": 6,
     "value": 45
+  },
+  axe_gang_flame_axe: {
+    "id": "axe_gang_flame_axe",
+    "name": "Axe Gang Flame Axe",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "big_guns",
+    "icon": "",
+    "description": "A gutted guitar body carrying a nozzle where the neck joins it, hosed to a dented fuel tank harnessed across the wearer's back. Loud, heavy, and the gang's favourite by reputation alone.",
+    "image_prompt": "A hollowed electric guitar body fitted with a scorched metal nozzle at the neck joint, a rubber fuel hose running to a dented tank harness, soot streaks blackening the guitar's lacquer, faded band stickers peeling off the tank.",
+    "stats": {
+      "dmg": "2d6+2",
+      "dmgType": "fire",
+      "range": 6,
+      "ammo_type": "flamer_fuel"
+    },
+    "weight": 9.5,
+    "value": 1100
+  },
+  axe_gang_rifle_axe: {
+    "id": "axe_gang_rifle_axe",
+    "name": "Axe Gang Rifle Axe",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "An electric guitar body with a rifle barrel bolted through the sound hole, the neck left on so its owner can still play a riff between shots.",
+    "image_prompt": "A battered electric guitar body with a rusted rifle barrel jutting from the sound hole, the neck and strings still intact, hand-painted flame decals peeling off the lacquer, a crude wire stock welded to the tailpiece.",
+    "stats": {
+      "dmg": "1d8+1",
+      "dmgType": "normal",
+      "range": 18,
+      "ammo_type": "makeshift_rounds"
+    },
+    "weight": 3.2,
+    "value": 500
+  },
+  axe_gang_sledge_axe: {
+    "id": "axe_gang_sledge_axe",
+    "name": "Axe Gang Sledge Axe",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "oversized",
+    "two_handed": true,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "A solid-body guitar plated with rebar and scrap steel, swung two-handed by the neck. The strings are still strung, snapping loose and dangling with every hit.",
+    "image_prompt": "A heavy electric guitar body wrapped and reinforced with welded rebar and dented scrap plate, snapped guitar strings hanging loose from the headstock, worn leather-wrapped neck grip, dried bloodstains along the reinforced edge.",
+    "stats": {
+      "dmg": "2d6+1",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "weight": 8.5,
+    "value": 500
+  },
+  axe_gang_volt_axe: {
+    "id": "axe_gang_volt_axe",
+    "name": "Axe Gang Volt Axe",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "energy_weapons",
+    "icon": "",
+    "description": "A guitar body strapped with a car battery and a scavenged focusing lens bolted over the pickups, wired straight into the fretboard. It hums audibly when charged.",
+    "image_prompt": "An electric guitar body with a corroded car battery strapped to its back and a cracked focusing lens mounted where the pickups once sat, loose wiring taped along the neck, scorch marks radiating from the lens housing.",
+    "stats": {
+      "dmg": "1d8+3",
+      "dmgType": "laser",
+      "range": 15,
+      "ammo_type": "energy_cell"
+    },
+    "weight": 5,
+    "value": 700
   },
   bent_rebar_spear: {
     "id": "bent_rebar_spear",

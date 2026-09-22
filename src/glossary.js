@@ -667,6 +667,344 @@ export const glossaryDatabase = {
       "Locations"
     ]
   },
+  ah_piu: {
+    "id": "ah_piu",
+    "name": "Ah Piu",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Ah Piu is a name that surfaces in Bandawang's gambling dens and back-alley deals.",
+    "category_path": [
+      "People"
+    ]
+  },
+  aida: {
+    "id": "aida",
+    "name": "Aida",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Aida is Ketua Bob's no-nonsense wife and matriarch of the Rakan Watch.",
+    "category_path": [
+      "People"
+    ]
+  },
+  bakri: {
+    "id": "bakri",
+    "name": "Bakri",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Bakri is the simple-minded, tactless and ambitious right hand of Ketua Bob — a man whose bite definitely hurts worse than his bark.",
+    "category_path": [
+      "People"
+    ]
+  },
+  cheryl_chia: {
+    "id": "cheryl_chia",
+    "name": "Cheryl Chia",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Cheryl Chia is a cute and curious Protectorate scientist travelling the Peninsula.",
+    "category_path": [
+      "People"
+    ]
+  },
+  colonel_rizal: {
+    "id": "colonel_rizal",
+    "name": "Colonel Rizal",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Colonel Rizal is the Federation Colonel in charge of all Federation military in Bandawang.",
+    "category_path": [
+      "People"
+    ]
+  },
+  commie_bot: {
+    "id": "commie_bot",
+    "name": "Commie Bot",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Commie Bot is a battered Mr Handy — reprogrammed decades ago to hunt Communists — now working the floor of the Peng Brothers' RNR as a massage-robot gimmick.",
+    "category_path": [
+      "People"
+    ]
+  },
+  daz: {
+    "id": "daz",
+    "name": "Daz",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Daz is a cranky ghoul who holds court in the corner of the Lakeside Bar.",
+    "category_path": [
+      "People"
+    ]
+  },
+  faiz: {
+    "id": "faiz",
+    "name": "Faiz",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Faiz is a mysterious Caliphate Pahlawan — a rare sight outside Caliphate territory.",
+    "category_path": [
+      "People"
+    ]
+  },
+  farmer_nick_peng: {
+    "id": "farmer_nick_peng",
+    "name": "Farmer Nick Peng",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Farmer Nick Peng is Bandawang's resident accepted grouch.",
+    "category_path": [
+      "People"
+    ]
+  },
+  gardener_steve: {
+    "id": "gardener_steve",
+    "name": "Gardener Steve",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Gardener Steve is a nerdy white guy in the middle of the Asian jungle, and all he wants to do is study it.",
+    "category_path": [
+      "People"
+    ]
+  },
+  gongmaster_jane: {
+    "id": "gongmaster_jane",
+    "name": "Gongmaster Jane",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Gongmaster Jane is the resident Gongkeeper of the Fallen Gong's Bandawang temple.",
+    "category_path": [
+      "People"
+    ]
+  },
+  guru_besar_raj: {
+    "id": "guru_besar_raj",
+    "name": "Guru Besar Raj",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Guru Besar Raj is the headmaster of Bandawang's Education Center, and a Rakan Watch representative.",
+    "category_path": [
+      "People"
+    ]
+  },
+  ishtar: {
+    "id": "ishtar",
+    "name": "Ishtar",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Ishtar is a charismatic young dealmaker bankrolling Bandawang's planned casino, Syurga — pleasant, affable, and almost too good to be true.",
+    "category_path": [
+      "People"
+    ]
+  },
+  janson_peng: {
+    "id": "janson_peng",
+    "name": "Janson Peng",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Janson Peng is tiny but ferocious.",
+    "category_path": [
+      "People"
+    ]
+  },
+  jas_kaur: {
+    "id": "jas_kaur",
+    "name": "Jas Kaur",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Jas Kaur is one of PosLaju's riders on the Bandawang run.",
+    "category_path": [
+      "People"
+    ]
+  },
+  ketua_bob: {
+    "id": "ketua_bob",
+    "name": "Ketua Bob",
+    "aliases": [
+      "Boss Bob"
+    ],
+    "strict_aliases": [],
+    "summary": "Ketua Bob is the Ketua (chief) of the Bandawang Rakan Watch — a big, loud yet kind-hearted father figure among Bandawang's civilians.",
+    "category_path": [
+      "People"
+    ]
+  },
+  mak_cik_yam: {
+    "id": "mak_cik_yam",
+    "name": "Mak Cik Yam",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Mak Cik Yam is Ketua Bob's cantankerous and irritable ghoul mother — a little forgetful, and prone to losing track of where she is.",
+    "category_path": [
+      "People"
+    ]
+  },
+  mother_senja: {
+    "id": "mother_senja",
+    "name": "Mother Senja",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Mother Senja is the stern caretaker of the Bandawang branch of the Kancil Orphanage.",
+    "category_path": [
+      "People"
+    ]
+  },
+  najwa: {
+    "id": "najwa",
+    "name": "Najwa",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Najwa is Bob's daughter and the light of his life — even through her sickness and weakness, she brightens any room she's in.",
+    "category_path": [
+      "People"
+    ]
+  },
+  niama_choo: {
+    "id": "niama_choo",
+    "name": "Niama Choo",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Niama Choo is the patriarch of the Choo Clan.",
+    "category_path": [
+      "People"
+    ]
+  },
+  nipu_nipi: {
+    "id": "nipu_nipi",
+    "name": "Nipu & Nipi",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Nipu & Nipi are the rascal twins of Bandawang Baru, usually seen running around town pulling pranks.",
+    "category_path": [
+      "People"
+    ]
+  },
+  orange_peng: {
+    "id": "orange_peng",
+    "name": "Orange Peng",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Orange Peng is simple.",
+    "category_path": [
+      "People"
+    ]
+  },
+  pastor_steven: {
+    "id": "pastor_steven",
+    "name": "Pastor Steven",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Pastor Steven is the charismatic face of the Church of the New Age Saints in Bandawang.",
+    "category_path": [
+      "People"
+    ]
+  },
+  sam_lim: {
+    "id": "sam_lim",
+    "name": "Sam Lim",
+    "aliases": [
+      "Mountain Master Sam Lim"
+    ],
+    "strict_aliases": [],
+    "summary": "Sam Lim is the Mountain Master of the 1414 Triad — hard to hear over his raspy voice, the legacy of years of excessive smoking.",
+    "category_path": [
+      "People"
+    ]
+  },
+  silas_tan: {
+    "id": "silas_tan",
+    "name": "Silas Tan",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Silas Tan is a Bandawang Enforcer who managed the prison's security before Kelam Sungai went up — some wonder if he made it out.",
+    "category_path": [
+      "People"
+    ]
+  },
+  slink_tan: {
+    "id": "slink_tan",
+    "name": "Slink Tan",
+    "aliases": [
+      "Red Pole Tan"
+    ],
+    "strict_aliases": [],
+    "summary": "Slink Tan is the Tan family's representative in Bandawang — a vicious enforcer, quick to violence despite his calm demeanour.",
+    "category_path": [
+      "People"
+    ]
+  },
+  sudirman: {
+    "id": "sudirman",
+    "name": "Sudirman",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Vokalis Sudirman is the leader of the Axe Gang — a tall, gaunt rocker living life on the edge.",
+    "category_path": [
+      "People"
+    ]
+  },
+  terror: {
+    "id": "terror",
+    "name": "Terror",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Terror is the Axe Gang's enforcer — a Gergasi larger than normal, and a man of few words.",
+    "category_path": [
+      "People"
+    ]
+  },
+  the_ghoul_king: {
+    "id": "the_ghoul_king",
+    "name": "The Ghoul King",
+    "aliases": [
+      "Ghoul King"
+    ],
+    "strict_aliases": [],
+    "summary": "The Ghoul King is a legend as much as a man — a name whispered from Bandawang's back alleys to the ruins of Kuala Lumpur Baru, attached to a different story everywhere it's told.",
+    "category_path": [
+      "People"
+    ]
+  },
+  the_marisni_s: {
+    "id": "the_marisni_s",
+    "name": "The Marisni's",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Marisni's is Bandawang slang for the Kancils working the Axe Gang's garages — essentially, junior mechanics.",
+    "category_path": [
+      "People"
+    ]
+  },
+  uncle_loo: {
+    "id": "uncle_loo",
+    "name": "Uncle Loo",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Uncle Loo is the mysterious, bedridden benefactor and businessman behind a seemingly limitless fortune.",
+    "category_path": [
+      "People"
+    ]
+  },
+  warden_robo: {
+    "id": "warden_robo",
+    "name": "Warden Robo",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Warden Robo is the prison's old Robco Securitron, \"fixed up\" once more, his eyepatch now pasted directly onto his screen.",
+    "category_path": [
+      "People"
+    ]
+  },
+  ying_ying_tan: {
+    "id": "ying_ying_tan",
+    "name": "Ying Ying Tan",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Ying Ying Tan is known around Bandawang as \"the girl with the dragon tattoo\" — a Tan family enforcer no one has seen since the Kelam Sungai explosion.",
+    "category_path": [
+      "People"
+    ]
+  },
   order_of_the_falling_gong: {
     "id": "order_of_the_falling_gong",
     "name": "Order of the Falling Gong",
