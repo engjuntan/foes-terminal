@@ -98,6 +98,179 @@ function escapeRegex(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// --- STATUS (STATUS_AND_CRIPPLE_SPEC.md Part A/C) ---
+// Human-readable labels for the non-SPECIAL, non-skill modifier keys
+// that show up in `derived.breakdown.other` and in status/need/radiation
+// tier `modifiers` objects — shared by the CONDITION block (dashboard +
+// STATUS tab) and the PASSIVE block (STATUS tab).
+const MODIFIER_KEY_LABELS = {
+  ac_bonus: 'Armor Class', sequence_bonus: 'Sequence', melee_dmg_flat: 'Melee Damage',
+  carry_bonus: 'Carry Capacity', healing_rate_bonus: 'Healing Rate', max_hp_flat: 'Max HP',
+  damage_res: 'Damage Resistance', hit_chance_pct: 'Hit Chance', skip_turn: 'Skip Turn',
+  damage_per_turn: 'Damage/Turn'
+};
+function modifierKeyLabel(key) {
+  if (MODIFIER_KEY_LABELS[key]) return MODIFIER_KEY_LABELS[key];
+  if (key.startsWith('special_')) return key.replace('special_', '').toUpperCase();
+  if (key.startsWith('skill_')) return key.replace('skill_', '').replace(/_/g, ' ').toUpperCase();
+  return key.replace(/_/g, ' ');
+}
+// Renders a modifiers object ({special_per:-2, ...}) as "-2 PER  -1 AGI"
+// for a single condition row. Non-numeric entries (skip_turn: true) show
+// their label alone, since there's no magnitude to sign.
+function formatModifierList(modifiers) {
+  return Object.entries(modifiers || {})
+    .map(([k, v]) => typeof v === 'number' ? `${v > 0 ? '+' : ''}${v} ${modifierKeyLabel(k)}` : modifierKeyLabel(k))
+    .join('  ');
+}
+
+// One source of truth for "what's active or approaching" — used by both
+// the dashboard's always-visible compact CONDITION block and the full
+// STATUS tab, so the two can never drift apart (GM ruling, 2026-09-22:
+// statuses belong on the dashboard, not just behind a tab).
+// Radiation deliberately never carries the exact rads number here — the
+// player-facing views never show it (see renderRadiationGauge); only the
+// GM's own screens do.
+function buildConditionRows(charData) {
+  const rows = [];
+
+  (charData.status_effects || []).forEach(fx => {
+    const hasEffect = Object.keys(fx.modifiers || {}).length > 0;
+    rows.push({
+      active: hasEffect,
+      label: fx.name,
+      detail: fx.duration_turns ? `${fx.duration_turns} turn(s) left` : 'until cured',
+      mods: hasEffect ? formatModifierList(fx.modifiers) : 'no numeric effect'
+    });
+  });
+
+  const needs = normalizeNeeds(charData.needs);
+  [['hunger', 'Hunger'], ['thirst', 'Thirst'], ['sleep', 'Sleep']].forEach(([key, label]) => {
+    const tier = getNeedTier(key, needs[key]);
+    const hasEffect = Object.keys(tier.modifiers || {}).length > 0;
+    if (!hasEffect && tier.at === 100) return; // fully sated/hydrated/rested — nothing to show
+    rows.push({
+      active: hasEffect,
+      label: tier.label,
+      detail: `${label.toLowerCase()} ${Math.round(needs[key])}/100`,
+      mods: hasEffect ? formatModifierList(tier.modifiers) : 'no effect yet'
+    });
+  });
+
+  const rads = charData.rads || 0;
+  if (rads > 0) {
+    const radTier = getRadiationTier(rads);
+    const hasEffect = Object.keys(radTier.modifiers || {}).length > 0;
+    rows.push({
+      active: hasEffect,
+      label: hasEffect ? 'Radiation Sickness' : 'Radiation (trace)',
+      detail: radTier.description,
+      mods: hasEffect ? formatModifierList(radTier.modifiers) : 'no effect yet'
+    });
+  }
+
+  return rows;
+}
+
+// Same row shape, two densities: the dashboard gets this exact markup
+// (small, single-line-ish); the STATUS tab reuses it verbatim under its
+// own CONDITION heading, per C.1/C.2.
+function renderConditionRows(rows) {
+  if (rows.length === 0) return `<div style="color:#555; font-size:12px; padding:4px 0;">No active or approaching conditions.</div>`;
+  return rows.map(r => `
+    <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:12px; padding:4px 0; border-bottom:1px dashed #222; opacity:${r.active ? 1 : 0.55};">
+      <span style="color:${r.active ? 'var(--danger, #ff5555)' : '#888'}; flex-shrink:0;">${r.active ? '●' : '○'} ${escapeHtml(r.label)}</span>
+      <span style="color:#888; text-align:center; flex-grow:1;">${escapeHtml(r.detail)}</span>
+      <span style="color:${r.active ? 'var(--danger, #ff5555)' : '#666'}; text-align:right; flex-shrink:0;">${escapeHtml(r.mods)}</span>
+    </div>`).join('');
+}
+
+// Full STATUS tab (STATUS_AND_CRIPPLE_SPEC.md Part C, GM adjustments
+// 2026-09-22): CONDITION (same rows as the dashboard's compact block),
+// ATTRIBUTES (full provenance — every modifier with its source, per
+// A.2/C.2), PASSIVE (things helping, not hurting). LIMBS is omitted —
+// there's no cripple system yet to have limb state to show.
+export function getStatusView(charId, liveData) {
+  const charData = liveData.characters[charId];
+  if (!charData) return `<h1>&gt; ERROR: IDENTITY NOT FOUND</h1>`;
+  const derived = deriveCharacter(charData);
+  const breakdown = derived.breakdown || { baseSpecial: {}, skillsBase: {}, special: {}, skills: {}, other: [] };
+
+  const conditionRows = buildConditionRows(charData);
+
+  // ATTRIBUTES — SPECIAL stats first (only ones with at least one
+  // modifier, per C.2's "a clean character should see a short screen"
+  // rule), then skills. Skill "base" folds in skill_ranks + the +20 tag
+  // bonus (deriveCharacter's own additions, not a modifier source) so
+  // the displayed arrow reconciles against the rows shown underneath it.
+  const attrRows = [];
+  SPECIAL_ORDER.forEach(stat => {
+    const mods = breakdown.special[stat];
+    if (!mods || mods.length === 0) return;
+    attrRows.push({
+      label: stat.toUpperCase(),
+      base: breakdown.baseSpecial[stat],
+      final: derived.special[stat],
+      mods
+    });
+  });
+  Object.keys(derived.skills).forEach(skillName => {
+    const mods = breakdown.skills[skillName];
+    if (!mods || mods.length === 0) return;
+    const rankBonus = (charData.skill_ranks?.[skillName] || 0) + (charData.tags?.[skillName] ? 20 : 0);
+    attrRows.push({
+      label: skillName.replace(/_/g, ' ').toUpperCase(),
+      base: (breakdown.skillsBase[skillName] || 0) + rankBonus,
+      final: derived.skills[skillName],
+      mods
+    });
+  });
+
+  const attributesHtml = attrRows.length === 0
+    ? `<div style="color:#555; font-size:12px;">Nothing modified — every attribute and skill is at its clean value.</div>`
+    : attrRows.map(row => `
+      <div style="margin-bottom:10px;">
+        <div style="display:flex; justify-content:space-between; font-size:14px;">
+          <strong>${row.label}</strong>
+          <span>${row.base} → <span style="color:${row.final < row.base ? 'var(--danger, #ff5555)' : 'var(--pip-green)'};">${row.final}</span></span>
+        </div>
+        ${row.mods.map(m => `
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:${m.value < 0 ? 'var(--danger, #ff5555)' : 'var(--pip-green)'}; padding-left:10px;">
+            <span>${m.value > 0 ? '+' : ''}${m.value} ${escapeHtml(m.source)}</span>
+            <span style="color:#666;">${m.sourceType || ''}</span>
+          </div>`).join('')}
+      </div>`).join('');
+
+  // PASSIVE — trait/perk/equipment/race sources only. Radiation/need
+  // sources land in `other` too (max_hp_flat) but they're already
+  // surfaced above in CONDITION — repeating them here would be the same
+  // penalty twice under two different headings.
+  const passiveRows = (breakdown.other || []).filter(r => ['trait', 'perk', 'equipment', 'race'].includes(r.sourceType));
+
+  const passiveHtml = passiveRows.length === 0
+    ? `<div style="color:#555; font-size:12px;">Nothing passive active.</div>`
+    : passiveRows.map(r => `
+      <div style="display:flex; justify-content:space-between; font-size:13px; padding:3px 0; border-bottom:1px dashed #222;">
+        <span style="color:${r.value < 0 ? 'var(--danger, #ff5555)' : 'var(--pip-green)'};">${r.value > 0 ? '+' : ''}${r.value} ${modifierKeyLabel(r.key)}</span>
+        <span style="color:#888;">${escapeHtml(r.source)} <span style="color:#555;">(${r.sourceType})</span></span>
+      </div>`).join('');
+
+  return `
+    <div class="dashboard-container" style="grid-template-columns: 1fr 1fr; max-width:900px; margin:0 auto;">
+      <div class="panel">
+        <h2 style="color:var(--pip-dim);">CONDITION</h2>
+        ${renderConditionRows(conditionRows)}
+      </div>
+      <div class="panel">
+        <h2 style="color:var(--pip-dim);">ATTRIBUTES</h2>
+        <div style="margin-bottom:20px;">${attributesHtml}</div>
+        <h2 style="color:var(--pip-dim);">PASSIVE</h2>
+        ${passiveHtml}
+      </div>
+    </div>
+  `;
+}
+
 // Wraps any glossary term found in already-escaped HTML with the
 // app's existing hover/tap tooltip (renderWikiLink — same mechanism
 // already used for SPECIAL stats, skills, traits, and item names), so
@@ -396,7 +569,7 @@ export function getGoatReviewView(charId, liveData) {
       <div class="panel" style="border:2px solid var(--pip-green); box-shadow:0 0 15px rgba(50,255,50,0.1);">
         <div style="display:flex; justify-content:space-between; align-items:center; background:var(--pip-green); margin:-10px -10px 20px -10px; padding:10px;">
           <h1 style="margin:0; color:black;">IDENTITY CARD</h1>
-          <button onclick="window.switchTab('STATUS')" style="background:black; color:lime; border:1px solid black; cursor:pointer;">BACK</button>
+          <button onclick="window.switchTab('DASHBOARD')" style="background:black; color:lime; border:1px solid black; cursor:pointer;">BACK</button>
         </div>
 
         <div style="display:flex; gap:20px; margin-bottom:20px;">
@@ -761,7 +934,7 @@ export function getCombatView(liveData, userRole, currentUser) {
         <div style="margin-top:15px;">${initiativeHtml}</div>
         ${canEndTurn ? `<button style="width:100%; margin-top:15px; padding:10px; background:var(--pip-dim); color:black; font-weight:bold; border:none; cursor:pointer;" onclick="window.endTurn()">END TURN</button>` : ''}
         ${isLive && userRole === 'gm' ? `<button style="width:100%; margin-top:8px; padding:10px; background:red; color:white; border:none; cursor:pointer;" onclick="window.endCombat()">END COMBAT</button>` : ''}
-        <button style="width:100%; margin-top:8px; padding:8px; background:#333; color:var(--pip-green); border:none; cursor:pointer;" onclick="window.switchTab('STATUS')">BACK TO DASHBOARD</button>
+        <button style="width:100%; margin-top:8px; padding:8px; background:#333; color:var(--pip-green); border:none; cursor:pointer;" onclick="window.switchTab('DASHBOARD')">BACK TO DASHBOARD</button>
       </div>
       <div>
         ${actionPanelHtml}
@@ -772,6 +945,11 @@ export function getCombatView(liveData, userRole, currentUser) {
       </div>
       <div class="panel">
         <h2>COMBAT LOG</h2>
+        ${userRole === 'gm' && liveData.last_resolution && liveData.last_resolution.kind === 'attack' ? `
+        <div style="border:1px solid orange; padding:8px; margin-bottom:10px;">
+          <div style="font-size:11px; color:orange;">LAST ACTION: ${liveData.last_resolution.actor} vs ${liveData.last_resolution.target} (rolled ${liveData.last_resolution.roll})</div>
+          <button style="width:100%; margin-top:6px; padding:6px; background:orange; color:black; font-weight:bold; border:none; cursor:pointer;" onclick="window.gmRerollLastResolution()">↻ REROLL (GM ONLY)</button>
+        </div>` : ''}
         <div style="max-height:500px; overflow-y:auto;">${logHtml || '<span style="color:#555;">No events yet.</span>'}</div>
       </div>
     </div>
@@ -907,6 +1085,11 @@ export function getChecksView(liveData, userRole, currentUser) {
       ${gmPanelHtml}
       <div class="panel">
         <h2>CHECK LOG</h2>
+        ${userRole === 'gm' && liveData.last_resolution && (liveData.last_resolution.kind === 'player_check' || liveData.last_resolution.kind === 'gm_check') ? `
+        <div style="border:1px solid orange; padding:8px; margin-bottom:10px;">
+          <div style="font-size:11px; color:orange;">LAST CHECK: ${liveData.last_resolution.actor} (rolled ${liveData.last_resolution.roll})</div>
+          <button style="width:100%; margin-top:6px; padding:6px; background:orange; color:black; font-weight:bold; border:none; cursor:pointer;" onclick="window.gmRerollLastResolution()">↻ REROLL (GM ONLY)</button>
+        </div>` : ''}
         <div style="max-height:500px; overflow-y:auto;">${checkLogHtml || '<span style="color:#555;">No checks rolled yet.</span>'}</div>
       </div>
     </div>
@@ -1202,7 +1385,6 @@ export function getPlayerView(charId, liveData) {
   if (!charData) return `<h1>> ERROR: IDENTITY '${charId.toUpperCase()}' NOT FOUND</h1>`;
 
   const equip = charData.equipment || { head: null, body: null, right_hand: null, left_hand: null, back: null };
-  const activeStatusEffects = charData.status_effects || [];
 
   // PASS RACE + STATUS EFFECTS + EQUIPMENT TO FORMULAS
   const derived = deriveCharacter(charData);
@@ -1418,13 +1600,11 @@ export function getPlayerView(charId, liveData) {
            <span style="color:cyan;">${charData.vault_points || 0}</span>
         </div>
 
-        ${activeStatusEffects.length > 0 ? `
-        <h3 style="color:orange; border-bottom:1px solid orange; margin-top:20px;">ACTIVE EFFECTS</h3>
-        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
-          ${activeStatusEffects.map(fx => renderWikiLink(fx.name.toUpperCase(),
-              Object.entries(fx.modifiers || {}).map(([k,v]) => `${k}: ${v > 0 ? '+' : ''}${v}`).join(', ') || 'No numeric effect.'
-            )).join('')}
-        </div>` : ''}
+        <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px; display:flex; justify-content:space-between; align-items:center;">
+          CONDITION
+          <span onclick="window.switchTab('STATUS')" style="cursor:pointer; font-size:11px; font-weight:normal; text-decoration:underline; color:var(--pip-dim);">[ FULL STATUS ]</span>
+        </h3>
+        <div style="margin-bottom:10px;">${renderConditionRows(buildConditionRows(charData))}</div>
 
         <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px;">S.P.E.C.I.A.L.</h3>
         ${SPECIAL_ORDER.map(k => `<div class="special-row"><span>${renderWikiLink(k.toUpperCase(), SPECIAL_INFO[k])}</span><span>${charData.special[k] ?? '-'}</span></div>`).join("")}
@@ -1442,6 +1622,12 @@ export function getPlayerView(charId, liveData) {
         ${charData.biography ? `
         <h2>BIOGRAPHY</h2>
         <div style="max-height:180px; overflow-y:auto; margin-bottom:20px; font-size:14px; color:#ccc; line-height:1.5; white-space:pre-wrap;">${escapeHtml(charData.biography)}</div>` : ''}
+
+        <h2>MY NOTES</h2>
+        <p style="font-size:11px; color:#666; margin:0 0 4px;">Private scratchpad, yours to write — the GM can read it but won't edit it. Separate from your biography above.</p>
+        <textarea id="playerNotesTextarea" rows="4" style="width:100%; background:black; color:var(--pip-green); border:1px solid #333; font-family:'IBM Plex Mono', monospace; font-size:12px; margin-bottom:6px;">${escapeHtml(charData.player_notes || '')}</textarea>
+        <button class="gm-btn" style="border-color:var(--pip-green); color:var(--pip-green); margin-bottom:20px;" onclick="window.savePlayerNotes()">SAVE NOTES</button>
+
         <h2>COMBAT STATS</h2>
          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
           <div style="border:1px solid #333; padding:5px; text-align:center;"><small>AC</small><br><strong style="font-size:24px;">${derived.armorClass}</strong></div>
@@ -1789,6 +1975,9 @@ export function renderGMScreen(liveData) {
         <label style="font-size:11px; color:#666;">GM NOTES</label>
         <textarea id="gmNotesTextarea" rows="6" style="width:100%; background:black; color:cyan; border:1px solid #333; font-family:'IBM Plex Mono', monospace; font-size:12px; margin-bottom:8px;">${(targetChar && targetChar.gm_notes) || ''}</textarea>
         <button class="gm-btn" style="width:100%; border-color:cyan; color:cyan;" onclick="window.gmSaveBiography()">SAVE</button>
+
+        <label style="font-size:11px; color:#666; display:block; margin-top:10px;">PLAYER'S OWN NOTES (read-only — written by the player, not you)</label>
+        <div style="max-height:120px; overflow-y:auto; width:100%; background:#0a0a0a; color:#999; border:1px solid #333; font-family:'IBM Plex Mono', monospace; font-size:12px; padding:6px; white-space:pre-wrap; box-sizing:border-box;">${escapeHtml((targetChar && targetChar.player_notes) || '') || '<span style="color:#555;">(empty)</span>'}</div>
 
         <h4 style="color:red; border-bottom:1px dashed red; margin-top:20px;">DANGER ZONE</h4>
         <button class="gm-btn" style="border-color:red; color:white; background:red; width:100%;" onclick="window.gmFactoryReset()">FACTORY RESET CHARACTER</button>

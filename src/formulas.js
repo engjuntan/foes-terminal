@@ -45,32 +45,61 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   // something (e.g. Short-Sighted's -1 PER goes away while Glasses are
   // equipped) — filtered out here so neither pass below has to know about it.
   const modifierSources = [
-    ...allModifiers.map(id => getTrait(id)),
-    ...(activeStatusEffects || []),
-    { modifiers: radModifiers },
-    { modifiers: hungerTier.modifiers },
-    { modifiers: thirstTier.modifiers },
-    { modifiers: sleepTier.modifiers },
+    ...allModifiers.map(id => { const t = getTrait(id); return t ? { ...t, sourceType: t.type || 'trait' } : t; }),
+    ...(activeStatusEffects || []).map(fx => ({ ...fx, sourceType: 'status' })),
+    // Anonymous sources named/typed here (STATUS_AND_CRIPPLE_SPEC.md A.3)
+    // so the provenance breakdown below can say *why* a number changed,
+    // not just by how much. A tier contributing nothing (`modifiers: {}`)
+    // still gets an entry — harmless, since the breakdown-building code
+    // only ever emits a row for a modifier key that's actually present.
+    { name: `Radiation (${rads} rads)`, sourceType: 'radiation', modifiers: radModifiers },
+    { name: hungerTier.label, sourceType: 'need', modifiers: hungerTier.modifiers },
+    { name: thirstTier.label, sourceType: 'need', modifiers: thirstTier.modifiers },
+    { name: sleepTier.label, sourceType: 'need', modifiers: sleepTier.modifiers },
     // Skill books grant a flat, permanent skill_<name> bonus on first
     // read (see useItem()) that has to persist after the book itself is
     // consumed — so it lives on the character, not the inventory, and
     // rides the exact same skill_<name> merge loop below that traits and
     // perks already use. No new merge logic needed for this to work.
-    { modifiers: permanentSkillBonuses }
+    // (A.3: naming which specific book(s) granted this is a view-layer
+    // job — formulas.js only knows the summed total, not which books
+    // exist — see views.js's Status tab.)
+    { name: 'Skill books', sourceType: 'book', modifiers: permanentSkillBonuses }
   ].filter(source => !source || !source.suppressed_by_item || !isItemEquipped(source.suppressed_by_item));
   let healingRateBonus = 0;
   let special = { ...baseSpecial };
 
+  // --- PROVENANCE (STATUS_AND_CRIPPLE_SPEC.md Part A) ---
+  // Purely additive bookkeeping alongside the real calculation below — no
+  // existing field changes, no existing caller breaks. `other` collects
+  // anything that isn't a SPECIAL stat or a skill (AC, carry, melee
+  // damage, healing rate, max HP), pushed at the exact site each one is
+  // actually applied so the rows can never drift from the real numbers.
+  const breakdown = {
+    baseSpecial: { ...baseSpecial },
+    skillsBase: {},
+    special: {},
+    skills: {},
+    other: []
+  };
+
   modifierSources.forEach(source => {
     if (source && source.modifiers) {
-      if (source.modifiers.special_str) special.str += source.modifiers.special_str;
-      if (source.modifiers.special_per) special.per += source.modifiers.special_per;
-      if (source.modifiers.special_end) special.end += source.modifiers.special_end;
-      if (source.modifiers.special_cha) special.cha += source.modifiers.special_cha;
-      if (source.modifiers.special_int) special.int += source.modifiers.special_int;
-      if (source.modifiers.special_agi) special.agi += source.modifiers.special_agi;
-      if (source.modifiers.special_luk) special.luk += source.modifiers.special_luk;
-      if (source.modifiers.healing_rate_bonus) healingRateBonus += source.modifiers.healing_rate_bonus;
+      const m = source.modifiers;
+      const pushSpecial = (statKey, modKey) => {
+        if (m[modKey]) {
+          special[statKey] += m[modKey];
+          (breakdown.special[statKey] = breakdown.special[statKey] || []).push({ source: source.name, sourceType: source.sourceType, value: m[modKey] });
+        }
+      };
+      pushSpecial('str', 'special_str');
+      pushSpecial('per', 'special_per');
+      pushSpecial('end', 'special_end');
+      pushSpecial('cha', 'special_cha');
+      pushSpecial('int', 'special_int');
+      pushSpecial('agi', 'special_agi');
+      pushSpecial('luk', 'special_luk');
+      if (m.healing_rate_bonus) healingRateBonus += m.healing_rate_bonus;
     }
   });
 
@@ -105,6 +134,7 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   // AC / Sequence
   let armorClass = agi + (raceDef.stats?.ac_bonus || 0);
   let sequenceBonus = agi;
+  if (raceDef.stats?.ac_bonus) breakdown.other.push({ source: raceDef.name, sourceType: 'race', key: 'ac_bonus', value: raceDef.stats.ac_bonus });
 
   // Equipped body armor's own AC is added on top of Agility — manual:
   // "The Armor Class from the armor is added with your Agility to
@@ -114,6 +144,7 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   const equippedBodyArmor = getItem((equipment || {}).body);
   if (equippedBodyArmor && typeof equippedBodyArmor.stats?.ac === 'number') {
     armorClass += equippedBodyArmor.stats.ac;
+    breakdown.other.push({ source: equippedBodyArmor.name, sourceType: 'equipment', key: 'ac_bonus', value: equippedBodyArmor.stats.ac });
   }
 
   // --- Carry Weight ---
@@ -131,7 +162,10 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   Object.values(equipment || {}).forEach(itemId => {
     if (!itemId) return;
     const eqItem = getItem(itemId);
-    if (eqItem && typeof eqItem.stats?.carry_bonus === 'number') carryBonus += eqItem.stats.carry_bonus;
+    if (eqItem && typeof eqItem.stats?.carry_bonus === 'number') {
+      carryBonus += eqItem.stats.carry_bonus;
+      breakdown.other.push({ source: eqItem.name, sourceType: 'equipment', key: 'carry_bonus', value: eqItem.stats.carry_bonus });
+    }
   });
   const carryCapacity = carryBase + carryBonus;
 
@@ -172,13 +206,24 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   let maxHpCalculated = baseHp + ((level - 1) * hpPerLevel);
   // Summed across every source now, not just radiation — Starving/Dehydrated
   // tiers carry max_hp_flat too (see needs.js), same as the 400+ rad tiers.
-  const totalMaxHpFlat = modifierSources.reduce((sum, s) => sum + ((s && s.modifiers && s.modifiers.max_hp_flat) || 0), 0);
+  const totalMaxHpFlat = modifierSources.reduce((sum, s) => {
+    const v = (s && s.modifiers && s.modifiers.max_hp_flat) || 0;
+    if (v) breakdown.other.push({ source: s.name, sourceType: s.sourceType, key: 'max_hp_flat', value: v });
+    return sum + v;
+  }, 0);
   if (totalMaxHpFlat) maxHpCalculated = Math.max(1, maxHpCalculated + totalMaxHpFlat);
 
   // Resistances
   let poisonRes = (end * 5) + (raceDef.stats?.poison_res || 0);
   let radRes = (end * 2) + (raceDef.stats?.rad_res || 0);
   let damageRes = raceDef.stats?.damage_res || 0; // Natural Armor (Gergasi/Robot)
+  if (raceDef.stats?.damage_res) breakdown.other.push({ source: raceDef.name, sourceType: 'race', key: 'damage_res', value: raceDef.stats.damage_res });
+
+  // Manual p.446: "Limb Resistance - EN/2 (round down) — 5 would mean 5
+  // attacks needed to cripple a limb." Floored at 1 so a 1-EN character
+  // doesn't get a 0-resistance limb that cripples on contact (or,
+  // worse, divides by zero downstream once the cripple counter lands).
+  const limbResistance = Math.max(1, Math.floor(end / 2));
 
   // Manual gives no numeric Robot implant limit ("increased resistance... come
   // naturally" is the only text) — using a modest placeholder bonus over the
@@ -221,18 +266,29 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
     instinct:       Math.floor((str + per + end + cha + int + agi + luk) / 3),
     survival:       5 + agi + agi
   };
+  // A.2/A.4: the skill numbers as computed above, before any post-calc
+  // modifier (trait/perk/status/skill-book) is folded in — the Status
+  // screen's "SMALL GUNS 15 → 6" needs both ends of that arrow.
+  breakdown.skillsBase = { ...skills };
 
   // --- 4. POST-CALCULATION MODIFIERS (traits, perks, and status effects alike) ---
   modifierSources.forEach(source => {
     if (source && source.modifiers) {
-      if (source.modifiers.ac_bonus) armorClass += source.modifiers.ac_bonus;
-      if (source.modifiers.sequence_bonus) sequenceBonus += source.modifiers.sequence_bonus;
-      if (source.modifiers.melee_dmg_flat) meleeDamageBase += source.modifiers.melee_dmg_flat;
+      const m = source.modifiers;
+      const pushOther = (key) => { if (m[key]) breakdown.other.push({ source: source.name, sourceType: source.sourceType, key, value: m[key] }); };
+      if (m.ac_bonus) armorClass += m.ac_bonus;
+      if (m.sequence_bonus) sequenceBonus += m.sequence_bonus;
+      if (m.melee_dmg_flat) meleeDamageBase += m.melee_dmg_flat;
+      pushOther('ac_bonus');
+      pushOther('sequence_bonus');
+      pushOther('melee_dmg_flat');
+      if (m.healing_rate_bonus) pushOther('healing_rate_bonus');
 
       Object.keys(skills).forEach(skillName => {
         const modKey = `skill_${skillName}`;
-        if (source.modifiers[modKey]) {
-          skills[skillName] += source.modifiers[modKey];
+        if (m[modKey]) {
+          skills[skillName] += m[modKey];
+          (breakdown.skills[skillName] = breakdown.skills[skillName] || []).push({ source: source.name, sourceType: source.sourceType, value: m[modKey] });
         }
       });
     }
@@ -251,10 +307,12 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
     poisonRes,
     radRes,
     damageRes,
+    limbResistance,
     implantLimit,
     skillPointsPerLevel,
     perksAllowed,
     skills,
+    breakdown,
     // Manual p.446: "Roll a 1d10, and regain hp per hour up to the maximum
     // of your EN" — EN after all modifiers (including the needs tiers just
     // folded in above), plus any healing_rate_bonus perks (Faster Healing,

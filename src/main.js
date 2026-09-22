@@ -10,7 +10,7 @@ import './style.css';
 window.liveData = null;
 window.currentUser = null;
 window.userRole = null;
-window.currentTab = 'STATUS';
+window.currentTab = 'DASHBOARD';
 
 // --- TEXT SIZE (per-device preference, not synced — CSS uses fixed px
 // everywhere, so rather than rewrite ~450 lines to rem units, this scales
@@ -42,6 +42,7 @@ window.forceReset = Controllers.forceReset;
 window.gmGrantItem = () => Controllers.gmGrantItem(window.selectedCharId);
 window.gmUnequipItem = (slot) => Controllers.gmUnequipItem(window.selectedCharId, slot);
 window.gmSaveBiography = () => Controllers.gmSaveBiography(window.selectedCharId);
+window.savePlayerNotes = Controllers.savePlayerNotes;
 window.gmGrantDataLog = Controllers.gmGrantDataLog;
 window.openDataLog = Controllers.openDataLog;
 window.gmGrantQuest = Controllers.gmGrantQuest;
@@ -79,6 +80,7 @@ window.setStance = Controllers.setStance;
 window.setCombatActionField = Controllers.setCombatActionField;
 window.rollForMe = Controllers.rollForMe;
 window.resolveAttack = Controllers.resolveAttack;
+window.gmRerollLastResolution = Controllers.gmRerollLastResolution;
 window.setPlayerCheckField = Controllers.setPlayerCheckField;
 window.setPlayerCheckWhat = Controllers.setPlayerCheckWhat;
 window.rollForPlayerCheck = Controllers.rollForPlayerCheck;
@@ -232,7 +234,7 @@ window.render = function() {
   }
 
   // 4. Sync sidebar active state to the current tab, plus unread badges
-  const navMap = { STATUS: 'btn-dashboard', QUESTS: 'btn-quests', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks' };
+  const navMap = { DASHBOARD: 'btn-dashboard', QUESTS: 'btn-quests', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks', WORKSHOP: 'btn-workshop', STATUS: 'btn-status' };
   Object.entries(navMap).forEach(([tab, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', window.currentTab === tab);
@@ -284,8 +286,10 @@ window.render = function() {
     // Logic: If 'is_finalized' is missing or false, send them to Registration.
     if (charData && charData.is_finalized === true) {
        // --- SHOW DASHBOARD ---
-       if (window.currentTab === 'STATUS') {
+       if (window.currentTab === 'DASHBOARD') {
           viewport.innerHTML = Views.getPlayerView(window.currentUser, window.liveData);
+       } else if (window.currentTab === 'STATUS') {
+          viewport.innerHTML = Views.getStatusView(window.currentUser, window.liveData);
        } else if (window.currentTab === 'GOAT_REVIEW') {
           viewport.innerHTML = Views.getGoatReviewView(window.currentUser, window.liveData);
        } else if (window.currentTab === 'COMBAT') {

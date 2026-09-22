@@ -15,6 +15,16 @@ import { normalizeNeeds, decayNeeds, rollRestHealing, formatGameTime } from './n
 import { getRecipe } from './recipes.js';
 import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
 
+// Marks a `last_resolution.before` field whose value was genuinely
+// undefined (the path had never been written before that resolution) —
+// a raw JS `undefined` can't be stored in Firestore, but `before` itself
+// gets persisted as ordinary document data (not a live update() call),
+// so a real FieldValue.delete() sentinel can't live inside it either
+// (Firestore only accepts those as top-level update() values). This
+// plain, JSON-safe marker stands in for "absent" until the value is
+// actually used — see gmRerollLastResolution().
+const FIELD_ABSENT = '__foes_field_absent__';
+
 // --- GAME ACTIONS ---
 export async function equipItem(itemId, targetSlot) {
   if (!window.currentUser || !window.liveData) return;
@@ -241,6 +251,21 @@ export async function gmSaveBiography(targetCharId) {
   const updatePayload = {};
   updatePayload[`characters.${targetCharId}.biography`] = biography;
   updatePayload[`characters.${targetCharId}.gm_notes`] = gmNotes;
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Player tool: save their own free-text notes (STATUS_AND_CRIPPLE_SPEC.md
+// C, GM adjustment 2026-09-22). Deliberately separate from biography/
+// gm_notes above — those are GM-owned and GM-only to edit; player_notes
+// is the player's own scratchpad, writable only by themselves. The GM
+// can read it (see the squad modal) but has no save control for it.
+export async function savePlayerNotes() {
+  if (!window.currentUser || !window.liveData) return;
+  const el = document.getElementById('playerNotesTextarea');
+  if (!el) return;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${window.currentUser}.player_notes`] = el.value;
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
@@ -1338,6 +1363,79 @@ export async function resolveAttack() {
   const roll = Number(draft.roll);
   if (isNaN(roll) || roll < 1 || roll > 100) { alert("ROLL MUST BE 1-100"); return; }
 
+  const resolved = computeAttackResolution(combat, attacker, target, draft, roll);
+  if (!resolved) return; // computeAttackResolution already alerted (e.g. no weapon/attack picked, out of ammo)
+  const { updatedCombat, charUpdates, message } = resolved;
+
+  // GM reroll (SCOPE_DECISIONS.md "Next systems" ruling, 2026-09-21):
+  // resolution already applies HP damage, AP/ammo and status effects, so
+  // snapshot the exact fields this write is about to touch — read fresh
+  // off window.liveData right now, before anything's actually written,
+  // so `before[path]` is the true pre-resolution value. Only the most
+  // recent resolution is rerollable: a new action overwrites this field
+  // wholesale, and a reroll itself deletes it (see gmRerollLastResolution).
+  const before = { active_combat: combat };
+  Object.keys(charUpdates).forEach(path => {
+    const v = getLiveDataPath(path);
+    before[path] = v === undefined ? FIELD_ABSENT : v;
+  });
+  const last_resolution = {
+    kind: 'attack',
+    actor: attacker.name,
+    target: target.name,
+    roll,
+    params: {
+      attackerCombatantId: attacker.combatant_id, targetCombatantId: target.combatant_id,
+      attackKey: draft.attackKey, bodyPart: draft.bodyPart, burst: !!draft.burst
+    },
+    before,
+    at: Date.now()
+  };
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, { active_combat: updatedCombat, ...charUpdates, last_resolution });
+    window.combatActionDraft = null;
+  } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Reads window.liveData at a dot-path ("characters.abc.hp.current") —
+// used to snapshot a field's value right before a resolution overwrites
+// it, and again (against a temporarily-restored window.liveData) when
+// rebuilding one for a reroll.
+function getLiveDataPath(path) {
+  const parts = path.split('.');
+  let cur = window.liveData;
+  for (const p of parts) {
+    if (cur === undefined || cur === null) return undefined;
+    cur = cur[p];
+  }
+  return cur;
+}
+
+// The reverse of getLiveDataPath: writes `value` at a dot-path inside
+// `obj`, cloning each object along the way so the original (and its
+// sibling keys) are left untouched — used to rebuild a restored
+// window.liveData from a last_resolution.before snapshot without
+// mutating the live one out from under the rest of the app.
+function setDeepPath(obj, keys, value) {
+  if (keys.length === 1) { obj[keys[0]] = value; return; }
+  const [head, ...rest] = keys;
+  obj[head] = { ...(obj[head] || {}) };
+  setDeepPath(obj[head], rest, value);
+}
+
+// All the actual attack math — hit/crit resolution, damage, status
+// effects, ammo, weapon destruction — with NO Firestore write of its
+// own; it only reads window.liveData (for the attacker/target's derived
+// stats and current values) and returns the {active_combat, charUpdates}
+// payload resolveAttack() would write. Kept Firestore-free specifically
+// so the GM's reroll can call this exact same logic again against a
+// temporarily-restored window.liveData and get back a correctly
+// recomputed result, instead of re-deriving (and inevitably drifting
+// from) the real resolution logic. Returns null, having already
+// alerted, if the draft doesn't describe a resolvable action.
+function computeAttackResolution(combat, attacker, target, draft, roll) {
   // Aimed shots are attacker-agnostic — a called shot works the same
   // whether a PC targets a monster or a monster (GM-controlled) targets a
   // PC. Torso is just the default normal attack, unchanged either way.
@@ -1693,11 +1791,157 @@ export async function resolveAttack() {
     log: [...combat.log, { id: `log_${Date.now()}`, type: 'action', message, timestamp: Date.now() }]
   };
 
-  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  return { updatedCombat, charUpdates, message };
+}
+
+// GM-only: rerolls the most recent resolved roll (attack or skill/SPECIAL
+// check) — SCOPE_DECISIONS.md "Next systems" ruling, 2026-09-21. Resolution
+// already applies HP damage, AP/ammo and status effects, so each resolver
+// above saves a `last_resolution.before` snapshot of exactly the fields it
+// touched. This restores those fields, then re-resolves the exact same
+// action (same attacker/target/weapon or same check) with a fresh roll —
+// both in the one updateDoc below. Only the most recent resolution is
+// rerollable: this deletes `last_resolution` on success rather than
+// replacing it with a new one, so a reroll can't itself be rerolled —
+// only a fresh action (which writes its own last_resolution) can.
+export async function gmRerollLastResolution() {
+  if (!window.liveData) return;
+  const last = window.liveData.last_resolution;
+  if (!last) { alert("NOTHING TO REROLL"); return; }
+
+  // Build a scratch copy of the live doc with the snapshot patched back
+  // in, so the re-resolution below reads pre-resolution data — exactly
+  // like the original resolution did, not the version it already wrote.
+  const restored = { ...window.liveData, characters: { ...window.liveData.characters } };
+  Object.entries(last.before).forEach(([path, storedValue]) => {
+    // FIELD_ABSENT means the path had no value before the original
+    // resolution — restore that as real `undefined` here (fine for an
+    // in-memory object; every reader already treats a missing key the
+    // same as one explicitly set to undefined).
+    const value = storedValue === FIELD_ABSENT ? undefined : storedValue;
+    const parts = path.split('.');
+    if (parts[0] === 'characters') {
+      const charId = parts[1];
+      restored.characters[charId] = { ...(restored.characters[charId] || {}) };
+      setDeepPath(restored.characters[charId], parts.slice(2), value);
+    } else {
+      restored[parts[0]] = value;
+    }
+  });
+
+  const originalLiveData = window.liveData;
+  let payload = null;
   try {
-    await updateDoc(charRef, { active_combat: updatedCombat, ...charUpdates });
-    window.combatActionDraft = null;
-  } catch (err) { alert("ERROR: " + err.message); }
+    // Synchronous swap — nothing below awaits until this function's own
+    // updateDoc call, so no render or other read of window.liveData can
+    // slip in and see the restored (not-yet-committed) state.
+    window.liveData = restored;
+
+    if (last.kind === 'attack') {
+      const combat = restored.active_combat;
+      const attacker = combat && combat.initiative_order.find(c => c.combatant_id === last.params.attackerCombatantId);
+      const target = combat && combat.initiative_order.find(c => c.combatant_id === last.params.targetCombatantId);
+      if (!attacker || !target) { alert("CAN'T REROLL — A COMBATANT FROM THAT ACTION IS NO LONGER PRESENT"); return; }
+      const freshRoll = rollPercentile();
+      const draft = { attackKey: last.params.attackKey, bodyPart: last.params.bodyPart, burst: last.params.burst, targetId: target.combatant_id };
+      const resolved = computeAttackResolution(combat, attacker, target, draft, freshRoll);
+      if (!resolved) return;
+      const rerollNote = {
+        id: `log_${Date.now()}_reroll`, type: 'system',
+        message: `[GM REROLL] ${last.actor}'s action vs ${last.target} was rerolled by the GM (was roll ${last.roll}, now ${freshRoll}).`,
+        timestamp: Date.now()
+      };
+      payload = {
+        ...last.before,
+        ...resolved.charUpdates,
+        active_combat: { ...resolved.updatedCombat, log: [...resolved.updatedCombat.log, rerollNote] },
+        last_resolution: deleteField()
+      };
+    } else if (last.kind === 'player_check' || last.kind === 'gm_check') {
+      payload = rerollCheckResolution(last);
+      if (!payload) return;
+    } else {
+      return;
+    }
+  } finally {
+    window.liveData = originalLiveData;
+  }
+
+  // Any snapshotted path that had no value before the original
+  // resolution (FIELD_ABSENT) needs an actual FieldValue.delete() here —
+  // valid now because these are real top-level update() keys, not nested
+  // data inside `before` any more.
+  Object.keys(payload).forEach(key => { if (payload[key] === FIELD_ABSENT) payload[key] = deleteField(); });
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, payload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Shared by gmRerollLastResolution() for both check kinds — re-rolls and
+// re-resolves against window.liveData (already temporarily restored by
+// the caller), producing a new `checks` entry and, when appropriate, a
+// visible `messages` entry so players see a reroll happened even for an
+// otherwise-secret GM check.
+function rerollCheckResolution(last) {
+  const p = last.params;
+  const freshRoll = p.kind === 'special' ? (p.useD20 ? rollD20() : rollD10()) : rollPercentile();
+
+  if (last.kind === 'player_check') {
+    const char = window.liveData.characters[p.charId];
+    if (!char) { alert("CAN'T REROLL — CHARACTER NOT FOUND"); return null; }
+    const derived = deriveCharacter(char);
+    const value = p.kind === 'special' ? char.special[p.key] : derived.skills[p.key];
+    const result = p.kind === 'special' ? resolveSpecialCheck(value, p.tier, freshRoll, p.useD20) : resolveSkillCheck(value, p.tier, freshRoll);
+    const entry = {
+      id: `check_${Date.now()}`, mode: 'player', scope: 'single', tier: p.tier, kind: p.kind, key: p.key, useD20: p.useD20,
+      hidden: false,
+      results: [{ char_id: p.charId, name: char.name, roll: freshRoll, threshold: result.threshold, success: result.success, critType: result.critType || null }],
+      timestamp: Date.now()
+    };
+    const currentChecks = window.liveData.checks || [];
+    const currentMessages = window.liveData.messages || [];
+    return {
+      checks: [...currentChecks, entry],
+      // Player checks are never secret, so the reroll is always spelled
+      // out in full — same visibility rule the original resolution used.
+      messages: [...currentMessages, { id: `msg_${Date.now()}`, from: 'GM', target: 'all', body: `${char.name}'s check was rerolled by the GM (was roll ${last.roll}, now ${freshRoll}).`, timestamp: Date.now() }],
+      last_resolution: deleteField()
+    };
+  }
+
+  // gm_check (scope 'single' or 'custom' — 'party' is never rerollable,
+  // see resolveGmCheck)
+  let value, name, charId = null;
+  if (p.scope === 'custom') {
+    name = (p.customName || '').trim();
+    value = Number(p.customValue);
+  } else {
+    const char = window.liveData.characters[p.targetCharId];
+    if (!char) { alert("CAN'T REROLL — TARGET NOT FOUND"); return null; }
+    const derived = deriveCharacter(char);
+    value = p.kind === 'special' ? char.special[p.key] : derived.skills[p.key];
+    name = char.name;
+    charId = p.targetCharId;
+  }
+  const result = p.kind === 'special' ? resolveSpecialCheck(value, p.tier, freshRoll, p.useD20) : resolveSkillCheck(value, p.tier, freshRoll);
+  const entry = {
+    id: `check_${Date.now()}`, mode: 'gm', scope: p.scope, tier: p.tier, kind: p.kind, key: p.scope === 'custom' ? null : p.key,
+    useD20: p.useD20, hidden: !p.reveal,
+    results: [{ char_id: charId, name, roll: freshRoll, threshold: result.threshold, success: result.success, critType: result.critType || null }],
+    timestamp: Date.now()
+  };
+  const currentChecks = window.liveData.checks || [];
+  const currentMessages = window.liveData.messages || [];
+  const updatePayload = { checks: [...currentChecks, entry], last_resolution: deleteField() };
+  // "Log the reroll visibly... so players see it happened" only applies
+  // once the result is player-visible — a still-hidden check stays
+  // hidden, same as the original resolution; the GM already sees it
+  // happened via the check log entry itself (GM view shows hidden
+  // entries too).
+  if (p.reveal) {
+    updatePayload.messages = [...currentMessages, { id: `msg_${Date.now()}`, from: 'GM', target: 'all', body: buildCheckRevealMessage(entry), timestamp: Date.now() }];
+  }
+  return updatePayload;
 }
 
 export async function passTurn() {
@@ -1710,7 +1954,10 @@ export async function passTurn() {
     log: [...combat.log, { id: `log_${Date.now()}`, type: 'action', message: `${attacker.name} passes.`, timestamp: Date.now() }]
   };
   const charRef = doc(db, "prisoncampaign", "alpha_team");
-  try { await updateDoc(charRef, { active_combat: updatedCombat }); } catch (err) { alert("ERROR: " + err.message); }
+  // Passing clears any pending reroll — it's a new action on top of
+  // whatever was last resolved, and "before" no longer matches the
+  // combat state a revert would need to land on.
+  try { await updateDoc(charRef, { active_combat: updatedCombat, last_resolution: deleteField() }); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // Advances initiative, applying each newly-current PC's status effects
@@ -1847,7 +2094,10 @@ export async function endTurn() {
   };
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   window.combatActionDraft = null;
-  try { await updateDoc(charRef, { active_combat: updatedCombat, ...charUpdates }); } catch (err) { alert("ERROR: " + err.message); }
+  // Ending the turn moves initiative/round state on — any pending reroll
+  // snapshot no longer matches what it would need to restore, so clear
+  // it rather than let a later reroll click revert past this turn.
+  try { await updateDoc(charRef, { active_combat: updatedCombat, ...charUpdates, last_resolution: deleteField() }); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // Changes a combatant's stance — free-form, any time, not gated to whose
@@ -1919,7 +2169,7 @@ export async function endCombat() {
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   try {
     await updateDoc(charRef, { active_combat: finalized });
-    window.currentTab = 'STATUS';
+    window.currentTab = 'DASHBOARD';
     window.render();
   } catch (err) { alert("ERROR: " + err.message); }
 }
@@ -2028,9 +2278,23 @@ export async function resolvePlayerCheck() {
   };
 
   const current = window.liveData.checks || [];
+  // GM reroll (SCOPE_DECISIONS.md "Next systems" ruling, 2026-09-21): a
+  // player check only ever touches the `checks` array, so the "before"
+  // snapshot is just that array without this new entry — see
+  // gmRerollLastResolution().
+  const last_resolution = {
+    kind: 'player_check',
+    actor: char.name,
+    target: null,
+    roll,
+    params: { charId: window.currentUser, kind: draft.kind, key: draft.key, tier: draft.tier, useD20: draft.useD20 },
+    before: { checks: current },
+    at: Date.now()
+  };
+
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   try {
-    await updateDoc(charRef, { checks: [...current, entry] });
+    await updateDoc(charRef, { checks: [...current, entry], last_resolution });
     window.playerCheckDraft = null;
     window.render();
   } catch (err) { alert("ERROR: " + err.message); }
@@ -2145,10 +2409,32 @@ export async function resolveGmCheck() {
     timestamp: Date.now()
   };
 
-  const updatePayload = { checks: [...(window.liveData.checks || []), entry] };
+  const currentChecks = window.liveData.checks || [];
+  const currentMessages = window.liveData.messages || [];
+  const updatePayload = { checks: [...currentChecks, entry] };
   if (draft.reveal) {
-    const currentMessages = window.liveData.messages || [];
     updatePayload.messages = [...currentMessages, { id: `msg_${Date.now()}`, from: 'GM', target: 'all', body: buildCheckRevealMessage(entry), timestamp: Date.now() }];
+  }
+
+  // GM reroll (SCOPE_DECISIONS.md "Next systems" ruling, 2026-09-21) —
+  // 'single' and 'custom' scope only. 'party' rolls N characters against
+  // one shared roll count at once, so "the last roll" has no single
+  // well-defined reroll target; left out rather than guess a semantics
+  // the ruling doesn't specify.
+  if (draft.scope !== 'party') {
+    updatePayload.last_resolution = {
+      kind: 'gm_check',
+      actor: results[0].name,
+      target: null,
+      roll: results[0].roll,
+      params: {
+        scope: draft.scope, targetCharId: draft.targetCharId, kind: draft.kind, key: draft.key,
+        tier: draft.tier, useD20: draft.useD20, reveal: draft.reveal,
+        customName: draft.customName, customValue: draft.customValue
+      },
+      before: { checks: currentChecks, messages: currentMessages },
+      at: Date.now()
+    };
   }
 
   const charRef = doc(db, "prisoncampaign", "alpha_team");
