@@ -78,21 +78,21 @@ export const dataLogDatabase = {
       "Abave"
     ]
   },
-  a_bartender_s_notebook: {
-    "id": "a_bartender_s_notebook",
-    "name": "A Bartender's Notebook",
+  a_bandawang_lama_household_diary: {
+    "id": "a_bandawang_lama_household_diary",
+    "name": "A Bandawang Lama Household Diary",
     "type": "data_log",
-    "body": "Tuesday. Sam Lim's boys drank on credit again. Bakri paid it off before I could even write it down — didn't ask, didn't explain, just left the RMR on the bar and walked out. That's the third time this month.\n\nI used to keep a ledger of who owes what. Now I just keep a ledger of who Bakri's already covered for. Different book, same handwriting, less honest with myself about why.\n\nWater's up two RMR a bottle again. Nobody's said why out loud. Everybody knows why.",
+    "body": "The Choo Clan collectors came by again — third time this cycle, always polite, always precise. Grandmother says the 1414 Triad used to be different, back when it was just Sam Lim doing the rounds himself. Now it's men in clean shirts with a ledger, and the ledger is never wrong, and being never wrong is somehow worse than being cruel.\n\nRoof still leaks. Put it on the list. The list is longer than the roof.",
     "category_path": [
       "Found Texts",
       "Bandawang"
     ]
   },
-  an_old_town_household_diary: {
-    "id": "an_old_town_household_diary",
-    "name": "An Old Town Household Diary",
+  a_bartender_s_notebook: {
+    "id": "a_bartender_s_notebook",
+    "name": "A Bartender's Notebook",
     "type": "data_log",
-    "body": "The Choo Family collectors came by again — third time this cycle, always polite, always precise. Grandmother says the 1414 Triad used to be different, back when it was just Sam Lim doing the rounds himself. Now it's men in clean shirts with a ledger, and the ledger is never wrong, and being never wrong is somehow worse than being cruel.\n\nRoof still leaks. Put it on the list. The list is longer than the roof.",
+    "body": "Tuesday. Sam Lim's boys drank on credit again. Bakri paid it off before I could even write it down — didn't ask, didn't explain, just left the RMR on the bar and walked out. That's the third time this month.\n\nI used to keep a ledger of who owes what. Now I just keep a ledger of who Bakri's already covered for. Different book, same handwriting, less honest with myself about why.\n\nWater's up two RMR a bottle again. Nobody's said why out loud. Everybody knows why.",
     "category_path": [
       "Found Texts",
       "Bandawang"
@@ -202,7 +202,7 @@ export const dataLogDatabase = {
     "id": "requisition_88c",
     "name": "Requisition 88-C",
     "type": "data_log",
-    "body": "To the Quartermaster, Bandawang Guard\nRe: Requisition 88-C — Construction-Grade Protectron units (x4)\n\nThe units arrived. The prison did not survive to receive them.\n\nI have four construction Protectrons standing in the salvage yard, powered down, still holding their original work order. The order reads: REPAIR PERIMETER WALL, BLOCK C.\n\nThere is no Block C. There is no perimeter. There is a crater, and there is a great deal of rebar, and there are four machines waiting to be told otherwise.\n\nThey will not take a new order from me. My clearance is Guard. The order was cut by Works, and Works no longer has an office in this district, because the office was in Block C.\n\nSo they stand there. I have stopped walking past them on my rounds. It is not that they are frightening. It is that they are patient, and I am not, and I find I cannot look at a thing that will outwait me.\n\nAdvise.",
+    "body": "To the Quartermaster, Bandawang Enforcers\nRe: Requisition 88-C — Construction-Grade Protectron units (x4)\n\nThe units arrived. The prison did not survive to receive them.\n\nI have four construction Protectrons standing in the salvage yard, powered down, still holding their original work order. The order reads: REPAIR PERIMETER WALL, BLOCK C.\n\nThere is no Block C. There is no perimeter. There is a crater, and there is a great deal of rebar, and there are four machines waiting to be told otherwise.\n\nThey will not take a new order from me. My clearance is Enforcer. The order was cut by Works, and Works no longer has an office in this district, because the office was in Block C.\n\nSo they stand there. I have stopped walking past them on my rounds. It is not that they are frightening. It is that they are patient, and I am not, and I find I cannot look at a thing that will outwait me.\n\nAdvise.",
     "category_path": [
       "Found Texts",
       "Bandawang"
@@ -482,7 +482,7 @@ export const dataLogDatabase = {
     "id": "peribahasa_baru",
     "name": "Peribahasa Baru",
     "type": "data_log",
-    "body": "PERIBAHASA BARU\nProverbs of the new country — collected by a schoolteacher who no longer has a school\n\n*Air mahal, darah murah.*\nWater is dear, blood is cheap. — Said of any argument that begins at a well.\n\n*Bagai ghoul menunggu cermin.*\nLike a ghoul waiting for a mirror. — Of a person hoping for news that will not come, or will not be kind when it does.\n\n*Jangan percaya jalan yang terlalu bersih.*\nNever trust a road that is too clean. — Someone is keeping it clear. Ask why before you walk it.\n\n*Syarikat sudah mati, borang masih hidup.*\nThe company is dead, the form is still alive. — Of Federation paperwork, and of anything else that outlives its purpose.\n\n*Tanam padi, tuai borang.*\nPlant rice, harvest paperwork.\n\n*Dua besar, satu meja.*\nTwo big men, one table. — Of a council that must agree. Said quietly, and not in New Town.\n\nCollector's note: the old proverbs were about rice, rain and patience. The new ones are about water, paperwork, and people who will not say plainly what they want. I do not think this is an improvement.\n\nI write them down anyway. A language that has stopped making these has stopped being used.",
+    "body": "PERIBAHASA BARU\nProverbs of the new country — collected by a schoolteacher who no longer has a school\n\n*Air mahal, darah murah.*\nWater is dear, blood is cheap. — Said of any argument that begins at a well.\n\n*Bagai ghoul menunggu cermin.*\nLike a ghoul waiting for a mirror. — Of a person hoping for news that will not come, or will not be kind when it does.\n\n*Jangan percaya jalan yang terlalu bersih.*\nNever trust a road that is too clean. — Someone is keeping it clear. Ask why before you walk it.\n\n*Syarikat sudah mati, borang masih hidup.*\nThe company is dead, the form is still alive. — Of Federation paperwork, and of anything else that outlives its purpose.\n\n*Tanam padi, tuai borang.*\nPlant rice, harvest paperwork.\n\n*Dua besar, satu meja.*\nTwo big men, one table. — Of a council that must agree. Said quietly, and not in Bandawang Baru.\n\nCollector's note: the old proverbs were about rice, rain and patience. The new ones are about water, paperwork, and people who will not say plainly what they want. I do not think this is an improvement.\n\nI write them down anyway. A language that has stopped making these has stopped being used.",
     "category_path": [
       "Found Texts",
       "The Peninsula"

@@ -235,22 +235,6 @@ export const itemDatabase = {
     "weight": 1.8,
     "value": "TBA"
   },
-  axe_town_coveralls: {
-    "id": "axe_town_coveralls",
-    "name": "Axe Town Coveralls",
-    "type": "armor",
-    "slot": "body",
-    "size": "medium",
-    "icon": "",
-    "image_prompt": "A pair of grease-stained factory coveralls in faded blue cotton, torn at one knee and patched with mismatched fabric, a stitched ProTiga company patch on the chest, oil smudges throughout.",
-    "description": "Factory-issue coveralls worn by ProTiga factory workers in North Bandawang. Light, cheap, common. Mapped to the manual's Ramshackle Armor tier.",
-    "stats": {
-      "ac": 8,
-      "dt_dr_normal": "2/25"
-    },
-    "weight": 1.5,
-    "value": "TBA"
-  },
   clothes: {
     "id": "clothes",
     "name": "Clothes",
@@ -485,6 +469,22 @@ export const itemDatabase = {
       "pr": 0
     },
     "weight": 12,
+    "value": "TBA"
+  },
+  north_bandawang_coveralls: {
+    "id": "north_bandawang_coveralls",
+    "name": "North Bandawang Coveralls",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "image_prompt": "A pair of grease-stained factory coveralls in faded blue cotton, torn at one knee and patched with mismatched fabric, a stitched ProTiga company patch on the chest, oil smudges throughout.",
+    "description": "Factory-issue coveralls worn by ProTiga factory workers in North Bandawang. Light, cheap, common. Mapped to the manual's Ramshackle Armor tier.",
+    "stats": {
+      "ac": 8,
+      "dt_dr_normal": "2/25"
+    },
+    "weight": 1.5,
     "value": "TBA"
   },
   padded_coveralls: {
@@ -2697,7 +2697,7 @@ export const itemDatabase = {
     "type": "junk",
     "icon": "",
     "image_prompt": "A jagged chunk of stamped sheet metal factory scrap, edges sheared and curled, a partial ProTiga logo stencil visible across a rust-streaked surface.",
-    "description": "Core local salvage pool — the ProTiga factory site is the obvious crafting-component source for North Bandawang/Axe Town.",
+    "description": "Core local salvage pool — the ProTiga factory site is the obvious crafting-component source for North Bandawang.",
     "scrap_yield": {
       "scrap_metal": 3
     },

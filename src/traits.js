@@ -38,7 +38,7 @@ export const traitDatabase = {
     "description": "1414 Triad-aligned perk — discount from Triad-affiliated vendors, possible reputation trade-off elsewhere.",
     "effect": "TBA",
     "modifiers": {
-      "vendor_discount_lim_clan": "TBA",
+      "vendor_discount_triad": "TBA",
       "reputation_tradeoff": "TBA"
     }
   },

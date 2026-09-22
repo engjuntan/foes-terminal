@@ -10,6 +10,16 @@ export const glossaryDatabase = {
       "01_World Details"
     ]
   },
+  abave: {
+    "id": "abave",
+    "name": "Abave",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Abave was a large pre-war business group with holdings across tourism, hotels, casinos and plantations, best known for the resort empire it built at the Abave Highlands.",
+    "category_path": [
+      "01_World Details"
+    ]
+  },
   bursa_chips: {
     "id": "bursa_chips",
     "name": "Bursa Chips",
@@ -35,17 +45,69 @@ export const glossaryDatabase = {
     "name": "FOES Timeline",
     "aliases": [],
     "strict_aliases": [],
-    "summary": "FOES Historical Timeline: The Road to 2242",
+    "summary": "Superseded — see 🕛 Timeline of Major Events",
+    "category_path": [
+      "01_World Details"
+    ]
+  },
+  helicopters: {
+    "id": "helicopters",
+    "name": "Helicopters",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Helicopters are an exceptionally rare sight on the Peninsula — pre-war flying machines run on atomic engines, which few people still know how to maintain, let alone fly safely.",
+    "category_path": [
+      "01_World Details"
+    ]
+  },
+  kapcai: {
+    "id": "kapcai",
+    "name": "Kapcai",
+    "aliases": [
+      "Kapcais"
+    ],
+    "strict_aliases": [],
+    "summary": "Kapcais are the Peninsula's name for biofuelled, salvaged custom vehicles — generally two-wheeled naked café-racer mopeds fitted with an oversized, jury-rigged engine, though some carry sidecars for hauling cargo or get modified into something closer to an open tuk-tuk.",
+    "category_path": [
+      "01_World Details"
+    ]
+  },
+  kerbau: {
+    "id": "kerbau",
+    "name": "Kerbau",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The kerbau is a work animal, a living symbol of human domestication on the Peninsula — put to hauling half-cut salvaged car carriages, pulling farming equipment, and, when nothing else is left, serving as a source of protein.",
+    "category_path": [
+      "01_World Details"
+    ]
+  },
+  palm_oil: {
+    "id": "palm_oil",
+    "name": "Palm Oil",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Palm oil was grown widely across pre-war Malaya and is still grown today, though on nowhere near the old scale.",
     "category_path": [
       "01_World Details"
     ]
   },
   protiga: {
     "id": "protiga",
-    "name": "Protiga",
+    "name": "ProTiga",
     "aliases": [],
     "strict_aliases": [],
-    "summary": "Protiga was one of the largest pre-war megacorporations on the Peninsula, formed through the merger of Petrogas, ProCars Automotive, and Tenaga Nasional.",
+    "summary": "ProTiga was one of the largest pre-war megacorporations on the Peninsula, formed through the merger of Petrogas, ProCars Automotive, and Tenaga Nasional.",
+    "category_path": [
+      "01_World Details"
+    ]
+  },
+  restored_vehicles: {
+    "id": "restored_vehicles",
+    "name": "Restored Vehicles",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Restored vehicles are a rare, if not quite unheard-of, sight on the Peninsula.",
     "category_path": [
       "01_World Details"
     ]
@@ -60,6 +122,16 @@ export const glossaryDatabase = {
       "01_World Details"
     ]
   },
+  the_sepuluh_ribu_cipher: {
+    "id": "the_sepuluh_ribu_cipher",
+    "name": "The Sepuluh Ribu Cipher",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Sepuluh Ribu Cipher is a keyword substitution cipher the Sepuluh Ribu use to pass messages hidden inside the New Peninsula Times, buried in the filing codes stamped on opinion pieces by Uncle Loo and other sympathetic writers.",
+    "category_path": [
+      "01_World Details"
+    ]
+  },
   timeline_of_major_events: {
     "id": "timeline_of_major_events",
     "name": "Timeline of Major Events",
@@ -70,12 +142,142 @@ export const glossaryDatabase = {
       "01_World Details"
     ]
   },
-  choo_family: {
-    "id": "choo_family",
-    "name": "Choo Family",
+  triad: {
+    "id": "triad",
+    "name": "Triad",
+    "aliases": [
+      "The 1414 Triad"
+    ],
+    "strict_aliases": [],
+    "summary": "The 1414 Triad is Bandawang's dominant crime syndicate, a triad with storied pre-war roots in the glamorous casinos of the Abave Highlands.",
+    "category_path": [
+      "02_Factions",
+      "Bandawang"
+    ]
+  },
+  asing_family: {
+    "id": "asing_family",
+    "name": "Asing Family",
+    "aliases": [
+      "The Asing Family",
+      "Asing"
+    ],
+    "strict_aliases": [],
+    "summary": "The Asing family is the third of the great families of the 1414 Triad, alongside the Tan Family and the Choo Clan.",
+    "category_path": [
+      "02_Factions",
+      "Bandawang"
+    ]
+  },
+  axe_gang: {
+    "id": "axe_gang",
+    "name": "Axe Gang",
+    "aliases": [
+      "The Axe Gang"
+    ],
+    "strict_aliases": [],
+    "summary": "The Axe Gang is a rocker gang of motorheads and ruffians in North Bandawang, bound together by a love of adrenaline, speed, engines and music.",
+    "category_path": [
+      "02_Factions",
+      "Bandawang"
+    ]
+  },
+  bandawang_enforcers: {
+    "id": "bandawang_enforcers",
+    "name": "Bandawang Enforcers",
+    "aliases": [
+      "B.E.",
+      "The Bandawang Enforcers",
+      "Enforcers"
+    ],
+    "strict_aliases": [],
+    "summary": "The Bandawang Enforcers, or B.E., are a rag-tag militia of gang rejects who make up the only police Bandawang has — nobody wants the job, but somebody's stuck doing it.",
+    "category_path": [
+      "02_Factions",
+      "Bandawang"
+    ]
+  },
+  peng_brothers: {
+    "id": "peng_brothers",
+    "name": "Peng Brothers",
+    "aliases": [
+      "The Peng Brothers"
+    ],
+    "strict_aliases": [],
+    "summary": "The Peng Brothers are one of Bandawang's richer families, their wealth generally credited to seio, the rest stop they run along The Longest Road.",
+    "category_path": [
+      "02_Factions",
+      "Bandawang"
+    ]
+  },
+  rakan_watch: {
+    "id": "rakan_watch",
+    "name": "Rakan Watch",
+    "aliases": [
+      "The Rakan Watch",
+      "Rakan Gang",
+      "Rakans"
+    ],
+    "strict_aliases": [],
+    "summary": "The Rakan Watch is a neighbourhood watch of ghouls, Gergasi, humans and other survivors banding together to keep Bandawang Baru safe.",
+    "category_path": [
+      "02_Factions",
+      "Bandawang"
+    ]
+  },
+  the_arborists: {
+    "id": "the_arborists",
+    "name": "The Arborists",
     "aliases": [],
     "strict_aliases": [],
-    "summary": "The Choo Family is a violent, aggressive and fast-expanding criminal syndicate operating from the ruins of Kulim, locked in a bitter blood feud with the more traditionalist Tan Family.",
+    "summary": "The Arborists are Bandawang's line of defence against the ever-encroaching Great Jungle, a mostly-ghoul group that studies how radiation has warped the jungle's growth and the dangerous mutations and creatures living within it.",
+    "category_path": [
+      "02_Factions",
+      "Bandawang"
+    ]
+  },
+  the_buayans: {
+    "id": "the_buayans",
+    "name": "The Buayans",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Buayans are ghouls who have undergone Clark's Transformation, a process that hardens their skin and raises leathery ridges across it, imitating a crocodile's hide.",
+    "category_path": [
+      "02_Factions",
+      "Bandawang"
+    ]
+  },
+  the_council: {
+    "id": "the_council",
+    "name": "The Council",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Council is the ruling body of The Free City of Bandawang, made up of the leaders of the city's three largest gangs: Boss Bob of the Rakan Watch, Sam Lim of the 1414 Triad, and Vokalis Sudirman of the Axe Gang.",
+    "category_path": [
+      "02_Factions",
+      "Bandawang"
+    ]
+  },
+  the_employment_agency: {
+    "id": "the_employment_agency",
+    "name": "The Employment Agency",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Employment Agency, formerly the Slaves Guild, is a now-legal outfit that matches unemployed people in Bandawang to job openings across the Peninsula — or so its holotapes claim, and it's sticking to that story.",
+    "category_path": [
+      "02_Factions",
+      "Bandawang"
+    ]
+  },
+  choo_clan: {
+    "id": "choo_clan",
+    "name": "Choo Clan",
+    "aliases": [
+      "Choo Family",
+      "the Choos"
+    ],
+    "strict_aliases": [],
+    "summary": "The Choo Clan is a powerful crime syndicate operating from the ruins of Kulim, one of the strongest families of the 1414 Triad, usually serving as its advisors and underbosses, managing cash flow for the Triad's businesses.",
     "category_path": [
       "02_Factions",
       "Sub-Factions"
@@ -113,7 +315,7 @@ export const glossaryDatabase = {
     "name": "Tan Family",
     "aliases": [],
     "strict_aliases": [],
-    "summary": "The Tan Family is a powerful, Kulim-based crime syndicate with deep cultural memory, wartime scars, and a legacy of violent pragmatism.",
+    "summary": "The Tan Family is a powerful, Kulim-based crime syndicate with deep cultural memory, wartime scars, and a legacy of violent pragmatism.",
     "category_path": [
       "02_Factions",
       "Sub-Factions"
@@ -246,7 +448,7 @@ export const glossaryDatabase = {
     "strict_aliases": [
       "Kosongs"
     ],
-    "summary": "The Kosongs are a caste of Protectorate made lobotomized laborers, created as part of the Federation–Protectorate Labor Exchange deal.",
+    "summary": "The Kosongs are a caste of Protectorate made lobotomized laborers, created as part of the Federation–Protectorate Labor Exchange deal.",
     "category_path": [
       "02_Factions",
       "The Federation"
@@ -368,6 +570,29 @@ export const glossaryDatabase = {
     "category_path": [
       "02_Factions",
       "The Federation"
+    ]
+  },
+  the_kancil_orphanage: {
+    "id": "the_kancil_orphanage",
+    "name": "The Kancil Orphanage",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Kancil Orphanage is a post-war institution founded by Mother Shalini, the First Mother, who began taking in children abandoned or orphaned in a time when infanticide was tragically common.",
+    "category_path": [
+      "02_Factions"
+    ]
+  },
+  the_new_peninsula_times: {
+    "id": "the_new_peninsula_times",
+    "name": "The New Peninsula Times",
+    "aliases": [
+      "The Peninsula Scoop",
+      "New Peninsula Times"
+    ],
+    "strict_aliases": [],
+    "summary": "The New Peninsula Times is a purportedly independent newspaper promising honest news across the Federation, taking its name from the pre-war Peninsula Times.",
+    "category_path": [
+      "02_Factions"
     ]
   },
   the_protectorate: {
@@ -514,7 +739,11 @@ export const glossaryDatabase = {
   supermutan: {
     "id": "supermutan",
     "name": "Supermutan",
-    "aliases": [],
+    "aliases": [
+      "Super Mutant",
+      "Supermutant",
+      "Gergasi"
+    ],
     "strict_aliases": [],
     "summary": "Super mutant is a general term referring to large muscular humanoid mutants created by exposing a regular human to a variety of the Forced Evolutionary Virus (FEV).",
     "category_path": [
@@ -529,6 +758,231 @@ export const glossaryDatabase = {
     "summary": "Ghoulification is the irreversible process by which intense, prolonged radiation exposure mutates human physiology, causing cellular decay, necrosis-resistant tissue regeneration, and near-immortality at the cost of appearance and sterility.",
     "category_path": [
       "Fallout Details"
+    ]
+  },
+  abave_highlands: {
+    "id": "abave_highlands",
+    "name": "Abave Highlands",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Abave Highlands were a pre-war tourist destination of casinos and theme parks, run by the Abave group — and stayed exactly that kind of place after the bombs fell, becoming a den of scum and villainy.",
+    "category_path": [
+      "Locations"
+    ]
+  },
+  bandar_buaya: {
+    "id": "bandar_buaya",
+    "name": "Bandar Buaya",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Bandar Buaya is a ghoul sanctuary on the outskirts of North Bandawang.",
+    "category_path": [
+      "Locations"
+    ]
+  },
+  bandawang_baru: {
+    "id": "bandawang_baru",
+    "name": "Bandawang Baru",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Bandawang Baru is the western district of Bandawang, where citizens are rebuilding amid the settling dust of perpetual construction — the Rakan Watch's home turf and the PCs' starting district.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  bandawang_lama: {
+    "id": "bandawang_lama",
+    "name": "Bandawang Lama",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Bandawang Lama is Bandawang's old pre-war town centre, its colonial art deco shoplots and tenements weathered and cracked by years of radioactive rain but never struck by the bombs.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  federation_checkpoint: {
+    "id": "federation_checkpoint",
+    "name": "Federation Checkpoint",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Federation Checkpoint is a hive of activity where travellers moving to and from Federation territory are checked and registered before they're let through.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  federation_recruitment_center: {
+    "id": "federation_recruitment_center",
+    "name": "Federation Recruitment Center",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Federation Recruitment Center sits pristine in a cul-de-sac of three completed semi-detached show homes, each built in a different style — a promise of the life a new Federation citizen could have.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  kelam_sungai: {
+    "id": "kelam_sungai",
+    "name": "Kelam Sungai",
+    "aliases": [
+      "Bandawang Waterworks",
+      "Bandawang Water Treatment Plant"
+    ],
+    "strict_aliases": [],
+    "summary": "Kelam Sungai is the water treatment plant north-west of Bandawang Baru that keeps the city's supply running — or did, before it was blown up in the days before the campaign begins.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  north_bandawang: {
+    "id": "north_bandawang",
+    "name": "North Bandawang",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "North Bandawang is the one district of Bandawang that took a direct nuclear strike, as the pre-war industrial hub and home of ProTiga's headquarters.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  protiga_hq: {
+    "id": "protiga_hq",
+    "name": "ProTiga HQ",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "ProTiga HQ is a dominating bomb-proof, quake-proof tower in North Bandawang, relatively short at twenty floors but built to outlast the apocalypse — its bulletproof windows have survived two centuries, dusty and pockmarked with bullet holes, some smashed in on the lower floors…",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  sekitar_litar: {
+    "id": "sekitar_litar",
+    "name": "Sekitar Litar",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Sekitar Litar is a pre-war automobile test track in North Bandawang, now choked with obstacles and the burned-out husks of kapcais of every size, wild grass ringing its cracked, patchy gravel.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  syurga: {
+    "id": "syurga",
+    "name": "Syurga",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Syurga is Ishtar's planned casino in Bandawang Baru, a British-parody theme park under grand, nearly-finished construction — a joke aimed as much at Malaysians' high opinion of the British and the West as at the British themselves.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  the_bandawang_enforcer_station_b_e_station: {
+    "id": "the_bandawang_enforcer_station_b_e_station",
+    "name": "The Bandawang Enforcer Station (B.E. Station)",
+    "aliases": [
+      "B.E. Station",
+      "Bandawang Enforcer Station"
+    ],
+    "strict_aliases": [
+      "The Bandawang Enforcer Station"
+    ],
+    "summary": "The Bandawang Enforcer Station (B.E.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  the_education_center: {
+    "id": "the_education_center",
+    "name": "The Education Center",
+    "aliases": [
+      "Education Center",
+      "Education Centre"
+    ],
+    "strict_aliases": [],
+    "summary": "The Education Center is a joint initiative of the Tan Family and the Rakan Watch to open education to anyone in Bandawang alike, housed in a repurposed primary school on a hill overlooking Bandawang Lama.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  the_lakeside_bar: {
+    "id": "the_lakeside_bar",
+    "name": "The Lakeside Bar",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Lakeside Bar is a ghoul speakeasy on the edge of the river that the Arborists diverted to hold back the Great Jungle.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  the_protectron_yard: {
+    "id": "the_protectron_yard",
+    "name": "The Protectron Yard",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Protectron Yard is a construction site in Bandawang Baru where nine Construction Protectrons are raising a new neighbourhood: a row of homes and a large community centre at its heart.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  the_rakan_community_center: {
+    "id": "the_rakan_community_center",
+    "name": "The Rakan Community Center",
+    "aliases": [
+      "Rakan Community Center",
+      "Rakan Community Centre"
+    ],
+    "strict_aliases": [],
+    "summary": "The Rakan Community Center is a repurposed multi-purpose hall in Bandawang Baru, lovingly refurbished with fresh paint and concrete and ringed by community murals of peaceful people and children, with a playground outside.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  the_scrapyard: {
+    "id": "the_scrapyard",
+    "name": "The Scrapyard",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Scrapyard is a sprawling scrap-and-electronics bazaar in North Bandawang, trading everything from stripped cabling to whole engine blocks — locals call it the Shenzhen of the wasteland.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  the_tiger_palace: {
+    "id": "the_tiger_palace",
+    "name": "The Tiger Palace",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Tiger Palace is the largest casino for hundreds of kilometres around, built into the shell of what was once a large bus terminal in Bandawang Lama.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
+  seio_peng_brothers_rnr: {
+    "id": "seio_peng_brothers_rnr",
+    "name": "seio (Peng Brothers RNR)",
+    "aliases": [
+      "seio",
+      "Peng Brothers RNR",
+      "Poseidon Oil"
+    ],
+    "strict_aliases": [],
+    "summary": "seio (Peng Brothers RNR) is a rest stop along The Longest Road, built into the hollow husk of a pre-war petrol station — two buildings, a station and a garage, refitted and worn from generations of use but never abused.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
     ]
   },
   batu_kapur: {
@@ -568,7 +1022,7 @@ export const glossaryDatabase = {
       "Penang"
     ],
     "strict_aliases": [],
-    "summary": "The Fortress City of Penang is the impregnable capital of the Protectorate, a fortress encircled by a monumental coastal wall of rusted ships, pre-war vessels crane-lifted and embedded upright into the shoreline to form an impenetrable barrier and welded tight by time, tide, a…",
+    "summary": "The Fortress City of Penang is the impregnable capital of the Protectorate, a fortress encircled by a monumental coastal wall of rusted ships, pre-war vessels crane-lifted and embedded upright into the shoreline to form an impenetrable barrier and welded tight by time, tide, a…",
     "category_path": [
       "Locations"
     ]
@@ -606,6 +1060,16 @@ export const glossaryDatabase = {
       "Locations"
     ]
   },
+  ma_qil_monastery: {
+    "id": "ma_qil_monastery",
+    "name": "Ma'qil Monastery",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Ma'qil Monastery is the home of the Abave Buddhist Enclave, a cluster of round buildings — built in the manner of the Fujian tulou — dotted along the mountainside of the Abave Highlands.",
+    "category_path": [
+      "Locations"
+    ]
+  },
   perdana_bunker: {
     "id": "perdana_bunker",
     "name": "Perdana Bunker",
@@ -639,6 +1103,26 @@ export const glossaryDatabase = {
     ],
     "strict_aliases": [],
     "summary": "Bandawang, once a glittering industrial jewel of the peninsula, now staggers forward as a broken empire of neon lights and rotting fortune.",
+    "category_path": [
+      "Locations"
+    ]
+  },
+  the_longest_road: {
+    "id": "the_longest_road",
+    "name": "The Longest Road",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The Longest Road is the surviving stretch of the old North-South highway, the main route linking the Federation in the south to the Protectorate in the north.",
+    "category_path": [
+      "Locations"
+    ]
+  },
+  the_north_south_railway: {
+    "id": "the_north_south_railway",
+    "name": "The North South Railway",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "The North South Railway is the wrecked remnant of a pre-war high-speed line that once used magnetic propulsion to connect the northern and southern Peninsula — a marvel of its age, built in a time when resources were already growing scarce.",
     "category_path": [
       "Locations"
     ]
@@ -1005,12 +1489,51 @@ export const glossaryDatabase = {
       "People"
     ]
   },
-  order_of_the_falling_gong: {
-    "id": "order_of_the_falling_gong",
-    "name": "Order of the Falling Gong",
+  abave_buddhist_enclave: {
+    "id": "abave_buddhist_enclave",
+    "name": "Abave Buddhist Enclave",
     "aliases": [],
     "strict_aliases": [],
-    "summary": "The Order of the Falling Gong is a spiritual cult that emerged in the aftermath of the Great War, spreading across the Peninsula with doctrines that blend mysticism, apocalyptic history, and philosophical obsession.",
+    "summary": "The Abave Buddhist Enclave is a monastic order of monks living at Ma'qil Monastery in the Abave Highlands, who worship Nong Mei, the deity said to have saved their ancestors by opening his humble home to them after the bombs fell.",
+    "category_path": [
+      "Religions"
+    ]
+  },
+  church_of_the_new_age_saints: {
+    "id": "church_of_the_new_age_saints",
+    "name": "Church of the New Age Saints",
+    "aliases": [
+      "Church of NAS",
+      "NAS",
+      "New Age Saints"
+    ],
+    "strict_aliases": [],
+    "summary": "The Church of the New Age Saints is a Christian-inspired faith that reveres the New Age Saints — figures believed to have worked miracles in the post-war Peninsula, foremost among them Saint Eng Hua, purportedly a new prophet sent down to Earth.",
+    "category_path": [
+      "Religions"
+    ]
+  },
+  nong_mei: {
+    "id": "nong_mei",
+    "name": "Nong Mei",
+    "aliases": [
+      "浓眉",
+      "Thick Eyebrows"
+    ],
+    "strict_aliases": [],
+    "summary": "Nong Mei is the deity revered by the Abave Buddhist Enclave, worshipped for saving the ancestors of its monks and depicted with comically long eyebrows.",
+    "category_path": [
+      "Religions"
+    ]
+  },
+  order_of_the_fallen_gong: {
+    "id": "order_of_the_fallen_gong",
+    "name": "Order of the Fallen Gong",
+    "aliases": [
+      "Order of the Falling Gong"
+    ],
+    "strict_aliases": [],
+    "summary": "The Order of the Fallen Gong is a spiritual cult that emerged in the aftermath of the Great War, spreading across the Peninsula with doctrines that blend mysticism, apocalyptic history, and philosophical obsession.",
     "category_path": [
       "Religions"
     ]
