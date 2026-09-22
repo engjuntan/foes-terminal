@@ -87,6 +87,20 @@ export const questDatabase = {
     "category_path": [
       "Quests"
     ]
+  },
+  the_mysterious_boss: {
+    "id": "the_mysterious_boss",
+    "name": "Example Quest",
+    "type": "quest",
+    "body": "A shipment bound for the Federal Cultural Library never arrived. The Protectorate wants it found before RobCo's rivals do.",
+    "objectives": [
+      "Track down the last known location of the shipment",
+      "Recover the cargo",
+      "Deliver it to the Federal Cultural Library"
+    ],
+    "category_path": [
+      "Quests"
+    ]
   }
 };
 
