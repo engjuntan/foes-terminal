@@ -1,9 +1,12 @@
-// tools/item-art.mjs — item icon pipeline: prompt sheet → images → Imgur → vault.
+// tools/item-art.mjs — art pipeline: prompt sheet → images → Imgur → vault/src.
+// Covers vault item icons and the content slots in tools/art-slots.mjs
+// (reputation tiers, karma tiers, SPECIAL cards).
 //
 //   npm run art -- status                 what's done, what's pending
 //   npm run art -- sheet [--limit N]      write art/prompt-sheet.md for manual generation (free)
 //   npm run art -- ingest [--limit N]     upload art/inbox/<item_id>.png|jpg to Imgur, link into the vault
 //   npm run art -- generate --limit N     PAID: generate N images with the Gemini API into art/inbox/
+//   npm run art -- link <id> <url>       attach an already-uploaded image to an item or slot
 //   npm run art -- set-prompts <file.json>  write {id: prompt} into the vault's image_prompt fields
 //
 // Add --dry-run to any command to see what it would do without doing it.
@@ -17,6 +20,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { allSlots } from './art-slots.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const VAULT = process.env.FOES_VAULT || '/Users/edge/Library/CloudStorage/GoogleDrive-fallouteasternshores@gmail.com/My Drive/FOES Wiki/FALLOUT_MASTER_ZIPv3';
@@ -118,28 +122,98 @@ function inboxFileFor(id) {
   return null;
 }
 
+// ---------- targets ----------
+// One shape for both kinds of art: vault items (prompt + icon in the item's
+// json) and content slots (prompt in art-slots.mjs, `image_url: ""` in a
+// hand-written module). Everything below works on targets, so `sheet`,
+// `generate` and `ingest` cover both without caring which is which.
+function itemTargets() {
+  return loadItems().map(item => ({
+    id: item.id,
+    name: item.name,
+    kind: 'item',
+    hasArt: hasArt(item),
+    hasPrompt: !!item.image_prompt,
+    prompt: fullPrompt(item),
+    description: item.description || '',
+    setUrl: url => setVaultField(item.file, 'icon', url)
+  }));
+}
+
+// Reads/writes `image_url: ""` on one entry of a hand-written source module.
+// The entry is found by its anchor (an id line, or a key line for SPECIAL),
+// then the next image_url after it — the same minimal-edit approach the vault
+// files get, so the rest of the file is left exactly as written.
+function slotUrlRange(text, anchor) {
+  const at = text.search(anchor);
+  if (at < 0) return null;
+  const field = /image_url:\s*(['"])((?:[^'"\\]|\\.)*)\1/g;
+  field.lastIndex = at;
+  const m = field.exec(text);
+  return m ? { start: m.index, end: m.index + m[0].length, value: m[2] } : null;
+}
+
+function slotTargets() {
+  return allSlots().map(slot => {
+    const full = path.join(ROOT, slot.file);
+    const text = fs.readFileSync(full, 'utf8');
+    const found = slotUrlRange(text, slot.anchor);
+    if (!found) console.warn(`  [slot] no image_url found for ${slot.id} in ${slot.file}`);
+    return {
+      id: slot.id,
+      name: slot.label,
+      kind: 'slot',
+      hasArt: !!(found && /^https?:\/\//.test(found.value)),
+      hasPrompt: true,
+      prompt: `${slot.style} Subject: ${slot.prompt}`,
+      description: slot.prompt,
+      setUrl: url => {
+        const current = fs.readFileSync(full, 'utf8');
+        const range = slotUrlRange(current, slot.anchor);
+        if (!range) throw new Error(`no image_url slot for ${slot.id}`);
+        const next = current.slice(0, range.start) + `image_url: ${JSON.stringify(url)}` + current.slice(range.end);
+        if (!DRY) fs.writeFileSync(full, next);
+      }
+    };
+  });
+}
+
+function allTargets() { return [...itemTargets(), ...slotTargets()]; }
+
 // ---------- commands ----------
 function status() {
-  const items = loadItems();
-  const linked = items.filter(hasArt).length;
-  const noPrompt = items.filter(i => !hasArt(i) && !i.image_prompt).length;
+  const targets = allTargets();
+  const report = (label, list) => {
+    const linked = list.filter(t => t.hasArt).length;
+    const noPrompt = list.filter(t => !t.hasArt && !t.hasPrompt).length;
+    console.log(`${label.padEnd(18)}${String(linked).padStart(4)} done, ${String(list.length - linked).padStart(4)} to go${noPrompt ? `  (${noPrompt} still need a prompt)` : ''}`);
+  };
+  report('Items:', targets.filter(t => t.kind === 'item'));
+  report('Content slots:', targets.filter(t => t.kind === 'slot'));
   const inInbox = fs.existsSync(INBOX) ? fs.readdirSync(INBOX).filter(f => !f.startsWith('.')).length : 0;
   const ledger = readLedger();
-  console.log(`Items:            ${items.length}`);
-  console.log(`Linked (done):    ${linked}`);
-  console.log(`Need an image:    ${items.length - linked}  (${noPrompt} of them have no prompt yet)`);
   console.log(`Waiting in inbox: ${inInbox}`);
   console.log(`Paid generations so far: ${ledger.generated} / ${LIFETIME_GENERATE_CAP} lifetime cap`);
 }
 
 function sheet() {
   const limit = option('limit') ? requireLimit() : Infinity;
-  const pending = loadItems().filter(i => !hasArt(i) && i.image_prompt && !inboxFileFor(i.id)).slice(0, limit);
-  const lines = [`# Item art — prompt sheet`, ``,
+  const pending = pendingTargets().slice(0, limit);
+  const lines = [`# Art — prompt sheet`, ``,
     `Generate each image, save it into \`art/inbox/\` named exactly as the **file name** below, then run \`npm run art -- ingest --limit N\`.`, ``];
-  pending.forEach(i => lines.push(`## ${i.name}`, `File name: \`${i.id}.png\``, '', '```', fullPrompt(i), '```', ''));
+  pending.forEach(t => lines.push(`## ${t.name}${t.kind === 'slot' ? ' *(content slot)*' : ''}`, `File name: \`${t.id}.png\``, '', '```', t.prompt, '```', ''));
   if (!DRY) fs.writeFileSync(path.join(ART, 'prompt-sheet.md'), lines.join('\n'));
   console.log(`${DRY ? '[dry run] would write' : 'Wrote'} art/prompt-sheet.md with ${pending.length} prompts.`);
+}
+
+// What still needs an image: no art yet, has a prompt, and isn't already
+// sitting in the inbox waiting to be ingested. `--only items|slots` narrows it.
+function pendingTargets() {
+  const only = option('only');
+  if (only && !['items', 'slots'].includes(only)) fail(`--only takes "items" or "slots".`);
+  return allTargets()
+    .filter(t => !only || t.kind === only.slice(0, -1))
+    .filter(t => !t.hasArt && t.hasPrompt && !inboxFileFor(t.id));
 }
 
 async function imgurAccessToken() {
@@ -156,14 +230,14 @@ async function imgurAccessToken() {
 
 async function ingest() {
   const limit = requireLimit();
-  const items = Object.fromEntries(loadItems().map(i => [i.id, i]));
+  const targets = Object.fromEntries(allTargets().map(t => [t.id, t]));
   const files = (fs.existsSync(INBOX) ? fs.readdirSync(INBOX) : []).filter(f => /\.(png|jpe?g|webp)$/i.test(f));
   const queue = [];
   for (const f of files) {
     const id = path.basename(f, path.extname(f));
-    if (!items[id]) { console.warn(`  skip ${f}: no item with id "${id}"`); continue; }
-    if (hasArt(items[id])) { console.warn(`  skip ${f}: ${items[id].name} is already linked`); continue; }
-    queue.push({ file: path.join(INBOX, f), item: items[id] });
+    if (!targets[id]) { console.warn(`  skip ${f}: nothing with id "${id}"`); continue; }
+    if (targets[id].hasArt) { console.warn(`  skip ${f}: ${targets[id].name} is already linked`); continue; }
+    queue.push({ file: path.join(INBOX, f), item: targets[id] });
   }
   const batch = queue.slice(0, limit);
   console.log(`Inbox: ${queue.length} ready, uploading ${batch.length}.`);
@@ -184,14 +258,14 @@ async function ingest() {
     if (res.status === 429) { console.log(`\nImgur rate limit reached after ${ledger.uploaded} total uploads. Run ingest again later to continue.`); break; }
     const json = await res.json().catch(() => ({}));
     if (!res.ok || !json.data || !json.data.link) fail(`Upload of ${item.name} failed (${res.status}): ${JSON.stringify(json).slice(0, 200)}`);
-    setVaultField(item.file, 'icon', json.data.link);
+    item.setUrl(json.data.link);
     fs.renameSync(file, path.join(DONE, path.basename(file)));
     ledger.uploaded++;
     ledger.history.push({ at: new Date().toISOString(), action: 'upload', id: item.id, url: json.data.link, deletehash: json.data.deletehash });
     writeLedger(ledger);
     console.log(`  ✓ ${item.name} → ${json.data.link}`);
   }
-  console.log('\nDone. Run `node sync-obsidian.js --once` to pull the new icons into the app.');
+  console.log('\nDone. Item icons: run `node sync-obsidian.js --once` to pull them into the app. Content-slot urls are written straight into src/ — commit them.');
 }
 
 // Pulls the first base64 image out of either Gemini response shape
@@ -214,10 +288,10 @@ async function generate() {
   const ledger = readLedger();
   const room = LIFETIME_GENERATE_CAP - ledger.generated;
   if (room <= 0) fail(`Lifetime cap of ${LIFETIME_GENERATE_CAP} paid generations reached. Raise LIFETIME_GENERATE_CAP in the script if you mean to go further.`);
-  const pending = loadItems().filter(i => !hasArt(i) && i.image_prompt && !inboxFileFor(i.id));
+  const pending = pendingTargets();
   const batch = pending.slice(0, Math.min(limit, room));
-  console.log(`${pending.length} items need art. Generating ${batch.length} with ${model}.`);
-  if (DRY) { batch.forEach(i => console.log(`  [dry run] ${i.id}: ${fullPrompt(i).slice(0, 110)}…`)); return; }
+  console.log(`${pending.length} images pending. Generating ${batch.length} with ${model}.`);
+  if (DRY) { batch.forEach(t => console.log(`  [dry run] ${t.id}: ${t.prompt.slice(0, 110)}…`)); return; }
 
   fs.mkdirSync(INBOX, { recursive: true });
   for (const item of batch) {
@@ -225,7 +299,7 @@ async function generate() {
       method: 'POST',
       headers: { 'x-goog-api-key': key, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: fullPrompt(item) }] }],
+        contents: [{ parts: [{ text: item.prompt }] }],
         generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: '1:1' } }
       })
     });
@@ -244,6 +318,18 @@ async function generate() {
   console.log('\nImages are in art/inbox/. Look through them, delete any you don\'t like, then run ingest.');
 }
 
+// Attach a url to any target by hand — for images uploaded outside this
+// script. Same write-back path `ingest` uses, so it's also the quickest way
+// to check a slot writes where it should.
+function link() {
+  const id = args[1], url = args[2];
+  if (!id || !/^https?:\/\//.test(url || '')) fail('link needs an id and an http(s) url: npm run art -- link rep_idolized https://…');
+  const target = allTargets().find(t => t.id === id);
+  if (!target) fail(`nothing with id "${id}".`);
+  target.setUrl(url);
+  console.log(`${DRY ? '[dry run] would link' : 'Linked'} ${target.name} → ${url}`);
+}
+
 function setPrompts() {
   const file = args[1];
   if (!file || !fs.existsSync(file)) fail('set-prompts needs a JSON file of {item_id: prompt}.');
@@ -260,7 +346,7 @@ function setPrompts() {
   console.log(`${DRY ? '[dry run] would write' : 'Wrote'} ${written} prompts; skipped ${skipped}.`);
 }
 
-const commands = { status, sheet, ingest, generate, 'set-prompts': setPrompts };
+const commands = { status, sheet, ingest, generate, link, 'set-prompts': setPrompts };
 if (!commands[command]) { console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(0, 9).join('\n')); process.exit(command ? 1 : 0); }
 fs.mkdirSync(INBOX, { recursive: true });
 await commands[command]();

@@ -42,6 +42,16 @@ project, and **set a budget alert** in Google Cloud. Roughly US$0.03 per
 image at the default model (`gemini-3.1-flash-lite-image`; override with
 `GEMINI_IMAGE_MODEL` in `.env`).
 
+## What it covers
+
+- **Item icons** — 284 vault items. Prompts live in each item's vault file.
+- **Content slots** — the 18 square cards the app shows outside the vault:
+  6 reputation tiers, 5 karma tiers, 7 SPECIAL cards. Their prompts live in
+  `tools/art-slots.mjs`, and the url is written straight into
+  `src/reputationContent.js` / `src/goatContent.js` (commit those).
+
+`--only items` or `--only slots` narrows `sheet` and `generate`.
+
 ## Daily use
 
 **Free route — you generate the images:**
@@ -66,6 +76,12 @@ npm run art -- generate --limit 5
 
 Look through `art/inbox/`, delete any image you don't like (it'll be
 regenerated next run), then `ingest` as above.
+
+**Already uploaded an image yourself?** Attach it without re-uploading:
+
+```bash
+npm run art -- link rep_idolized https://i.imgur.com/xxxx.png
+```
 
 After ingesting, pull the icons into the app:
 
