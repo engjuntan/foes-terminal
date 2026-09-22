@@ -96,8 +96,8 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
-    "description": "A three-headed chicken, ordinary-sized and ordinary-tempered until something sets it off. The ones that end up fried still have all three heads on the plate.",
-    "notes": "Has 3 attacks (one peck per head) and 1 move. GM trigger — grows large: after roughly 2 rounds of combat, or if it eats a downed ally, the GM may swap in this grown stat line at full HP — Tier T3 boss, HP 129, AC 14, DT/DR normal 3/20, Hit 75%, three pecks at 2d8+6 each, and it fights alongside up to 2 small Ayam Berkepala Tiga. This is entirely a GM call, never automatic.",
+    "description": "A three-headed chicken, ordinary-sized and ordinary-tempered until something sets it off — though farmers swear the ones left to feed long enough grow as big as a kerbau. The ones that end up fried still have all three heads on the plate.",
+    "notes": "Has 3 attacks (one peck per head) and 1 move.",
     "stats": {
       "hp": 19,
       "variance_bias": "normal",

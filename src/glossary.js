@@ -82,12 +82,15 @@ export const glossaryDatabase = {
       "01_World Details"
     ]
   },
-  palm_oil: {
-    "id": "palm_oil",
-    "name": "Palm Oil",
-    "aliases": [],
+  minyak_sawit: {
+    "id": "minyak_sawit",
+    "name": "Minyak Sawit",
+    "aliases": [
+      "Palm Oil",
+      "sawit"
+    ],
     "strict_aliases": [],
-    "summary": "Palm oil was grown widely across pre-war Malaya and is still grown today, though on nowhere near the old scale.",
+    "summary": "Minyak Sawit (palm oil) was grown widely across pre-war Malaya and is still grown today, though on nowhere near the old scale.",
     "category_path": [
       "01_World Details"
     ]
@@ -664,6 +667,18 @@ export const glossaryDatabase = {
       "UCL"
     ]
   },
+  the_battle_of_the_bands: {
+    "id": "the_battle_of_the_bands",
+    "name": "The Battle of the Bands",
+    "aliases": [
+      "Battle of the Bands"
+    ],
+    "strict_aliases": [],
+    "summary": "The Battle of the Bands is the Axe Gang's annual free-for-all battle royale, fought across the old test track at Sekitar Litar in North Bandawang.",
+    "category_path": [
+      "Bandawang"
+    ]
+  },
   auto_docs: {
     "id": "auto_docs",
     "name": "Auto-Docs",
@@ -876,7 +891,7 @@ export const glossaryDatabase = {
     "name": "Syurga",
     "aliases": [],
     "strict_aliases": [],
-    "summary": "Syurga is Ishtar's planned casino in Bandawang Baru, a British-parody theme park under grand, nearly-finished construction — a joke aimed as much at Malaysians' high opinion of the British and the West as at the British themselves.",
+    "summary": "Syurga is Ishtar's planned casino in Bandawang Baru, a British-themed casino and theme park under grand, nearly-finished construction — built in complete sincerity by someone who genuinely believed a Proper English Casino was exactly what the wasteland needed.",
     "category_path": [
       "Locations",
       "Bandawang"
