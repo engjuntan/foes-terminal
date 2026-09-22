@@ -17,7 +17,7 @@ import { DIFFICULTY_TIERS } from './checks.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
-import { BODY_PARTS, BURST_HIT_PENALTY, STANCES, COVER_LEVELS, DAMAGE_TYPE_LABELS, isMonsterAttackMelee } from './combat.js';
+import { BODY_PARTS, BURST_HIT_PENALTY, STANCES, COVER_LEVELS, DAMAGE_TYPE_LABELS, isMonsterAttackMelee, effectiveTargetAC } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { peopleDatabase } from './people.js';
 import { questDatabase } from './quests.js';
@@ -473,12 +473,10 @@ function buildParentTree(entries) {
 export function renderWikiLink(name, description) {
   if (!description) description = "No data available.";
   const safeDesc = description.replace(/"/g, "&quot;").replace(/'/g, "\\'");
-  return `<span class="wiki-link"
-          onmouseover="window.showTooltip('${safeDesc}', event)"
-          onmouseout="window.hideTooltip()"
-          onclick="window.toggleTooltip('${safeDesc}', event)">
-      ${name}
-    </span>`;
+  // One line, no whitespace around the name: this is dropped inline into
+  // white-space:pre-wrap bodies (data logs, people, quests), where any
+  // newline or indent in the markup renders as a real line break.
+  return `<span class="wiki-link" onmouseover="window.showTooltip('${safeDesc}', event)" onmouseout="window.hideTooltip()" onclick="window.toggleTooltip('${safeDesc}', event)">${name}</span>`;
 }
 
 export function getNavbar(currentTab, currentUser) {
@@ -933,14 +931,8 @@ export function getCombatView(liveData, userRole, currentUser) {
             }
           }
         }
-        let targetAC = null;
-        if (target.ref_type === 'monster') {
-          targetAC = target.ac;
-        } else {
-          const targetChar = liveData.characters[target.char_id];
-          const targetDerived = deriveCharacter(targetChar);
-          targetAC = targetDerived.armorClass;
-        }
+        // Same stance-aware AC the attack itself rolls against.
+        const targetAC = effectiveTargetAC(target, liveData.characters);
         if (attackerValue !== null && targetAC !== null) {
           const part = BODY_PARTS[selectedPart] || BODY_PARTS.torso;
           // Job 1: same cover penalty computeAttackResolution() applies —

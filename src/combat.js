@@ -3,6 +3,7 @@
 // initiative, and resolving actions. Kept separate from formulas.js since
 // that file is about a single character's derived stats, not encounters.
 import { getMonster } from './bestiary.js';
+import { deriveCharacter } from './formulas.js';
 
 // Rolls a real HP value for a monster instance within +/-30% of its
 // bestiary "hp" value, respecting variance_bias ("upper"/"lower"/"normal").
@@ -370,4 +371,26 @@ export function buildAttackLogMessage({ isHit, attackerName, targetName, weaponN
   // regardless of whether the original target actually got hit.
   const suffix = `${burstTag || ''} (rolled ${roll} vs ${chance}%)${effectAppliedMsg || ''}`;
   return sentence + suffix;
+}
+
+// A combat target's AC after its stance. Crouching / prone / knocked down
+// cap how much of AC comes from AGI — for PCs and, since the 2026-09-22
+// ruling, for monsters too (via their SPECIAL block; combatants created
+// before monsters carried `special` fall back to the bestiary entry).
+// Shared by the attack itself and the hit-chance preview, so the number
+// the GM sees is the number that gets rolled against.
+export function effectiveTargetAC(target, characters) {
+  const stanceDef = STANCES[target.stance || 'standing'] || STANCES.standing;
+  const capped = stanceDef.agiCap !== null && stanceDef.agiCap !== undefined;
+  if (target.ref_type === 'monster') {
+    const special = (target.special && Object.keys(target.special).length) ? target.special
+      : ((getMonster(target.source_id) || {}).stats || {}).special || {};
+    const agi = special.agi;
+    return (capped && typeof agi === 'number') ? target.ac - agi + Math.min(agi, stanceDef.agiCap) : target.ac;
+  }
+  const targetChar = characters[target.char_id];
+  const derived = deriveCharacter(targetChar);
+  const charStance = STANCES[targetChar.stance || 'standing'] || STANCES.standing;
+  const charCapped = charStance.agiCap !== null && charStance.agiCap !== undefined;
+  return charCapped ? derived.armorClass - derived.special.agi + Math.min(derived.special.agi, charStance.agiCap) : derived.armorClass;
 }

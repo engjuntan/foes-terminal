@@ -5,7 +5,7 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
 import { RACE_RULES, calculateDerivedStats, deriveCharacter, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
 import { getMonster } from './bestiary.js';
-import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES, COVER_LEVELS, isMonsterAttackMelee } from './combat.js';
+import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES, COVER_LEVELS, isMonsterAttackMelee, effectiveTargetAC } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { questDatabase } from './quests.js';
 import { mapDatabase } from './maps.js';
@@ -1933,35 +1933,12 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
 
   // --- Target's AC + damage mitigation ---
   let targetAC, targetDtdr, targetName;
+  targetAC = effectiveTargetAC(target, window.liveData.characters);
   if (target.ref_type === 'monster') {
-    targetAC = target.ac;
-    // Job 2 (SCOPE_DECISIONS.md ruling: "NPC stances must cost AC the way
-    // PC stances do"): today a crouching/prone NPC got the stance's hit
-    // bonus for free, with no matching AC loss, because the AGI-cap math
-    // only ran for a PC target below. Same formula, gated on the monster
-    // actually carrying a SPECIAL block (`special.agi` — most bestiary
-    // entries have it per this brief; when it's absent this is skipped
-    // entirely and the monster's authored `ac` is left exactly as-is).
-    const targetAgi = target.special && target.special.agi;
-    if (typeof targetAgi === 'number') {
-      const stanceDef = STANCES[target.stance || 'standing'] || STANCES.standing;
-      if (stanceDef.agiCap !== null && stanceDef.agiCap !== undefined) {
-        targetAC = targetAC - targetAgi + Math.min(targetAgi, stanceDef.agiCap);
-      }
-    }
     targetDtdr = target.dtdr || {};
     targetName = target.name;
   } else {
     const targetChar = window.liveData.characters[target.char_id];
-    const targetDerived = deriveCharacter(targetChar);
-    targetAC = targetDerived.armorClass;
-    // Crouching/prone/knocked-down caps how much of AC comes from AGI —
-    // only meaningful for a PC, since AC's AGI component is what's being
-    // capped and a monster's flat `ac` isn't decomposed that way.
-    const targetStanceDef = STANCES[targetChar.stance || 'standing'] || STANCES.standing;
-    if (targetStanceDef.agiCap !== null && targetStanceDef.agiCap !== undefined) {
-      targetAC = targetAC - targetDerived.special.agi + Math.min(targetDerived.special.agi, targetStanceDef.agiCap);
-    }
     const armorItem = getItem((targetChar.equipment || {}).body);
     // Armor's own condition marks scale every DT/DR figure by the same
     // curve as weapon damage (§2.2: "the same multiplier on every DT and
