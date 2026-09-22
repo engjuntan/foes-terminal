@@ -116,12 +116,18 @@ export function getCritChance(rawValue) {
 // don't have a Luck stat, so they skip that 91-99 save — only a natural
 // 100 can fumble them; a deliberate simplification rather than
 // inventing a proxy formula for something the bestiary doesn't track.
-export function resolveCrit(roll, critChance, luckStat, isPc) {
+// `luckPenalty` is the weapon-condition durability system's fumble-save
+// penalty (BALANCE_PROPOSAL.md §2.2: "succeeds on d10 <= LK - floor(m/2)")
+// — floor(marks/2), 0 for an unarmed attack or a pristine weapon. Kept as
+// a plain number param rather than importing condition.js here, so this
+// file stays decoupled from the durability data shape (see its own
+// header comment); the caller (controllers.js) computes it.
+export function resolveCrit(roll, critChance, luckStat, isPc, luckPenalty = 0) {
   if (roll <= critChance) return 'success';
   if (roll === 100) return 'fail';
   if (isPc && roll >= 91 && roll <= 99) {
     const saveRoll = rollD10();
-    if (saveRoll > luckStat) return 'fail';
+    if (saveRoll > (luckStat - luckPenalty)) return 'fail';
   }
   return null;
 }
@@ -137,10 +143,16 @@ export function rollCritTableEntry(isSuccess) {
 }
 
 // `effect` is a tag resolveAttack() switches on to apply the mechanical
-// consequence — see controllers.js. Entries 5/6/7 on the failure table
-// were the ones built on weapon condition marks (cut — no durability
-// system exists), so they're blank ("no special effect beyond the
-// miss") rather than renumbered, keeping the original 1-10 odds intact.
+// consequence — see controllers.js. Entries 6/7 on the failure table are
+// back to their original condition-mark effect now that the durability
+// system exists (GM ruling 2026-09-22, SCOPE_DECISIONS.md "Balance
+// proposal — GM rulings": "Crit-fail entries 6 and 7 go back to adding
+// condition marks: 1d3"). Entry 5 stays a plain miss — only 6 and 7 were
+// named. Every crit-fail (this pair included) also gets the manual's
+// blanket "+1 mark on any critical failure" on top, unless the entry
+// overrides it: 6/7 use 1d3 instead of the flat +1, and Backfire (entry
+// 2) sets the weapon straight to Broken (10) instead — see
+// controllers.js's computeAttackResolution for where that's applied.
 export const CRIT_SUCCESS_TABLE = {
   1: { label: 'Nothing extra — a clean hit', effect: 'none' },
   2: { label: 'Cripples their leg', effect: 'cripple_leg' },
@@ -155,12 +167,12 @@ export const CRIT_SUCCESS_TABLE = {
 };
 export const CRIT_FAIL_TABLE = {
   1: { label: 'Misfire — jammed, loses their next turn', effect: 'jammed' },
-  2: { label: 'Weapon backfires — cripples their own arm, weapon destroyed', effect: 'backfire' },
+  2: { label: 'Weapon backfires — cripples their own arm, weapon Broken', effect: 'backfire' },
   3: { label: 'Hits themselves for half their weapon\'s damage', effect: 'hit_self' },
   4: { label: 'Hits someone else nearby instead', effect: 'hit_other' },
   5: { label: 'Nothing extra — just a miss', effect: 'none' },
-  6: { label: 'Nothing extra — just a miss', effect: 'none' },
-  7: { label: 'Nothing extra — just a miss', effect: 'none' },
+  6: { label: 'Condition damage — the weapon takes a beating (1d3 marks)', effect: 'add_marks' },
+  7: { label: 'Condition damage — the weapon takes a beating (1d3 marks)', effect: 'add_marks' },
   8: { label: 'Distracted — loses their next turn', effect: 'distracted' },
   9: { label: 'Knocked down — loses their next turn', effect: 'knockdown_fail' },
   10: { label: 'Drops their weapon — attack misses', effect: 'drop_weapon' }
