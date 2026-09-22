@@ -88,6 +88,7 @@ window.adjustCombatDraftMonster = Controllers.adjustCombatDraftMonster;
 window.startCombat = Controllers.startCombat;
 window.endCombat = Controllers.endCombat;
 window.setStance = Controllers.setStance;
+window.setCover = Controllers.setCover;
 window.setCombatActionField = Controllers.setCombatActionField;
 window.rollForMe = Controllers.rollForMe;
 window.resolveAttack = Controllers.resolveAttack;

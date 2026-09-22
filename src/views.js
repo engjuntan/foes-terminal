@@ -17,8 +17,9 @@ import { DIFFICULTY_TIERS } from './checks.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
-import { BODY_PARTS, BURST_HIT_PENALTY, STANCES } from './combat.js';
+import { BODY_PARTS, BURST_HIT_PENALTY, STANCES, COVER_LEVELS, DAMAGE_TYPE_LABELS, isMonsterAttackMelee } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
+import { peopleDatabase } from './people.js';
 import { questDatabase } from './quests.js';
 import { glossaryDatabase } from './glossary.js';
 import { mapDatabase } from './maps.js';
@@ -750,6 +751,20 @@ export function getCombatView(liveData, userRole, currentUser) {
     return `<select onclick="event.stopPropagation();" onchange="event.stopPropagation(); window.setStance('${c.combatant_id}', this.value)" style="font-size:11px; background:black; color:${colors[current]}; border:1px solid ${colors[current]}; padding:0 2px;">${options}</select>`;
   };
 
+  // Cover (job 1 — SCOPE_DECISIONS.md "Combat, scrap, People tab, heist"
+  // ruling: "Cover is GM-assigned"). GM-only control, unlike stance —
+  // combat space is navigated manually at the table, so only the GM
+  // calls it. A non-GM viewer just sees the current level, when it isn't
+  // "None" (the common case stays uncluttered).
+  const coverHtml = (c) => {
+    const current = c.cover || 'none';
+    if (userRole !== 'gm') {
+      return current !== 'none' ? `<span style="font-size:11px; color:orange; border:1px solid orange; padding:0 5px; margin-left:4px;">${COVER_LEVELS[current].label.toUpperCase()}</span>` : '';
+    }
+    const options = Object.entries(COVER_LEVELS).map(([key, lvl]) => `<option value="${key}" ${current === key ? 'selected' : ''}>${lvl.label}</option>`).join('');
+    return `<select onclick="event.stopPropagation();" onchange="event.stopPropagation(); window.setCover('${c.combatant_id}', this.value)" style="font-size:11px; background:black; color:orange; border:1px solid orange; padding:0 2px; margin-left:4px;">${options}</select>`;
+  };
+
   const initiativeHtml = combat.initiative_order.map((c, idx) => {
     const isCurrent = isLive && idx === combat.turn_index;
     const hp = resolveHp(c);
@@ -759,6 +774,7 @@ export function getCombatView(liveData, userRole, currentUser) {
         <div>
           <strong style="color:${c.ref_type === 'pc' ? 'cyan' : 'red'};">${isCurrent ? '▶ ' : ''}${c.name}</strong>
           ${stanceHtml(c)}
+          ${coverHtml(c)}
           <div style="font-size:11px; color:#666;">INIT ${c.initiative}</div>
           ${afflictionTags(c)}
         </div>
@@ -807,8 +823,13 @@ export function getCombatView(liveData, userRole, currentUser) {
 
     let attackOptions = '';
     if (currentActor.ref_type === 'monster') {
+      // Job 3: show each attack's damage type (new per-attack `dmgType`,
+      // defaulting to normal when absent — matches computeAttackResolution).
       attackOptions = (currentActor.attacks || [])
-        .map(a => `<option value="${a.name}" ${draft.attackKey === a.name ? 'selected' : ''}>${a.name} (${a.hit_percent}% · ${a.damage})</option>`).join('');
+        .map(a => {
+          const dmgTypeLabel = DAMAGE_TYPE_LABELS[a.dmgType || 'normal'];
+          return `<option value="${a.name}" ${draft.attackKey === a.name ? 'selected' : ''}>${a.name} (${a.hit_percent}% · ${a.damage}${dmgTypeLabel ? ` · ${dmgTypeLabel}` : ''})</option>`;
+        }).join('');
     } else {
       const char = liveData.characters[currentActor.char_id];
       const equip = (char && char.equipment) || {};
@@ -822,7 +843,10 @@ export function getCombatView(liveData, userRole, currentUser) {
         const slot = equip.right_hand === itemId ? 'right_hand' : 'left_hand';
         const itemClipSize = item.stats && item.stats.clip_size;
         const ammoTag = itemClipSize ? ` (${ammo[slot] ?? itemClipSize}/${itemClipSize} ammo)` : '';
-        return `<option value="${itemId}" ${draft.attackKey === itemId ? 'selected' : ''}>${item.name}${ammoTag}</option>`;
+        // Job 3: show the weapon's own damage type (stats.dmgType, default normal).
+        const dmgTypeLabel = DAMAGE_TYPE_LABELS[(item.stats && item.stats.dmgType) || 'normal'];
+        const typeTag = dmgTypeLabel ? ` [${dmgTypeLabel}]` : '';
+        return `<option value="${itemId}" ${draft.attackKey === itemId ? 'selected' : ''}>${item.name}${ammoTag}${typeTag}</option>`;
       }).join('');
       attackOptions = `<option value="unarmed" ${!draft.attackKey || draft.attackKey === 'unarmed' ? 'selected' : ''}>Unarmed</option>${weaponOpts}`;
     }
@@ -886,18 +910,24 @@ export function getCombatView(liveData, userRole, currentUser) {
       const target = combat.initiative_order.find(c => c.combatant_id === draft.targetId);
       if (target) {
         let attackerValue = null;
+        let isMeleeAttack = false; // job 1: cover only penalizes ranged attacks
         if (currentActor.ref_type === 'monster') {
           const attackDef = (currentActor.attacks || []).find(a => a.name === draft.attackKey);
-          if (attackDef) attackerValue = attackDef.hit_percent;
+          if (attackDef) {
+            attackerValue = attackDef.hit_percent;
+            isMeleeAttack = isMonsterAttackMelee(attackDef);
+          }
         } else {
           const char = liveData.characters[currentActor.char_id];
           const derived = deriveCharacter(char);
           if (!draft.attackKey || draft.attackKey === 'unarmed') {
             attackerValue = derived.skills.unarmed;
+            isMeleeAttack = true;
           } else {
             const weaponItem = getItem(draft.attackKey);
             if (weaponItem) {
               const isMelee = !weaponItem.stats || (weaponItem.stats.range || 0) <= 1;
+              isMeleeAttack = isMelee;
               const skillKey = weaponItem.skill || (isMelee ? 'melee_weapons' : 'small_guns');
               attackerValue = derived.skills[skillKey] ?? 0;
             }
@@ -913,8 +943,13 @@ export function getCombatView(liveData, userRole, currentUser) {
         }
         if (attackerValue !== null && targetAC !== null) {
           const part = BODY_PARTS[selectedPart] || BODY_PARTS.torso;
-          const chance = Math.max(0, attackerValue - part.penalty - (burstSelected ? BURST_HIT_PENALTY : 0) - targetAC);
-          previewHtml = `<div style="font-size:11px; color:#888; margin-bottom:6px;">Hit chance vs ${target.name}: <span style="color:var(--pip-green); font-weight:bold;">${chance}%</span></div>`;
+          // Job 1: same cover penalty computeAttackResolution() applies —
+          // GM-assigned on the target, ranged attacks only.
+          const coverLevel = COVER_LEVELS[target.cover || 'none'] || COVER_LEVELS.none;
+          const coverPenalty = !isMeleeAttack ? coverLevel.penalty : 0;
+          const chance = Math.max(0, attackerValue - part.penalty - (burstSelected ? BURST_HIT_PENALTY : 0) - coverPenalty - targetAC);
+          const coverNote = coverPenalty > 0 ? ` <span style="color:orange;">(${coverLevel.label} −${coverPenalty})</span>` : '';
+          previewHtml = `<div style="font-size:11px; color:#888; margin-bottom:6px;">Hit chance vs ${target.name}: <span style="color:var(--pip-green); font-weight:bold;">${chance}%</span>${coverNote}</div>`;
         }
       }
 

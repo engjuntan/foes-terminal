@@ -5,7 +5,7 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
 import { RACE_RULES, calculateDerivedStats, deriveCharacter, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
 import { getMonster } from './bestiary.js';
-import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES } from './combat.js';
+import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES, COVER_LEVELS, isMonsterAttackMelee } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { questDatabase } from './quests.js';
 import { mapDatabase } from './maps.js';
@@ -1581,7 +1581,8 @@ export async function startCombat() {
       name: char.name,
       initiative_roll: roll,
       initiative: total,
-      is_down: false
+      is_down: false,
+      cover: 'none' // GM-assigned per combatant — see COVER_LEVELS (combat.js)
     });
   });
 
@@ -1810,10 +1811,21 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
   // carries a trackable copy). Populated below once the equipped weapon
   // (if any) is known.
   let weaponMarks = 0, weaponSlot = null;
+  // Job 1 (cover): cover only penalizes RANGED attacks, so every branch
+  // below has to say which kind of attack this is. A monster attack has
+  // no range/melee field of its own (see combat.js's
+  // isMonsterAttackMelee comment for why that's a name-keyword guess).
+  let isMeleeAttack = false;
   if (attacker.ref_type === 'monster') {
-    attackDef = (attacker.attacks || []).find(a => a.name === draft.attackKey);
-    if (!attackDef) { alert("PICK AN ATTACK"); return; }
+    const rawAttackDef = (attacker.attacks || []).find(a => a.name === draft.attackKey);
+    if (!rawAttackDef) { alert("PICK AN ATTACK"); return; }
+    // Job 3: a monster attack's own `dmgType` (new per-attack bestiary
+    // field), defaulting to normal when absent — cloned rather than
+    // mutated in place since `rawAttackDef` is the actual shared
+    // bestiary object (bestiaryDatabase), not a per-instance copy.
+    attackDef = { ...rawAttackDef, damageType: rawAttackDef.dmgType || 'normal' };
     attackerValue = attackDef.hit_percent;
+    isMeleeAttack = isMonsterAttackMelee(attackDef);
   } else {
     const char = window.liveData.characters[attacker.char_id];
     const derived = deriveCharacter(char);
@@ -1825,10 +1837,12 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
     if (!draft.attackKey || draft.attackKey === 'unarmed') {
       attackDef = { name: 'Unarmed', damage: derived.unarmedDamageFull, damageType: 'normal' };
       attackerValue = derived.skills.unarmed;
+      isMeleeAttack = true;
     } else {
       const weaponItem = getItem(draft.attackKey);
       if (!weaponItem) { alert("PICK A WEAPON"); return; }
       const isMelee = !weaponItem.stats || (weaponItem.stats.range || 0) <= 1;
+      isMeleeAttack = isMelee;
       const skillKey = weaponItem.skill || (isMelee ? 'melee_weapons' : 'small_guns');
       attackerValue = derived.skills[skillKey] ?? 0;
       const dmgDice = (weaponItem.stats && weaponItem.stats.dmg) || '1d4';
@@ -1875,6 +1889,20 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
   let targetAC, targetDtdr, targetName;
   if (target.ref_type === 'monster') {
     targetAC = target.ac;
+    // Job 2 (SCOPE_DECISIONS.md ruling: "NPC stances must cost AC the way
+    // PC stances do"): today a crouching/prone NPC got the stance's hit
+    // bonus for free, with no matching AC loss, because the AGI-cap math
+    // only ran for a PC target below. Same formula, gated on the monster
+    // actually carrying a SPECIAL block (`special.agi` — most bestiary
+    // entries have it per this brief; when it's absent this is skipped
+    // entirely and the monster's authored `ac` is left exactly as-is).
+    const targetAgi = target.special && target.special.agi;
+    if (typeof targetAgi === 'number') {
+      const stanceDef = STANCES[target.stance || 'standing'] || STANCES.standing;
+      if (stanceDef.agiCap !== null && stanceDef.agiCap !== undefined) {
+        targetAC = targetAC - targetAgi + Math.min(targetAgi, stanceDef.agiCap);
+      }
+    }
     targetDtdr = target.dtdr || {};
     targetName = target.name;
   } else {
@@ -1919,10 +1947,16 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
     .filter(fx => fx.modifiers && fx.modifiers.hit_chance_pct)
     .reduce((sum, fx) => sum + fx.modifiers.hit_chance_pct, 0);
 
+  // Job 1 (cover): GM-assigned on the TARGET combatant, ranged attacks
+  // only — melee is unaffected regardless of what cover is set to. Read
+  // straight off the `target` combatant object (initiative_order entry),
+  // same place setCover() writes it, for PC and monster targets alike.
+  const coverPenalty = !isMeleeAttack ? (COVER_LEVELS[target.cover || 'none'] || COVER_LEVELS.none).penalty : 0;
+
   // Weapon condition's own hit penalty (§2.2: flat -1/mark, capped at -9,
   // separate from the value multiplier applied to damage below) and its
   // fumble-save penalty (floor(marks/2) off the 91-99 save's LK target).
-  const { effectiveChance, isHit: normalHit } = resolveHit(attackerValue - bodyPart.penalty - burstPenalty + hitChancePenalty + attackerStance.hitBonus + hitPenalty(weaponMarks), targetAC, roll);
+  const { effectiveChance, isHit: normalHit } = resolveHit(attackerValue - bodyPart.penalty - burstPenalty + hitChancePenalty + attackerStance.hitBonus + hitPenalty(weaponMarks) - coverPenalty, targetAC, roll);
   const critResult = resolveCrit(roll, critChance, luckStat, attackerIsPc, fumbleLuckPenalty(weaponMarks)); // 'success' | 'fail' | null
   // A crit success always hits, even overriding a miss; a crit failure
   // always fumbles, even overriding what would've been a hit — a fumble
@@ -2128,12 +2162,51 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
 
     let rawDamage = 0;
     if (!damageAlreadyApplied) {
-      // §2.2: "Damage: round(rolled x (1 - 0.05m)), before DT/DR" —
-      // weaponMarks is 0 for unarmed/monster attacks, so conditionMultiplier
-      // is a no-op (x1) there.
-      rawDamage = Math.round(rolledDamage * damageMultiplier * conditionMultiplier(weaponMarks));
-      const { mitigated } = applyHpDamage(target, rawDamage, bypassMitigation);
-      finalDamage = mitigated;
+      if (attackDef.damageType === 'emp') {
+        // Job 3 (manual: "Not actually damage but rather a stunning
+        // effect. If armor has negative EMP then you are always
+        // stunned."): no HP damage either way — only a stun, and only
+        // when the target's EMP resistance is negative. Monsters carry
+        // it under stats.resistances.emp (robots are expected to author
+        // a negative value); a PC's comes from an optional stats.emp
+        // number on their equipped body armor (no such armor exists in
+        // the vault yet — see this agent's report's DATA NEEDED).
+        damageAlreadyApplied = true;
+        finalDamage = 0;
+        let empResistance = 0;
+        if (target.ref_type === 'monster') {
+          empResistance = (target.resistances && target.resistances.emp) || 0;
+        } else {
+          const targetChar = window.liveData.characters[target.char_id];
+          const armorItem = getItem((targetChar.equipment || {}).body);
+          empResistance = (armorItem && armorItem.stats && typeof armorItem.stats.emp === 'number') ? armorItem.stats.emp : 0;
+        }
+        if (empResistance < 0) {
+          effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'stunned', 1 + Math.floor(Math.random() * 4))}!`;
+        } else {
+          effectAppliedMsg += ` The EMP pulse has no effect on ${targetName}.`;
+        }
+      } else {
+        // §2.2: "Damage: round(rolled x (1 - 0.05m)), before DT/DR" —
+        // weaponMarks is 0 for unarmed/monster attacks, so conditionMultiplier
+        // is a no-op (x1) there.
+        rawDamage = Math.round(rolledDamage * damageMultiplier * conditionMultiplier(weaponMarks));
+        if (attackDef.damageType === 'poison') {
+          // Job 3 (manual: "Poison Resistance... Roll EN. Success = half
+          // poison damage."): a d10 against the target's END, success
+          // halves it. Bypasses DT/DR entirely — a toxin isn't stopped by
+          // armor the way a physical hit is, same reasoning as True.
+          const endStat = target.ref_type === 'monster'
+            ? ((target.special && target.special.end) || 0)
+            : deriveCharacter(window.liveData.characters[target.char_id]).special.end;
+          if (rollD10() <= endStat) rawDamage = Math.floor(rawDamage / 2);
+          bypassMitigation = true;
+        } else if (attackDef.damageType === 'true') {
+          bypassMitigation = true; // manual: "Ignores DT and DR and directly affects HP."
+        }
+        const { mitigated } = applyHpDamage(target, rawDamage, bypassMitigation);
+        finalDamage = mitigated;
+      }
     }
 
     // --- Armor wear (§2.3): the TARGET's own body armor takes marks from
@@ -2229,7 +2302,8 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
   const burstTag = isBurstShot ? ` [BURST FIRE, ${ammoAfterShot}/${(getItem(draft.attackKey).stats || {}).clip_size} ammo left]` : '';
   const message = buildAttackLogMessage({
     isHit, attackerName: attacker.name, targetName, weaponName: attackDef.name,
-    partTag, burstTag: burstTag + critTag, damage: finalDamage, roll, chance: effectiveChance, effectAppliedMsg
+    partTag, burstTag: burstTag + critTag, damage: finalDamage, roll, chance: effectiveChance, effectAppliedMsg,
+    damageType: attackDef.damageType
   });
 
   const updatedCombat = {
@@ -2568,6 +2642,27 @@ export async function setStance(combatantId, stance) {
     updatePayload['active_combat.initiative_order'] = newInitiativeOrder;
   }
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// GM-only: sets a combatant's cover level (SCOPE_DECISIONS.md "Combat,
+// scrap, People tab, heist" ruling — cover is GM-assigned, since combat
+// space is navigated manually at the table, not tracked by the app).
+// Unlike stance, cover isn't a PC-sheet attribute that persists outside
+// combat — it lives entirely on the initiative_order entry for BOTH a PC
+// and a monster combatant, same field either way, which is also what
+// lets computeAttackResolution() read `target.cover` directly off
+// whichever combatant object it already has in hand.
+export async function setCover(combatantId, cover) {
+  if (window.userRole !== 'gm') return;
+  const combat = window.liveData.active_combat;
+  if (!combat || !combat.is_active) return;
+  if (!COVER_LEVELS[cover]) return;
+  const combatant = combat.initiative_order.find(c => c.combatant_id === combatantId);
+  if (!combatant) return;
+
+  const newInitiativeOrder = combat.initiative_order.map(c => c.combatant_id === combatantId ? { ...c, cover } : c);
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, { 'active_combat.initiative_order': newInitiativeOrder }); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // GM-only: add a fresh monster to an in-progress fight. Appended to the
