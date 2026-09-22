@@ -14,6 +14,12 @@ import { DIFFICULTY_TIERS, rollD10, rollD20, resolveSpecialCheck, resolveSkillCh
 import { normalizeNeeds, decayNeeds, rollRestHealing, formatGameTime } from './needs.js';
 import { getRecipe } from './recipes.js';
 import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
+import {
+  isDurable, isBroken, clampMarks, normalizeCondition, takeCopyAt, putCopy,
+  conditionMultiplier, hitPenalty, fumbleLuckPenalty, scrapYieldFor,
+  applyConditionToDtdr, repairFloor, repairSaveChance,
+  totalRepairCost, startMarksForItem
+} from './condition.js';
 
 // Marks a `last_resolution.before` field whose value was genuinely
 // undefined (the path had never been written before that resolution) —
@@ -32,7 +38,12 @@ function withoutUndefined(obj) {
 }
 
 // --- GAME ACTIONS ---
-export async function equipItem(itemId, targetSlot) {
+// `copyIndex` (new, durability system) picks which owned copy of `itemId`
+// gets equipped, by position ascending-sorted-by-marks — the inventory
+// view renders one row per copy for a durable item, so each row's EQUIP
+// button passes its own row index. Omitted/out-of-range falls back to
+// the lowest-marks (best-condition) copy, §2.1's stated default.
+export async function equipItem(itemId, targetSlot, copyIndex) {
   if (!window.currentUser || !window.liveData) return;
 
   // Race-based size gating (e.g. Gergasi/Robot can't use human-sized gear).
@@ -65,11 +76,29 @@ export async function equipItem(itemId, targetSlot) {
   // gear doesn't erase what you were wearing.
   if (previousId) newInv = addToInventory(newInv, previousId, 1);
 
+  // --- Condition (durability system, BALANCE_PROPOSAL.md §2.1) ---
+  const previousItem = getItem(previousId);
+  const condition = normalizeCondition(char);
+  const newCondInv = { ...condition.inv };
+  const newCondWorn = { ...condition.worn };
+  if (isDurable(item)) {
+    const { marks, rest } = takeCopyAt(newCondInv[itemId], copyIndex);
+    if (rest.length) newCondInv[itemId] = rest; else delete newCondInv[itemId];
+    newCondWorn[targetSlot] = marks;
+  } else {
+    delete newCondWorn[targetSlot]; // non-durable gear in this slot carries no marks
+  }
+  if (previousId && isDurable(previousItem)) {
+    const previousMarks = condition.worn[targetSlot] ?? 0;
+    newCondInv[previousId] = putCopy(newCondInv[previousId], previousMarks);
+  }
+
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const charPath = `characters.${window.currentUser}`;
   const updatePayload = {};
   updatePayload[`${charPath}.equipment.${targetSlot}`] = itemId;
   updatePayload[`${charPath}.inventory`] = newInv;
+  updatePayload[`${charPath}.condition`] = { inv: newCondInv, worn: newCondWorn };
   // Ammo tracking lives per equipped slot, not per item instance (the app
   // doesn't track individual item copies anywhere). Equipping a weapon
   // with a clip_size always assumes a fresh, full magazine; a weapon with
@@ -84,10 +113,20 @@ export async function unequipItem(targetSlot) {
   const char = window.liveData.characters[window.currentUser];
   if (!char) return;
   const itemId = (char.equipment || {})[targetSlot];
+  const item = getItem(itemId);
+  const condition = normalizeCondition(char);
+  const newCondWorn = { ...condition.worn };
+  delete newCondWorn[targetSlot];
+  const newCondInv = { ...condition.inv };
+  if (itemId && isDurable(item)) {
+    const marks = condition.worn[targetSlot] ?? 0;
+    newCondInv[itemId] = putCopy(newCondInv[itemId], marks);
+  }
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
   updatePayload[`characters.${window.currentUser}.equipment.${targetSlot}`] = null;
   updatePayload[`characters.${window.currentUser}.ammo.${targetSlot}`] = null;
+  updatePayload[`characters.${window.currentUser}.condition`] = { inv: newCondInv, worn: newCondWorn };
   // Unequipping returns the item to the pack — it doesn't vanish.
   if (itemId) updatePayload[`characters.${window.currentUser}.inventory`] = addToInventory(char.inventory, itemId, 1);
   await updateDoc(charRef, updatePayload);
@@ -100,10 +139,20 @@ export async function gmUnequipItem(targetCharId, targetSlot) {
   const char = window.liveData.characters[targetCharId];
   if (!char) return;
   const itemId = (char.equipment || {})[targetSlot];
+  const item = getItem(itemId);
+  const condition = normalizeCondition(char);
+  const newCondWorn = { ...condition.worn };
+  delete newCondWorn[targetSlot];
+  const newCondInv = { ...condition.inv };
+  if (itemId && isDurable(item)) {
+    const marks = condition.worn[targetSlot] ?? 0;
+    newCondInv[itemId] = putCopy(newCondInv[itemId], marks);
+  }
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
   updatePayload[`characters.${targetCharId}.equipment.${targetSlot}`] = null;
   updatePayload[`characters.${targetCharId}.ammo.${targetSlot}`] = null;
+  updatePayload[`characters.${targetCharId}.condition`] = { inv: newCondInv, worn: newCondWorn };
   if (itemId) updatePayload[`characters.${targetCharId}.inventory`] = addToInventory(char.inventory, itemId, 1);
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
@@ -458,28 +507,46 @@ export async function openMessage(messageId) {
 }
 
 // 1. Give Item (Updated to allow duplicates)
+// A durable (weapon/armor) grant reads an optional #gmItemMarks number
+// input (0-10) so the GM can hand out pre-worn gear directly — e.g.
+// "disrepair" loot — without it defaulting to the item's own start_marks
+// (see condition.js's startMarksForItem). Left blank, it uses that
+// default (pristine unless the item itself is authored pre-worn).
 export async function gmGrantItem(targetCharId) {
   const select = document.getElementById('gmItemSelect');
   const itemId = select.value;
   if (!itemId) return;
+  const item = getItem(itemId);
 
   const charRef = doc(db, "prisoncampaign", "alpha_team");
-  
+
   try {
     // READ current data first
     const charSnap = await getDoc(charRef);
     if (!charSnap.exists()) return;
 
+    const targetCharDoc = charSnap.data().characters[targetCharId];
     // Inventory is a stacked { itemId: quantity } map now — normalizes
     // and upgrades transparently even if this character still has the
     // old flat-array shape from before stacking existed.
-    const currentInv = charSnap.data().characters[targetCharId].inventory;
+    const currentInv = targetCharDoc.inventory;
     const newInv = addToInventory(currentInv, itemId, 1);
 
     // WRITE the entire updated map back
     const charPath = `characters.${targetCharId}`;
     const updatePayload = {};
     updatePayload[`${charPath}.inventory`] = newInv;
+
+    if (isDurable(item)) {
+      const condition = normalizeCondition(targetCharDoc);
+      const marksInput = document.getElementById('gmItemMarks');
+      const marksRaw = marksInput ? marksInput.value : '';
+      const marks = (marksRaw !== '' && !isNaN(Number(marksRaw))) ? clampMarks(Number(marksRaw)) : startMarksForItem(item);
+      updatePayload[`${charPath}.condition`] = {
+        inv: { ...condition.inv, [itemId]: [...(condition.inv[itemId] || []), marks].sort((a, b) => a - b) },
+        worn: condition.worn
+      };
+    }
 
     await updateDoc(charRef, updatePayload);
     alert(`GRANTED ${itemId.toUpperCase()} TO ${targetCharId.toUpperCase()}`);
@@ -799,13 +866,22 @@ export async function craftItem(recipeId) {
   Object.entries(recipe.inputs || {}).forEach(([componentId, qty]) => {
     inv = removeFromInventory(inv, componentId, qty);
   });
-  inv = addToInventory(inv, recipe.produces.item, recipe.produces.qty || 1);
+  const outputQty = recipe.produces.qty || 1;
+  inv = addToInventory(inv, recipe.produces.item, outputQty);
 
   const consumedText = Object.entries(recipe.inputs || {})
     .map(([id, qty]) => `${qty} ${(getItem(id) || {}).name || id}`).join(', ');
 
   const updatePayload = {};
   updatePayload[`characters.${charId}.inventory`] = inv;
+  // Crafted gear is always pristine (§2.4: "Crafted | 0") — appends fresh
+  // 0-mark copies for a durable output, same as any other inventory gain.
+  if (isDurable(outputItem)) {
+    const condition = normalizeCondition(char);
+    const existing = condition.inv[recipe.produces.item] || [];
+    const grown = [...existing, ...Array(outputQty).fill(0)].sort((a, b) => a - b);
+    updatePayload[`characters.${charId}.condition`] = { inv: { ...condition.inv, [recipe.produces.item]: grown }, worn: condition.worn };
+  }
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   try {
     await updateDoc(charRef, updatePayload);
@@ -827,20 +903,140 @@ export async function scrapItem(itemId) {
   if (getInventoryQuantity(char.inventory, itemId) < 1) { alert("YOU DON'T HAVE THAT"); return; }
 
   let inv = removeFromInventory(char.inventory, itemId, 1);
-  Object.entries(item.scrap_yield).forEach(([componentId, qty]) => {
+
+  // Durable items (weapon/armor) scale their yield by condition — §2.6:
+  // "Condition then applies the §2.2 multiplier." §2.1's stated default
+  // for scrapping/selling is the HIGHEST-marks (worst-condition) copy —
+  // you salvage your beaters, not your best gear. Junk (the only thing
+  // the WORKSHOP's Salvage panel currently lists) carries no marks at
+  // all, so it always scraps at full yield, same as before.
+  let updatePayload = {};
+  let actualYield = item.scrap_yield;
+  if (isDurable(item)) {
+    const condition = normalizeCondition(char);
+    const sorted = [...(condition.inv[itemId] || [])].sort((a, b) => a - b);
+    const marks = sorted.length ? sorted[sorted.length - 1] : 0;
+    const rest = sorted.slice(0, -1);
+    const newCondInv = { ...condition.inv };
+    if (rest.length) newCondInv[itemId] = rest; else delete newCondInv[itemId];
+    updatePayload[`characters.${charId}.condition`] = { inv: newCondInv, worn: condition.worn };
+    actualYield = scrapYieldFor(item.scrap_yield, marks);
+  }
+
+  Object.entries(actualYield).forEach(([componentId, qty]) => {
     inv = addToInventory(inv, componentId, qty);
   });
 
-  const yieldText = Object.entries(item.scrap_yield)
+  const yieldText = Object.entries(actualYield)
     .map(([id, qty]) => `${qty} ${(getItem(id) || {}).name || id}`).join(', ');
 
-  const updatePayload = {};
   updatePayload[`characters.${charId}.inventory`] = inv;
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   try {
     await updateDoc(charRef, updatePayload);
     alert(`Scrapped ${item.name} → ${yieldText}.`);
   } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// --- REPAIR (§2.5) ---
+// Instant, no roll — same shape as craftItem: read entirely off the
+// repairer's own Repair skill and station access, self-service only (no
+// GM-on-behalf-of path, matching how crafting works, since the number
+// that matters — Repair skill, tool bonuses — belongs to whoever's
+// actually fixing it). `copyRef` is `{ slot }` for a worn item or
+// `{ index }` for a specific inventory copy (position ascending-sorted by
+// marks — same convention as equip/give's copyIndex), so the WORKSHOP can
+// offer a REPAIR button per row, same as INVENTORY does for equip/give.
+//
+// Repairs straight down to the Repair-skill floor in one action (the
+// floor being how low a single job can reach, not a per-mark toggle),
+// consuming totalRepairCost() components for every mark removed — unless
+// one d100 roll (repairSaveChance, capped 30%) saves the whole job's
+// components, per §2.5's arbitrage-guard design.
+export async function repairItem(itemId, copyRef) {
+  const charId = window.currentUser;
+  if (!charId || !window.liveData) return;
+  const char = window.liveData.characters[charId];
+  if (!char) return;
+  const item = getItem(itemId);
+  if (!isDurable(item)) { alert("THAT CAN'T BE REPAIRED"); return; }
+
+  const condition = normalizeCondition(char);
+  const isWorn = !!(copyRef && copyRef.slot);
+  const currentMarks = isWorn ? condition.worn[copyRef.slot] : (condition.inv[itemId] || [])[copyRef && copyRef.index];
+  if (currentMarks === undefined) { alert("COPY NOT FOUND — IT MAY HAVE MOVED, TRY AGAIN"); return; }
+
+  const derived = deriveCharacter(char);
+  const repairSkill = derived.skills.repair || 0;
+  const benchStationId = item.type === 'weapon' ? 'weapons_bench' : 'armour_bench';
+  const atBench = !!(char.stations && char.stations[benchStationId]);
+  const floor = repairFloor(repairSkill, atBench);
+
+  if (currentMarks <= floor) {
+    alert(`ALREADY AT THE BEST CONDITION YOUR REPAIR SKILL ALLOWS (${floor} MARK${floor === 1 ? '' : 'S'}${atBench ? ', AT A BENCH' : ''})`);
+    return;
+  }
+  const marksToRepair = currentMarks - floor;
+  const cost = totalRepairCost(item, marksToRepair);
+  const missing = Object.entries(cost).filter(([id, qty]) => getInventoryQuantity(char.inventory, id) < qty);
+  if (missing.length) {
+    alert(`MISSING COMPONENTS: ${missing.map(([id, qty]) => `${qty} ${(getItem(id) || {}).name || id}`).join(', ')}`);
+    return;
+  }
+
+  const saveChance = repairSaveChance(repairSkill);
+  const saved = (Math.random() * 100) < saveChance;
+  let inv = normalizeInventory(char.inventory);
+  if (!saved) Object.entries(cost).forEach(([id, qty]) => { inv = removeFromInventory(inv, id, qty); });
+
+  const newCondition = { inv: { ...condition.inv }, worn: { ...condition.worn } };
+  if (isWorn) {
+    newCondition.worn[copyRef.slot] = floor;
+  } else {
+    const arr = [...(newCondition.inv[itemId] || [])].sort((a, b) => a - b);
+    arr[copyRef.index] = floor;
+    newCondition.inv[itemId] = arr.sort((a, b) => a - b);
+  }
+
+  const updatePayload = {};
+  updatePayload[`characters.${charId}.inventory`] = inv;
+  updatePayload[`characters.${charId}.condition`] = newCondition;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, updatePayload);
+    const costText = Object.entries(cost).map(([id, qty]) => `${qty} ${(getItem(id) || {}).name || id}`).join(', ') || 'nothing';
+    alert(`Repaired ${item.name} to ${floor} mark${floor === 1 ? '' : 's'}. ${saved ? `Parts saved — ${costText} not consumed!` : `Consumed: ${costText}.`}`);
+  } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// GM tool: sets a specific copy's marks directly, no cost or roll — for
+// handing out pre-worn "disrepair" loot onto a copy that's already in
+// play, or correcting a mistake. `copyRef` is the same { slot } / { index }
+// shape repairItem() takes.
+export async function gmSetItemCondition(targetCharId, itemId, copyRef, marks) {
+  if (!targetCharId || !window.liveData) return;
+  const char = window.liveData.characters[targetCharId];
+  if (!char) return;
+  const item = getItem(itemId);
+  if (!isDurable(item)) return;
+
+  const condition = normalizeCondition(char);
+  const clamped = clampMarks(marks);
+  const newCondition = { inv: { ...condition.inv }, worn: { ...condition.worn } };
+  if (copyRef && copyRef.slot) {
+    newCondition.worn[copyRef.slot] = clamped;
+  } else {
+    const arr = [...(newCondition.inv[itemId] || [])].sort((a, b) => a - b);
+    if (copyRef && typeof copyRef.index === 'number' && copyRef.index >= 0 && copyRef.index < arr.length) {
+      arr[copyRef.index] = clamped;
+      newCondition.inv[itemId] = arr.sort((a, b) => a - b);
+    } else return;
+  }
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.condition`] = newCondition;
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // Player-to-player item transfer. Direct/immediate — no accept step,
@@ -859,7 +1055,15 @@ export async function scrapItem(itemId) {
 // gmGrantItem — a GM grant is an out-of-fiction administrative action
 // (same category as gmAdjustHP/gmSetRadiation), not something the
 // game's own carry-weight rule constrains.
-export async function giveItem(itemId, qty, toCharId) {
+// `copyIndex` (new, durability system) is which owned copy of a durable
+// itemId to give, by position ascending-sorted-by-marks — this is §2.1's
+// "Give moves the copy the player picks": the inventory view renders one
+// row per copy for a durable item, and each row's own GIVE button passes
+// its own index, so the player is choosing by clicking that specific
+// row rather than the app defaulting for them. Ignored for qty>1 or a
+// non-durable (stacked) item, and falls back to the lowest-marks copy if
+// omitted/out of range.
+export async function giveItem(itemId, qty, toCharId, copyIndex) {
   const fromCharId = window.currentUser;
   if (!fromCharId || !toCharId || fromCharId === toCharId) return;
   const fromChar = window.liveData.characters[fromCharId];
@@ -899,6 +1103,32 @@ export async function giveItem(itemId, qty, toCharId) {
   updatePayload[`characters.${fromCharId}.inventory`] = newFromInv;
   updatePayload[`characters.${toCharId}.inventory`] = newToInv;
   updatePayload.messages = [...messages, message];
+
+  if (isDurable(item)) {
+    const fromCondition = normalizeCondition(fromChar);
+    // Same character giving to themselves is blocked above, so from/to
+    // are always two different characters' condition trees — safe to
+    // read toChar's fresh, unaffected by fromChar's own write this call.
+    const toCondition = normalizeCondition(toChar);
+    let movedMarks = [];
+    let fromArr = [...(fromCondition.inv[itemId] || [])].sort((a, b) => a - b);
+    if (qty === 1) {
+      const { marks, rest } = takeCopyAt(fromArr, copyIndex);
+      movedMarks = [marks];
+      fromArr = rest;
+    } else {
+      // No per-copy picker for a multi-give — moves the lowest-marks
+      // (best-condition) `qty` copies, cheapest reasonable default.
+      movedMarks = fromArr.slice(0, qty);
+      fromArr = fromArr.slice(qty);
+    }
+    const newFromCondInv = { ...fromCondition.inv };
+    if (fromArr.length) newFromCondInv[itemId] = fromArr; else delete newFromCondInv[itemId];
+    const newToCondInv = { ...toCondition.inv, [itemId]: [...(toCondition.inv[itemId] || []), ...movedMarks].sort((a, b) => a - b) };
+    updatePayload[`characters.${fromCharId}.condition`] = { inv: newFromCondInv, worn: fromCondition.worn };
+    updatePayload[`characters.${toCharId}.condition`] = { inv: newToCondInv, worn: toCondition.worn };
+  }
+
   try {
     await updateDoc(charRef, updatePayload);
     alert(`GAVE ${qty > 1 ? `${qty}x ` : ''}${item.name.toUpperCase()} TO ${toChar.name.toUpperCase()}`);
@@ -1460,6 +1690,11 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
   let attackDef, attackerValue;
   let burstPenalty = 0, isBurstShot = false;
   let ammoCharId = null, ammoSlot = null, ammoAfterShot = null;
+  // Durability system (BALANCE_PROPOSAL.md §2.2/§2.3): the equipped
+  // weapon's own condition marks, 0 for unarmed/monster attacks (neither
+  // carries a trackable copy). Populated below once the equipped weapon
+  // (if any) is known.
+  let weaponMarks = 0, weaponSlot = null;
   if (attacker.ref_type === 'monster') {
     attackDef = (attacker.attacks || []).find(a => a.name === draft.attackKey);
     if (!attackDef) { alert("PICK AN ATTACK"); return; }
@@ -1487,6 +1722,16 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
         damage: isMelee ? `${dmgDice}+${derived.meleeDamageBase}` : dmgDice,
         damageType: (weaponItem.stats && weaponItem.stats.dmgType) || 'normal'
       };
+
+      // --- Weapon condition (durability system) — 10 marks (Broken) is
+      // "cannot be used (blocked, turn not spent)" per SCOPE_DECISIONS.md's
+      // GM ruling, checked before the ammo check/turn is spent. ---
+      if (isDurable(weaponItem)) {
+        const equipNow = char.equipment || {};
+        weaponSlot = equipNow.right_hand === draft.attackKey ? 'right_hand' : equipNow.left_hand === draft.attackKey ? 'left_hand' : null;
+        weaponMarks = weaponSlot ? (normalizeCondition(char).worn[weaponSlot] ?? 0) : 0;
+        if (isBroken(weaponMarks)) { alert(`${weaponItem.name.toUpperCase()} IS BROKEN (10/10 MARKS) — REPAIR IT FIRST`); return; }
+      }
 
       // --- Ammo check (only for weapons authored with a clip_size, under
       // stats — same block as dmg/range/dmgType) ---
@@ -1529,7 +1774,12 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
       targetAC = targetAC - targetDerived.special.agi + Math.min(targetDerived.special.agi, targetStanceDef.agiCap);
     }
     const armorItem = getItem((targetChar.equipment || {}).body);
-    targetDtdr = armorItem ? parseArmorDtdr(armorItem) : {};
+    // Armor's own condition marks scale every DT/DR figure by the same
+    // curve as weapon damage (§2.2: "the same multiplier on every DT and
+    // DR"). AC's own reduction already happened above via deriveCharacter
+    // (which reads armorMarks internally — see formulas.js).
+    const targetArmorMarks = normalizeCondition(targetChar).worn.body || 0;
+    targetDtdr = armorItem ? applyConditionToDtdr(parseArmorDtdr(armorItem), targetArmorMarks) : {};
     targetName = targetChar.name;
   }
 
@@ -1554,8 +1804,11 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
     .filter(fx => fx.modifiers && fx.modifiers.hit_chance_pct)
     .reduce((sum, fx) => sum + fx.modifiers.hit_chance_pct, 0);
 
-  const { effectiveChance, isHit: normalHit } = resolveHit(attackerValue - bodyPart.penalty - burstPenalty + hitChancePenalty + attackerStance.hitBonus, targetAC, roll);
-  const critResult = resolveCrit(roll, critChance, luckStat, attackerIsPc); // 'success' | 'fail' | null
+  // Weapon condition's own hit penalty (§2.2: flat -1/mark, capped at -9,
+  // separate from the value multiplier applied to damage below) and its
+  // fumble-save penalty (floor(marks/2) off the 91-99 save's LK target).
+  const { effectiveChance, isHit: normalHit } = resolveHit(attackerValue - bodyPart.penalty - burstPenalty + hitChancePenalty + attackerStance.hitBonus + hitPenalty(weaponMarks), targetAC, roll);
+  const critResult = resolveCrit(roll, critChance, luckStat, attackerIsPc, fumbleLuckPenalty(weaponMarks)); // 'success' | 'fail' | null
   // A crit success always hits, even overriding a miss; a crit failure
   // always fumbles, even overriding what would've been a hit — a fumble
   // is worse than a plain miss, not just a miss with extra steps.
@@ -1623,7 +1876,8 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
     } else {
       const otherChar = window.liveData.characters[combatantRef.char_id];
       const armorItem = getItem((otherChar.equipment || {}).body);
-      dtdrForThis = armorItem ? parseArmorDtdr(armorItem) : {};
+      const otherArmorMarks = normalizeCondition(otherChar).worn.body || 0;
+      dtdrForThis = armorItem ? applyConditionToDtdr(parseArmorDtdr(armorItem), otherArmorMarks) : {};
     }
     const mitigated = bypassMitigation ? dmg : applyDamageReduction(dmg, dtdrForThis, attackDef.damageType || 'normal');
     let newCurrent;
@@ -1641,19 +1895,48 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
     return { mitigated, newCurrent };
   };
 
-  // A weapon that's destroyed/dropped only meaningfully applies to a PC
-  // firing a real equipped gun/melee weapon — monsters don't have
-  // trackable equipment, and unarmed has nothing to destroy or drop.
-  const destroyOrDropAttackerWeapon = (returnToInventory) => {
+  // Durability system: adds (or directly sets) marks on the attacker's
+  // own equipped weapon — used by the crit-fail table's blanket "+1 mark
+  // on any critical failure" (§2.3), entries 6/7's 1d3 override, and
+  // Backfire setting the weapon straight to Broken (10) instead of
+  // destroying it (GM ruling 2026-09-22 — BALANCE_PROPOSAL.md's original
+  // "weapon destroyed" text is superseded). Reads/writes through
+  // charUpdates so it composes correctly with a later drop (see
+  // dropAttackerWeapon below), which needs the POST-wear marks value.
+  // Monsters and unarmed attacks have nothing to wear.
+  const applyAttackerWeaponWear = ({ add, set } = {}) => {
+    if (!attackerIsPc || !weaponSlot) return null;
+    const char = window.liveData.characters[attacker.char_id];
+    const condPath = `characters.${attacker.char_id}.condition`;
+    const cond = charUpdates[condPath] || normalizeCondition(char);
+    const current = cond.worn[weaponSlot] ?? 0;
+    const next = clampMarks(set !== undefined ? set : current + (add || 0));
+    charUpdates[condPath] = { inv: cond.inv, worn: { ...cond.worn, [weaponSlot]: next } };
+    return attackDef.name;
+  };
+
+  // The crit-fail table's "drops their weapon" — always returns it to the
+  // pack (Backfire is the only crit-fail outcome that keeps a weapon out
+  // of the inventory loop entirely, and it no longer removes the weapon
+  // at all, just Breaks it in place — see applyAttackerWeaponWear). Only
+  // meaningfully applies to a PC firing a real equipped weapon — monsters
+  // don't have trackable equipment, and unarmed has nothing to drop.
+  const dropAttackerWeapon = () => {
     if (!attackerIsPc || !draft.attackKey || draft.attackKey === 'unarmed') return null;
     const char = window.liveData.characters[attacker.char_id];
     const equip = char.equipment || {};
-    const slot = equip.right_hand === draft.attackKey ? 'right_hand' : equip.left_hand === draft.attackKey ? 'left_hand' : null;
+    const slot = weaponSlot || (equip.right_hand === draft.attackKey ? 'right_hand' : equip.left_hand === draft.attackKey ? 'left_hand' : null);
     if (!slot) return null;
     charUpdates[`characters.${attacker.char_id}.equipment.${slot}`] = null;
     charUpdates[`characters.${attacker.char_id}.ammo.${slot}`] = null;
-    if (returnToInventory) {
-      charUpdates[`characters.${attacker.char_id}.inventory`] = addToInventory(char.inventory, draft.attackKey, 1);
+    charUpdates[`characters.${attacker.char_id}.inventory`] = addToInventory(char.inventory, draft.attackKey, 1);
+    if (isDurable(getItem(draft.attackKey))) {
+      const condPath = `characters.${attacker.char_id}.condition`;
+      const cond = charUpdates[condPath] || normalizeCondition(char);
+      const marksNow = cond.worn[slot] ?? 0;
+      const newWorn = { ...cond.worn };
+      delete newWorn[slot];
+      charUpdates[condPath] = { inv: { ...cond.inv, [draft.attackKey]: putCopy(cond.inv[draft.attackKey], marksNow) }, worn: newWorn };
     }
     return attackDef.name;
   };
@@ -1728,10 +2011,37 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
       }
     }
 
+    let rawDamage = 0;
     if (!damageAlreadyApplied) {
-      const rawDamage = Math.round(rolledDamage * damageMultiplier);
+      // §2.2: "Damage: round(rolled x (1 - 0.05m)), before DT/DR" —
+      // weaponMarks is 0 for unarmed/monster attacks, so conditionMultiplier
+      // is a no-op (x1) there.
+      rawDamage = Math.round(rolledDamage * damageMultiplier * conditionMultiplier(weaponMarks));
       const { mitigated } = applyHpDamage(target, rawDamage, bypassMitigation);
       finalDamage = mitigated;
+    }
+
+    // --- Armor wear (§2.3): the TARGET's own body armor takes marks from
+    // being hit — an attack roll ending in 0 (the manual's "every 10
+    // hits, one mark", approximated off the percentile roll itself), plus
+    // floor(raw/10) extra for an explosive hit. Only a PC target has
+    // trackable armor; artery/instant-kill's fixed damage isn't "raw
+    // weapon damage" in the mitigation sense, so explosive wear is
+    // skipped for those (roll-ending-in-0 wear still applies).
+    if (target.ref_type === 'pc') {
+      let armorWearMarks = (roll % 10 === 0) ? 1 : 0;
+      if (attackDef.damageType === 'explosive' && !damageAlreadyApplied) armorWearMarks += Math.floor(rawDamage / 10);
+      if (armorWearMarks > 0) {
+        const targetChar = window.liveData.characters[target.char_id];
+        const armorId = (targetChar.equipment || {}).body;
+        const armorItemDef = getItem(armorId);
+        if (armorId && isDurable(armorItemDef)) {
+          const condPath = `characters.${target.char_id}.condition`;
+          const cond = charUpdates[condPath] || normalizeCondition(targetChar);
+          const current = cond.worn.body ?? 0;
+          charUpdates[condPath] = { inv: cond.inv, worn: { ...cond.worn, body: clampMarks(current + armorWearMarks) } };
+        }
+      }
     }
 
     // Aimed-shot effects apply on any hit that leaves the target
@@ -1749,12 +2059,29 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
   if (critResult === 'fail') {
     const entry = rollCritTableEntry(false);
     critTag = ` [CRITICAL FAILURE: ${entry.label}]`;
+
+    // §2.3's weapon wear: every critical failure adds a mark, UNLESS this
+    // entry overrides that — Backfire sets Broken (10) outright, 6/7 roll
+    // 1d3 instead of the flat 1. Applied before the switch below so
+    // 'drop_weapon' (entry 10, no override — gets the flat +1) carries the
+    // freshly-worn marks value when it returns the weapon to the pack.
+    if (entry.effect === 'backfire') {
+      applyAttackerWeaponWear({ set: 10 });
+    } else if (entry.effect === 'add_marks') {
+      applyAttackerWeaponWear({ add: 1 + Math.floor(Math.random() * 3) }); // 1d3
+    } else {
+      applyAttackerWeaponWear({ add: 1 });
+    }
+
     switch (entry.effect) {
       case 'jammed': effectAppliedMsg += ` ${attacker.name} is afflicted by ${grantEffect(attacker, 'jammed', 1)}!`; break;
       case 'backfire': {
         effectAppliedMsg += ` ${attacker.name} is afflicted by ${grantEffect(attacker, 'crippled_arm')}!`;
-        const destroyed = destroyOrDropAttackerWeapon(false);
-        if (destroyed) effectAppliedMsg += ` ${destroyed} is destroyed — reduced to scrap!`;
+        effectAppliedMsg += ` ${attackDef.name} is wrecked — Broken (10/10 marks), unusable until repaired!`;
+        break;
+      }
+      case 'add_marks': {
+        effectAppliedMsg += ` ${attackDef.name} grinds and takes a beating!`;
         break;
       }
       case 'hit_self': {
@@ -1775,11 +2102,11 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
       case 'distracted': effectAppliedMsg += ` ${attacker.name} is afflicted by ${grantEffect(attacker, 'distracted', 1)}!`; break;
       case 'knockdown_fail': effectAppliedMsg += ` ${attacker.name} is afflicted by ${grantEffect(attacker, 'knocked_down', 1)}!`; break;
       case 'drop_weapon': {
-        const dropped = destroyOrDropAttackerWeapon(true);
+        const dropped = dropAttackerWeapon();
         if (dropped) effectAppliedMsg += ` ${attacker.name} drops ${dropped}!`;
         break;
       }
-      default: break; // 'none' — just a miss
+      default: break; // 'none' — just a miss (still took the flat +1 wear above)
     }
   }
 
@@ -2214,6 +2541,7 @@ export async function gmFactoryReset(targetCharId) {
   updatePayload[`characters.${targetCharId}.tags`] = {};
   updatePayload[`characters.${targetCharId}.inventory`] = {};
   updatePayload[`characters.${targetCharId}.equipment`] = { head: null, body: null, right_hand: null, left_hand: null, back: null };
+  updatePayload[`characters.${targetCharId}.condition`] = { inv: {}, worn: {} };
   updatePayload[`characters.${targetCharId}.skill_points`] = 0;
   updatePayload[`characters.${targetCharId}.level`] = 1;
   updatePayload[`characters.${targetCharId}.hp`] = { current: 15, max: 15 };

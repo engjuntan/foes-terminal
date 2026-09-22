@@ -61,6 +61,12 @@ window.requestRest = Controllers.requestRest;
 window.gmAdvanceTimeAction = Controllers.gmAdvanceTimeAction;
 window.craftItem = Controllers.craftItem;
 window.scrapItem = Controllers.scrapItem;
+// Durability system: `slot` (a worn item) or `index` (a specific
+// inventory copy, position ascending-sorted-by-marks) identify which
+// copy — exactly one of the two is passed by the view, so `slot` wins if
+// somehow both are (never expected in practice).
+window.repairItem = (itemId, slot, index) => Controllers.repairItem(itemId, slot ? { slot } : { index });
+window.gmSetItemCondition = (itemId, slot, index, marks) => Controllers.gmSetItemCondition(window.selectedCharId, itemId, slot ? { slot } : { index }, marks);
 window.gmGrantStation = Controllers.gmGrantStation;
 window.gmRevokeStation = Controllers.gmRevokeStation;
 window.useItem = Controllers.useItem;

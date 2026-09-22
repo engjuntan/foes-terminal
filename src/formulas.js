@@ -3,6 +3,7 @@ import { getTrait } from './traits.js';
 import { getItem } from './items.js';
 import { normalizeInventory } from './inventory.js';
 import { getNeedTier } from './needs.js';
+import { normalizeCondition, applyConditionToStat } from './condition.js';
 
 // How far over carryCapacity a character is allowed to go before
 // acquiring more items gets hard-blocked (trades, GM grants). Below
@@ -15,7 +16,13 @@ export const CARRY_OVERAGE_ALLOWANCE = 1.10;
 // Unlike traits/perks (looked up by id from a database), status effect
 // instances already carry their own resolved modifiers, ad-hoc or from
 // the status-effect library, so they need no lookup step here.
-export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [], activePerks = [], race = 'human', activeStatusEffects = [], equipment = {}, rads = 0, inventory = {}, needs = {}, permanentSkillBonuses = {}) {
+// `armorMarks` (added for the durability system, BALANCE_PROPOSAL.md §2.2)
+// is the equipped body armor's own condition marks — deriveCharacter()
+// reads it off normalizeCondition(char).worn.body so callers here never
+// have to touch the raw condition field themselves. Defaults to 0
+// (pristine) for the character-creation preview calls, which pass no
+// equipment at all.
+export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [], activePerks = [], race = 'human', activeStatusEffects = [], equipment = {}, rads = 0, inventory = {}, needs = {}, permanentSkillBonuses = {}, armorMarks = 0) {
 
   // --- 0. RACE DATA ---
   const raceDef = RACE_RULES[race] || RACE_RULES['human'];
@@ -143,8 +150,11 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
   // what was equipped.
   const equippedBodyArmor = getItem((equipment || {}).body);
   if (equippedBodyArmor && typeof equippedBodyArmor.stats?.ac === 'number') {
-    armorClass += equippedBodyArmor.stats.ac;
-    breakdown.other.push({ source: equippedBodyArmor.name, sourceType: 'equipment', key: 'ac_bonus', value: equippedBodyArmor.stats.ac });
+    // Condition wear scales the armor's own AC contribution (not the AGI
+    // component), per §2.2's "AGI + round(ac x (1 - 0.05m))".
+    const wornAcBonus = applyConditionToStat(equippedBodyArmor.stats.ac, armorMarks);
+    armorClass += wornAcBonus;
+    breakdown.other.push({ source: equippedBodyArmor.name, sourceType: 'equipment', key: 'ac_bonus', value: wornAcBonus });
   }
 
   // --- Carry Weight ---
@@ -445,10 +455,12 @@ export const RACE_RULES = {
 // requirement and display goes through here, so the number a player
 // reads on their sheet is the number they roll against.
 export function deriveCharacter(char) {
+  const armorMarks = normalizeCondition(char).worn.body || 0;
   const derived = calculateDerivedStats(
     char.special, char.level || 1, char.traits || [], char.perks || [],
     char.race || 'human', char.status_effects || [], char.equipment || {},
-    char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {}
+    char.rads || 0, char.inventory || {}, char.needs || {}, char.permanent_skill_bonuses || {},
+    armorMarks
   );
   Object.keys(derived.skills).forEach(key => {
     derived.skills[key] += (char.skill_ranks?.[key] || 0) + (char.tags?.[key] ? 20 : 0);

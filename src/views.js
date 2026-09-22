@@ -25,12 +25,29 @@ import { mapDatabase } from './maps.js';
 import { normalizeNeeds, getNeedTier, formatGameTime, NEED_RATES } from './needs.js';
 import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
 import { recipeDatabase } from './recipes.js';
+import {
+  isDurable, isBroken, normalizeCondition, conditionLabel, scrapYieldFor,
+  repairFloor, repairSaveChance, totalRepairCost
+} from './condition.js';
 
 // --- HELPERS ---
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// Durability system: a small 5-dot meter (each dot = 2 marks) plus a
+// text label, e.g. "●●●○○ Worn (6/10)" — the brief's own suggested
+// format. Shared by every gear/inventory listing that shows a durable
+// item's condition, GM controls included.
+function conditionMeter(marks) {
+  const m = Math.max(0, Math.min(10, marks || 0));
+  const filled = Math.round(m / 2);
+  const dots = '●'.repeat(filled) + '○'.repeat(5 - filled);
+  const broken = m >= 10;
+  const color = m === 0 ? 'var(--pip-green)' : broken ? 'var(--danger, #d4574a)' : m >= 7 ? 'orange' : 'var(--pip-dim)';
+  return `<span style="color:${color}; font-size:11px; white-space:nowrap;" title="${conditionLabel(m)} (${m}/10)">${dots} ${conditionLabel(m)} (${m}/10)${broken ? ' — BROKEN' : ''}</span>`;
 }
 
 // used/capacity gauge for the carry-weight system — green under
@@ -1454,6 +1471,12 @@ export function getPlayerView(charId, liveData) {
   const otherPlayers = Object.entries(liveData.characters || {})
     .filter(([id, c]) => id !== charId && c.is_finalized);
 
+  // Durability system: one row per copy for a weapon/armor item (marks
+  // are per-copy, not per-stack), same convention equip/give/repair all
+  // key off — the row's own index (position ascending-sorted-by-marks)
+  // is what those onclick calls pass back.
+  const condition = normalizeCondition(charData);
+
   if (charData.inventory) {
     const invMap = normalizeInventory(charData.inventory);
     const rawInv = Object.entries(invMap).map(([itemId, qty]) => {
@@ -1464,42 +1487,64 @@ export function getPlayerView(charId, liveData) {
     walletHtml = rawInv.filter(i => i.def && i.def.type === 'currency')
       .map(i => `<div style="display:flex; justify-content:space-between; border-bottom:1px dashed #333; padding:2px 0;">${renderWikiLink(i.def.name, i.def.description)}<span style="color:var(--pip-gold);">x${i.qty}</span></div>`).join("");
 
-    inventoryHtml = `<ul class="inventory-list">` + rawInv.filter(i => !i.def || i.def.type !== 'currency').map(i => {
+    // Renders one <li> for a specific copy (marksIndex is null/omitted for
+    // a non-durable, stacked item — qty-based display, unchanged from
+    // before the durability system).
+    const renderInvRow = (itemDef, itemId, qty, marks, marksIndex) => {
+      const isEquipped = marksIndex === null && Object.values(equip).includes(itemId);
+      const style = isEquipped ? "opacity: 0.5; border-color: #555;" : "";
+      const safeDesc = (itemDef.description || "").replace(/"/g, "&quot;").replace(/'/g, "\\'");
+      const qtyTag = (marksIndex === null && qty > 1) ? ` <span style="color:var(--pip-green);">x${qty}</span>` : '';
+      const idxArg = marksIndex === null ? '' : `, ${marksIndex}`;
+      const broken = marksIndex !== null && isBroken(marks);
+
+      let buttons = "";
+      if (!isEquipped) {
+        if (broken && itemDef.type === 'weapon') {
+          buttons = `<span style="color:var(--danger, #d4574a); font-size:10px;">[BROKEN]</span>`;
+        } else if (itemDef.slot === "hand") buttons = `<button onclick="window.equipItem('${itemId}', 'right_hand'${idxArg})">R</button> <button onclick="window.equipItem('${itemId}', 'left_hand'${idxArg})">L</button>`;
+        else if (itemDef.slot === "body") buttons = `<button onclick="window.equipItem('${itemId}', 'body'${idxArg})">EQUIP</button>`;
+        else if (itemDef.slot === "head") buttons = `<button onclick="window.equipItem('${itemId}', 'head'${idxArg})">EQUIP</button>`;
+        else if (itemDef.slot === "back") buttons = `<button onclick="window.equipItem('${itemId}', 'back'${idxArg})">EQUIP</button>`;
+        else if (itemDef.type === "consumable") buttons = `<button onclick="window.useItem('${charId}', '${itemId}')">USE</button>`;
+      } else { buttons = `<span style="color:var(--pip-green); font-size:10px;">[EQUIPPED]</span>`; }
+
+      // Give-to-party-member — only for unequipped items (equipped gear
+      // has to come off first, same as any other inventory action), and
+      // only when there's someone else to give it to. §2.1: "Give moves
+      // the copy the player picks" — for a durable item that's THIS row's
+      // own copy (marksIndex), not an app-chosen default.
+      const giveSelectId = `giveTarget_${itemId}${marksIndex === null ? '' : '_' + marksIndex}`;
+      const giveControl = (!isEquipped && otherPlayers.length > 0) ? `
+        <select id="${giveSelectId}" style="background:black; color:lime; border:1px solid #333; font-size:10px; max-width:70px;">
+          ${otherPlayers.map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('')}
+        </select>
+        <button onclick="window.giveItem('${itemId}', 1, document.getElementById('${giveSelectId}').value${idxArg})">GIVE</button>` : '';
+
+      const meterTag = marksIndex !== null ? `<div style="margin-top:2px;">${conditionMeter(marks)}</div>` : '';
+
+      return `<li class="inv-card" style="${style}"><img src="${itemDef.icon}" class="inv-icon"><div class="inv-info"><span class="inv-name" style="cursor:help; border-bottom:1px dotted var(--pip-green);" onmouseover="window.showTooltip('${safeDesc}', event)" onmouseout="window.hideTooltip()">${itemDef.name}</span>${qtyTag}<span class="inv-meta">${itemDef.type.toUpperCase()}</span>${meterTag}</div><div class="inv-actions">${buttons}${giveControl}</div></li>`;
+    };
+
+    inventoryHtml = `<ul class="inventory-list">` + rawInv.filter(i => !i.def || i.def.type !== 'currency').flatMap(i => {
         const itemDef = i.def;
         const itemId = i.id;
-        if (itemDef) {
-          const isEquipped = Object.values(equip).includes(itemId);
-          const style = isEquipped ? "opacity: 0.5; border-color: #555;" : "";
-          const safeDesc = (itemDef.description || "").replace(/"/g, "&quot;").replace(/'/g, "\\'");
-          const qtyTag = i.qty > 1 ? ` <span style="color:var(--pip-green);">x${i.qty}</span>` : '';
-
-          let buttons = "";
-          if (!isEquipped) {
-            if (itemDef.slot === "hand") buttons = `<button onclick="window.equipItem('${itemId}', 'right_hand')">R</button> <button onclick="window.equipItem('${itemId}', 'left_hand')">L</button>`;
-            else if (itemDef.slot === "body") buttons = `<button onclick="window.equipItem('${itemId}', 'body')">EQUIP</button>`;
-            else if (itemDef.slot === "head") buttons = `<button onclick="window.equipItem('${itemId}', 'head')">EQUIP</button>`;
-            else if (itemDef.slot === "back") buttons = `<button onclick="window.equipItem('${itemId}', 'back')">EQUIP</button>`;
-            else if (itemDef.type === "consumable") buttons = `<button onclick="window.useItem('${charId}', '${itemId}')">USE</button>`;
-          } else { buttons = `<span style="color:var(--pip-green); font-size:10px;">[EQUIPPED]</span>`; }
-
-          // Give-to-party-member — only for unequipped items (equipped
-          // gear has to come off first, same as any other inventory
-          // action), and only when there's someone else to give it to.
-          const giveControl = (!isEquipped && otherPlayers.length > 0) ? `
-            <select id="giveTarget_${itemId}" style="background:black; color:lime; border:1px solid #333; font-size:10px; max-width:70px;">
-              ${otherPlayers.map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('')}
-            </select>
-            <button onclick="window.giveItem('${itemId}', 1, document.getElementById('giveTarget_${itemId}').value)">GIVE</button>` : '';
-
-          return `<li class="inv-card" style="${style}"><img src="${itemDef.icon}" class="inv-icon"><div class="inv-info"><span class="inv-name" style="cursor:help; border-bottom:1px dotted var(--pip-green);" onmouseover="window.showTooltip('${safeDesc}', event)" onmouseout="window.hideTooltip()">${itemDef.name}</span>${qtyTag}<span class="inv-meta">${itemDef.type.toUpperCase()}</span></div><div class="inv-actions">${buttons}${giveControl}</div></li>`;
-        } else { return `<li>${itemId} (DATA SYNC PENDING)</li>`; }
+        if (!itemDef) return [`<li>${itemId} (DATA SYNC PENDING)</li>`];
+        if (isDurable(itemDef)) {
+          const marksArr = condition.inv[itemId] || []; // one entry per unequipped copy, same length as i.qty
+          return marksArr.map((marks, idx) => renderInvRow(itemDef, itemId, 1, marks, idx));
+        }
+        return [renderInvRow(itemDef, itemId, i.qty, null, null)];
     }).join("") + `</ul>`;
   }
 
   const renderSlot = (slotName, slotKey) => {
     const itemId = equip[slotKey];
     const itemDef = getItem(itemId);
-    if (itemDef) return `<div class="slot-box occupied" onclick="window.unequipItem('${slotKey}')"><small>${slotName}</small><div style="display:flex; align-items:center; gap:5px;"><img src="${itemDef.icon}" style="width:24px; height:24px; border:1px solid var(--pip-green);"><span>${itemDef.name}</span></div></div>`;
+    if (itemDef) {
+      const meterTag = isDurable(itemDef) ? `<div>${conditionMeter(condition.worn[slotKey])}</div>` : '';
+      return `<div class="slot-box occupied" onclick="window.unequipItem('${slotKey}')"><small>${slotName}</small><div style="display:flex; align-items:center; gap:5px;"><img src="${itemDef.icon}" style="width:24px; height:24px; border:1px solid var(--pip-green);"><div><span>${itemDef.name}</span>${meterTag}</div></div></div>`;
+    }
     return `<div class="slot-box empty"><small>${slotName}</small><span style="color:#555;">[EMPTY]</span></div>`;
   };
 
@@ -1680,6 +1725,8 @@ export function getWorkshopView(charId, liveData) {
   const stations = charData.stations || {};
 
   const derived = deriveCharacter(charData);
+  const condition = normalizeCondition(charData);
+  const repairSkill = derived.skills.repair || 0;
 
   // COMPONENTS — every item authored as type:"component", dimmed at 0.
   // Not hardcoded to the 9 ids CRAFTING_SPEC.md proposes, so a newly
@@ -1746,24 +1793,78 @@ export function getWorkshopView(charId, liveData) {
         return `<h4 style="color:var(--pip-dim); border-bottom:1px dashed var(--pip-dim); margin-top:14px;">${categoryLabels[cat] || cat.toUpperCase()}</h4>${rowsHtml}`;
       }).join('');
 
-  // SALVAGE — junk currently owned (qty > 0), scrap to components.
-  const junkOwned = Object.keys(inventory)
+  // SALVAGE — junk currently owned (qty > 0), plus any durable
+  // weapon/armor the vault has authored a scrap_yield for (none yet —
+  // see this agent's report — but the moment one exists, this picks it
+  // up with no code change). A durable item's preview scraps its
+  // HIGHEST-marks copy (§2.1's stated default — "Scrap and sell take the
+  // highest-marks copy") and shows the condition-scaled yield that copy
+  // would actually produce, not the item's full-price yield.
+  const scrappable = Object.keys(inventory)
     .map(id => getItem(id))
-    .filter(i => i && i.type === 'junk' && i.scrap_yield && inventory[i.id] > 0);
-  const salvageHtml = junkOwned.length === 0
+    .filter(i => i && i.scrap_yield && inventory[i.id] > 0);
+  const salvageHtml = scrappable.length === 0
     ? `<div style="color:#555; font-size:12px;">Nothing to scrap.</div>`
-    : junkOwned.map(j => {
-        const yieldText = Object.entries(j.scrap_yield).map(([id, qty]) => {
+    : scrappable.map(j => {
+        const durable = isDurable(j);
+        const worstMarks = durable ? Math.max(0, ...(condition.inv[j.id] || [0])) : 0;
+        const previewYield = durable ? scrapYieldFor(j.scrap_yield, worstMarks) : j.scrap_yield;
+        const yieldText = Object.entries(previewYield).map(([id, qty]) => {
           const c = getItem(id);
           return `${qty} ${c ? c.name : id}`;
         }).join(', ');
+        const meterTag = durable ? ` — scraps worst copy: ${conditionMeter(worstMarks)}` : '';
         return `
           <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #222; padding:6px 8px; margin-bottom:4px;">
             <div>
               <span>${renderWikiLink(j.name, j.description)} <span style="color:#666; font-size:11px;">x${inventory[j.id]}</span></span>
-              <div style="font-size:11px; color:#888;">→ ${yieldText}</div>
+              <div style="font-size:11px; color:#888;">→ ${yieldText}${meterTag}</div>
             </div>
             <button class="gm-btn" onclick="window.scrapItem('${j.id}')">SCRAP</button>
+          </div>`;
+      }).join('');
+
+  // REPAIR — every owned durable copy (worn + unequipped), one row each,
+  // with the cost/cap shown before confirming (per the brief: "a REPAIR
+  // action in the WORKSHOP with the cost and cap shown before confirming").
+  const repairRows = [];
+  Object.entries(equipLike(charData)).forEach(([slot, itemId]) => {
+    if (!itemId) return;
+    const item = getItem(itemId);
+    if (!isDurable(item)) return;
+    repairRows.push({ item, itemId, marks: condition.worn[slot] || 0, slot, index: null });
+  });
+  Object.entries(condition.inv).forEach(([itemId, marksArr]) => {
+    const item = getItem(itemId);
+    marksArr.forEach((marks, index) => repairRows.push({ item, itemId, marks, slot: null, index }));
+  });
+  const repairHtml = repairRows.length === 0
+    ? `<div style="color:#555; font-size:12px;">No weapons or armor to repair.</div>`
+    : repairRows.sort((a, b) => b.marks - a.marks).map(({ item, itemId, marks, slot, index }) => {
+        const benchStationId = item.type === 'weapon' ? 'weapons_bench' : 'armour_bench';
+        const atBench = !!stations[benchStationId];
+        const floor = repairFloor(repairSkill, atBench);
+        const marksToRepair = Math.max(0, marks - floor);
+        const cost = totalRepairCost(item, marksToRepair);
+        const costText = Object.entries(cost).map(([id, qty]) => {
+          const owned = inventory[id] || 0;
+          const short = owned < qty;
+          const c = getItem(id);
+          return `<span style="color:${short ? 'var(--danger, #d4574a)' : 'var(--pip-green)'};">${qty} ${c ? c.name : id}</span>`;
+        }).join(' · ') || 'nothing';
+        const saveChance = repairSaveChance(repairSkill);
+        const canRepair = marksToRepair > 0 && Object.entries(cost).every(([id, qty]) => (inventory[id] || 0) >= qty);
+        const argTail = slot !== null ? `'${slot}', null` : `null, ${index}`;
+        return `
+          <div style="border:1px solid #222; padding:8px; margin-bottom:6px; ${marksToRepair === 0 ? 'opacity:0.55;' : ''}">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong>${renderWikiLink(item.name, item.description)}${slot ? ` <span style="color:#666; font-size:11px;">(worn)</span>` : ''}</strong>
+              <button class="gm-btn" ${canRepair ? '' : 'disabled'} style="border-color:var(--pip-green); color:var(--pip-green); ${canRepair ? '' : 'opacity:0.5; cursor:not-allowed;'}" onclick="window.repairItem('${itemId}', ${argTail})">REPAIR</button>
+            </div>
+            <div style="margin-top:4px;">${conditionMeter(marks)}</div>
+            ${marksToRepair > 0
+              ? `<div style="font-size:12px; margin-top:4px;">Repairs to ${floor} mark${floor === 1 ? '' : 's'}${atBench ? ' (bench)' : ' (field)'} — costs ${costText}${saveChance ? `, ${saveChance}% chance to save the parts` : ''}.</div>`
+              : `<div style="font-size:11px; color:#666; margin-top:4px;">Already at the best condition Repair ${repairSkill} allows${atBench ? ' at a bench' : ''}.</div>`}
           </div>`;
       }).join('');
 
@@ -1782,12 +1883,21 @@ export function getWorkshopView(charId, liveData) {
       </div>
 
       <div class="panel">
+        <h2>REPAIR</h2>
+        <p style="font-size:11px; color:#666;">Instant, no roll — capped by your Repair skill (${repairSkill}).</p>
+        <div style="overflow-y:auto; flex-grow:1; margin-bottom:16px;">${repairHtml}</div>
         <h2>SALVAGE</h2>
         <p style="font-size:11px; color:#666;">Scrapping is instant and can't be undone.</p>
         <div>${salvageHtml}</div>
       </div>
     </div>
   `;
+}
+
+// Equipment map, tolerant of a character doc that predates the equipment
+// field existing at all — same default shape the dashboard view uses.
+function equipLike(charData) {
+  return charData.equipment || { head: null, body: null, right_hand: null, left_hand: null, back: null };
 }
 
 // --- GM SCREEN ---
@@ -1950,23 +2060,58 @@ export function renderGMScreen(liveData) {
         </div>
 
         <h4 style="color:lime; border-bottom:1px dashed lime;">INVENTORY</h4>
-        <div style="display:flex; gap:5px; margin-bottom:10px;">
+        <div style="display:flex; gap:5px; margin-bottom:4px;">
           <select id="gmItemSelect" style="flex-grow:1; background:black; color:lime; border:1px solid lime; font-family:'VT323';">
             ${itemOptions}
           </select>
           <button class="gm-btn" style="border-color:lime; color:lime;" onclick="window.gmGrantItem()">GRANT</button>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px; color:#666;">Starting marks (weapon/armor only, 0-10) — blank uses the item's own default:</label>
+          <input type="number" id="gmItemMarks" min="0" max="10" step="1" placeholder="0" style="width:50px; background:black; color:lime; border:1px solid #333; font-family:'VT323'; margin-left:6px;">
         </div>
         <div>
           ${['head', 'body', 'right_hand', 'left_hand'].map(slot => {
             const equippedId = targetChar && targetChar.equipment ? targetChar.equipment[slot] : null;
             const equippedItem = getItem(equippedId);
             if (!equippedItem) return '';
-            return `<div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #333; padding:3px 8px; margin-bottom:4px; font-size:13px;">
-              <span>${slot.replace('_', ' ').toUpperCase()}: ${equippedItem.name}</span>
-              <button class="gm-btn" style="border-color:lime; color:lime; padding:0 8px;" onclick="window.gmUnequipItem('${slot}')">UNEQUIP</button>
+            const targetCondition = normalizeCondition(targetChar);
+            const durableTag = isDurable(equippedItem) ? `
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
+                ${conditionMeter(targetCondition.worn[slot])}
+                <span>
+                  <input type="number" id="gmMarks_${slot}" min="0" max="10" value="${targetCondition.worn[slot] || 0}" style="width:40px; background:black; color:orange; border:1px solid #333; font-family:'VT323';">
+                  <button class="gm-btn" style="border-color:orange; color:orange; padding:0 6px;" onclick="window.gmSetItemCondition('${equippedId}', '${slot}', null, document.getElementById('gmMarks_${slot}').value)">SET</button>
+                </span>
+              </div>` : '';
+            return `<div style="border:1px solid #333; padding:3px 8px; margin-bottom:4px; font-size:13px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span>${slot.replace('_', ' ').toUpperCase()}: ${equippedItem.name}</span>
+                <button class="gm-btn" style="border-color:lime; color:lime; padding:0 8px;" onclick="window.gmUnequipItem('${slot}')">UNEQUIP</button>
+              </div>
+              ${durableTag}
             </div>`;
           }).join('') || `<div style="color:#555; font-size:12px;">Nothing equipped.</div>`}
         </div>
+        ${(() => {
+          if (!targetChar) return '';
+          const targetCondition = normalizeCondition(targetChar);
+          const rows = Object.entries(targetCondition.inv).flatMap(([itemId, marksArr]) => {
+            const item = getItem(itemId);
+            return marksArr.map((marks, idx) => ({ item, itemId, marks, idx }));
+          });
+          if (rows.length === 0) return '';
+          return `
+            <h5 style="color:#888; margin:10px 0 4px;">UNEQUIPPED GEAR CONDITION</h5>
+            <div>${rows.map(({ item, itemId, marks, idx }) => `
+              <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #222; padding:2px 8px; margin-bottom:2px; font-size:12px;">
+                <span>${item ? item.name : itemId} — ${conditionMeter(marks)}</span>
+                <span>
+                  <input type="number" id="gmMarks_${itemId}_${idx}" min="0" max="10" value="${marks}" style="width:40px; background:black; color:orange; border:1px solid #333; font-family:'VT323';">
+                  <button class="gm-btn" style="border-color:orange; color:orange; padding:0 6px;" onclick="window.gmSetItemCondition('${itemId}', null, ${idx}, document.getElementById('gmMarks_${itemId}_${idx}').value)">SET</button>
+                </span>
+              </div>`).join('')}</div>`;
+        })()}
 
         <h4 style="color:cyan; border-bottom:1px dashed cyan; margin-top:20px;">BIOGRAPHY &amp; GM NOTES</h4>
         <p style="font-size:11px; color:#666; margin:0 0 4px;">Visible only to this player (and you) — not the rest of the party.</p>
