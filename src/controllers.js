@@ -24,6 +24,12 @@ import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
 // plain, JSON-safe marker stands in for "absent" until the value is
 // actually used — see gmRerollLastResolution().
 const FIELD_ABSENT = '__foes_field_absent__';
+// Firestore rejects `undefined` anywhere in a write, and reroll params come
+// straight off UI drafts where an untouched field (no aimed shot, no custom
+// check) is undefined. Store those as null; every reader treats both alike.
+function withoutUndefined(obj) {
+  return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v === undefined ? null : v]));
+}
 
 // --- GAME ACTIONS ---
 export async function equipItem(itemId, targetSlot) {
@@ -1384,10 +1390,10 @@ export async function resolveAttack() {
     actor: attacker.name,
     target: target.name,
     roll,
-    params: {
+    params: withoutUndefined({
       attackerCombatantId: attacker.combatant_id, targetCombatantId: target.combatant_id,
       attackKey: draft.attackKey, bodyPart: draft.bodyPart, burst: !!draft.burst
-    },
+    }),
     before,
     at: Date.now()
   };
@@ -2287,7 +2293,7 @@ export async function resolvePlayerCheck() {
     actor: char.name,
     target: null,
     roll,
-    params: { charId: window.currentUser, kind: draft.kind, key: draft.key, tier: draft.tier, useD20: draft.useD20 },
+    params: withoutUndefined({ charId: window.currentUser, kind: draft.kind, key: draft.key, tier: draft.tier, useD20: draft.useD20 }),
     before: { checks: current },
     at: Date.now()
   };
@@ -2427,11 +2433,11 @@ export async function resolveGmCheck() {
       actor: results[0].name,
       target: null,
       roll: results[0].roll,
-      params: {
+      params: withoutUndefined({
         scope: draft.scope, targetCharId: draft.targetCharId, kind: draft.kind, key: draft.key,
         tier: draft.tier, useD20: draft.useD20, reveal: draft.reveal,
         customName: draft.customName, customValue: draft.customValue
-      },
+      }),
       before: { checks: currentChecks, messages: currentMessages },
       at: Date.now()
     };
