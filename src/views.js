@@ -33,7 +33,7 @@ import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
 import { recipeDatabase } from './recipes.js';
 import {
   isDurable, isBroken, normalizeCondition, conditionLabel, scrapYieldFor,
-  repairFloor, repairSaveChance, totalRepairCost
+  repairFloor, repairSaveChance, totalRepairCost, genericScrapComponent
 } from './condition.js';
 
 // --- HELPERS ---
@@ -1895,27 +1895,37 @@ export function getWorkshopView(charId, liveData) {
         return `<h4 style="color:var(--pip-dim); border-bottom:1px dashed var(--pip-dim); margin-top:14px;">${categoryLabels[cat] || cat.toUpperCase()}</h4>${rowsHtml}`;
       }).join('');
 
-  // SALVAGE — junk currently owned (qty > 0), plus any durable
-  // weapon/armor the vault has authored a scrap_yield for (none yet —
-  // see this agent's report — but the moment one exists, this picks it
-  // up with no code change). A durable item's preview scraps its
-  // HIGHEST-marks copy (§2.1's stated default — "Scrap and sell take the
-  // highest-marks copy") and shows the condition-scaled yield that copy
-  // would actually produce, not the item's full-price yield.
+  // SALVAGE — junk currently owned (qty > 0) with an authored
+  // scrap_yield, plus every durable weapon/armor owned: either its own
+  // authored scrap_yield (exact preview, condition-scaled off its
+  // HIGHEST-marks copy — §2.1's stated default, "Scrap and sell take the
+  // highest-marks copy") or, per job 4's generic fallback
+  // (genericScrapComponent/scrapItem, condition.js/controllers.js), a
+  // "1-3 <Component>" RANGE — the real roll is weighted by Repair skill
+  // and only happens when SCRAP is actually clicked, so it can't be
+  // previewed as one exact number the way an authored yield can.
   const scrappable = Object.keys(inventory)
     .map(id => getItem(id))
-    .filter(i => i && i.scrap_yield && inventory[i.id] > 0);
+    .filter(i => i && inventory[i.id] > 0 && (i.scrap_yield || genericScrapComponent(i)))
+    .map(i => ({ item: i, generic: !i.scrap_yield }));
   const salvageHtml = scrappable.length === 0
     ? `<div style="color:#555; font-size:12px;">Nothing to scrap.</div>`
-    : scrappable.map(j => {
+    : scrappable.map(({ item: j, generic }) => {
         const durable = isDurable(j);
         const worstMarks = durable ? Math.max(0, ...(condition.inv[j.id] || [0])) : 0;
-        const previewYield = durable ? scrapYieldFor(j.scrap_yield, worstMarks) : j.scrap_yield;
-        const yieldText = Object.entries(previewYield).map(([id, qty]) => {
-          const c = getItem(id);
-          return `${qty} ${c ? c.name : id}`;
-        }).join(', ');
-        const meterTag = durable ? ` — scraps worst copy: ${conditionMeter(worstMarks)}` : '';
+        let yieldText, meterTag = durable ? ` — scraps worst copy: ${conditionMeter(worstMarks)}` : '';
+        if (generic) {
+          const component = genericScrapComponent(j);
+          yieldText = component === 'power_armor'
+            ? `1 ${(getItem('hardened_alloy') || {}).name || 'Hardened Alloy'} + 1–3 ${(getItem('scrap_metal') || {}).name || 'Scrap Metal'}`
+            : `1–3 ${(getItem(component) || {}).name || component}`;
+        } else {
+          const previewYield = durable ? scrapYieldFor(j.scrap_yield, worstMarks) : j.scrap_yield;
+          yieldText = Object.entries(previewYield).map(([id, qty]) => {
+            const c = getItem(id);
+            return `${qty} ${c ? c.name : id}`;
+          }).join(', ');
+        }
         return `
           <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #222; padding:6px 8px; margin-bottom:4px;">
             <div>

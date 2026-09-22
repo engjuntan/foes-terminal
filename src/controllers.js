@@ -23,7 +23,7 @@ import {
   isDurable, isBroken, clampMarks, normalizeCondition, takeCopyAt, putCopy,
   conditionMultiplier, hitPenalty, fumbleLuckPenalty, scrapYieldFor,
   applyConditionToDtdr, repairFloor, repairSaveChance,
-  totalRepairCost, startMarksForItem
+  totalRepairCost, startMarksForItem, genericScrapYield
 } from './condition.js';
 
 // Marks a `last_resolution.before` field whose value was genuinely
@@ -1014,7 +1014,17 @@ export async function scrapItem(itemId) {
   const char = window.liveData.characters[charId];
   if (!char) return;
   const item = getItem(itemId);
-  if (!item || !item.scrap_yield) return;
+  if (!item) return;
+  // Job 4 (SCOPE_DECISIONS.md ruling: "Every weapon and armor scraps for
+  // 1-3 generic components matching what it is"): an authored
+  // `scrap_yield` always wins; a weapon/armor with none still scraps for
+  // something via genericScrapYield (condition.js), rolled fresh (weighted
+  // by this character's Repair skill) every time it's actually scrapped —
+  // not a fixed number, so it can't be previewed exactly ahead of time
+  // (the WORKSHOP shows a 1-3 range instead — see views.js).
+  const baseYield = item.scrap_yield
+    || ((item.type === 'weapon' || item.type === 'armor') ? genericScrapYield(item, deriveCharacter(char).skills.repair) : null);
+  if (!baseYield) return;
   if (getInventoryQuantity(char.inventory, itemId) < 1) { alert("YOU DON'T HAVE THAT"); return; }
 
   let inv = removeFromInventory(char.inventory, itemId, 1);
@@ -1023,10 +1033,11 @@ export async function scrapItem(itemId) {
   // "Condition then applies the §2.2 multiplier." §2.1's stated default
   // for scrapping/selling is the HIGHEST-marks (worst-condition) copy —
   // you salvage your beaters, not your best gear. Junk (the only thing
-  // the WORKSHOP's Salvage panel currently lists) carries no marks at
-  // all, so it always scraps at full yield, same as before.
+  // the WORKSHOP's Salvage panel used to list before generic yields
+  // existed) carries no marks at all, so it always scraps at full yield,
+  // same as before.
   let updatePayload = {};
-  let actualYield = item.scrap_yield;
+  let actualYield = baseYield;
   if (isDurable(item)) {
     const condition = normalizeCondition(char);
     const sorted = [...(condition.inv[itemId] || [])].sort((a, b) => a - b);
@@ -1035,7 +1046,7 @@ export async function scrapItem(itemId) {
     const newCondInv = { ...condition.inv };
     if (rest.length) newCondInv[itemId] = rest; else delete newCondInv[itemId];
     updatePayload[`characters.${charId}.condition`] = { inv: newCondInv, worn: condition.worn };
-    actualYield = scrapYieldFor(item.scrap_yield, marks);
+    actualYield = scrapYieldFor(baseYield, marks);
   }
 
   Object.entries(actualYield).forEach(([componentId, qty]) => {
