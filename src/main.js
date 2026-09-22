@@ -56,6 +56,11 @@ window.openMessage = Controllers.openMessage;
 window.gmAdjustHP = (amt) => Controllers.gmAdjustHP(window.selectedCharId, amt);
 window.gmSetRadiation = (amt) => Controllers.gmSetRadiation(window.selectedCharId, amt);
 window.gmSetNeed = (needKey, val) => Controllers.gmSetNeed(window.selectedCharId, needKey, val);
+window.gmSetReputation = Controllers.gmSetReputation;
+window.gmSetKarma = (val) => Controllers.gmSetKarma(window.selectedCharId, val);
+window.gmAddReputationEntity = Controllers.gmAddReputationEntity;
+window.gmRenameReputationEntity = Controllers.gmRenameReputationEntity;
+window.gmRemoveReputationEntity = Controllers.gmRemoveReputationEntity;
 window.advanceTime = Controllers.advanceTime;
 window.requestRest = Controllers.requestRest;
 window.gmAdvanceTimeAction = Controllers.gmAdvanceTimeAction;
@@ -240,7 +245,7 @@ window.render = function() {
   }
 
   // 4. Sync sidebar active state to the current tab, plus unread badges
-  const navMap = { DASHBOARD: 'btn-dashboard', QUESTS: 'btn-quests', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks', WORKSHOP: 'btn-workshop', STATUS: 'btn-status' };
+  const navMap = { DASHBOARD: 'btn-dashboard', QUESTS: 'btn-quests', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks', WORKSHOP: 'btn-workshop', STATUS: 'btn-status', REPUTATION: 'btn-reputation' };
   Object.entries(navMap).forEach(([tab, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', window.currentTab === tab);
@@ -312,6 +317,8 @@ window.render = function() {
           viewport.innerHTML = Views.getChecksView(window.liveData, 'player', window.currentUser);
        } else if (window.currentTab === 'WORKSHOP') {
           viewport.innerHTML = Views.getWorkshopView(window.currentUser, window.liveData);
+       } else if (window.currentTab === 'REPUTATION') {
+          viewport.innerHTML = Views.getReputationView(window.currentUser, window.liveData);
        } else {
           viewport.innerHTML = Views.getPlayerView(window.currentUser, window.liveData);
        }

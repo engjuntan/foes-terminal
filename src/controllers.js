@@ -15,6 +15,11 @@ import { normalizeNeeds, decayNeeds, rollRestHealing, formatGameTime } from './n
 import { getRecipe } from './recipes.js';
 import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
 import {
+  REPUTATION_MIN, REPUTATION_MAX, KARMA_MIN, KARMA_MAX,
+  getReputationTier, getReputationValue, getKarmaTier, getKarmaValue,
+  normalizeReputationEntities
+} from './reputationContent.js';
+import {
   isDurable, isBroken, clampMarks, normalizeCondition, takeCopyAt, putCopy,
   conditionMultiplier, hitPenalty, fumbleLuckPenalty, scrapYieldFor,
   applyConditionToDtdr, repairFloor, repairSaveChance,
@@ -582,6 +587,113 @@ export async function gmSetRadiation(targetCharId, amount) {
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
   updatePayload[`characters.${targetCharId}.rads`] = clamped;
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// --- REPUTATION & KARMA ---
+// Party-wide standing with a faction/town, modelled on Fallout 2 — every
+// player sees the same tier for a given entity. Stored flat at
+// `reputation.<entityId>` (missing = 0 = Neutral, see
+// reputationContent.js's getReputationValue). GM-only write, one
+// updateDoc, same commit-on-release slider convention as gmSetNeed.
+export async function gmSetReputation(entityId, value) {
+  if (!window.liveData || !entityId) return;
+  const clamped = Math.max(REPUTATION_MIN, Math.min(REPUTATION_MAX, Math.round(Number(value) || 0)));
+  const before = getReputationValue(window.liveData, entityId);
+  const beforeTier = getReputationTier(before);
+  const afterTier = getReputationTier(clamped);
+
+  const entities = normalizeReputationEntities(window.liveData.reputation_entities);
+  const entity = entities.find(e => e.id === entityId);
+  const entityName = entity ? entity.name : entityId;
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`reputation.${entityId}`] = clamped;
+  // Only post when the TIER actually changes, not every slider nudge —
+  // players see named tiers, never raw numbers, so a message only makes
+  // sense when what they'd see has actually moved.
+  if (afterTier.id !== beforeTier.id) {
+    const currentMessages = window.liveData.messages || [];
+    updatePayload.messages = [...currentMessages, {
+      id: `msg_${Date.now()}`, from: 'GM', target: 'all',
+      body: `Your standing with the ${entityName} is now: ${afterTier.name}.`,
+      timestamp: Date.now()
+    }];
+  }
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Personal karma — one character's own track, private to them (message
+// targets just that charId, not 'all'). Missing = 0 = "Nobody", see
+// getKarmaValue.
+export async function gmSetKarma(targetCharId, value) {
+  const char = window.liveData.characters[targetCharId];
+  if (!char) return;
+  const clamped = Math.max(KARMA_MIN, Math.min(KARMA_MAX, Math.round(Number(value) || 0)));
+  const beforeTier = getKarmaTier(getKarmaValue(char));
+  const afterTier = getKarmaTier(clamped);
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.karma`] = clamped;
+  if (afterTier.id !== beforeTier.id) {
+    const currentMessages = window.liveData.messages || [];
+    updatePayload.messages = [...currentMessages, {
+      id: `msg_${Date.now()}`, from: 'GM', target: targetCharId,
+      body: `Your karma shifts. You are now regarded as: ${afterTier.name}.`,
+      timestamp: Date.now()
+    }];
+  }
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// --- REPUTATION ENTITY ROSTER (GM add/rename/remove) ---
+// `reputation_entities` only gets WRITTEN to Firestore the first time the
+// GM actually edits the roster — until then every reader falls back to
+// DEFAULT_REPUTATION_ENTITIES via normalizeReputationEntities, same lazy-
+// write-on-first-touch convention as needs/condition defaults elsewhere
+// in this file. Editing always starts from that normalized list so a
+// GM's first add/rename/remove seeds the full default roster, not just
+// the one entry they touched.
+function slugifyReputationEntityName(name, existingIds) {
+  const base = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'entity';
+  let id = base;
+  let n = 2;
+  while (existingIds.includes(id)) { id = `${base}_${n}`; n++; }
+  return id;
+}
+
+export async function gmAddReputationEntity() {
+  const input = document.getElementById('gmNewReputationEntity');
+  const name = input ? input.value.trim() : '';
+  if (!name) { alert("ENTER A NAME"); return; }
+  const entities = normalizeReputationEntities(window.liveData.reputation_entities);
+  const id = slugifyReputationEntityName(name, entities.map(e => e.id));
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, { reputation_entities: [...entities, { id, name }] });
+    if (input) input.value = '';
+  } catch (err) { alert("ERROR: " + err.message); }
+}
+
+export async function gmRenameReputationEntity(entityId) {
+  const input = document.getElementById(`gmRenameReputationEntity_${entityId}`);
+  const name = input ? input.value.trim() : '';
+  if (!name) { alert("ENTER A NAME"); return; }
+  const entities = normalizeReputationEntities(window.liveData.reputation_entities);
+  const updated = entities.map(e => e.id === entityId ? { ...e, name } : e);
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, { reputation_entities: updated }); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+export async function gmRemoveReputationEntity(entityId) {
+  if (!confirm("REMOVE THIS ENTITY FROM REPUTATION TRACKING? Its stored standing is discarded too.")) return;
+  const entities = normalizeReputationEntities(window.liveData.reputation_entities);
+  const updated = entities.filter(e => e.id !== entityId);
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = { reputation_entities: updated };
+  updatePayload[`reputation.${entityId}`] = deleteField();
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 

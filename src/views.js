@@ -23,6 +23,11 @@ import { questDatabase } from './quests.js';
 import { glossaryDatabase } from './glossary.js';
 import { mapDatabase } from './maps.js';
 import { normalizeNeeds, getNeedTier, formatGameTime, NEED_RATES } from './needs.js';
+import {
+  REPUTATION_TIERS, REPUTATION_MIN, REPUTATION_MAX, KARMA_TIERS, KARMA_MIN, KARMA_MAX,
+  getReputationTier, getReputationModifiers, getKarmaTier, getKarmaValue,
+  normalizeReputationEntities
+} from './reputationContent.js';
 import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
 import { recipeDatabase } from './recipes.js';
 import {
@@ -283,6 +288,68 @@ export function getStatusView(charId, liveData) {
         <div style="margin-bottom:20px;">${attributesHtml}</div>
         <h2 style="color:var(--pip-dim);">PASSIVE</h2>
         ${passiveHtml}
+      </div>
+    </div>
+  `;
+}
+
+// --- REPUTATION (Fallout 2-style: named tiers only, never raw numbers —
+// the exact slider value is GM-only, same convention as radiation's
+// "only a Geiger Counter tells you the real count") ---
+// One small square art slot per tier/card, per SCOPE_DECISIONS.md —
+// shows a tasteful empty frame with the tier name until the GM supplies
+// image_url, same fallback used for the G.O.A.T. focus-stat card above.
+function reputationArtFrame(imageUrl, label) {
+  return imageUrl
+    ? `<img src="${imageUrl}" style="width:100%; height:100%; object-fit:cover; display:block;">`
+    : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; text-align:center; color:#444; font-size:11px; padding:4px; box-sizing:border-box;">[ ART PENDING — ${escapeHtml(label)} ]</div>`;
+}
+
+export function getReputationView(charId, liveData) {
+  const char = liveData.characters[charId];
+  if (!char) return `<h1>&gt; ERROR: IDENTITY NOT FOUND</h1>`;
+
+  const karmaValue = getKarmaValue(char);
+  const karmaTier = getKarmaTier(karmaValue);
+
+  const entities = normalizeReputationEntities(liveData.reputation_entities);
+  const entityCardsHtml = entities.map(entity => {
+    const { tier } = getReputationModifiers(entity.id, liveData);
+    return `
+      <div style="display:flex; gap:10px; border:1px solid var(--pip-dim); background:rgba(0,20,0,0.3); padding:10px; margin-bottom:10px;">
+        <div style="width:80px; height:80px; flex-shrink:0; border:1px solid var(--pip-dim); overflow:hidden;">
+          ${reputationArtFrame(tier.image_url, tier.name)}
+        </div>
+        <div style="flex-grow:1; min-width:0;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:6px;">
+            <strong style="color:var(--pip-green);">${escapeHtml(entity.name)}</strong>
+            <span style="color:var(--pip-gold); font-size:12px; text-transform:uppercase; letter-spacing:1px;">${escapeHtml(tier.name)}</span>
+          </div>
+          <div style="font-size:13px; color:#ccc; margin:6px 0; line-height:1.4;">${escapeHtml(tier.description)}</div>
+          <div style="font-size:12px; color:var(--pip-dim); border-top:1px dashed #333; padding-top:5px;">${escapeHtml(tier.effect)}</div>
+        </div>
+      </div>`;
+  }).join('') || `<div style="color:#555; font-size:12px;">No known factions tracked yet.</div>`;
+
+  return `
+    <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto; padding-top:10px;">
+      <div class="panel" style="margin-bottom:16px;">
+        <h2 style="color:var(--pip-dim);">KARMA</h2>
+        <div style="display:flex; gap:14px; align-items:center;">
+          <div style="width:80px; height:80px; flex-shrink:0; border:1px solid var(--pip-dim); overflow:hidden;">
+            ${reputationArtFrame(karmaTier.image_url, karmaTier.name)}
+          </div>
+          <div>
+            <div style="color:var(--pip-gold); font-size:18px; text-transform:uppercase; letter-spacing:1px;">${escapeHtml(karmaTier.name)}</div>
+            <div style="font-size:13px; color:#ccc; margin-top:4px; line-height:1.4;">${escapeHtml(karmaTier.description)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 style="color:var(--pip-dim);">REPUTATION</h2>
+        <p style="font-size:11px; color:#666; margin:-6px 0 10px;">How each faction and town actually treats you. The exact standing is known only to the GM — this is what it looks like from where you're standing.</p>
+        ${entityCardsHtml}
       </div>
     </div>
   `;
@@ -1969,6 +2036,29 @@ export function renderGMScreen(liveData) {
         </div>`;
     }).join('') || `<div style="color:#555; font-size:12px;">No bestiary entries yet.</div>`;
 
+  // --- REPUTATION (party-wide entity roster + sliders) ---
+  const reputationEntities = normalizeReputationEntities(liveData.reputation_entities);
+  const reputationRowsHtml = reputationEntities.map(entity => {
+    const { value, tier } = getReputationModifiers(entity.id, liveData);
+    return `
+      <div style="border:1px solid #222; padding:6px 8px; margin-bottom:8px;">
+        <div style="display:flex; gap:4px; margin-bottom:4px;">
+          <input type="text" id="gmRenameReputationEntity_${entity.id}" value="${escapeHtml(entity.name)}"
+                 style="flex-grow:1; background:black; color:var(--pip-green); border:1px solid #333; font-family:'VT323'; font-size:14px; padding:2px 4px;">
+          <button class="gm-btn" style="padding:0 6px;" onclick="window.gmRenameReputationEntity('${entity.id}')">SAVE</button>
+          <button class="gm-btn" style="border-color:red; color:red; padding:0 6px;" onclick="window.gmRemoveReputationEntity('${entity.id}')">X</button>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
+          <span>STANDING</span>
+          <span style="color:var(--pip-green);">${value} — ${tier.name}</span>
+        </div>
+        <input type="range" min="${REPUTATION_MIN}" max="${REPUTATION_MAX}" value="${value}" style="width:100%;"
+               oninput="this.nextElementSibling.textContent = this.value"
+               onchange="window.gmSetReputation('${entity.id}', Number(this.value))">
+        <span style="display:none;">${value}</span>
+      </div>`;
+  }).join('') || `<div style="color:#555; font-size:12px;">No entities tracked yet.</div>`;
+
   const activeCombat = liveData.active_combat;
   const combatActionHtml = activeCombat && activeCombat.is_active
     ? `<div style="color:red; margin-bottom:10px; animation: blink 1s infinite;">⚠ COMBAT IN PROGRESS</div>
@@ -2018,6 +2108,24 @@ export function renderGMScreen(liveData) {
               <span style="display:none;">${Math.round(val)}</span>
             </div>`;
           }).join('')}
+        </div>
+
+        <h4 style="color:var(--pip-gold); border-bottom:1px dashed var(--pip-gold);">KARMA</h4>
+        <div style="margin-bottom:10px;">
+          ${(() => {
+            const karmaVal = getKarmaValue(targetChar);
+            const karmaTier = getKarmaTier(karmaVal);
+            return `
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
+              <span>PERSONAL KARMA</span>
+              <span style="color:var(--pip-gold);">${karmaVal} — ${karmaTier.name}</span>
+            </div>
+            <input type="range" min="${KARMA_MIN}" max="${KARMA_MAX}" value="${karmaVal}" style="width:100%;"
+                   oninput="this.nextElementSibling.textContent = this.value"
+                   onchange="window.gmSetKarma(Number(this.value))">
+            <span style="display:none;">${karmaVal}</span>
+            <p style="font-size:10px; color:#555; margin:4px 0 0;">Only visible to this player and you. Posts a message to them if the tier changes.</p>`;
+          })()}
         </div>
 
         <h4 style="color:var(--pip-green); border-bottom:1px dashed var(--pip-green);">CRAFTING STATIONS</h4>
@@ -2132,7 +2240,7 @@ export function renderGMScreen(liveData) {
   `;
 
   return `
-    <div class="dashboard-container" style="grid-template-columns: 360px 280px 280px; justify-content: center;">
+    <div class="dashboard-container" style="grid-template-columns: 360px 280px 280px 300px; justify-content: center;">
       ${modalHtml}
 
       <div class="panel">
@@ -2179,6 +2287,21 @@ export function renderGMScreen(liveData) {
         <p style="font-size:11px; color:#666; margin-top:10px;">Pick enemies for the next encounter:</p>
         <div style="max-height:260px; overflow-y:auto; border-top:1px solid #333; padding-top:6px;">
           ${bestiaryListHtml}
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="color:var(--pip-gold);">REPUTATION</h3>
+        <p style="font-size:11px; color:#666; margin-top:-4px;">Party-wide standing (-100..100). A player's karma is set per-character in their MANAGE modal instead.</p>
+        <div style="margin-bottom:10px; border:1px solid #333; padding:8px; background:rgba(0,0,0,0.5);">
+          <small>TRACK A NEW ENTITY</small>
+          <div style="display:flex; gap:5px; margin-top:5px;">
+            <input type="text" id="gmNewReputationEntity" placeholder="NAME (e.g. Scrapyard Crew)" style="flex-grow:1; background:black; color:lime; border:1px solid #333;">
+            <button class="gm-btn" onclick="window.gmAddReputationEntity()">ADD</button>
+          </div>
+        </div>
+        <div style="max-height:400px; overflow-y:auto;">
+          ${reputationRowsHtml}
         </div>
       </div>
     </div>
