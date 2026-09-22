@@ -766,62 +766,54 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
-    "description": "A small, cheap and ineffective robot. This was once manufactured in large quantities as disruption based machines to distract enemy backlines. Usually where one is found there are more around.",
-    "notes": "Can attack and move. NOTE: this description text is identical to 'Liberator Robot Mk 1' in the source manual — likely a copy-paste artifact worth checking against the real page.",
+    "description": "The matriarch of a troop of mutated monkeys. Grey-furred and heavy across the shoulders, she is far faster than her size suggests and fiercely protective of the troop. She screams once before she comes.",
+    "notes": "Can attack and move. Never found alone — a troop of Monyet Sakai is always nearby, and they join in once she engages.",
     "stats": {
       "hp": 50,
       "variance_bias": "normal",
-      "sequence": 20,
+      "sequence": 18,
       "crit_chance": 7,
-      "ac": 20,
+      "ac": 16,
       "dtdr": {
         "normal": {
-          "dt": 2,
-          "dr": 30
+          "dt": 1,
+          "dr": 15
         },
         "laser": {
-          "dt": 2,
-          "dr": 20
+          "dt": 0,
+          "dr": 5
         },
         "fire": {
-          "dt": 2,
-          "dr": 20
+          "dt": 0,
+          "dr": -10
         },
         "plasma": {
-          "dt": 2,
-          "dr": 20
+          "dt": 0,
+          "dr": 5
         },
         "explosive": {
-          "dt": 2,
-          "dr": 20
+          "dt": 0,
+          "dr": 10
         }
       },
       "resistances": {
         "energy": 0,
-        "poison": 100,
-        "rad": 100,
+        "poison": 20,
+        "rad": 40,
         "gas": 0,
-        "emp": -50
+        "emp": 0
       },
       "special": {
-        "str": 6,
-        "per": 5,
-        "end": 5,
-        "cha": 4,
+        "str": 7,
+        "per": 6,
+        "end": 6,
+        "cha": 3,
         "int": 3,
         "agi": 8,
-        "luk": 7
+        "luk": 5
       }
     },
     "attacks": [
-      {
-        "name": "Laser Fire",
-        "hit_percent": 50,
-        "action": "Attack",
-        "damage": "1d6+2",
-        "effect": "none",
-        "dmgType": "laser"
-      },
       {
         "name": "Claw",
         "hit_percent": 70,
@@ -829,6 +821,22 @@ export const bestiaryDatabase = {
         "damage": "1d4+4",
         "effect": "none",
         "dmgType": "normal"
+      },
+      {
+        "name": "Bite",
+        "hit_percent": 60,
+        "action": "Attack",
+        "damage": "1d6+3",
+        "effect": "none",
+        "dmgType": "normal"
+      },
+      {
+        "name": "Screech",
+        "hit_percent": 100,
+        "action": "SM",
+        "damage": "0",
+        "effect": "Every Monyet Sakai in earshot joins the fight on her next turn. Foes make a CH throw or lose their small action to the noise.",
+        "dmgType": "true"
       }
     ]
   },

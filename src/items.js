@@ -781,7 +781,7 @@ export const itemDatabase = {
       "dt_dr_explosive": "2/20",
       "dt_dr_fire": "2/20",
       "dt_dr_plasma": "1/15",
-      "emp": -20
+      "emp": 100
     },
     "weight": 14,
     "value": 140
@@ -803,7 +803,7 @@ export const itemDatabase = {
       "dt_dr_fire": "1/12",
       "dt_dr_plasma": "0/8",
       "dt_dr_explosive": "1/10",
-      "emp": -15
+      "emp": 100
     },
     "weight": 5,
     "value": 60
