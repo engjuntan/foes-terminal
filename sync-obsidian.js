@@ -20,6 +20,7 @@ const MAPS_TARGET = path.join(__dirname, 'src', 'maps.js');
 const QUESTS_TARGET = path.join(__dirname, 'src', 'quests.js');
 const RECIPES_TARGET = path.join(__dirname, 'src', 'recipes.js');
 const GLOSSARY_TARGET = path.join(__dirname, 'src', 'glossary.js');
+const PEOPLE_TARGET = path.join(__dirname, 'src', 'people.js');
 const INDEX_TARGET = path.join(__dirname, 'VAULT_INDEX.tsv');
 
 // Folders whose plain-prose pages (no ```json block at all) become
@@ -40,6 +41,7 @@ let mapsMap = {};
 let questsMap = {};
 let recipesMap = {};
 let glossaryMap = {};
+let peopleMap = {};
 
 // --- HELPER FUNCTIONS ---
 
@@ -63,7 +65,7 @@ function getAllFiles(dirPath, arrayOfFiles) {
 
 // Generate the final JS file content
 function generateFileContent(type, dataMap) {
-  const dbNames = { item: 'itemDatabase', status_effect: 'statusEffectDatabase', monster: 'bestiaryDatabase', trait: 'traitDatabase', data_log: 'dataLogDatabase', map: 'mapDatabase', quest: 'questDatabase', recipe: 'recipeDatabase', glossary: 'glossaryDatabase' };
+  const dbNames = { item: 'itemDatabase', status_effect: 'statusEffectDatabase', monster: 'bestiaryDatabase', trait: 'traitDatabase', data_log: 'dataLogDatabase', map: 'mapDatabase', quest: 'questDatabase', recipe: 'recipeDatabase', glossary: 'glossaryDatabase', person: 'peopleDatabase' };
   const dbName = dbNames[type] || dbNames.trait;
 
   const helperFuncs = {
@@ -75,7 +77,8 @@ function generateFileContent(type, dataMap) {
     map: `export function getMap(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return mapDatabase[cleanId] || null; }`,
     quest: `export function getQuest(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return questDatabase[cleanId] || null; }`,
     recipe: `export function getRecipe(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return recipeDatabase[cleanId] || null; }`,
-    glossary: `export function getGlossaryTerm(id) { if (!id) return null; return glossaryDatabase[id] || null; }`
+    glossary: `export function getGlossaryTerm(id) { if (!id) return null; return glossaryDatabase[id] || null; }`,
+    person: `export function getPerson(id) { if (!id) return null; const cleanId = id.toLowerCase().replace(/ /g, "_"); return peopleDatabase[cleanId] || null; }`
   };
   const helperFunc = helperFuncs[type] || helperFuncs.trait;
 
@@ -271,6 +274,31 @@ function processGlossaryCandidate(filePath, rawContent) {
     strict.length ? `strict: ${strict.join(', ')}` : ''
   ].filter(Boolean).join(' | ');
   console.log(`[GLOSSARY] Extracted: ${name}${aliasNote ? ` (${aliasNote})` : ''}`);
+
+  // Job 5 (SCOPE_DECISIONS.md "People tab" ruling): People/ notes are
+  // glossary candidates like every other allowlisted folder (short
+  // `summary` tooltip above), but ALSO get their full player-facing body
+  // emitted into src/people.js's peopleDatabase, keyed by this same
+  // glossary id, so the Data Logs tab can show the whole note rather than
+  // just its first sentence. `stripped` is the same GM-block-stripped,
+  // lightly-markdown-converted text the summary was cut from (headings,
+  // embeds, wiki-link/emphasis syntax removed, paragraph breaks kept) —
+  // matches how a data log's own `body` reads in the app. `topFolder`
+  // reads off relDir directly rather than isInGlossaryFolder() (which
+  // this function is already inside the caller's check for) since it
+  // also doubles as the People-only gate here.
+  const topFolder = relDir ? relDir.split(path.sep)[0] : '';
+  if (topFolder === 'People') {
+    const subPath = relDir.split(path.sep).slice(1); // e.g. ["Rakan Watch"] for People/Rakan Watch/Boss Bob.md
+    peopleMap[id] = {
+      id,
+      name,
+      type: 'person',
+      body: stripped,
+      category_path: ['People', ...subPath]
+    };
+    console.log(`[PERSON] Extracted: ${name}`);
+  }
 }
 
 // Process a single file to extract JSON
@@ -362,6 +390,7 @@ function runSync() {
   questsMap = {};
   recipesMap = {};
   glossaryMap = {};
+  peopleMap = {};
   idOwners = {};
   duplicateIds = [];
 
@@ -397,6 +426,7 @@ function runSync() {
   fs.writeFileSync(QUESTS_TARGET, generateFileContent('quest', questsMap));
   fs.writeFileSync(RECIPES_TARGET, generateFileContent('recipe', recipesMap));
   fs.writeFileSync(GLOSSARY_TARGET, generateFileContent('glossary', glossaryMap));
+  fs.writeFileSync(PEOPLE_TARGET, generateFileContent('person', peopleMap));
   writeVaultIndex(allFiles);
 
   if (duplicateIds.length > 0) {
@@ -405,7 +435,7 @@ function runSync() {
     console.warn(`    Fix: give each file its own unique "id".\n`);
   }
 
-  console.log(`[SYNC] Complete. Items: ${Object.keys(itemsMap).length} | Traits: ${Object.keys(traitsMap).length} | Status Effects: ${Object.keys(statusEffectsMap).length} | Bestiary: ${Object.keys(bestiaryMap).length} | Data Logs: ${Object.keys(dataLogsMap).length} | Maps: ${Object.keys(mapsMap).length} | Quests: ${Object.keys(questsMap).length} | Recipes: ${Object.keys(recipesMap).length} | Glossary: ${Object.keys(glossaryMap).length}`);
+  console.log(`[SYNC] Complete. Items: ${Object.keys(itemsMap).length} | Traits: ${Object.keys(traitsMap).length} | Status Effects: ${Object.keys(statusEffectsMap).length} | Bestiary: ${Object.keys(bestiaryMap).length} | Data Logs: ${Object.keys(dataLogsMap).length} | Maps: ${Object.keys(mapsMap).length} | Quests: ${Object.keys(questsMap).length} | Recipes: ${Object.keys(recipesMap).length} | Glossary: ${Object.keys(glossaryMap).length} | People: ${Object.keys(peopleMap).length}`);
 }
 
 // --- VAULT INDEX ---

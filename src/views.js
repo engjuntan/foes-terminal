@@ -1216,8 +1216,21 @@ export function getChecksView(liveData, userRole, currentUser) {
 }
 
 // --- DATA LOGS ---
+// Job 5 (SCOPE_DECISIONS.md "People tab" ruling: "People notes are
+// browsed inside the Data Logs tab — the one place players go to learn,
+// read, or refresh their memory"): people.js's peopleDatabase (generated
+// by sync-obsidian.js from People/ notes, GM blocks stripped) is folded
+// into the SAME tree as data logs here, each person carrying its own
+// `category_path` rooted at "People" (see sync-obsidian.js) so it shows
+// up as one more top-level folder alongside the vault-folder-derived
+// data log categories — not a separate tab. Unlock/read state is its own
+// pair of character fields (unlocked_people/read_people), mirroring
+// unlocked_logs/read_logs exactly (see gmGrantPerson/openPerson,
+// controllers.js). `entry.type` ('data_log' vs 'person') tells
+// renderEntry which row/detail styling and controller pair to use.
 export function getDataLogsView(liveData, userRole, currentUser) {
   const allLogs = Object.values(dataLogDatabase);
+  const allPeople = Object.values(peopleDatabase);
   const players = Object.entries(liveData.characters || {}).filter(([, c]) => c.is_finalized);
 
   if (userRole === 'gm') {
@@ -1232,25 +1245,42 @@ export function getDataLogsView(liveData, userRole, currentUser) {
           <button class="gm-btn" style="padding:0 8px; font-size:11px;" onclick="window.gmGrantDataLog('${log.id}', document.getElementById('grantLogTarget_${log.id}').value)">GRANT</button>
         </div>
       </div>`;
+    const renderPerson = (person) => `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #222; padding:5px 0;">
+        <span>${person.name}</span>
+        <div style="display:flex; gap:4px;">
+          <select id="grantPersonTarget_${person.id}" style="background:black; color:orange; border:1px solid #333; font-size:11px;">
+            <option value="all">ALL PLAYERS</option>
+            ${players.map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('')}
+          </select>
+          <button class="gm-btn" style="padding:0 8px; font-size:11px; border-color:orange; color:orange;" onclick="window.gmGrantPerson('${person.id}', document.getElementById('grantPersonTarget_${person.id}').value)">REVEAL</button>
+        </div>
+      </div>`;
+    const renderEntry = (entry) => entry.type === 'person' ? renderPerson(entry) : renderLog(entry);
+    const allEntries = [...allLogs, ...allPeople];
     return `
       <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto; padding-top:10px;">
         <div class="panel">
           <h2>DATA LOGS — GM VIEW</h2>
-          <p style="font-size:12px; color:#666;">You see everything unconditionally. Grant a log to a player (or everyone) to unlock it for them.</p>
-          ${allLogs.length > 0 ? renderCategoryTree(buildCategoryTree(allLogs), renderLog) : '<p style="color:#555;">No data logs authored yet.</p>'}
+          <p style="font-size:12px; color:#666;">You see everything unconditionally. Grant a log, or reveal a person, to a player (or everyone).</p>
+          ${allEntries.length > 0 ? renderCategoryTree(buildCategoryTree(allEntries), renderEntry) : '<p style="color:#555;">No data logs authored yet.</p>'}
         </div>
       </div>`;
   }
 
   const char = liveData.characters[currentUser];
-  const unlocked = new Set(char.unlocked_logs || []);
-  const readSet = new Set(char.read_logs || []);
-  const visibleLogs = allLogs.filter(l => unlocked.has(l.id));
-  const openId = window.openLogId;
+  const unlockedLogs = new Set(char.unlocked_logs || []);
+  const readLogs = new Set(char.read_logs || []);
+  const unlockedPeople = new Set(char.unlocked_people || []);
+  const readPeople = new Set(char.read_people || []);
+  const visibleLogs = allLogs.filter(l => unlockedLogs.has(l.id));
+  const visiblePeople = allPeople.filter(p => unlockedPeople.has(p.id));
+  const openLogId = window.openLogId;
+  const openPersonId = window.openPersonId;
 
   const renderLog = (log) => {
-    const isUnread = !readSet.has(log.id);
-    const isOpen = openId === log.id;
+    const isUnread = !readLogs.has(log.id);
+    const isOpen = openLogId === log.id;
     return `
       <div>
         <div onclick="window.openDataLog('${log.id}')" style="cursor:pointer; padding:6px 0; border-bottom:1px dashed #222; ${isUnread ? 'font-weight:bold; color:var(--pip-green);' : 'color:#888;'}">
@@ -1259,12 +1289,29 @@ export function getDataLogsView(liveData, userRole, currentUser) {
         ${isOpen ? `<div style="background:rgba(0,50,0,0.2); border:1px solid var(--pip-dim); padding:10px; margin:6px 0; font-size:13px; color:#ccc; white-space:pre-wrap;">${applyGlossaryTooltips(escapeHtml(log.body || ''))}</div>` : ''}
       </div>`;
   };
+  // Glossary hover links work the same way as a data log's body (same
+  // applyGlossaryTooltips(escapeHtml(...)) call) — a person's own name is
+  // already a glossary term too (People/ has always fed the glossary),
+  // so linking works both ways with no extra code.
+  const renderPerson = (person) => {
+    const isUnread = !readPeople.has(person.id);
+    const isOpen = openPersonId === person.id;
+    return `
+      <div>
+        <div onclick="window.openPerson('${person.id}')" style="cursor:pointer; padding:6px 0; border-bottom:1px dashed #222; ${isUnread ? 'font-weight:bold; color:orange;' : 'color:#888;'}">
+          ${isUnread ? '<span style="color:red;">●</span> ' : ''}${person.name}
+        </div>
+        ${isOpen ? `<div style="background:rgba(50,30,0,0.15); border:1px solid orange; padding:10px; margin:6px 0; font-size:13px; color:#ccc; white-space:pre-wrap;">${applyGlossaryTooltips(escapeHtml(person.body || ''))}</div>` : ''}
+      </div>`;
+  };
+  const renderEntry = (entry) => entry.type === 'person' ? renderPerson(entry) : renderLog(entry);
+  const visibleEntries = [...visibleLogs, ...visiblePeople];
 
   return `
     <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto; padding-top:10px;">
       <div class="panel">
         <h2>DATA LOGS</h2>
-        ${visibleLogs.length === 0 ? '<p style="color:#555; font-size:13px;">Nothing unlocked yet — your GM will grant you access as the story unfolds.</p>' : renderCategoryTree(buildCategoryTree(visibleLogs), renderLog)}
+        ${visibleEntries.length === 0 ? '<p style="color:#555; font-size:13px;">Nothing unlocked yet — your GM will grant you access as the story unfolds.</p>' : renderCategoryTree(buildCategoryTree(visibleEntries), renderEntry)}
       </div>
     </div>`;
 }
