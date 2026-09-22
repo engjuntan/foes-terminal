@@ -244,6 +244,21 @@ export async function gmSaveBiography(targetCharId) {
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
+// Player tool: save their own free-text notes (STATUS_AND_CRIPPLE_SPEC.md
+// C, GM adjustment 2026-09-22). Deliberately separate from biography/
+// gm_notes above — those are GM-owned and GM-only to edit; player_notes
+// is the player's own scratchpad, writable only by themselves. The GM
+// can read it (see the squad modal) but has no save control for it.
+export async function savePlayerNotes() {
+  if (!window.currentUser || !window.liveData) return;
+  const el = document.getElementById('playerNotesTextarea');
+  if (!el) return;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${window.currentUser}.player_notes`] = el.value;
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
 // --- DATA LOGS ---
 export async function gmGrantDataLog(logId, target) {
   const characters = window.liveData.characters || {};
