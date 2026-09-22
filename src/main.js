@@ -80,6 +80,7 @@ window.setStance = Controllers.setStance;
 window.setCombatActionField = Controllers.setCombatActionField;
 window.rollForMe = Controllers.rollForMe;
 window.resolveAttack = Controllers.resolveAttack;
+window.gmRerollLastResolution = Controllers.gmRerollLastResolution;
 window.setPlayerCheckField = Controllers.setPlayerCheckField;
 window.setPlayerCheckWhat = Controllers.setPlayerCheckWhat;
 window.rollForPlayerCheck = Controllers.rollForPlayerCheck;

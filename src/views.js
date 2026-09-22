@@ -569,7 +569,7 @@ export function getGoatReviewView(charId, liveData) {
       <div class="panel" style="border:2px solid var(--pip-green); box-shadow:0 0 15px rgba(50,255,50,0.1);">
         <div style="display:flex; justify-content:space-between; align-items:center; background:var(--pip-green); margin:-10px -10px 20px -10px; padding:10px;">
           <h1 style="margin:0; color:black;">IDENTITY CARD</h1>
-          <button onclick="window.switchTab('STATUS')" style="background:black; color:lime; border:1px solid black; cursor:pointer;">BACK</button>
+          <button onclick="window.switchTab('DASHBOARD')" style="background:black; color:lime; border:1px solid black; cursor:pointer;">BACK</button>
         </div>
 
         <div style="display:flex; gap:20px; margin-bottom:20px;">
@@ -934,7 +934,7 @@ export function getCombatView(liveData, userRole, currentUser) {
         <div style="margin-top:15px;">${initiativeHtml}</div>
         ${canEndTurn ? `<button style="width:100%; margin-top:15px; padding:10px; background:var(--pip-dim); color:black; font-weight:bold; border:none; cursor:pointer;" onclick="window.endTurn()">END TURN</button>` : ''}
         ${isLive && userRole === 'gm' ? `<button style="width:100%; margin-top:8px; padding:10px; background:red; color:white; border:none; cursor:pointer;" onclick="window.endCombat()">END COMBAT</button>` : ''}
-        <button style="width:100%; margin-top:8px; padding:8px; background:#333; color:var(--pip-green); border:none; cursor:pointer;" onclick="window.switchTab('STATUS')">BACK TO DASHBOARD</button>
+        <button style="width:100%; margin-top:8px; padding:8px; background:#333; color:var(--pip-green); border:none; cursor:pointer;" onclick="window.switchTab('DASHBOARD')">BACK TO DASHBOARD</button>
       </div>
       <div>
         ${actionPanelHtml}
@@ -945,6 +945,11 @@ export function getCombatView(liveData, userRole, currentUser) {
       </div>
       <div class="panel">
         <h2>COMBAT LOG</h2>
+        ${userRole === 'gm' && liveData.last_resolution && liveData.last_resolution.kind === 'attack' ? `
+        <div style="border:1px solid orange; padding:8px; margin-bottom:10px;">
+          <div style="font-size:11px; color:orange;">LAST ACTION: ${liveData.last_resolution.actor} vs ${liveData.last_resolution.target} (rolled ${liveData.last_resolution.roll})</div>
+          <button style="width:100%; margin-top:6px; padding:6px; background:orange; color:black; font-weight:bold; border:none; cursor:pointer;" onclick="window.gmRerollLastResolution()">↻ REROLL (GM ONLY)</button>
+        </div>` : ''}
         <div style="max-height:500px; overflow-y:auto;">${logHtml || '<span style="color:#555;">No events yet.</span>'}</div>
       </div>
     </div>
@@ -1080,6 +1085,11 @@ export function getChecksView(liveData, userRole, currentUser) {
       ${gmPanelHtml}
       <div class="panel">
         <h2>CHECK LOG</h2>
+        ${userRole === 'gm' && liveData.last_resolution && (liveData.last_resolution.kind === 'player_check' || liveData.last_resolution.kind === 'gm_check') ? `
+        <div style="border:1px solid orange; padding:8px; margin-bottom:10px;">
+          <div style="font-size:11px; color:orange;">LAST CHECK: ${liveData.last_resolution.actor} (rolled ${liveData.last_resolution.roll})</div>
+          <button style="width:100%; margin-top:6px; padding:6px; background:orange; color:black; font-weight:bold; border:none; cursor:pointer;" onclick="window.gmRerollLastResolution()">↻ REROLL (GM ONLY)</button>
+        </div>` : ''}
         <div style="max-height:500px; overflow-y:auto;">${checkLogHtml || '<span style="color:#555;">No checks rolled yet.</span>'}</div>
       </div>
     </div>
