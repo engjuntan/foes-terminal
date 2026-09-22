@@ -45,6 +45,8 @@ window.gmSaveBiography = () => Controllers.gmSaveBiography(window.selectedCharId
 window.savePlayerNotes = Controllers.savePlayerNotes;
 window.gmGrantDataLog = Controllers.gmGrantDataLog;
 window.openDataLog = Controllers.openDataLog;
+window.gmGrantPerson = Controllers.gmGrantPerson;
+window.openPerson = Controllers.openPerson;
 window.gmGrantQuest = Controllers.gmGrantQuest;
 window.openQuest = Controllers.openQuest;
 window.gmSetQuestStatus = Controllers.gmSetQuestStatus;
@@ -88,6 +90,7 @@ window.adjustCombatDraftMonster = Controllers.adjustCombatDraftMonster;
 window.startCombat = Controllers.startCombat;
 window.endCombat = Controllers.endCombat;
 window.setStance = Controllers.setStance;
+window.setCover = Controllers.setCover;
 window.setCombatActionField = Controllers.setCombatActionField;
 window.rollForMe = Controllers.rollForMe;
 window.resolveAttack = Controllers.resolveAttack;
@@ -254,7 +257,12 @@ window.render = function() {
   if (window.userRole === 'player' && window.liveData.characters[window.currentUser]) {
     const char = window.liveData.characters[window.currentUser];
     const readLogs = new Set(char.read_logs || []);
-    const unreadLogCount = (char.unlocked_logs || []).filter(id => !readLogs.has(id)).length;
+    // People (job 5) live inside the same DATA LOGS tab/nav button, so
+    // their unread count folds into the same badge rather than getting
+    // one of its own.
+    const readPeople = new Set(char.read_people || []);
+    const unreadLogCount = (char.unlocked_logs || []).filter(id => !readLogs.has(id)).length
+      + (char.unlocked_people || []).filter(id => !readPeople.has(id)).length;
 
     const readQuests = new Set(char.read_quests || []);
     const unreadQuestCount = (char.unlocked_quests || []).filter(id => !readQuests.has(id)).length;

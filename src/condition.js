@@ -253,6 +253,59 @@ export function repairCategory(item) {
   return null;
 }
 
+// --- GENERIC SCRAP (SCOPE_DECISIONS.md "Combat, scrap, People tab,
+// heist" GM ruling, 2026-09-22: "Every weapon and armor scraps for 1-3
+// generic components matching what it is... Low Repair skews toward 1;
+// higher Repair skews toward 3.") ---
+// Only used as a FALLBACK by scrapItem() (controllers.js) when the item
+// has no authored `scrap_yield` of its own — an authored yield always
+// wins. Component choice reuses the same armor family judgment call
+// repairCategory() already makes (power-armor-by-id, heavy-by-weight —
+// see that function's own comment), but weapons are grouped differently
+// here than for repair (repair only cares energy/melee/guns; scrap also
+// separates melee from unarmed/throwing into the same bucket, matching
+// the brief's literal component list).
+export function genericScrapComponent(item) {
+  if (!item) return null;
+  if (item.type === 'weapon') {
+    if (item.skill === 'energy_weapons') return 'electronics';
+    if (item.skill === 'melee_weapons' || item.skill === 'unarmed' || item.skill === 'throwing') return 'scrap_metal';
+    return 'gun_parts'; // small_guns, big_guns, or unspecified — "a gun"
+  }
+  if (item.type === 'armor') {
+    const id = item.id || '';
+    if (id.includes('power_armor')) return 'power_armor'; // special-cased in genericScrapYield below
+    const heavy = typeof item.weight === 'number' && item.weight >= HEAVY_ARMOR_WEIGHT_KG;
+    return heavy ? 'scrap_metal' : 'cloth';
+  }
+  return null;
+}
+
+// Quantity bands (this build's own call, stated per the brief): roll
+// d100 + Repair skill, then <=70 -> 1, 71-130 -> 2, >130 -> 3. At
+// Repair 0 that's ~70% chance of 1 and no chance of 3 (mostly 1); at
+// Repair 100 it's ~70% chance of 3 and no chance of 1 (mostly 3); Repair
+// ~50 lands mostly on 2 — a smooth low-to-high skew across the normal
+// skill range with no hard cap on either end.
+export function genericScrapQty(repairSkill) {
+  const total = Math.floor(Math.random() * 100) + 1 + (repairSkill || 0);
+  if (total > 130) return 3;
+  if (total > 70) return 2;
+  return 1;
+}
+
+// { componentId: qty }, or null if this item isn't a weapon/armor this
+// build knows how to classify. Power armor is the one two-component
+// case: 1 Hardened Alloy (the "and" the brief calls for) plus the
+// Repair-weighted Scrap Metal roll.
+export function genericScrapYield(item, repairSkill) {
+  const component = genericScrapComponent(item);
+  if (!component) return null;
+  const qty = genericScrapQty(repairSkill);
+  if (component === 'power_armor') return { hardened_alloy: 1, scrap_metal: qty };
+  return { [component]: qty };
+}
+
 // Per §2.5: "primary x max(1, ceil(0.10 x value / primary.value)) + 1
 // secondary, plus 1 rare per 2 marks" — returns the cost for ONE mark of
 // repair; totalRepairCost() below multiplies it out for a whole job.

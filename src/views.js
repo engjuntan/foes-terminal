@@ -17,8 +17,9 @@ import { DIFFICULTY_TIERS } from './checks.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
-import { BODY_PARTS, BURST_HIT_PENALTY, STANCES } from './combat.js';
+import { BODY_PARTS, BURST_HIT_PENALTY, STANCES, COVER_LEVELS, DAMAGE_TYPE_LABELS, isMonsterAttackMelee } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
+import { peopleDatabase } from './people.js';
 import { questDatabase } from './quests.js';
 import { glossaryDatabase } from './glossary.js';
 import { mapDatabase } from './maps.js';
@@ -32,7 +33,7 @@ import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
 import { recipeDatabase } from './recipes.js';
 import {
   isDurable, isBroken, normalizeCondition, conditionLabel, scrapYieldFor,
-  repairFloor, repairSaveChance, totalRepairCost
+  repairFloor, repairSaveChance, totalRepairCost, genericScrapComponent
 } from './condition.js';
 
 // --- HELPERS ---
@@ -750,6 +751,20 @@ export function getCombatView(liveData, userRole, currentUser) {
     return `<select onclick="event.stopPropagation();" onchange="event.stopPropagation(); window.setStance('${c.combatant_id}', this.value)" style="font-size:11px; background:black; color:${colors[current]}; border:1px solid ${colors[current]}; padding:0 2px;">${options}</select>`;
   };
 
+  // Cover (job 1 — SCOPE_DECISIONS.md "Combat, scrap, People tab, heist"
+  // ruling: "Cover is GM-assigned"). GM-only control, unlike stance —
+  // combat space is navigated manually at the table, so only the GM
+  // calls it. A non-GM viewer just sees the current level, when it isn't
+  // "None" (the common case stays uncluttered).
+  const coverHtml = (c) => {
+    const current = c.cover || 'none';
+    if (userRole !== 'gm') {
+      return current !== 'none' ? `<span style="font-size:11px; color:orange; border:1px solid orange; padding:0 5px; margin-left:4px;">${COVER_LEVELS[current].label.toUpperCase()}</span>` : '';
+    }
+    const options = Object.entries(COVER_LEVELS).map(([key, lvl]) => `<option value="${key}" ${current === key ? 'selected' : ''}>${lvl.label}</option>`).join('');
+    return `<select onclick="event.stopPropagation();" onchange="event.stopPropagation(); window.setCover('${c.combatant_id}', this.value)" style="font-size:11px; background:black; color:orange; border:1px solid orange; padding:0 2px; margin-left:4px;">${options}</select>`;
+  };
+
   const initiativeHtml = combat.initiative_order.map((c, idx) => {
     const isCurrent = isLive && idx === combat.turn_index;
     const hp = resolveHp(c);
@@ -759,6 +774,7 @@ export function getCombatView(liveData, userRole, currentUser) {
         <div>
           <strong style="color:${c.ref_type === 'pc' ? 'cyan' : 'red'};">${isCurrent ? '▶ ' : ''}${c.name}</strong>
           ${stanceHtml(c)}
+          ${coverHtml(c)}
           <div style="font-size:11px; color:#666;">INIT ${c.initiative}</div>
           ${afflictionTags(c)}
         </div>
@@ -807,8 +823,13 @@ export function getCombatView(liveData, userRole, currentUser) {
 
     let attackOptions = '';
     if (currentActor.ref_type === 'monster') {
+      // Job 3: show each attack's damage type (new per-attack `dmgType`,
+      // defaulting to normal when absent — matches computeAttackResolution).
       attackOptions = (currentActor.attacks || [])
-        .map(a => `<option value="${a.name}" ${draft.attackKey === a.name ? 'selected' : ''}>${a.name} (${a.hit_percent}% · ${a.damage})</option>`).join('');
+        .map(a => {
+          const dmgTypeLabel = DAMAGE_TYPE_LABELS[a.dmgType || 'normal'];
+          return `<option value="${a.name}" ${draft.attackKey === a.name ? 'selected' : ''}>${a.name} (${a.hit_percent}% · ${a.damage}${dmgTypeLabel ? ` · ${dmgTypeLabel}` : ''})</option>`;
+        }).join('');
     } else {
       const char = liveData.characters[currentActor.char_id];
       const equip = (char && char.equipment) || {};
@@ -822,7 +843,10 @@ export function getCombatView(liveData, userRole, currentUser) {
         const slot = equip.right_hand === itemId ? 'right_hand' : 'left_hand';
         const itemClipSize = item.stats && item.stats.clip_size;
         const ammoTag = itemClipSize ? ` (${ammo[slot] ?? itemClipSize}/${itemClipSize} ammo)` : '';
-        return `<option value="${itemId}" ${draft.attackKey === itemId ? 'selected' : ''}>${item.name}${ammoTag}</option>`;
+        // Job 3: show the weapon's own damage type (stats.dmgType, default normal).
+        const dmgTypeLabel = DAMAGE_TYPE_LABELS[(item.stats && item.stats.dmgType) || 'normal'];
+        const typeTag = dmgTypeLabel ? ` [${dmgTypeLabel}]` : '';
+        return `<option value="${itemId}" ${draft.attackKey === itemId ? 'selected' : ''}>${item.name}${ammoTag}${typeTag}</option>`;
       }).join('');
       attackOptions = `<option value="unarmed" ${!draft.attackKey || draft.attackKey === 'unarmed' ? 'selected' : ''}>Unarmed</option>${weaponOpts}`;
     }
@@ -886,18 +910,24 @@ export function getCombatView(liveData, userRole, currentUser) {
       const target = combat.initiative_order.find(c => c.combatant_id === draft.targetId);
       if (target) {
         let attackerValue = null;
+        let isMeleeAttack = false; // job 1: cover only penalizes ranged attacks
         if (currentActor.ref_type === 'monster') {
           const attackDef = (currentActor.attacks || []).find(a => a.name === draft.attackKey);
-          if (attackDef) attackerValue = attackDef.hit_percent;
+          if (attackDef) {
+            attackerValue = attackDef.hit_percent;
+            isMeleeAttack = isMonsterAttackMelee(attackDef);
+          }
         } else {
           const char = liveData.characters[currentActor.char_id];
           const derived = deriveCharacter(char);
           if (!draft.attackKey || draft.attackKey === 'unarmed') {
             attackerValue = derived.skills.unarmed;
+            isMeleeAttack = true;
           } else {
             const weaponItem = getItem(draft.attackKey);
             if (weaponItem) {
               const isMelee = !weaponItem.stats || (weaponItem.stats.range || 0) <= 1;
+              isMeleeAttack = isMelee;
               const skillKey = weaponItem.skill || (isMelee ? 'melee_weapons' : 'small_guns');
               attackerValue = derived.skills[skillKey] ?? 0;
             }
@@ -913,8 +943,13 @@ export function getCombatView(liveData, userRole, currentUser) {
         }
         if (attackerValue !== null && targetAC !== null) {
           const part = BODY_PARTS[selectedPart] || BODY_PARTS.torso;
-          const chance = Math.max(0, attackerValue - part.penalty - (burstSelected ? BURST_HIT_PENALTY : 0) - targetAC);
-          previewHtml = `<div style="font-size:11px; color:#888; margin-bottom:6px;">Hit chance vs ${target.name}: <span style="color:var(--pip-green); font-weight:bold;">${chance}%</span></div>`;
+          // Job 1: same cover penalty computeAttackResolution() applies —
+          // GM-assigned on the target, ranged attacks only.
+          const coverLevel = COVER_LEVELS[target.cover || 'none'] || COVER_LEVELS.none;
+          const coverPenalty = !isMeleeAttack ? coverLevel.penalty : 0;
+          const chance = Math.max(0, attackerValue - part.penalty - (burstSelected ? BURST_HIT_PENALTY : 0) - coverPenalty - targetAC);
+          const coverNote = coverPenalty > 0 ? ` <span style="color:orange;">(${coverLevel.label} −${coverPenalty})</span>` : '';
+          previewHtml = `<div style="font-size:11px; color:#888; margin-bottom:6px;">Hit chance vs ${target.name}: <span style="color:var(--pip-green); font-weight:bold;">${chance}%</span>${coverNote}</div>`;
         }
       }
 
@@ -1181,8 +1216,21 @@ export function getChecksView(liveData, userRole, currentUser) {
 }
 
 // --- DATA LOGS ---
+// Job 5 (SCOPE_DECISIONS.md "People tab" ruling: "People notes are
+// browsed inside the Data Logs tab — the one place players go to learn,
+// read, or refresh their memory"): people.js's peopleDatabase (generated
+// by sync-obsidian.js from People/ notes, GM blocks stripped) is folded
+// into the SAME tree as data logs here, each person carrying its own
+// `category_path` rooted at "People" (see sync-obsidian.js) so it shows
+// up as one more top-level folder alongside the vault-folder-derived
+// data log categories — not a separate tab. Unlock/read state is its own
+// pair of character fields (unlocked_people/read_people), mirroring
+// unlocked_logs/read_logs exactly (see gmGrantPerson/openPerson,
+// controllers.js). `entry.type` ('data_log' vs 'person') tells
+// renderEntry which row/detail styling and controller pair to use.
 export function getDataLogsView(liveData, userRole, currentUser) {
   const allLogs = Object.values(dataLogDatabase);
+  const allPeople = Object.values(peopleDatabase);
   const players = Object.entries(liveData.characters || {}).filter(([, c]) => c.is_finalized);
 
   if (userRole === 'gm') {
@@ -1197,25 +1245,42 @@ export function getDataLogsView(liveData, userRole, currentUser) {
           <button class="gm-btn" style="padding:0 8px; font-size:11px;" onclick="window.gmGrantDataLog('${log.id}', document.getElementById('grantLogTarget_${log.id}').value)">GRANT</button>
         </div>
       </div>`;
+    const renderPerson = (person) => `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #222; padding:5px 0;">
+        <span>${person.name}</span>
+        <div style="display:flex; gap:4px;">
+          <select id="grantPersonTarget_${person.id}" style="background:black; color:orange; border:1px solid #333; font-size:11px;">
+            <option value="all">ALL PLAYERS</option>
+            ${players.map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('')}
+          </select>
+          <button class="gm-btn" style="padding:0 8px; font-size:11px; border-color:orange; color:orange;" onclick="window.gmGrantPerson('${person.id}', document.getElementById('grantPersonTarget_${person.id}').value)">REVEAL</button>
+        </div>
+      </div>`;
+    const renderEntry = (entry) => entry.type === 'person' ? renderPerson(entry) : renderLog(entry);
+    const allEntries = [...allLogs, ...allPeople];
     return `
       <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto; padding-top:10px;">
         <div class="panel">
           <h2>DATA LOGS — GM VIEW</h2>
-          <p style="font-size:12px; color:#666;">You see everything unconditionally. Grant a log to a player (or everyone) to unlock it for them.</p>
-          ${allLogs.length > 0 ? renderCategoryTree(buildCategoryTree(allLogs), renderLog) : '<p style="color:#555;">No data logs authored yet.</p>'}
+          <p style="font-size:12px; color:#666;">You see everything unconditionally. Grant a log, or reveal a person, to a player (or everyone).</p>
+          ${allEntries.length > 0 ? renderCategoryTree(buildCategoryTree(allEntries), renderEntry) : '<p style="color:#555;">No data logs authored yet.</p>'}
         </div>
       </div>`;
   }
 
   const char = liveData.characters[currentUser];
-  const unlocked = new Set(char.unlocked_logs || []);
-  const readSet = new Set(char.read_logs || []);
-  const visibleLogs = allLogs.filter(l => unlocked.has(l.id));
-  const openId = window.openLogId;
+  const unlockedLogs = new Set(char.unlocked_logs || []);
+  const readLogs = new Set(char.read_logs || []);
+  const unlockedPeople = new Set(char.unlocked_people || []);
+  const readPeople = new Set(char.read_people || []);
+  const visibleLogs = allLogs.filter(l => unlockedLogs.has(l.id));
+  const visiblePeople = allPeople.filter(p => unlockedPeople.has(p.id));
+  const openLogId = window.openLogId;
+  const openPersonId = window.openPersonId;
 
   const renderLog = (log) => {
-    const isUnread = !readSet.has(log.id);
-    const isOpen = openId === log.id;
+    const isUnread = !readLogs.has(log.id);
+    const isOpen = openLogId === log.id;
     return `
       <div>
         <div onclick="window.openDataLog('${log.id}')" style="cursor:pointer; padding:6px 0; border-bottom:1px dashed #222; ${isUnread ? 'font-weight:bold; color:var(--pip-green);' : 'color:#888;'}">
@@ -1224,12 +1289,29 @@ export function getDataLogsView(liveData, userRole, currentUser) {
         ${isOpen ? `<div style="background:rgba(0,50,0,0.2); border:1px solid var(--pip-dim); padding:10px; margin:6px 0; font-size:13px; color:#ccc; white-space:pre-wrap;">${applyGlossaryTooltips(escapeHtml(log.body || ''))}</div>` : ''}
       </div>`;
   };
+  // Glossary hover links work the same way as a data log's body (same
+  // applyGlossaryTooltips(escapeHtml(...)) call) — a person's own name is
+  // already a glossary term too (People/ has always fed the glossary),
+  // so linking works both ways with no extra code.
+  const renderPerson = (person) => {
+    const isUnread = !readPeople.has(person.id);
+    const isOpen = openPersonId === person.id;
+    return `
+      <div>
+        <div onclick="window.openPerson('${person.id}')" style="cursor:pointer; padding:6px 0; border-bottom:1px dashed #222; ${isUnread ? 'font-weight:bold; color:orange;' : 'color:#888;'}">
+          ${isUnread ? '<span style="color:red;">●</span> ' : ''}${person.name}
+        </div>
+        ${isOpen ? `<div style="background:rgba(50,30,0,0.15); border:1px solid orange; padding:10px; margin:6px 0; font-size:13px; color:#ccc; white-space:pre-wrap;">${applyGlossaryTooltips(escapeHtml(person.body || ''))}</div>` : ''}
+      </div>`;
+  };
+  const renderEntry = (entry) => entry.type === 'person' ? renderPerson(entry) : renderLog(entry);
+  const visibleEntries = [...visibleLogs, ...visiblePeople];
 
   return `
     <div class="dashboard-container" style="display:block; max-width:700px; margin:0 auto; padding-top:10px;">
       <div class="panel">
         <h2>DATA LOGS</h2>
-        ${visibleLogs.length === 0 ? '<p style="color:#555; font-size:13px;">Nothing unlocked yet — your GM will grant you access as the story unfolds.</p>' : renderCategoryTree(buildCategoryTree(visibleLogs), renderLog)}
+        ${visibleEntries.length === 0 ? '<p style="color:#555; font-size:13px;">Nothing unlocked yet — your GM will grant you access as the story unfolds.</p>' : renderCategoryTree(buildCategoryTree(visibleEntries), renderEntry)}
       </div>
     </div>`;
 }
@@ -1860,27 +1942,37 @@ export function getWorkshopView(charId, liveData) {
         return `<h4 style="color:var(--pip-dim); border-bottom:1px dashed var(--pip-dim); margin-top:14px;">${categoryLabels[cat] || cat.toUpperCase()}</h4>${rowsHtml}`;
       }).join('');
 
-  // SALVAGE — junk currently owned (qty > 0), plus any durable
-  // weapon/armor the vault has authored a scrap_yield for (none yet —
-  // see this agent's report — but the moment one exists, this picks it
-  // up with no code change). A durable item's preview scraps its
-  // HIGHEST-marks copy (§2.1's stated default — "Scrap and sell take the
-  // highest-marks copy") and shows the condition-scaled yield that copy
-  // would actually produce, not the item's full-price yield.
+  // SALVAGE — junk currently owned (qty > 0) with an authored
+  // scrap_yield, plus every durable weapon/armor owned: either its own
+  // authored scrap_yield (exact preview, condition-scaled off its
+  // HIGHEST-marks copy — §2.1's stated default, "Scrap and sell take the
+  // highest-marks copy") or, per job 4's generic fallback
+  // (genericScrapComponent/scrapItem, condition.js/controllers.js), a
+  // "1-3 <Component>" RANGE — the real roll is weighted by Repair skill
+  // and only happens when SCRAP is actually clicked, so it can't be
+  // previewed as one exact number the way an authored yield can.
   const scrappable = Object.keys(inventory)
     .map(id => getItem(id))
-    .filter(i => i && i.scrap_yield && inventory[i.id] > 0);
+    .filter(i => i && inventory[i.id] > 0 && (i.scrap_yield || genericScrapComponent(i)))
+    .map(i => ({ item: i, generic: !i.scrap_yield }));
   const salvageHtml = scrappable.length === 0
     ? `<div style="color:#555; font-size:12px;">Nothing to scrap.</div>`
-    : scrappable.map(j => {
+    : scrappable.map(({ item: j, generic }) => {
         const durable = isDurable(j);
         const worstMarks = durable ? Math.max(0, ...(condition.inv[j.id] || [0])) : 0;
-        const previewYield = durable ? scrapYieldFor(j.scrap_yield, worstMarks) : j.scrap_yield;
-        const yieldText = Object.entries(previewYield).map(([id, qty]) => {
-          const c = getItem(id);
-          return `${qty} ${c ? c.name : id}`;
-        }).join(', ');
-        const meterTag = durable ? ` — scraps worst copy: ${conditionMeter(worstMarks)}` : '';
+        let yieldText, meterTag = durable ? ` — scraps worst copy: ${conditionMeter(worstMarks)}` : '';
+        if (generic) {
+          const component = genericScrapComponent(j);
+          yieldText = component === 'power_armor'
+            ? `1 ${(getItem('hardened_alloy') || {}).name || 'Hardened Alloy'} + 1–3 ${(getItem('scrap_metal') || {}).name || 'Scrap Metal'}`
+            : `1–3 ${(getItem(component) || {}).name || component}`;
+        } else {
+          const previewYield = durable ? scrapYieldFor(j.scrap_yield, worstMarks) : j.scrap_yield;
+          yieldText = Object.entries(previewYield).map(([id, qty]) => {
+            const c = getItem(id);
+            return `${qty} ${c ? c.name : id}`;
+          }).join(', ');
+        }
         return `
           <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #222; padding:6px 8px; margin-bottom:4px;">
             <div>

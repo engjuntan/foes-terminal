@@ -39,10 +39,17 @@ export function instantiateMonster(monsterId, label) {
     crit_chance: template.stats.crit_chance,
     dtdr: template.stats.dtdr,
     resistances: template.stats.resistances,
+    // Bundled rather than picked apart into individual fields — job 2
+    // (NPC stance AC cap) needs `special.agi`, job 3's poison EN save
+    // needs `special.end`, and most bestiary entries already author the
+    // full SPECIAL block (see combat.js's callers) — this just carries
+    // whatever's there through to the combat instance untouched.
+    special: template.stats.special || {},
     attacks: template.attacks || [],
     is_boss: template.stats.is_boss || false, // "one shot one kill" crit takes 20 true damage instead
     status_effects: [], // same shape as a PC's — carries crit/aimed-shot afflictions inline
     stance: 'standing',
+    cover: 'none', // GM-assigned (SCOPE_DECISIONS.md "Combat, scrap, People tab, heist" ruling) — see COVER_LEVELS
     is_down: false
   };
 }
@@ -65,6 +72,23 @@ export const STANCES = {
   crouching: { label: 'Crouching', hitBonus: 10, agiCap: 3, blocksMelee: false },
   prone: { label: 'Prone', hitBonus: 25, agiCap: 1, blocksMelee: true },
   knocked_down: { label: 'Knocked Down', hitBonus: 0, agiCap: 0, blocksMelee: false }
+};
+
+// --- COVER (GM-assigned — SCOPE_DECISIONS.md "Combat, scrap, People tab,
+// heist" GM rulings, 2026-09-22) ---
+// Combat space is navigated manually at the table; the GM just tells the
+// app how covered a combatant currently is. Applies to RANGED attacks
+// against that combatant only — melee is unaffected, same manual rule
+// cover always carries. Stored per-combatant on
+// active_combat.initiative_order (see instantiateMonster's `cover` field
+// and startCombat's PC entries in controllers.js), so it survives a GM
+// reroll the same way stance does.
+export const COVER_LEVELS = {
+  none: { label: 'None', penalty: 0 },
+  quarter: { label: '¼ Cover', penalty: 25 },
+  half: { label: '½ Cover', penalty: 50 },
+  three_quarter: { label: '¾ Cover', penalty: 75 },
+  full: { label: 'Full Cover', penalty: 100 }
 };
 
 // --- AIMED SHOTS (new — not from the manual, numbers agreed with the user) ---
@@ -236,18 +260,50 @@ export function applyDamageReduction(rawDamage, dtdrBlock, damageType) {
 // applyDamageReduction expects (the same shape the bestiary stores
 // natively, since monsters skip this string-parsing step entirely).
 const ARMOR_DAMAGE_TYPES = ['normal', 'laser', 'fire', 'plasma', 'explosive'];
+// Parses one "DT/DR" string, or returns null if it's missing/malformed.
+function parseOneDtdr(raw) {
+  if (typeof raw !== 'string') return null;
+  const [dtStr, drStr] = raw.split('/');
+  const dt = parseFloat(dtStr);
+  const dr = parseFloat(drStr);
+  if (Number.isNaN(dt) || Number.isNaN(dr)) return null;
+  return { dt, dr };
+}
+// Job 3 (damage types): many armor pieces only author `dt_dr_normal` —
+// per SCOPE_DECISIONS.md's ruling, a missing type falls back to the
+// armor's normal DT/DR rather than 0/0, so an un-numbered laser/fire/
+// plasma/explosive column doesn't just ignore that armor outright. Every
+// type in ARMOR_DAMAGE_TYPES always comes back with a value now (never
+// omitted), defaulting to {0,0} only if `dt_dr_normal` itself is absent.
 export function parseArmorDtdr(armorItem) {
   const stats = (armorItem && armorItem.stats) || {};
+  const normal = parseOneDtdr(stats.dt_dr_normal) || { dt: 0, dr: 0 };
   const result = {};
   ARMOR_DAMAGE_TYPES.forEach(type => {
-    const raw = stats[`dt_dr_${type}`];
-    if (typeof raw !== 'string') return;
-    const [dtStr, drStr] = raw.split('/');
-    const dt = parseFloat(dtStr);
-    const dr = parseFloat(drStr);
-    if (!Number.isNaN(dt) && !Number.isNaN(dr)) result[type] = { dt, dr };
+    result[type] = parseOneDtdr(stats[`dt_dr_${type}`]) || normal;
   });
   return result;
+}
+
+// --- MONSTER ATTACK RANGED/MELEE CLASSIFICATION (job 1 — cover only
+// affects ranged attacks) ---
+// The bestiary doesn't carry a range/melee flag per attack (unlike
+// weapon items, which have `stats.range`), so this reads it off the
+// attack's own name/action the same way a person skimming the stat
+// block would: "Bite", "Claw", "Mandibles" read as melee; "Rifle",
+// "Laser Fire", "Mortar" read as ranged. Listed explicitly rather than
+// guessed some other way — false positives here just mean cover doesn't
+// apply to an attack it should (or vice versa), never a crash. A
+// generated `dmgType`/reach field on monster attacks would replace this
+// outright; see this agent's report.
+const MELEE_ATTACK_KEYWORDS = [
+  'bite', 'claw', 'mandible', 'swipe', 'tail', 'gore', 'charge', 'headbutt',
+  'punch', 'kick', 'sledgehammer', 'smash', 'melee', 'bayonet', 'machete',
+  'knife', 'blade', 'lick', 'peck', 'strike', 'slam', 'fist', 'stomp'
+];
+export function isMonsterAttackMelee(attackDef) {
+  const text = `${(attackDef && attackDef.name) || ''} ${(attackDef && attackDef.action) || ''}`.toLowerCase();
+  return MELEE_ATTACK_KEYWORDS.some(word => text.includes(word));
 }
 
 // --- RANDOMIZED COMBAT LOG FLAVOR TEXT ---
@@ -278,16 +334,35 @@ const MISS_TEMPLATES = [
   ({ attacker, target, weapon, part }) => `Bad luck for ${attacker} — ${weapon} misses ${target}${part} entirely.`
 ];
 
+// Job 3: damage type labels for the combat log ("... 12 Fire damage").
+// `normal` deliberately shows no label — every hit template already
+// reads fine as plain "X damage" and that's by far the common case.
+export const DAMAGE_TYPE_LABELS = {
+  normal: '', laser: 'Laser', fire: 'Fire', plasma: 'Plasma',
+  explosive: 'Explosive', emp: 'EMP', poison: 'Poison', true: 'True'
+};
+
 // Builds the full combat log line: a randomly-picked flavor sentence plus
 // the mechanical numbers, which are always present regardless of which
 // flavor variant got picked. `partTag`/`burstTag`/`effectAppliedMsg` are
 // the same pre-formatted strings resolveAttack() already builds
-// (e.g. " (aimed at Head)", " [BURST FIRE, 21/24 ammo left]").
-export function buildAttackLogMessage({ isHit, attackerName, targetName, weaponName, partTag, burstTag, damage, roll, chance, effectAppliedMsg }) {
+// (e.g. " (aimed at Head)", " [BURST FIRE, 21/24 ammo left]"). Every hit
+// template contains exactly one "DMG damage" phrase — `damageType` gets
+// folded into that single spot rather than rewriting all 8 templates.
+export function buildAttackLogMessage({ isHit, attackerName, targetName, weaponName, partTag, burstTag, damage, roll, chance, effectAppliedMsg, damageType }) {
   const templates = isHit ? HIT_TEMPLATES : MISS_TEMPLATES;
   const template = templates[Math.floor(Math.random() * templates.length)];
   let sentence = template({ attacker: attackerName, target: targetName, weapon: weaponName, part: partTag || '' });
-  if (isHit) sentence = sentence.replace('DMG', damage);
+  if (isHit) {
+    if (damageType === 'emp') {
+      // Not damage — the stun/no-effect message is already in
+      // effectAppliedMsg, so this just avoids a nonsensical "0 damage".
+      sentence = sentence.replace('DMG damage', 'an EMP pulse');
+    } else {
+      const label = DAMAGE_TYPE_LABELS[damageType] || '';
+      sentence = sentence.replace('DMG damage', `${damage} ${label ? label + ' ' : ''}damage`);
+    }
+  }
   // effectAppliedMsg used to only ever get set on a hit (aimed-shot
   // afflictions), so gating it behind isHit was safe — but a critical
   // failure now carries its own effectAppliedMsg too (backfire,
