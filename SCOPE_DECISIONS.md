@@ -836,3 +836,60 @@ Answers to BALANCE_PROPOSAL.md §9 and changes to its proposals.
   detail added.
 - **Balance:** T1 special rules as a suggestion list, drawing on Fallout
   bosses. Damage types to be reworked with Fallout 2's system in mind.
+
+## Lore audit — GM decisions (2026-09-22)
+
+Answers to `reviews/lore-audit-org-map.md`. These override older vault notes.
+
+1. **Tan / Choo:** the map wins. Tans = hot-tempered, violent enforcers;
+   Choos = silver-tongued, careful, the cash-flow advisors. Sister families
+   inside the 1414 Triad (they split later). Rewrite both vault notes,
+   keeping what still fits.
+2. **Timeline:** `01_World Details/🕛 Timeline of Major Events.md` is canon
+   (campaign starts 2247). Other dates yield to it.
+3. **Kosongs:** the Protectorate makes them. The Federation hands over
+   "volunteers" to the Protectorate.
+4. **Triad ranks:** Sam Lim leads the 1414 Triad as its Mountain Master.
+   Slink Tan is the triad's main enforcer (Red Pole). He *told* Iron Legs
+   he was Mountain Master — a lie; Iron Legs' backstory stays as written.
+5. **Bandawang is real-world Rawang** (north of KL). Map locations
+   correspond to real places.
+6. **Districts:** Bandawang Lama, Bandawang Baru, North Bandawang only
+   (no Old Town / New Town / Axe Town). The PCs start in Bandawang Baru.
+   The prison is north-west of Bandawang Baru. The Scrapyard is in North
+   Bandawang.
+7. **Kelam Sungai** is the prison and the water plant — one site. To
+   outsiders it's a water plant; locals know it's a prison.
+8. **Police:** only "Bandawang Enforcers" / "B.E." (never Militia/Guard).
+9. **Ghouls:** accepted in Bandawang. The 1414 Triad bars them from its
+   casino and its ranks only.
+10. **Muthu → Jas Kaur** (Sikh woman, PosLaju rider).
+11. **Nong Mei** is an Indian deity figure (not "Mamak").
+12. **Dates:** anything when the bombs fell is 23 October 2077; pre-War
+    logs are dated before that.
+13. **America invading Malaya** was late-war paranoia that came true;
+    add it to the timeline.
+14. Iron Legs' tagged skills stay (players will make new characters).
+15. **Axe Gang Cleaver:** delete the item.
+16. (Session 1 Recap: GM reviewing.)
+17. **Names:** Choo **Clan** (not Family/Gang), the New Peninsula Times,
+    the Fallen Gong, Gergasi, the Ishtar Device.
+18. 1414 / Lim / Abave echoes of real triads and families: keep.
+
+**Also decided:**
+- **Asing family** is the triad's third family. The name is deliberate:
+  the PCs are meant to confront overt Asian racism. Don't soften it.
+- **Syurga** (Ishtar's casino) is a British-parody theme, mocking
+  Malaysians' high opinion of the British and the West as much as the
+  British. The nautical data log needs reworking.
+- **The heist target is the ProTiga HQ vault.** Quest progression takes
+  the PCs through all three districts. The Choos' betrayal and the Ghoul
+  King's frame-up still happen; whether Faiz goes missing is open.
+- **The Ghoul King** is deliberately enigmatic: a legendary, mythical
+  figure of rumour. His identity (Naim, in Taman Hidup) belongs to a
+  **separate campaign module** — not this campaign.
+- **Tenggiling Besar** was meant to be the existing Panguling — no new
+  entry.
+- **New item:** Pak Kopi's Kopi (generic food).
+- **Balance agent paused;** a coding agent works on the systems during
+  lore discussions.

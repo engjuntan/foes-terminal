@@ -1443,6 +1443,21 @@ export const itemDatabase = {
     "weight": 0.3,
     "value": 20
   },
+  pak_kopis_kopi: {
+    "id": "pak_kopis_kopi",
+    "name": "Pak Kopi's Kopi",
+    "type": "consumable",
+    "icon": "",
+    "image_prompt": "A crumpled foil sachet of instant coffee printed with a faded cartoon of a smiling old man holding a steaming cup, the brand name Pak Kopi's Kopi in bold retro lettering, torn corner leaking dark powder.",
+    "description": "A satchet of the infamous Pak Kopi's Kopi. It smells 100 years too old. Maybe it's tasty?",
+    "effect": "Restores 15 Hunger",
+    "stats": {
+      "hunger": 15
+    },
+    "addictive": false,
+    "weight": 0.05,
+    "value": 6
+  },
   preserved_salted_egg: {
     "id": "preserved_salted_egg",
     "name": "Preserved Salted Egg",
@@ -3061,25 +3076,6 @@ export const itemDatabase = {
     },
     "weight": 6,
     "value": 45
-  },
-  axe_gang_cleaver: {
-    "id": "axe_gang_cleaver",
-    "name": "Axe Gang Cleaver",
-    "type": "weapon",
-    "slot": "hand",
-    "size": "medium",
-    "two_handed": true,
-    "skill": "melee_weapons",
-    "icon": "",
-    "image_prompt": "A broad meat cleaver forged from a repurposed factory press blade, thick steel edge notched and dulled, handle wrapped in worn cord, faded red paint marking the spine with a crude axe symbol.",
-    "description": "Signature weapon of the Axe Gang, an oversized meat cleaver forged from repurposed factory press blades.",
-    "stats": {
-      "dmg": "TBA",
-      "dmgType": "normal",
-      "range": 1
-    },
-    "weight": 1.5,
-    "value": "TBA"
   },
   bent_rebar_spear: {
     "id": "bent_rebar_spear",

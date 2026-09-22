@@ -60,8 +60,20 @@ player-facing and uses this convention.
   Dinar, Protectorate Dollar. Not bottle caps.
 - **The Rakan Watch** (once drafted as "1414 Gang" — "1414" now means only the triad); Boss Bob leads it —
   "Ketua Bob" is the same man in Malay.
-- **The 1414 Triad** is the main gang (the Lim, Tan and Choo families are
-  within it; Red Pole Sam Lim leads it). Never "Lim Clan".
+- **The 1414 Triad** is the main gang, led by Mountain Master Sam Lim.
+  Its families: the Tans (Slink Tan is the triad's Red Pole enforcer), the
+  **Choo Clan**, the **Asing family** (name deliberate — see
+  SCOPE_DECISIONS). Never "Lim Clan". Bars ghouls from its casino and
+  ranks; otherwise ghouls are accepted in Bandawang.
+- **Bandawang** = real-world Rawang. Districts: Bandawang Lama, Bandawang
+  Baru (PCs start here), North Bandawang (Axe Gang, Scrapyard, ProTiga
+  HQ). **Kelam Sungai** is the prison / water plant, north-west of Baru.
+  Police: **Bandawang Enforcers (B.E.)** only.
+- **Names:** the New Peninsula Times, the Fallen Gong, Gergasi (not Super
+  Mutant), the Ishtar Device. Dates on the day of the bombs: 23 October
+  2077. `🕛 Timeline of Major Events.md` is the canon timeline.
+- **The Ghoul King** is a rumour and a legend in this campaign; who he is
+  belongs to a separate campaign module (Taman Hidup). Never reveal it.
 - **Abave** replaces Genting everywhere (Abave Highlands, the Abave
   Buddhist Enclave, the Abave group). Some real names stay by GM choice:
   Sudirman, Harimau Malaya, a passing pre-War mention of Perodua.
