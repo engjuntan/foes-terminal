@@ -893,3 +893,72 @@ Answers to `reviews/lore-audit-org-map.md`. These override older vault notes.
 - **New item:** Pak Kopi's Kopi (generic food).
 - **Balance agent paused;** a coding agent works on the systems during
   lore discussions.
+
+## Combat, scrap, People tab, heist — GM rulings (2026-09-22)
+
+**Combat**
+- **Cover** is GM-assigned: the GM gives a combatant a cover level
+  (combat space is navigated manually). Manual values: ¼ −25, ½ −50,
+  ¾ −75, full −100 to hit, ranged attacks only.
+- **NPC stances** must cost AC the way PC stances do.
+- **Damage types**: the manual's list — Normal, Laser, Fire, Plasma,
+  Explosive, EMP (Electricity: a stun effect, not damage; armor with
+  negative EMP = always stunned), plus Poison (EN roll halves it), Fall,
+  True (ignores DT/DR). Enemies deal typed damage; armor and enemies
+  resist per type. Types must make sense (a missile is Explosive, a
+  flamer is Fire). Explosive damage adds armor condition marks by the
+  first digit of the damage (manual). No AP/JHP ammo for now. Fallout:
+  New Vegas formulas are a reference point.
+
+**Scrap**
+- Every weapon and armor scraps for **1–3 generic components** matching
+  what it is (a gun → Gun Parts, clothing → Cloth, and so on). Low Repair
+  skews toward 1; higher Repair skews toward 3.
+
+**Skills**
+- The heist's security should give **every skill** a chance to matter.
+
+**People tab**
+- People notes are browsed **inside the Data Logs tab** — the one place
+  players go to learn, read, or refresh their memory.
+
+**Lore corrections**
+- The Free City of Bandawang has **exactly three districts**: Bandawang
+  Baru, Bandawang Lama, North Bandawang. Kelam Sungai and the B.E.
+  Station are places, not districts.
+- **Nong Mei series:** the narrator is unnamed — an American Chinese who
+  left America, wary of the Buddhists. The janitor is unnamed, and was
+  mostly ignored before the bombs. The triad had **no bunker**: they were
+  in the casinos, and Abave was far enough from military targets that the
+  triad was not ghoulified.
+- **ProTiga heist logs:** remove the Americans on Level 16 / Army
+  contract.
+- **Syurga:** no overt dig at locals fawning over Westerners — the
+  satire is simply that someone thought a British-themed casino was a
+  good idea.
+- **Giant Datuk** (not "Datuk Gong"). **Minyak Sawit** is palm oil's
+  in-world name.
+- **Three-headed Ayam:** "can grow large" is flavour text for its
+  description. No grown/boss variant for now.
+- **Jas Kaur's importance:** she holds the mail that carries the codes to
+  the ProTiga security system.
+
+**The heist** (full brief: `99_Backend Engine/GM Notes/The ProTiga Heist.md`)
+- Theme: the campaign leans into heist films and heist media.
+- Purpose: the Ghoul King's plan was forced forward. His next phase is
+  locating the US Army's weapon and munitions caches; ProTiga HQ
+  processed those delivery orders and the data sits on a server in the
+  ProTiga vault. Posing as **"Naim"** (Boss Bob doesn't know who he is),
+  he convinced Boss Bob a cure for Najwa might be on those servers.
+  Faiz, also courting Boss Bob, learned of the heist; suspicious, he
+  still sees Boss Bob as the man to bring to the Caliphate — (a) to give
+  the Caliphate a presence in the East, (b) to change a life, as the
+  Path asks. Before the campaign Faiz has been scouting crew, and has
+  identified the Peng Brothers.
+- Approaches so far: **Loud** — win the Battle of the Bands; the prize
+  (an honorary invitation to the gang and a custom Axe Gang Axe) is
+  presented in a private ceremony in the trophy room, which is the vault
+  door's room. **Split** — the Distraction (pose as high rollers in the
+  retropunk / cassette-futurism VIP lounge) and the Lockpick (sneak in
+  and crack the vault). More alternatives to follow, after the vault's
+  security is designed.
