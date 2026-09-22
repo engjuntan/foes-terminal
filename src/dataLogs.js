@@ -42,7 +42,7 @@ export const dataLogDatabase = {
     "id": "an_old_town_household_diary",
     "name": "An Old Town Household Diary",
     "type": "data_log",
-    "body": "The Choo Family collectors came by again — third time this cycle, always polite, always precise. Grandmother says the Lim Clan used to be different, back when it was just Sam Lim doing the rounds himself. Now it's men in clean shirts with a ledger, and the ledger is never wrong, and being never wrong is somehow worse than being cruel.\n\nRoof still leaks. Put it on the list. The list is longer than the roof.",
+    "body": "The Choo Family collectors came by again — third time this cycle, always polite, always precise. Grandmother says the 1414 Triad used to be different, back when it was just Sam Lim doing the rounds himself. Now it's men in clean shirts with a ledger, and the ledger is never wrong, and being never wrong is somehow worse than being cruel.\n\nRoof still leaks. Put it on the list. The list is longer than the roof.",
     "category_path": [
       "Found Texts",
       "Bandawang"

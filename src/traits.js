@@ -35,7 +35,7 @@ export const traitDatabase = {
     "id": "triad_ties",
     "name": "Triad Ties",
     "type": "perk",
-    "description": "Lim Clan-aligned perk — discount from Lim-affiliated vendors, possible reputation trade-off elsewhere.",
+    "description": "1414 Triad-aligned perk — discount from Triad-affiliated vendors, possible reputation trade-off elsewhere.",
     "effect": "TBA",
     "modifiers": {
       "vendor_discount_lim_clan": "TBA",

@@ -42,6 +42,12 @@ the filename is the term, the first sentence is the summary, and
 frontmatter `aliases:` add short forms ("Federation", "KLB"). Nothing
 under `99_Backend Engine` is ever player-visible — it holds GM secrets.
 
+**GM-only text inside a player-facing note** goes in an Obsidian callout:
+`> [!gm]- Secret` then `>`-prefixed lines (`-` folds it). The sync strips
+these blocks before anything reaches the app, and warns `[GM LEAK?]` if a
+"Secretly…" sentence sits outside one. `People/` (NPC notes) is
+player-facing and uses this convention.
+
 ## World rules (apply to all writing)
 
 - **Powers:** the Federation of Malaya (bunkers, the Public Citizenship
@@ -52,9 +58,18 @@ under `99_Backend Engine` is ever player-visible — it holds GM secrets.
   Baru (KLB, "City of the Dead") is the ghoul-filled ruin.
 - **Currency:** Reformed Malayan Ringgit (RMR, most common), Caliphate
   Dinar, Protectorate Dollar. Not bottle caps.
-- **The Rakan Watch** (formerly "1414 Gang"); Boss Bob leads it.
-- **Off limits:** the labour camp, the slave trade, and the player
-  characters' origin. Don't write about them.
+- **The Rakan Watch** (formerly "1414 Gang"); Boss Bob leads it —
+  "Ketua Bob" is the same man in Malay.
+- **The 1414 Triad** is the main gang (the Lim, Tan and Choo families are
+  within it; Red Pole Sam Lim leads it). Never "Lim Clan".
+- **Abave** replaces Genting everywhere (Abave Highlands, the Abave
+  Buddhist Enclave, the Abave group). Some real names stay by GM choice:
+  Sudirman, Harimau Malaya, a passing pre-War mention of Perodua.
+- **Dark themes are canon but GM-led:** the labour camp, slavery and
+  indentured servitude (the Employment Agency), the Kancil Orphanage's
+  child labour. Write them only where the GM's notes ask for it, in the
+  GM's framing. Never invent anything about the PCs' own prison and
+  labour-camp origin.
 - **GM secrets are hinted, never stated** in player-facing text (e.g.
   Bandar Buaya's mayor experimenting on ghouls).
 - **The party is low level.** Anything high-tier appears worn, rusted or

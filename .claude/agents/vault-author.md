@@ -116,6 +116,25 @@ Component ids: see `Items/Components/` in the index.
 }
 ```
 
+**GM secrets** in any lore, location or People note go in a callout,
+never in the plain text — the sync strips it, and players never see it:
+```markdown
+> [!gm]- Secret
+> Ishtar is secretly an agent of the Protectorate.
+```
+
+**Person (NPC)** — goes in `People/`, no json block, player-facing.
+```markdown
+**Name** is <one-sentence public introduction>.
+
+**Background:** …
+**Description:** …
+**Importance:** …
+
+> [!gm]- Secret
+> <anything players must not know>
+```
+
 **Location / faction / lore page** — no json block. Frontmatter, then prose.
 The first sentence becomes the hover tooltip, so make it a complete
 definition that works on its own.

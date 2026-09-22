@@ -813,3 +813,26 @@ Answers to BALANCE_PROPOSAL.md §9 and changes to its proposals.
   Malaysian names for replacement.
 - **Map to-dos not yet built:** a player **notes** section on the
   dashboard; special abilities; reroll; reputation.
+
+## Organization Map intake — GM answers (2026-09-22)
+
+- **Dark themes** (Employment Agency, slavery, Kancil child labour, the
+  labour camp) are canon; written only where the GM's notes ask, in the
+  GM's framing. Nothing invented about the PCs' own origin.
+- **People/** is a new, player-facing vault folder for NPC notes. GM
+  secrets must stay out of what players see (convention proposed below).
+- **PC backstories** go into each character's in-app biography.
+- **Prison Rags** = the existing prison clothes item; merge.
+- **Rakan Watch item ids** move from `1414_` to `rakan_`.
+- **1414 Triad** is the main gang; the Lim family is part of it.
+- **Boss Bob = Ketua Bob.** **Abave replaces Genting.** Sudirman,
+  Harimau Malaya and a pre-War Perodua mention stay.
+- **Ishtar** (two versions in the map) will be settled while the heist
+  is brainstormed. **Pastor Steven** is a generic Church of NAS NPC.
+  Empty Importance lines (Slink Tan, Nipu & Nipi, Muthu, Sudirman) stay
+  empty for now.
+- **Notes the map says are "in the vault"** must be checked; report any
+  that don't exist. Existing notes (e.g. Penang) get the map's extra
+  detail added.
+- **Balance:** T1 special rules as a suggestion list, drawing on Fallout
+  bosses. Damage types to be reworked with Fallout 2's system in mind.

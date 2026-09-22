@@ -216,20 +216,23 @@ export const itemDatabase = {
     "weight": 0.03,
     "value": "TBA"
   },
-  "1414_windbreaker": {
-    "id": "1414_windbreaker",
-    "name": "Rakan Watch Windbreaker",
+  triad_tailored_suit: {
+    "id": "triad_tailored_suit",
+    "name": "1414 Triad Tailored Suit",
     "type": "armor",
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "image_prompt": "A cheap gang-colored windbreaker jacket in faded red and black nylon, a cracked zipper, a hand-painted Rakan Watch emblem on the back peeling at the edges, frayed cuffs.",
-    "description": "Cheap, gang-colored, instantly recognizable jacket of The Rakan Watch. Mapped to the manual's Clothes tier, barely above rags.",
+    "image_prompt": "A dark tailored suit jacket with narrow lapels, the fabric faded but pressed, gold thread embroidery of the 1414 Triad crest worn thin at the breast pocket, cuffs slightly frayed.",
+    "description": "Status armor worn by Tan/Choo subfamily members of the 1414 Triad. Low DR, social value instead. Mapped to the manual's Protectorate Officers Uniform tier (status armor, not combat armor).",
     "stats": {
-      "ac": 1,
-      "dt_dr_normal": "0/5"
+      "ac": 3,
+      "dt_dr_normal": "1/10"
     },
-    "weight": 0.6,
+    "modifiers": {
+      "special_cha": 2
+    },
+    "weight": 1.8,
     "value": "TBA"
   },
   axe_town_coveralls: {
@@ -358,25 +361,6 @@ export const itemDatabase = {
     },
     "weight": 6,
     "value": 55
-  },
-  lim_clan_tailored_suit: {
-    "id": "lim_clan_tailored_suit",
-    "name": "Lim Clan Tailored Suit",
-    "type": "armor",
-    "slot": "body",
-    "size": "medium",
-    "icon": "",
-    "image_prompt": "A dark tailored suit jacket with narrow lapels, the fabric faded but pressed, gold thread embroidery of the Lim Clan crest worn thin at the breast pocket, cuffs slightly frayed.",
-    "description": "Status armor worn by Tan/Choo subfamily members of the Lim Clan Association. Low DR, social value instead. Mapped to the manual's Protectorate Officers Uniform tier (status armor, not combat armor).",
-    "stats": {
-      "ac": 3,
-      "dt_dr_normal": "1/10"
-    },
-    "modifiers": {
-      "special_cha": 2
-    },
-    "weight": 1.8,
-    "value": "TBA"
   },
   malayan_frontliner_armor: {
     "id": "malayan_frontliner_armor",
@@ -535,15 +519,15 @@ export const itemDatabase = {
     "weight": 16,
     "value": "TBA"
   },
-  prison_labourer_clothes: {
-    "id": "prison_labourer_clothes",
-    "name": "Prison/Labourer Clothes",
+  prison_rags: {
+    "id": "prison_rags",
+    "name": "Prison Rags",
     "type": "armor",
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "image_prompt": "A drab grey jumpsuit with a stencilled number faded on the chest, coarse fabric worn thin at the knees and elbows, a frayed rope belt, dark stains along one sleeve.",
-    "description": "From the manual — zero combat value. May wear armor over it.",
+    "image_prompt": "A heap of threadbare grey prison rags, fabric worn almost see-through in patches, a faded stencilled number on the chest, torn hems and knotted rope in place of a belt.",
+    "description": "Old, raggedy and almost see-through in places. Get some real clothes, you beggar.",
     "stats": {
       "ac": 0,
       "dt_dr_normal": "0/0",
@@ -634,6 +618,22 @@ export const itemDatabase = {
       "pr": 0
     },
     "weight": 1.5,
+    "value": "TBA"
+  },
+  rakan_windbreaker: {
+    "id": "rakan_windbreaker",
+    "name": "Rakan Watch Windbreaker",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "image_prompt": "A cheap gang-colored windbreaker jacket in faded red and black nylon, a cracked zipper, a hand-painted Rakan Watch emblem on the back peeling at the edges, frayed cuffs.",
+    "description": "Cheap, gang-colored, instantly recognizable jacket of The Rakan Watch. Mapped to the manual's Clothes tier, barely above rags.",
+    "stats": {
+      "ac": 1,
+      "dt_dr_normal": "0/5"
+    },
+    "weight": 0.6,
     "value": "TBA"
   },
   ramshackle_armor: {
@@ -1032,7 +1032,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "image_prompt": "A cloudy glass bottle of homebrew liquor sealed with a cork and wax, a handwritten label reading Ah Beng's, the glass scratched and slightly discoloured, sediment settled at the bottom.",
-    "description": "Homebrew liquor, staple of Lim Clan Association gambling dens.",
+    "description": "Homebrew liquor, staple of 1414 Triad gambling dens.",
     "effect": "+2 CHA, -2 PER for 2 hours",
     "stats": {
       "buff": "+2 CHA",
@@ -3024,23 +3024,23 @@ export const itemDatabase = {
     "weight": 0.05,
     "value": 1
   },
-  "1414_chain_whip": {
-    "id": "1414_chain_whip",
-    "name": "Rakan Watch Chain Whip",
+  triad_straight_razor: {
+    "id": "triad_straight_razor",
+    "name": "1414 Triad Straight Razor",
     "type": "weapon",
     "slot": "hand",
     "size": "small",
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "image_prompt": "A length of motorcycle chain wound tight and wrapped in layers of black electrical tape for a grip, links rusted at the exposed ends, a small strip of red cloth tied near the handle marking it Rakan Watch.",
-    "description": "Bicycle chain wrapped in tape, The Rakan Watch's signature improvised flail.",
+    "image_prompt": "A folding straight razor with a polished steel blade kept honed sharp despite its age, a dark lacquered wood handle worn smooth, a small engraved character mark near the hinge identifying its owner's clan.",
+    "description": "Quiet, close-range blade favored by the Tan/Choo subfamilies of the 1414 Triad for discreet business.",
     "stats": {
       "dmg": "TBA",
       "dmgType": "normal",
       "range": 1
     },
-    "weight": 1,
+    "weight": 0.1,
     "value": "TBA"
   },
   angkasa_wrench: {
@@ -3680,25 +3680,6 @@ export const itemDatabase = {
     "weight": 0.2,
     "value": 10
   },
-  lim_clan_straight_razor: {
-    "id": "lim_clan_straight_razor",
-    "name": "Lim Clan Straight Razor",
-    "type": "weapon",
-    "slot": "hand",
-    "size": "small",
-    "two_handed": false,
-    "skill": "melee_weapons",
-    "icon": "",
-    "image_prompt": "A folding straight razor with a polished steel blade kept honed sharp despite its age, a dark lacquered wood handle worn smooth, a small engraved character mark near the hinge identifying its owner's clan.",
-    "description": "Quiet, close-range blade favored by the Tan/Choo subfamilies of the Lim Clan Association for discreet business.",
-    "stats": {
-      "dmg": "TBA",
-      "dmgType": "normal",
-      "range": 1
-    },
-    "weight": 0.1,
-    "value": "TBA"
-  },
   baseball_bat: {
     "id": "baseball_bat",
     "name": "Baseball Bat",
@@ -4314,6 +4295,25 @@ export const itemDatabase = {
       "ammo_type": "nails"
     },
     "weight": 3,
+    "value": "TBA"
+  },
+  rakan_chain_whip: {
+    "id": "rakan_chain_whip",
+    "name": "Rakan Watch Chain Whip",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "image_prompt": "A length of motorcycle chain wound tight and wrapped in layers of black electrical tape for a grip, links rusted at the exposed ends, a small strip of red cloth tied near the handle marking it Rakan Watch.",
+    "description": "Bicycle chain wrapped in tape, The Rakan Watch's signature improvised flail.",
+    "stats": {
+      "dmg": "TBA",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "weight": 1,
     "value": "TBA"
   },
   rebar_nail_club: {

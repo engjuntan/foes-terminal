@@ -29,7 +29,7 @@ const INDEX_TARGET = path.join(__dirname, 'VAULT_INDEX.tsv');
 // Character Details, Maps, Media, and critically 99_Backend Engine,
 // which holds GM-only plot notes and session prep) never becomes a
 // player-visible tooltip, even by accident.
-const GLOSSARY_FOLDERS = ['01_World Details', '02_Factions', 'Locations', 'Religions', 'Fallout Details', 'Bandawang'];
+const GLOSSARY_FOLDERS = ['01_World Details', '02_Factions', 'Locations', 'Religions', 'Fallout Details', 'Bandawang', 'People'];
 
 let itemsMap = {};
 let traitsMap = {};
@@ -231,6 +231,15 @@ function extractAliases(rawContent, name) {
   return { aliases: [...aliases], strict: [...strict] };
 }
 
+// GM-only material inside a player-facing note. In Obsidian it's a
+// callout — `> [!gm] Title` followed by `>`-prefixed lines (add a `-`,
+// `> [!gm]-`, to fold it) — so the GM keeps secrets next to what they
+// describe. The sync removes every such block before anything reaches
+// the app, so a secret can never become a tooltip or player text.
+function stripGmBlocks(text) {
+  return text.replace(/^>\s*\[!gm\][^\n]*(?:\n>[^\n]*)*\n?/gim, '');
+}
+
 function processGlossaryCandidate(filePath, rawContent) {
   const name = path.basename(filePath, '.md')
     .replace(/^\d+[_ ]/, '')                                       // Obsidian sort-order prefixes ("01_", "02 ")
@@ -239,7 +248,12 @@ function processGlossaryCandidate(filePath, rawContent) {
   if (!name) return;
   const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
   if (!id) return;
-  const stripped = stripMarkdown(rawContent);
+  const playerText = stripGmBlocks(rawContent);
+  // The GM's notes mark secrets with "Secretly…"; one left outside a
+  // [!gm] block is almost certainly a leak, so say so on every sync.
+  const leak = playerText.match(/(^|[.!?]\s+|\n)\**secretly\b[^.\n]*/i);
+  if (leak) console.warn(`[GM LEAK?] ${path.relative(OBSIDIAN_PATH, filePath)}: "${leak[0].trim().slice(0, 80)}" — move it into a > [!gm] block`);
+  const stripped = stripMarkdown(playerText);
   const summary = firstSentence(stripped);
   if (!summary) return; // nothing but a title/embed — not useful as a tooltip
   const relDir = path.relative(OBSIDIAN_PATH, path.dirname(filePath));
