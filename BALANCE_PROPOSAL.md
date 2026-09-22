@@ -1,4 +1,4 @@
-# FOES Balance Proposal (rev. 3)
+# FOES Balance Proposal (rev. 4)
 
 Written by the `balance-auditor` agent.
 
@@ -6,7 +6,8 @@ Written by the `balance-auditor` agent.
 |---|---|---|
 | rev. 1 | 2026-09-21 | First proposal |
 | rev. 2 | 2026-09-22 | First round of GM rulings |
-| rev. 3 | 2026-09-22 | **Second round of GM rulings** (win-rate ceiling, enemy tiers, faction character, Repair skill, RMR baseline prices, skill books not shared) |
+| rev. 3 | 2026-09-22 | Second round of GM rulings (win-rate ceiling, enemy tiers, faction character, Repair skill, RMR baseline prices, skill books not shared) |
+| **rev. 4** | 2026-09-22 | **Movement, cover and stances modelled; T1 special abilities; damage types (§7); the 20-entry bestiary; the inflation multiplier as a GM shop setting** |
 
 Nothing in `src/`, the vault or the specs was changed. Everything here is a proposal
 unless it is marked **RULED**.
@@ -24,7 +25,10 @@ numbers.
 
   | Script | What it produces |
   |---|---|
-  | `tier.mjs` | The encounter engine |
+  | `tier.mjs` | The rev. 3 encounter engine |
+  | `tier2.mjs` / `tier3.mjs` | The rev. 4 engine: movement, cover, stances, party makeup, T1 ability hooks |
+  | `tune3.mjs`, `newb*.mjs`, `chk.mjs`, `combo.mjs` | Rev. 4 tuning and verification |
+  | `t1b.mjs`, `t1c.mjs` | T1 ability win rates |
   | `final.mjs` | The tuned stat lines and the per-tier verification |
   | `fix*.mjs` | The last adjustments |
   | `wear2.mjs` | Wear rates |
@@ -38,7 +42,7 @@ numbers.
   multiplied by 10 (for example, Stimpak 75 → 750).
 - **PD price = value ÷ 100. Dinar price = value ÷ 2,000.**
 - All values in this file are the new RMR values unless marked otherwise.
-- Inflation is a GM-moved multiplier on top of the baseline (§4.3).
+- Inflation is a GM-set multiplier on top of the baseline, adjusted from the shop tab (§4.3).
 
 ---
 
@@ -46,16 +50,19 @@ numbers.
 
 | # | Tag | Change | Why it matters |
 |---|---|---|---|
-| 1 | **RULED** + NEW | **Enemy tiers T5 to T1**, each with a target party level and win rate: T5 at level 1 (85%), T4 at level 2 (85%), T3 at level 3 (80%), T2 at level 5 (75%), T1 at level 7 (about 55%, a hard fight). Every bestiary entry is placed and tuned, and 10 new entries are proposed (§6). | Every tuned matchup lands between **75% and 89%** of its target. **None exceeds 89%**, against 97–100% in rev. 2. |
+| 1 | **RULED** + NEW | **Enemy tiers T5 to T1**, each with a target party level and win rate: T5 at level 1 (85%), T4 at level 2 (85%), T3 at level 3 (80%), T2 at level 5 (75%), T1 at level 7 (a hard fight). All 16 current and 20 new or changed bestiary entries are tuned (§6.3, §6.6). | Under the **movement and cover model** (§6.1) every standard encounter lands at 80–86% (T5–T4), 79–81% (T3) or 74–76% (T2). |
+| 1a | **NEW finding** | **Rev. 3 ignored movement, cover and stances.** That made melee creatures about 10–15 points too hard and low-level gunfights 3–10 points too easy. The app has **no cover**, and **NPCs crouch without losing AC**. | §6.1 proposes a cover selector, an NPC stance-AC fix, and applying the aimed-shot penalty after the 95% cap. |
+| 1b | **NEW** | **T1 elites** have a moderate 77 HP, plus a menu of 9 Fallout-boss abilities with simulated win rates (§6.5) | The GM picks. Packages for about 55% are suggested. |
+| 1c | **NEW** | **Damage types (§7).** 14 armors have no non-normal DT/DR, so energy damage ignores them. No monster attack has a type. Proposed: add electrical and EMP, per-family armor fallbacks, faction strengths and weaknesses, and FMJ/JHP/AP ammo. | Makes "Federation lead against Protectorate light" a real choice |
 | 2 | **NEW finding** | **Win rate falls off a cliff with encounter size.** One enemy fewer than standard gives 94–100% wins. One more gives 2–63%. | Stats can only hit a target at one group size. The GM has to hold the **standard group sizes** in §6.2. Adding a single enemy is a tier jump. |
 | 3 | **RULED** | Faction character: the **Caliphate** has the best-trained elites (Pahlawan, 120% to hit). The **Federation** has poor regulars (65%) and elite commandos (110%). The **Protectorate** has the best gear (AC 26 and 31, pristine armor) but poor training (65–70% to hit), and makes up for it with numbers and toughness. | Protectorate troops no longer wear worn armor. Only raiders do. |
 | 4 | **NEW** | Durability shape: `condition = { inv: { itemId: [marks…] }, worn: { slot: marks } }`. `inventory` stays `{itemId: qty}`. | Unchanged from rev. 2 (§2.1). |
 | 5 | **RULED** | Linear wear from the first mark: weapon damage ×(1 − 0.05 × marks), −1 to hit per mark, armor potency ×(1 − 0.05 × marks), and 10 marks = Broken. | Unchanged from rev. 2 (§2.2). |
 | 6 | **RULED** | **The Repair skill (3 × INT, the Fallout 2 formula)** governs repair. The floor is `6 − floor(Repair / 20)`. There is a chance not to use up components: 10% at Repair 60, 20% at 80, **30% at 100 (the cap)**. | The arbitrage guard still holds after the ×10 price change (§2.5). |
-| 7 | **RULED** | 1 PD = 100 RMR and 1 Dinar = 2,000 RMR. Inflation is a GM-moved **market multiplier** on RMR prices, suggested at +5% a week. PD and Dinar prices don't move. | §4 |
+| 7 | **RULED** | 1 PD = 100 RMR and 1 Dinar = 2,000 RMR. Inflation is a **GM-set market multiplier** on RMR prices, adjusted in the shop tab. PD and Dinar prices don't move. | §4 |
 | 8 | **NEW** | Five item tiers (T5 Homemade to T1 Pre-War) with bands per tier, and all 119 weapons and armor pieces placed (Appendix A, now in RMR). | §3 |
-| 9 | **CHANGE** | Junk values = the value of their scrap yield, which removes the money printer. The barter limits stay at buy ≥ 1.05 and sell ≤ 0.65. | §5, §8 |
-| 10 | **RULED** | Skill books: each character reads their **own copy** (+5 skill points, 2 hours on the shared clock per book). Nails: 10 RMR each. The Nail Driver is 700 RMR. | §7.2, §3.3 |
+| 9 | **CHANGE** | Junk values = the value of their scrap yield, which removes the money printer. The barter limits stay at buy ≥ 1.05 and sell ≤ 0.65. | §5, §9 |
+| 10 | **RULED** | Skill books: each character reads their **own copy** (+5 skill points, 2 hours on the shared clock per book). Nails: 10 RMR each. The Nail Driver is 700 RMR. | §8.2, §3.3 |
 
 These bugs from earlier revisions are still open: burst never triggers (`burst_capable`
 vs `burst_shots`), head armor is ignored, Gergasi DR is unused, armor `modifiers` and
@@ -363,23 +370,31 @@ The Bursa's spread is ±10%, or ±15% in a shock week.
 | Caliphate (Round City) | 90 / 110 | House of Syed buyback 20 PD. Cults and scholars pay a premium (trade hook). | ×1.0 | RMR is the daily money. |
 | KLB | 85 / 120 | 1,600 / 2,400 | ×1.0 | Old unstamped Ringgit taken at par by ghoul vendors. |
 
-### 4.3 Inflation as a GM-moved market multiplier
+### 4.3 Inflation: a GM-set market multiplier (shop tab)
 
-**The rule.** RMR price = `value × market multiplier × regional level`. The multiplier
-starts at **1.0**. PD and Dinar prices (value ÷ 100 and value ÷ 2,000) **never move**,
-so the RMR cost of 1 PD is 100 × the multiplier. The GM moves the multiplier. A
-suggested weekly roll:
+**The rule.** RMR price = `value × market multiplier × regional level`.
+- The **market multiplier is a number the GM sets in the shop tab.** It starts at
+  **1.00**, and the GM raises it when the story says so.
+- PD and Dinar prices (value ÷ 100 and value ÷ 2,000) **never move**, so the shop
+  shows 1 PD = 100 × the multiplier in RMR.
+- The app should store it as one field (for example `economy.rmr_multiplier`), shown
+  to the GM in the shop tab with + and − 0.05 steps and a free-entry box. Players see
+  the prices, not the number, unless the GM chooses to post a Bursa sheet.
 
-| 1d10 | Multiplier change | What players see |
+**Suggested pacing (a GM aid only, not an automatic roll).** Early hyperinflation is
+about +5% a week, or +20–25% a month. The classic threshold for hyperinflation is 50%
+a month. If the GM wants a random nudge, this optional weekly roll gives that average:
+
+| 1d10 (optional) | Change | What players see |
 |---|---|---|
 | 1–4 | none | "Prices holding." |
 | 5–8 | +0.05 | "Water's up two RMR a bottle again." |
 | 9 | +0.10 | Vendors re-mark their stock. |
-| 10 | **+0.20, a shock week** | The spread widens to ±15%. Vendors sell T2+ goods and meds only for hard currency or barter. |
+| 10 | +0.20, a shock week | The spread widens to ±15%. T2+ goods and meds sell only for hard currency or barter. |
 
-The expected drift is about +5% a week, or +20–25% a month. That is the onset of
-hyperinflation (the classic threshold is 50% a month). A doubled-step "full
-hyperinflation" row is available for story beats.
+**Story beats that justify a GM bump:** a counterfeit ring exposed (+0.10), a
+Federation crisis (+0.20), a bunker failure (+0.30), or a Protectorate trade embargo
+(PD premium +0.10).
 
 | Vendor behaviour | Rule |
 |---|---|
@@ -394,7 +409,7 @@ hyperinflation" row is available for story beats.
 |---|---|---|
 | `rmr_unstamped`, "Old Ringgit" | 0.5 RMR (Federation), 0.4 (Bursa), 1.0 (KLB and ghoul markets) | Vault: only validated notes carry full value |
 | `rmr_suspect`, "Ringgit (unverified)" | 0 if caught, 0.3 at the Bursa | The vendor makes an Instinct or PER check. If caught, the note is refused and reputation with the town drops by 5. |
-| An active counterfeit ring | — | Regional price level +0.1, vendors inspect notes (−10 Speech), and the next weekly roll counts as at least a 9 |
+| An active counterfeit ring | — | Regional price level +0.1, vendors inspect notes (−10 Speech), and the GM should bump the multiplier (+0.10) |
 
 ---
 
@@ -428,138 +443,380 @@ PD** with the hard-currency discount). They sell a 10mm Pistol at 5 marks for 1,
 
 ---
 
-## 6. Combat: enemy tiers (**RULED** targets)
+## 6. Combat: enemy tiers (**RULED** targets), with movement and cover modelled
 
-### 6.1 Method and assumptions
+### 6.1 What the app actually does, and what the simulation now models
 
-- **Party:** four 40-point humans. Two gunners (tagged Small Guns 41) and two
-  melee/pistol characters (35, MD 3). Main skill +20 per level. HP follows the Phase 0
-  formula.
-- **Gear by level:** Ramshackle armor at levels 1–2, Leather at 3–4, Mercenary at 5–6,
-  Malayan Infantry at 7. Weapons: 10mm, Hunting Rifle and Machete (level 1–2);
-  Assault Rifle, Combat Shotgun and Sledgehammer (3–4); Battle Rifle, Riot Shotgun and
-  Super Sledge (5–6); Sniper and Battle Rifle (7).
-- **Assumed away:** PC gear is pristine, and nobody uses stimpaks, cover, stances or
-  aimed shots.
-- **Win** means every enemy goes down before every PC does, within 60 rounds. Enemy
-  HP is varied ±30% (the bestiary rule). 4,000 fights per line.
-- **The simulation is harsher than a real table.** Real players have tactics and
-  stimpaks, so the table will run a little easier than these numbers.
-- **Humanoid NPCs** are built like PCs. HP = `15 + ST + 2×EN + (NPC level − 1) × (3 +
-  EN/2)`, from a generic 40-point SPECIAL (Grunt 6/6/6/5/5/6/6, Soldier 6/7/6/4/5/6/6,
-  Elite AG 8 LK 7). AC = AG + their armor. DT/DR = their armor. **Training is their
-  hit %**, which is the faction's character.
+| Mechanic | In the app today (`combat.js`, `resolveAttack`) | Manual | Modelled in rev. 4 |
+|---|---|---|---|
+| **Range** | `stats.range` only decides melee (≤ 1) or ranged. There is no distance and no range penalty. | Range accuracy modifiers are listed among the systems the manual removed (§ intro). Distances are loose: small radius 5–10 m, medium 10–15 m, large 15–20 m. | Not needed: there is no rule to model. |
+| **Movement** | Not tracked. The action economy is free-form. | Each turn is Movement + Action + Small action. A move covers a small radius. | **Yes.** A melee combatant facing a ranged line loses **1 turn closing the distance** (2 turns in the ½-cover scenario). |
+| **Stances** | Built: crouch gives +10 hit and caps AC from AGI at 3; prone gives +25 hit, caps AC from AGI at 1 and blocks melee. **The AC cap only applies to PCs.** A monster's AC is flat. | The same table (Standing, Crouching, Prone, Knocked Down) | **Yes.** Ranged combatants on both sides crouch. The AC cap is applied to PC-built NPCs, which is a proposed fix (below). |
+| **Cover** | **Not implemented.** There is no cover field. | ¼ cover −25, ½ cover −50, ¾ cover −75, full cover −100, as a hit penalty on the attacker | **Yes.** It applies to ranged attacks only. The default is ¼ cover on both sides; a ½-cover scenario is also run. |
+| **Aimed shots** | Built (`BODY_PARTS`): Head −20 hit for 1.5× damage, and others | — | Not simulated. The bias is discussed below. |
+
+**Proposed fixes (NEW).**
+1. Add a **cover selector** to the action panel, the same way the body-part selector works. It applies the manual's −25 / −50 / −75 / −100 to *ranged* attacks against that target.
+2. Give PC-built NPCs an `agi` field, so that crouching and going prone cap their AC the same way they cap a PC's. **Today an NPC crouches for free**: +10 to hit and no AC loss. That alone makes low-level ranged fights 6–8 points harder for the party than they should be.
+3. **Apply the aimed-shot penalty *after* capping hit chance at 95.** At level 5 and above a PC's hit chance is far past the cap, so a −20 head shot costs nothing and adds 50% damage for free.
+
+**The default scenario from now on:** melee combatants lose 1 approach turn, ranged
+combatants crouch, ranged exchanges happen in ¼ cover on both sides, and NPC stance
+AC is fixed.
+
+**Which way each omission biased rev. 3.** These are the old rev. 3 stat lines, re-run
+with movement and cover added.
+
+| Omission in rev. 3 | Effect on the party's win rate | Why |
+|---|---|---|
+| The approach turn for melee enemies | **+5 to +10** against melee creatures | Two or three free volleys before contact |
+| Crouching and firing | **+5** against melee creatures (**+10 to +15** together with the approach turn) | +10 to hit, and the lost AC doesn't matter against enemies that aren't shooting |
+| ¼ cover in gunfights, with the app as-is | **−8 to −18** against T3–T4 shooters | Both sides lose 25 hit, but NPCs crouch without losing AC |
+| ¼ cover with the NPC stance fix | **−3 to −10** | |
+| ½ cover | Depends on who shoots better. Level-2 party vs raiders: **−35**. Level-5 party vs Protectorate: **+20** | A −50 penalty zeroes out the weaker shooter. The Protectorate are poor shots, so heavy cover *helps* the party against them. |
+| Aimed shots (not modelled) | Estimated **+5 to +10 at level 5 and up**, about 0 at levels 1–3 | Free head shots above the 95% cap (fix 3 removes this). At low level a −20 penalty costs more than the 1.5× damage gains. |
+| Party composition | An **all-ranged party is 6 to 20 points worse** against T3–T2 humanoids and big creatures. A melee-heavy party is about the same as the default. | A ranged party fires into cover. A melee party has no cover penalty once it is in contact. |
+
+**Net effect:** rev. 3 made melee creatures **too hard**, by about 10–15 points. It
+also made humanoid gunfights at levels 2–3 slightly **too easy**, by about 3–10 points
+with the fix and 8–18 as-is. Every line below is re-tuned under the default scenario.
 
 ### 6.2 Tiers, target level and standard group size
 
-| Tier | Target party level | Target win rate | Standard group vs 4 PCs | Contents |
+| Tier | Party level | Target win rate | Standard group vs 4 PCs |
+|---|---|---|---|
+| **T5** Pests | 1 | 85% | 6 rats, ants, dogs or small ayam. 5 soldier ants. 4 of anything else. |
+| **T4** Low humanoids and larger creatures | 2 | 85% | 4 (5 feral ghouls or Rakan Watch). Boss: Rat King + 3 rats. |
+| **T3** Regulars, gangs, Gergasi, big beasts | 3–4 | 80% | 4 humanoids. 2 tenggiling or Construction Protectrons. 1 rhino. Ayam Besar + 2 small ayam. |
+| **T2** Protectorate regulars (T2.5), Federation heavies | 5–6 | 75% | 4 Protectorate, 3 heavies, or 1 turret + 2 Protectorate |
+| **T1** Elites | 7+ | a hard fight (about 50–60%) | 2, with **special abilities** (§6.5) |
+
+**Encounter size is still the strongest lever.** One enemy more or fewer moves the win
+rate by 15–50 points (the −1 / +1 columns). Treat every extra enemy as roughly a tier
+jump.
+
+**The ≤ 85% ceiling (RULED).** Under the default scenario every standard encounter
+lands at **80–86%** (T5–T4), 79–81% (T3) and 74–76% (T2). Readings of 86% are within
+the simulation's noise (±1.5 points). Terrain can still push individual fights above
+85%: ½ cover against melee creatures gives 90–95%, and open ground against T4
+shooters gives 90–92%. No stat line prevents that. **GM rule of thumb:** when the
+terrain clearly favours the party, add one enemy from the tier below, or take away the
+cover.
+
+### 6.3 Stat lines (tuned under the default scenario)
+
+Changes since rev. 3 are in **bold**. Humanoids keep PC-built HP. Their hit % is their
+training (Protectorate poor, Federation commandos and Pahlawan elite).
+
+| Tier | Entry | HP | AC | DT/DR | Hit | Attack | Group |
+|---|---|---|---|---|---|---|---|
+| T5 | giant_rat | **23** | 5 | 0/0 | 75 | Bite 1d6+4 | 6 |
+| T5 | giant_ant | **22** | 2 | 0/0 | 60 | Mandibles 2d6+3 | 6 |
+| T5 | soldier_ant | **33** | 5 | 1/10 | 70 | 1d8+2 | 5 |
+| T5 | lesser_panguling | **31** | 12 | 2/0 | 80 | Roll 2d6 | 4 |
+| T5 | liberator_robot_mk1 | **36** | 14 | 2/20 | 70 | Claw 1d4+3 | 4 |
+| T4 | raider (L2 Grunt) | 39 | 13 (+ `agi: 6`) | 2/23 | **61** | 1d8+3 | 4 |
+| T4 | labourer | **66** | 6 | 0/5 | 60 | Sledgehammer 2d6+4 | 4 |
+| T4 | monyet_sakai | **52** | 15 | 1/25 | 75 | 1d6+4 | 4 |
+| T4 | panguling | **37** | 16 | 4/20 | 85 | Roll 2d4+1 | 4 |
+| T4 | ibu_sakai | **48** | 16 | 2/30 | 70 | 1d4+4 | 4 |
+| T4 | liberator_robot_follower | **36** | 15 | 3/25 | 78 | 1d4+5 | 4 |
+| T4 boss | rat_king | **47** | 14 | 4/25 | 90 | 2d6+2, 2 attacks a turn | + 3 rats |
+| T3 | ucl_regular | 51 | 20 | 2/23 | **75** | 2d6+4 | 4 |
+| T3 | supermutant_labourer | **62** | 5 | 1/35 | 78 | 2d6+7 | 4 |
+| T2 | protectorate_infantry | 87 | 26 (pristine) | 4/35 | 65 | Laser rifle 2d10+6 | 4 |
+| T2 | automated_turret | **126** | 28 | 5/40 | 75 | 2d8+15 | + 2 Protectorate |
+
+The new entries are in §6.6.
+
+### 6.4 Results by tier (default scenario, plus sensitivity)
+
+Columns: **Default** win % / Open ground (movement only, no cover, no crouch) / ½
+cover (plus a 2-turn approach) / All-ranged party / Melee-heavy party (2 guns, 2
+melee) / One enemy fewer / One enemy more. 3,000–4,000 fights per cell.
+
+| Tier | Encounter | Default | Open | ½ cover | Ranged party | Melee party | −1 | +1 |
+|---|---|---|---|---|---|---|---|---|
+| T5 | 6 giant rats | **86** | 67 | 94 | 88 | 81 | 98 | 53 |
+| T5 | 6 giant ants | **86** | 71 | 94 | 87 | 85 | 97 | 56 |
+| T5 | 5 soldier ants | **86** | 68 | 92 | 87 | 83 | 99 | 47 |
+| T5 | 4 lesser pangulings | **85** | 65 | 91 | 88 | 83 | 99 | 42 |
+| T5 | 4 Liberator Mk1 | **85** | 65 | 90 | 87 | 82 | 99 | 44 |
+| T5 | 6 vicious dogs (NEW) | **86** | 67 | 92 | 88 | 84 | — | — |
+| T5 | 6 small ayam (NEW) | **85** | 68 | 93 | 89 | 83 | — | — |
+| T4 | 4 raiders | **86** | 92 | 50 | 86 | 89 | 99 | 44 |
+| T4 | 4 raider ghouls (NEW) | **86** | 90 | 52 | 86 | 87 | — | — |
+| T4 | 5 Rakan Watch members (NEW) | **84** | 90 | 53 | 84 | 86 | — | — |
+| T4 | 4 Raider Protectrons (NEW) | **85** | 92 | 50 | 86 | 85 | — | — |
+| T4 | 4 labourers | **85** | 77 | 92 | 85 | 85 | 100 | 33 |
+| T4 | 4 monyet sakai | **85** | 69 | 90 | 84 | 81 | 100 | 27 |
+| T4 | 4 pangulings | **85** | 74 | 90 | 88 | 85 | 100 | 36 |
+| T4 | 4 ibu sakai | **85** | 73 | 91 | 86 | 86 | 100 | 33 |
+| T4 | 4 Liberator Followers | **86** | 72 | 92 | 87 | 86 | 100 | 34 |
+| T4 | 5 feral ghouls (NEW) | **83** | 71 | 93 | 85 | 83 | — | — |
+| T4 | 4 giant centipedes (NEW) | **86** | 73 | 91 | 86 | 86 | — | — |
+| T4 | 4 giant vicious dogs (NEW) | **83** | 71 | 93 | 86 | 83 | — | — |
+| T4 | Rat King + 3 rats | **85** | 75 | — | — | — | — | — |
+| T3 | 4 UCL regulars | **80** | 85 | 74 | 74 | 80 | 99 | 29 |
+| T3 | 4 Federation regulars (NEW) | **80** | 81 | 86 | 75 | 78 | 99 | 30 |
+| T3 | 4 Rakan enforcers (NEW) | **81** | 85 | 71 | 74 | 82 | 99 | 31 |
+| T3 | 4 raider veterans (NEW) | **80** | 83 | 83 | 75 | 80 | 99 | 34 |
+| T3 | 4 mercenaries (NEW) | **81** | 85 | 76 | 72 | 83 | 99 | 31 |
+| T3 | 4 Gergasi labourers | **79** | 72 | 93 | 66 | 82 | 100 | 19 |
+| T3 | 2 Construction Protectrons (NEW) | **81** | 82 | 86 | 63 | 79 | — | — |
+| T3 | 2 tenggiling besar (NEW) | **80** | 76 | 86 | 60 | 84 | — | — |
+| T3 | 1 Sumatran rhino (NEW) | **81** | 77 | 88 | 65 | 83 | — | — |
+| T3 | Ayam Besar + 2 small ayam (NEW) | **80** | 76 | — | — | — | — | — |
+| T2 | 4 Protectorate infantry | **74** | 70 | 95 | 69 | 72 | 99 | 20 |
+| T2 | 3 Federation heavies (NEW) | **76** | 74 | 85 | 56 | 76 | 100 | 12 |
+| T2 | Turret + 2 Protectorate | **76** | 73 | — | — | — | — | — |
+
+**Sensitivity by tier**
+
+| Tier | Default | Open ground | ½ cover | Ranged party | Melee party |
+|---|---|---|---|---|---|
+| T5 | 85–86 | 65–71 | 90–94 | 87–89 | 81–85 |
+| T4 creatures | 83–86 | 69–77 | 90–93 | 84–88 | 81–86 |
+| T4 shooters | 84–86 | 90–92 | 50–53 | 84–86 | 85–89 |
+| T3 humanoids | 80–81 | 81–85 | 71–86 | 72–75 | 78–83 |
+| T3 beasts and robots | 79–81 | 72–82 | 86–93 | 60–66 | 79–84 |
+| T2 | 74–76 | 70–74 | 85–95 | 56–69 | 72–76 |
+
+### 6.5 T1 elites: moderate HP plus special abilities (the GM picks)
+
+**Keep T1 HP moderate: 77**, which is the PC formula for a level-7 elite
+(35 + 6 × 7). The rev. 3 HP sponges (126–141) are withdrawn.
+
+Base stat lines at HP 77:
+
+| Elite | AC | DT/DR | Hit | Attack |
 |---|---|---|---|---|
-| **T5** Pests | 1 | 85% | 6 rats or ants, 5 soldier ants, 4 of anything else | giant_rat, giant_ant, soldier_ant, lesser_panguling, liberator_robot_mk1 |
-| **T4** Low humanoids and larger creatures | 2 | 85% | 4 (5 feral ghouls). Boss: 1 Rat King + 3 rats | raider, labourer, feral_ghoul (NEW), monyet_sakai, panguling, ibu_sakai, liberator_robot_follower, rat_king |
-| **T3** Regulars, gangs, Gergasi | 3–4 | 80% | 4 | ucl_regular, supermutant_labourer, federation_regular (NEW), rakan_watch_enforcer (NEW), raider_veteran (NEW), mercenary (NEW) |
-| **T2** Protectorate regulars (T2.5), Federation heavies | 5–6 | 75% | 4 Protectorate (they fight in numbers), 3 heavies. Turret: 1 turret + 2 Protectorate. | protectorate_infantry, federation_heavy (NEW), automated_turret |
-| **T1** Elites | 7+ | about 55% (a hard fight) | 2 | federation_commando (NEW), protectorate_power_armor (NEW), pahlawan (NEW) |
+| Federation Commando | 28 (AG 8) | 7/45 | 110 | 3d10+8 |
+| Protectorate Power Armor | 31 | 10/50 | 70 | Plasma 4d8+10 |
+| Pahlawan | 28 (AG 8) | 6/40 | 120 | 3d10+10 |
 
-**Encounter-size warning (NEW finding).** The "−1 / +1" columns in §6.4 show that
-**one enemy more or fewer moves the win rate far more than any stat change** (for
-example raider ×3 = 99%, ×4 = 84%, ×5 = 33%). This is the Lanchester effect: extra
-attackers multiply damage and also soak the party's attacks. Table rule: **every enemy
-above the standard group is roughly a tier jump.** Either hold the group size, or swap
-in a weaker type to add bodies.
+With **no ability**, a level-7 party wins **98–99%** of fights against two of them.
+Every figure below is the win rate for 2 elites against a level-7 party, in the
+default scenario, over 3,000 fights. It reads **Commando / Power Armor / Pahlawan**.
 
-### 6.3 Proposed stat lines
+| # | Ability (Fallout source) | Rule in this app's terms | Suits | Win % |
+|---|---|---|---|---|
+| 1 | **Relentless** (Frank Horrigan; the manual's AG 8/10 bonus actions) | Takes a second full attack each turn. Optional: the second attack is at −30 hit. | Pahlawan, Commando | 34 / 56 / 34. With the −30 second attack: 63 / 92 / 56 |
+| 2 | **Plated hide** (Deathclaw Alpha / Legendary armor) | +4 DT against everything except **Head or Eyes aimed shots**, which ignore the bonus. That teaches players to aim. | Protectorate Power Armor | DT +3: 84 / 83 / 86. DT +4: 65 / 66 / 72. DT +5: 48 / 50 / 51. Aiming players pull these up by an estimated 10–15. |
+| 3 | **Mutate** (FO4 legendary enemies) | Once, on falling below half HP: heal 40 and damage +25% for the rest of the fight. The log line "…mutates!" warns the party. | Pahlawan (zeal), Commando (combat stims) | Heal 40: 66 / 80 / 63. Heal to full: 24 / 50 / 21 |
+| 4 | **Energy shield** (Sierra Madre holograms; Mothership Zeta) | Absorbs the first N damage it takes each round. EMP (§7) or an Eyes shot drops it for a round. | Protectorate Power Armor | N = 5: 80 / 71 / 86. N = 8: 47 / 37 / 59. N = 15: 8 / 10 / 10 (too strong) |
+| 5 | **Self-destruct** (Mr. Gutsy / Sentry Bot) | On death, explodes: 4d10+20 explosive to 2 PCs (an AG check halves it). Crippling both arms before death disarms it, as in FO4 Protectrons. | Protectorate Power Armor, robots, turrets | 3d10+10 alone: 95 / 95 / 96. 4d10+20 with DT +3: 43 / 53 / 46 |
+| 6 | **Stun strike** (Zeta stun baton; the Master's psychic assault) | On a hit, 50% chance the target loses their next turn (EN check to resist). | Commando (shock baton), Protectorate (tech) | 50% alone: 92 / 97 / 93. With DT +3: 59 / 74 / 60 |
+| 7 | **Last stand** (Legate Lanius / Legion zeal) | The first lethal hit leaves it at 1 HP. | Pahlawan | 98 / 98 / 98 alone, which is flavour only. It's useful as a second ability (with a 15 shield: 6–9%). |
+| 8 | **Commander** (Lanius; Enclave officers) | Allies within a medium radius get +10 hit and ignore their first crit-fail. | Federation Commando (as a squad leader) | Not simulated. Pair it with T2 escorts. Estimated −5 to −10 per escort. |
+| 9 | **Boss immunity** (every Fallout boss) | Already exists: `is_boss` turns One Shot One Kill into 20 true damage. | All T1 | About 0 alone (instant kills are 0.5% of attacks). Use it on every T1. |
 
-Changes from the current bestiary are in **bold**. An NPC level applies only to
-humanoids.
+**Suggested packages at about 55% win:**
 
-| Tier | Entry | NPC level | HP | AC | DT/DR | Hit | Attack | Character |
-|---|---|---|---|---|---|---|---|---|
-| T5 | giant_rat | — | **14** | 5 | 0/0 | 75 | Bite **1d6+4** | Dog-sized. Only dangerous in a pack. |
-| T5 | giant_ant | — | 15 | 2 | 0/0 | 60 | Mandibles **2d6+3** | |
-| T5 | soldier_ant | — | 25 | 5 | 1/10 | 70 | Mandibles **1d8+2** | |
-| T5 | lesser_panguling | — | 20 | **12** | **2/0** | 80 | Roll 2d6 | It was AC 15 and DT 4, which made it nearly immune to level-1 guns. |
-| T5 | liberator_robot_mk1 | — | 25 | **14** | 2/20 | 70 | Claw **1d4+3** | |
-| T4 | raider | L2 Grunt | **39** | **13** (Ramshackle, 2 marks) | **2/23** | **70** | **1d8+3** (9mm) | Worn gear, as the ruling allows |
-| T4 | labourer | L4 Grunt | **51** | **6** | **0/5** | **60** | **Sledgehammer 2d6+4** | Only fights when forced, but hits hard when it does |
-| T4 | feral_ghoul **(NEW)** | — | 30 | 8 | 0/0 | 65 | Claw 1d6+8 | Group of 5 |
-| T4 | monyet_sakai | — | 40 | 15 | 1/25 | 75 | Swipe **1d6+4** | |
-| T4 | panguling | — | 30 | **16** | **4/20** | **85** | Roll **2d4+1** | Was 2d8. That killed a level-2 party in 99% of fights. |
-| T4 | ibu_sakai | — | **40** | **16** | **2/30** | 70 | Claw **1d4+4** | |
-| T4 | liberator_robot_follower | — | 30 | 15 | 3/25 | **78** | Claw **1d4+5** | |
-| T4 boss | rat_king | — | **36** | 14 | 4/25 | 90 | Claw **2d6+2**, 2 attacks a turn | With 3 giant rats |
-| T3 | ucl_regular | L4 Soldier | **51** | **20** (UCL Soldier Armor, 2 marks) | **2/23** | **80** | Assault Rifle **2d6+4** | Basic training, drilled teamwork |
-| T3 | federation_regular **(NEW)** | L5 Soldier | 57 | 19 (Malayan Infantry, 3 marks) | 3/30 | **65** | Hunting Rifle 2d8+2 | **Poor regulars** (RULED) |
-| T3 | rakan_watch_enforcer **(NEW)** | L4 Grunt | 51 | 26 (Combat Leather Jacket) | 2/30 | 75 | 10mm-class 2d6+3 | Gang. Rank-and-file in the 1414 Windbreaker use raider stats. |
-| T3 | raider_veteran **(NEW)** | L3 Grunt | 45 | 21 (Leather) | 2/25 | 75 | Combat Shotgun 2d8+4 | "Well-equipped raiders" |
-| T3 | mercenary **(NEW)** | L3 Soldier | 45 | 18 (Mercenary) | 3/25 | 85 | Assault Rifle 2d6+4 | |
-| T3 | supermutant_labourer | L2 Gergasi (ST 9, EN 8) | **50** | 5 | **1/35** (+10% Gergasi DR) | **78** | Sledgehammer **2d6+7** | |
-| T2 | protectorate_infantry | L10 Soldier | **87** | **26** (Protectorate Infantry Armor, **pristine**) | **4/35** | **65** | **Laser rifle 2d10+6**. Mortar 2d10+17 (1-turn setup). Grenade 2d8+9. | **Best gear, poor training** (RULED). Tough and numerous, but they miss. |
-| T2 | federation_heavy **(NEW)** | L9 Soldier | 81 | 26 (Frontliner) | 7/45 | 80 | LMG 2d8+6 (burst) | |
-| T2 | automated_turret | — | **130** | 28 | 5/40 | 75 | Heavy Fire 2d8+15 | Support piece. Pair it with a squad. |
-| T1 | federation_commando **(NEW)** | L15 Elite | 133 | 28 | 7/45 | **110** | 3d10+8 | **Solid elite commandos** (RULED) |
-| T1 | protectorate_power_armor **(NEW)** | L19 Soldier | 141 | 31 (full T1 power armor) | 10/50 | **70** | Plasma 4d8+10 | **Top gear, still poor training** |
-| T1 | pahlawan **(NEW)** | L14 Elite | 126 | 28 (Caliphate armor) | 6/40 | **120** | 3d10+10 | **The best-trained soldiers on the Peninsula** (RULED) |
-
-### 6.4 Simulation results by tier (win % / rounds / PCs downed per win; −1 and +1 are one enemy fewer or more)
-
-| Tier | Encounter | vs party level | Target | **Win** | Rounds | Downed | −1 | +1 |
-|---|---|---|---|---|---|---|---|---|
-| T5 | 6 giant rats | 1 | 85 | **87%** | 9.7 | 0.43 | 98% | 63% |
-| T5 | 6 giant ants | 1 | 85 | **82%** | 9.5 | 0.57 | 96% | 55% |
-| T5 | 5 soldier ants | 1 | 85 | **83%** | — | — | 98% | 45% |
-| T5 | 4 lesser pangulings | 1 | 85 | **86%** | 12.5 | 0.44 | 99% | 49% |
-| T5 | 4 Liberator Mk1s | 1 | 85 | **85%** | 19.0 | 0.49 | 99% | 44% |
-| T4 | 4 raiders | 2 | 85 | **84%** | 16.8 | 0.60 | 99% | 33% |
-| T4 | 4 labourers | 2 | 85 | **87%** | 12.7 | 0.61 | 99% | 42% |
-| T4 | 5 feral ghouls | 2 | 85 | **83%** | 10.2 | 0.64 | 98% | 43% |
-| T4 | 4 monyet sakai | 2 | 85 | **86%** | 16.0 | 0.55 | 100% | 35% |
-| T4 | 4 pangulings | 2 | 85 | **83%** | — | — | 99% | 34% |
-| T4 | 4 ibu sakai | 2 | 85 | **83%** | 19.6 | 0.59 | 99% | 35% |
-| T4 | 4 Liberator Followers | 2 | 85 | **80%** | — | — | 99% | 28% |
-| T4 | Rat King + 3 giant rats | 2 | 85 | **85%** | 8.1 | 0.42 | — | — |
-| T3 | 4 UCL regulars | 3 | 80 | **81%** | 12.9 | 0.74 | 100% | 25% |
-| T3 | 4 Federation regulars | 3 | 80 | **80%** | 16.8 | 0.75 | 99% | 25% |
-| T3 | 4 Rakan Watch enforcers | 3 | 80 | **80%** | 15.2 | 0.70 | 100% | 26% |
-| T3 | 4 raider veterans | 3 | 80 | **78%** | 11.9 | 0.77 | 99% | 27% |
-| T3 | 4 mercenaries | 3 | 80 | **77%** | 12.3 | 0.79 | 100% | 21% |
-| T3 | 4 Gergasi labourers | 3 | 80 | **80%** | — | — | 99% | 20% |
-| T2 | 4 Protectorate infantry | 5 | 75 | **75%** | 14.4 | 0.94 | 99% | 17% |
-| T2 | 3 Federation heavies | 5 | 75 | **78%** | 15.0 | 0.85 | 100% | 12% |
-| T2 | 1 turret + 2 Protectorate | 5 | 75 | **77%** | 13.3 | 0.85 | — | — |
-| T1 | 2 Federation commandos | 7 | ~55 | **55%** | 12.2 | 1.14 | 100% | 2% |
-| T1 | 2 Protectorate power armor | 7 | ~55 | **55%** | 17.7 | 1.00 | 100% | 3% |
-| T1 | 2 Pahlawans | 7 | ~55 | **58%** | 10.1 | 1.17 | 100% | 2% |
-
-A dash means that line came from a later re-tune run that only recorded the win rate.
-For comparison, the current bestiary at the same levels and group sizes:
-
-| Encounter | Win today |
-|---|---|
-| 4 rats | 100% |
-| 4 raiders (level 1) | 1% |
-| 4 pangulings (level 1) | 1% |
-| 4 UCL regulars | 93% |
-| 3 Protectorate infantry (level 5) | 100% |
-| Turret alone (level 7) | 100% |
-
-### 6.5 Other combat notes and bugs
-
-| Item | Tag | Note |
+| Elite | Package | Win % |
 |---|---|---|
-| Protectorate mortar | CHANGE | 2d12+60 → 2d10+17, and the one-turn setup is enforced |
-| Homemade Pistol / PVC Pipe Gun | CHANGE | 1d6+2 / 1d4+1 |
-| Level 5 and up | Note | PC main-skill hit reaches the 95% ceiling. From T2 upward, balance comes from HP, DT and enemy hit, not AC. |
-| Bestiary text | Flag | ibu_sakai, monyet_sakai and liberator_robot_follower carry each other's descriptions (copy-paste from the manual; their own notes already say so) |
-| Burst fire | **BUG** | `burst_capable` vs `burst_shots`. None of the 8 weapons can burst. |
-| Head armor | **BUG** | Only `body` is read. The slot stays shared with Glasses (RULED). |
-| Gergasi +10% DR | **BUG** | Never applied. The Gergasi labourer line above already includes it. |
-| Crit chance | Minor BUG | Reads raw base LK |
+| Federation Commando | Relentless (second attack at −30) + boss | ≈ 63 |
+| Protectorate Power Armor | Plated hide +4 + boss, or Shield 8 + self-destruct | ≈ 55–66 |
+| Pahlawan | Relentless + boss | ≈ 34 (hard). With the −30 second attack ≈ 56. |
+
+Levers that **do not work** at level 7 are left out on purpose. Extra AC or cover (+25
+to +40) changes nothing, because PC hit chance is already past the 95% cap. A higher
+crit chance (25%) gives only 93–97%.
+
+### 6.6 The 20 new and changed bestiary entries
+
+The GM's list was merged with this proposal's. Stats are tuned under the default
+scenario at the tier's standard group size (win rates are in §6.4). Rev. 3 counted "10
+proposed entries" but listed 9. Rakan Watch Member is added here as the 10th.
+
+**FO4 conversion rule (for the Protectrons)**, one table step:
+
+| FO4 stat | FOES equivalent |
+|---|---|
+| Health | FOES HP = health ÷ 2.5 |
+| DR | DT = DR ÷ 10, DR% = DR ÷ 2 |
+| ER | Laser and plasma DT/DR, converted the same way |
+| Damage | ÷ 2.5 |
+
+Hit % has no FO4 equivalent, so it is tier-tuned.
+
+- **FO4 Protectron** (fallout.wiki): level 5, 100 health, DR 40, ER 25, laser 22.
+- **Utility / Subway tier:** level 14, 190 health, DR 75, ER 50.
+
+The wiki has no separate Construction Protectron row, so the Utility tier is used for
+it (confirm).
+
+| # | Entry | Source | Tier | HP | AC | DT/DR normal (other types) | Hit | Attack | Group | Notes |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | giant_ant | GM (**exists: adjust**) | T5 | 15 → **22** | 2 | 0/0, fire −25 | 60 | Mandibles 2d6+3 | 6 | Weak to fire (§7) |
+| 2 | vicious_dog | GM | T5 | 26 | 8 | 0/0 | 70 | Bite 1d6+3 | 6 | |
+| 3 | ayam_berkepala_tiga (small) | GM | T5 | 19 | 10 | 0/0 | 65 | **3 pecks** 1d4+1 | 6 | Three heads, three attacks |
+| 4 | ayam_berkepala_tiga (grown) | GM | T3 boss | 129 | 14 | 3/20 | 75 | **3 pecks** 2d8+6 | 1 + 2 small | **Grows** on a GM trigger (for example after 2 rounds, or after eating a downed ally): swap in this stat line at full HP |
+| 5 | giant_centipede | GM | T4 | 58 | 12 | 2/10, fire −25 | 70 | Bite 1d8+3 + poison (EN check, or 1d4 a turn for 2 turns) | 4 | Poison not simulated: expect a few points harder |
+| 6 | giant_vicious_dog | GM | T4 | 47 | 10 | 1/10 | 75 | Bite 2d6+3 | 4 | |
+| 7 | raider_ghoul | GM | T4 | 39 | 13 (`agi: 6`) | 2/23 | 61 | 1d8+3 | 4 | Raider stats. RR 80, PR 30 (ghoul racial) |
+| 8 | raider_protectron | GM (FO4 −10%) | T4 | 36 | 10 | 4/18 (laser 2/11), **electrical −50, EMP** | 56 | Laser 1d6+4 (laser) | 4 | Self-destructs when both arms are crippled (FO4) |
+| 9 | construction_protectron | GM (FO4 Utility tier) | T3 | 76 | 10 | 8/38 (laser 5/25), **electrical −50, EMP** | 74 | Nail and spike driver 2d6+4 | 2 | Drops `ammo_nails` |
+| 10 | tenggiling_besar | GM | T3 | 99 | 18 | 6/30, fire 0/0, plasma 0/0 | 80 | Roll 2d8+4 | 2 | Curl up: +5 AC for a small action. **It is a bigger panguling:** reuse its text or note the relation. |
+| 11 | sumatran_rhino | GM | T3 | 144 | 10 | 5/25 | 75 | Gore 3d8+6, **2 attacks a turn** (charge + gore) | 1 | A charge hit forces an AG check or the target is Knocked Down |
+| 12 | feral_ghoul | rev. 3 | T4 | 41 | 8 | 0/0 | 65 | Claw 1d6+8 | 5 | Rad immune. Fire weak (−15). |
+| 13 | rakan_watch_member | rev. 4 | T4 | 39 | 7 (1414 Windbreaker) | 0/5 | 72 | 9mm 1d8+3 | 5 | The gang's rank and file |
+| 14 | rakan_watch_enforcer | rev. 3 | T3 | 51 | 26 (Combat Leather Jacket) | 2/30 | **70** | 2d6+3 | 4 | |
+| 15 | federation_regular | rev. 3 | T3 | 57 | 19 | 3/30 (laser 1/10: weak to energy) | **63** | Hunting rifle 2d8+2 | 4 | Poor regulars |
+| 16 | raider_veteran | rev. 3 | T3 | 45 | 21 | 2/25 | **69** | Combat shotgun 2d8+4 | 4 | |
+| 17 | mercenary | rev. 3 | T3 | 45 | 18 | 3/25 | **77** | Assault rifle 2d6+4 | 4 | |
+| 18 | federation_heavy | rev. 3 | T2 | 81 | 26 | 7/45 (Frontliner) | 80 | LMG 2d8+6 (burst) | 3 | |
+| 19 | federation_commando | rev. 3 | T1 | **77** | 28 | 7/45 | 110 | 3d10+8 | 2 | Plus abilities from §6.5 |
+| 20 | protectorate_power_armor | rev. 3 | T1 | **77** | 31 | 10/50 (laser/plasma 12/60), **EMP** | 70 | Plasma 4d8+10 (plasma) | 2 | Plus abilities. EMP-vulnerable (§7). |
+| — | pahlawan | rev. 3 | T1 | **77** | 28 | 6/40 | 120 | 3d10+10 | 2 | The 21st row, kept from rev. 3 |
+
+Unchanged since rev. 3: the Protectorate mortar is 2d10+17 with a one-turn setup, and
+the Homemade Pistol and PVC Pipe Gun are 1d6+2 and 1d4+1. These bugs are still open:
+burst never fires, head armor is ignored, Gergasi DR is unused, and crit chance reads
+raw LK.
 
 ---
 
-## 7. Traits, perks and skill books
+## 7. Damage types (NEW)
 
-### 7.1 Traits and perks
+### 7.1 How damage types are used today (audit)
+
+| Area | Finding |
+|---|---|
+| Weapons | 86 total: normal 66, explosive 7, fire 4, **laser 5, plasma 4**. Of those 9 energy weapons, 8 are `TBA`, so today almost everything deals normal damage. |
+| Armor | 33 pieces. **14 have only a normal DT/DR** (for example Rebar Plate Vest, Riot Shield Harness, the Tarp items, Press Plate, the PA helmet). `parseArmorDtdr` skips missing types, so **a laser, fire, plasma or explosive hit ignores those armors completely.** |
+| Bestiary attacks | **0 of 50 attacks carry a `damageType`.** `resolveAttack` treats every monster attack as normal, including the turret's *Flame* and *Laser*, the robots' *Laser Fire*, and Protectorate grenades and mortars. |
+| Bestiary resistances | `resistances.energy` (robots −50 or −100, Protectorate +30) is **never read** by combat |
+| Missing types | The manual has **EMP** ("not damage but a stunning effect… negative EMP means always stunned") and **electric** weapons (Displacer Glove, Pulse Pistol/Rifle). Neither exists in the app. |
+| Ammo | The manual's per-ammo AC and DR modifiers, and its FMJ/JHP/AP variants, are **not implemented**. Ammo items have no modifier fields. |
+| Race | The Human +20 Energy Resistance (manual) is still unused |
+
+### 7.2 Fallout 2 reference
+
+- **Seven damage types:** Normal, Laser, Fire, Plasma, Electrical, EMP and Explosion.
+  Armor lists DT/DR for Normal, Laser, Fire, Plasma and Explode. Critters also carry
+  Electrical and EMP values.
+- **EMP** only hurts robots and power armor. Everyone else takes no damage.
+- **Ammo** changes the target's AC, the target's DR and the damage multiplier. Values
+  below are from the fallout.wiki ammunition table.
+
+| FO2 ammo | AC mod | DR mod | Damage |
+|---|---|---|---|
+| 10mm JHP | 0 | +25% | ×2 |
+| 10mm AP | 0 | −25% | ×½ |
+| 5mm JHP | 0 | +35% | ×2 |
+| 5mm AP | 0 | −35% | ×½ |
+| 14mm AP | 0 | −50% | ×½ |
+| .223 FMJ | −20% | −20% | ×1 |
+| 2mm EC | −30% | −20% | ×3/2 |
+| Rocket AP | −15% | −50% | ×1 |
+
+**The lesson from FO2:** because JHP doubles damage while AP halves it, JHP
+out-damages AP against almost everything. The FOES version below scales the
+multipliers so that each round type has a clear job.
+
+### 7.3 Types FOES should use
+
+| Type | Status | Used by | Rule |
+|---|---|---|---|
+| normal | keep | Ballistic weapons, melee, most creatures | — |
+| laser | keep | Laser weapons. The turret, robot and Protectorate lasers are **re-tagged** as laser. | — |
+| plasma | keep | Plasma weapons, Protectorate power armor | — |
+| fire | keep | Flamer, Molotov, Incendiary, Shishkebab, turret Flame | A fire hit of 10+ on cloth or leather armor adds **+1 condition mark** |
+| explosive | keep | Grenades, launchers, mines, mortar | Marks equal to the first digit of the damage (existing) |
+| **electrical** | **NEW** | Displacer Glove, Pulse weapons, Tesla Cannon, shock batons | Its own DT/DR column. **Robots and power armor have negative DR** against it. |
+| **EMP** | **NEW** | EMP grenade, Pulse weapons (manual) | **Does no damage to organics.** Robots and power armor take the full hit and must pass an EN check or be **stunned 1 turn** (manual). Also drops an energy shield (§6.5). |
+| true | keep | Bear Trap, crit effects | Ignores DT and DR |
+
+**Data changes:**
+- Add `damageType` to every bestiary attack.
+- Add `dt_dr_electrical` to armor. EMP needs no column: it only works if the target
+  has `emp_vulnerable: true`.
+- Retire `resistances.energy` and fold it into the per-type DT/DR.
+
+**Fallback for armor missing a type** (fixes the 14 normal-only armors): if
+`dt_dr_<type>` is missing, derive it from the normal value using the family rule
+below. Never fall back to 0/0.
+
+| Armor family (examples) | Laser | Fire | Plasma | Explosive | Electrical |
+|---|---|---|---|---|---|
+| Cloth / soft (tarp, coveralls, windbreaker) | 0 / DR−5 | 0 / 0 | 0 / DR÷2 | 0 / DR−5 | 0 / DR+5 |
+| Leather / hide (leather, jackets) | 0 / DR−5 | 0 / DR−5 | 0 / DR÷2 | DT−2 / DR−5 | 0 / DR |
+| Scrap metal (ramshackle, rebar, riot harness, press plate) | = normal (reflective) | DT−1 / DR÷2 | 0 / DR÷2 | = normal | **0 / −25 (conducts)** |
+| Military kevlar (Federation, UCL) | 1 / DR−15 | 1 / DR−10 | 1 / DR−15 | 1 / DR−5 | 0 / DR−10 |
+| Protectorate energy-dissipating | **DT+2 / DR+15** | 1 / DR−15 | **DT+1 / DR+15** | 1 / DR−15 | = normal |
+| Power armor (T1) | +2 / +15 | +0 / +15 | +1 / +15 | = normal | **0 / −25, plus EMP stun** |
+
+**Typical DT/DR by armor tier and type.** T5–T1 come from the manual's armor table.
+The electrical column is new.
+
+| Tier (example) | Normal | Laser | Fire | Plasma | Explosive | Electrical |
+|---|---|---|---|---|---|---|
+| T5 (Clothes) | 0/5 | 0/0 | 0/0 | 0/0 | 0/0 | 0/10 |
+| T4 (Ramshackle) | 2/25 | 0/25 | 0/15 | 0/25 | 1/20 | 0/−25 |
+| T3 (Leather) | 2/25 | 0/20 | 0/20 | 0/10 | 0/20 | 0/25 |
+| T2 (Protectorate Infantry) | 4/35 | 1/30 → **6/50** proposed | 1/20 | 1/30 → **5/50** | 1/20 | 4/35 |
+| T1 (Protectorate Heavy Trooper) | 8/45 | 10/60 | 7/60 | 9/60 | 8/40 | 8/45 |
+
+This gives each faction a signature. The **Protectorate resists energy but is only
+average against ballistics**, and the **Federation is the opposite** (Malayan Infantry
+laser 1/10). "Federation lead against Protectorate light" is a real tactical choice.
+
+### 7.4 Enemy strengths and weaknesses
+
+| Enemy group | Strong against | Weak against |
+|---|---|---|
+| Robots (Liberators, Protectrons, turret) | laser (existing 60 DR on the Follower), fire, poison, rad | **electrical (DR −50), EMP (stun)** |
+| Insects (ants, centipede) | poison | **fire (DR −25)** |
+| Pangulings and tenggiling | normal (high DT) | fire, plasma (0/0) |
+| Feral ghouls, raider ghouls | rad (immune), poison 30 | fire (−15) |
+| Gergasi | everything +10 DR (racial, fix the bug) | — |
+| Protectorate infantry and power armor | laser, plasma | normal ballistic and AP ammo (§7.5). Power armor: EMP and electrical |
+| Federation regulars and heavies | normal | laser, plasma |
+| Dogs, rhino, ayam, rats | — | nothing special. Plain beasts. |
+
+### 7.5 Ammo variants (NEW, a table-friendly FO2 and manual hybrid)
+
+| Variant | Rule | Value | Best against |
+|---|---|---|---|
+| FMJ (standard) | — | ×1 | Everything |
+| **JHP** | Damage ×1.5, and the target's **DT counts double** | ×1.5 | Unarmored or lightly armored targets: creatures, raiders |
+| **AP** | **Ignores DT**, damage ×0.75 | ×2 | High-DT targets: Protectorate, power armor, robots |
+| Overcharged cell (energy) | Damage ×1.25. A crit-fail with it adds +1 extra condition mark. | ×2 | Energy weapons in a pinch |
+
+Sources: the manual has "JHP… +40% DT… increased damage" and "AP ignores DT but −40%
+damage". FO2 used JHP ×2 / DR +25 and AP ×½ / DR −25. Here AP is set to ×0.75
+instead of ×½ so it has a clear job.
+
+**Rule of thumb for the table:** JHP beats FMJ when the **target's DT is under half the
+gun's average damage**. AP beats FMJ when the **DT is over a quarter of it**.
+
+Average damage per hit:
+
+| Gun (average) | vs Raider (2/23): FMJ / JHP / AP | vs Protectorate (4/35) | vs Power Armor (10/50) |
+|---|---|---|---|
+| 10mm Pistol (9) | 5.4 / **7.3** / 5.2 | 3.3 / 3.6 / **4.4** | 0 / 0 / **3.4** |
+| Battle Rifle (17) | 11.6 / **16.6** / 9.8 | 8.5 / **11.4** / 8.3 | 3.5 / 2.8 / **6.4** |
+
+**Data.** Variant ammo is a separate item per caliber (for example `ammo_10mm_ap`)
+with `ammo_mod: { dmg_mult, dt_mult, ignore_dt }`. The loaded variant is stored next
+to the round count: `characters.<id>.ammo_variant.<slot>`. Reloading with a different
+variant empties the magazine first.
+
+### 7.6 How damage types interact with durability
+
+- Condition scales every type's DT/DR by the same ×(1 − 0.05 × marks) (§2.2).
+- Wear by type:
+  - **Explosive:** marks equal to the first digit of the damage (existing).
+  - **Fire** on cloth or leather: +1 mark for each hit of 10 or more.
+  - **EMP or electrical** on power armor and robot plating: +1d3 marks per hit.
+  - **AP ammo:** a crit-fail adds +1 extra mark to the gun (hot loads).
+- Repairing energy-dissipating Protectorate armor and power armor needs Pre-War Tech
+  (§2.5). This keeps faction gear hard to maintain in the field.
+
+## 8. Traits, perks and skill books
+
+### 8.1 Traits and perks
 
 | Entry | Proposal |
 |---|---|
@@ -572,7 +829,7 @@ For comparison, the current bestiary at the same levels and group sizes:
 | Feral Blood | +1 STR. Feral checks start at 500 rads instead of 600. |
 | Armor `modifiers` | **BUG:** never applied |
 
-### 7.2 Skill books (**RULED**: +5 skill points, own copy, reading takes time)
+### 8.2 Skill books (**RULED**: +5 skill points, own copy, reading takes time)
 
 | Question | Proposal |
 |---|---|
@@ -583,9 +840,9 @@ For comparison, the current bestiary at the same levels and group sizes:
 
 ---
 
-## 8. Survival and crafting (RMR)
+## 9. Survival and crafting (RMR)
 
-### 8.1 Cost of staying fed
+### 9.1 Cost of staying fed
 
 | Need | Cheapest clean options | RMR per point | RMR per day |
 |---|---|---|---|
@@ -599,7 +856,7 @@ For comparison, the current bestiary at the same levels and group sizes:
 - **Boil & Strain (NEW recipe):** 2 Dirty Water + 1 Chemicals → 1 Purified Water
   (1.36×).
 
-### 8.2 Healing value
+### 9.2 Healing value
 
 | Item | Average HP | RMR per HP |
 |---|---|---|
@@ -608,7 +865,7 @@ For comparison, the current bestiary at the same levels and group sizes:
 | Doctor's Bag | 21 | 62 |
 | Med Kit | 5.5 | 100 → **55 at the proposed value of 300 (CHANGE)** |
 
-### 8.3 Recipes and junk
+### 9.3 Recipes and junk
 
 - All 25 recipes pass the 1.5× rule. The ×10 doesn't change any ratio.
 - **Studded Leather** inputs → 8 Cloth + 10 Scrap + 6 Adhesive (1.39×).
@@ -632,7 +889,7 @@ For comparison, the current bestiary at the same levels and group sizes:
 
 ---
 
-## 9. Questions for the GM
+## 10. Questions for the GM
 
 ### Resolved
 
@@ -655,6 +912,9 @@ For comparison, the current bestiary at the same levels and group sizes:
 | N3 (rev. 2) | Worn Protectorate gear? | **RESOLVED:** no. Protectorate gear is always maintained; they are balanced through training and numbers. |
 | — | Win-rate ceiling | **RESOLVED:** ~85%, with the per-tier targets met in §6.4 |
 | — | Skill books shared? | **RESOLVED:** no |
+| O3 (rev. 3) | T1 HP sponges? | **RESOLVED:** no. Moderate HP (77) plus GM-chosen special abilities (§6.5). |
+| O5 (rev. 3) | Inflation roll: weekly or per session? | **RESOLVED:** neither. A GM setting in the shop tab (§4.3). |
+| — | Win rate ≤ 85% after movement and cover? | **RESOLVED** for standard encounters under the default scenario (§6.2). Terrain can still push single fights higher. |
 
 ### Still open
 
@@ -662,9 +922,10 @@ For comparison, the current bestiary at the same levels and group sizes:
 |---|---|---|
 | O1 | **What counts as a "loss"?** The simulation counts a party wipe (or 60 rounds) as a loss. So "85% against pests" means 15% of standard T5 fights wipe the party, if nobody uses stimpaks or tactics. The alternative is to count "at least one PC downed" as the failure; then at the same stats the clean-win rate is lower. Which one is the target? | It decides whether T5 and T4 creatures should be as dangerous as tuned here. Giant rats now bite for 1d6+4. |
 | O2 | **Are the standard group sizes (§6.2) acceptable as a GM rule?** No stat line can keep 80–85% across different group sizes (the ±1 columns). | The alternative is a threat-point encounter budget, which is more complex to run at the table. |
-| O3 | **T1 elites need 126–141 HP** (NPC levels 14–19) to be a hard fight for a level-7 party with its 95% hit rate. Is a bullet-sponge elite fine, or should elites get special rules instead (cover, stimpaks, an extra action)? | This is a design choice, not a numbers one. |
-| O4 | Should the 10 new bestiary entries (§6.3) be written to the vault by `vault-author`? feral_ghoul, federation_regular, rakan_watch_enforcer, raider_veteran, mercenary, federation_heavy, federation_commando, protectorate_power_armor and pahlawan are proposals only. | They don't exist yet. |
-| O5 | Market multiplier: rolled weekly or per session, and can every player see it or only those who check a Bursa board? | This sets how visible the inflation is. |
+| O3 | **Which T1 abilities?** Pick from the §6.5 menu. Suggested packages give about 55–65% wins. | GM design call (RULED: the GM writes the special rules) |
+| O4 | Confirm the 20 bestiary entries in §6.6 before `vault-author` writes them. In particular: Construction Protectron uses the FO4 Utility-tier numbers (the wiki has no separate row); Tenggiling Besar overlaps the Panguling (a big pangolin); and the Ayam's "grow" trigger needs choosing. | Content decisions |
+| O5 | **Add a cover selector** and the **NPC stance-AC fix** to the combat UI (§6.1)? | Without them, table play diverges from the tuned numbers by 5–18 points in gunfights |
+| O6 | **Damage types (§7):** adopt electrical and EMP, the armor family fallbacks, and the JHP/AP ammo variants? | Needs `damageType` on monster attacks and a new armor column. Bigger than a number change. |
 
 ---
 
