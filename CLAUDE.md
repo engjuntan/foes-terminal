@@ -58,7 +58,7 @@ player-facing and uses this convention.
   Baru (KLB, "City of the Dead") is the ghoul-filled ruin.
 - **Currency:** Reformed Malayan Ringgit (RMR, most common), Caliphate
   Dinar, Protectorate Dollar. Not bottle caps.
-- **The Rakan Watch** (formerly "1414 Gang"); Boss Bob leads it —
+- **The Rakan Watch** (once drafted as "1414 Gang" — "1414" now means only the triad); Boss Bob leads it —
   "Ketua Bob" is the same man in Malay.
 - **The 1414 Triad** is the main gang (the Lim, Tan and Choo families are
   within it; Red Pole Sam Lim leads it). Never "Lim Clan".
