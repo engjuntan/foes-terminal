@@ -2233,14 +2233,26 @@ export function renderGMScreen(liveData) {
        <button style="width:100%; padding:10px; cursor:pointer; background:red; color:white; font-weight:bold; border:none;" onclick="window.switchTab('COMBAT')">GO TO COMBAT</button>`
     : `<button style="width:100%; padding:10px; cursor:pointer; background:red; color:white; font-weight:bold; border:none;" onclick="window.startCombat()">START COMBAT</button>`;
 
+  // Open/closed state and the title both live in window state (not just
+  // set once via DOM after the fact) so they survive a re-render — every
+  // GM action (grant item, apply status, adjust a slider…) writes to
+  // Firestore, and the onSnapshot listener re-renders the WHOLE gm screen
+  // from scratch afterward, which used to snap this markup back to its
+  // default "hidden" class and wipe out whatever openGMModal had set on
+  // the live DOM node a moment earlier. Baking both into the template
+  // itself means a re-render reproduces the same open/closed state
+  // instead of resetting it.
+  const modalOpen = !!(window.gmModalOpen && targetChar);
+  const modalTitle = targetChar ? ("MANAGING: " + window.selectedCharId.toUpperCase()) : "MANAGING TARGET";
+
   const modalHtml = `
-    <div id="gm-modal" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:2000; display:flex; justify-content:center; align-items:center;">
-      <div class="panel" style="width:400px; border:2px solid red; background:#110000; height:auto; overflow:visible;">
-        <div style="display:flex; justify-content:space-between; border-bottom:1px solid red; margin-bottom:10px;">
-          <h2 style="background:none; color:red; margin:0;" id="gm-modal-title">MANAGING TARGET</h2>
-          <button onclick="document.getElementById('gm-modal').classList.add('hidden')" style="background:red; color:white; border:none; cursor:pointer;">[CLOSE]</button>
+    <div id="gm-modal" class="modal-overlay ${modalOpen ? '' : 'hidden'}">
+      <div class="panel modal-panel" style="max-width:400px; border:2px solid red; background:#110000;">
+        <div class="modal-header" style="border-bottom:1px solid red; padding-bottom:8px; margin-bottom:10px;">
+          <h2 style="background:none; color:red; margin:0;" id="gm-modal-title">${modalTitle}</h2>
+          <button onclick="window.closeGMModal()" style="background:red; color:white; border:none; cursor:pointer; flex-shrink:0;">[CLOSE]</button>
         </div>
-        
+        <div class="modal-body">
         <h4 style="color:red; border-bottom:1px dashed red;">VITALS</h4>
         <div style="display:flex; gap:10px; margin-bottom:10px;">
          <button class="gm-btn" onclick="window.gmAdjustHP(-1)">-1 HP</button>
@@ -2426,13 +2438,13 @@ export function renderGMScreen(liveData) {
 
         <h4 style="color:red; border-bottom:1px dashed red; margin-top:20px;">DANGER ZONE</h4>
         <button class="gm-btn" style="border-color:red; color:white; background:red; width:100%;" onclick="window.gmFactoryReset()">FACTORY RESET CHARACTER</button>
-
+        </div>
       </div>
     </div>
   `;
 
   return `
-    <div class="dashboard-container" style="grid-template-columns: 360px 280px 280px 300px; justify-content: center;">
+    <div class="dashboard-container" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
       ${modalHtml}
 
       <div class="panel">

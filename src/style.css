@@ -464,6 +464,54 @@ option {
   color: var(--pip-green);
 }
 
+/* --- MODALS ---
+   Every full-screen modal in the app (the GM's character-management
+   modal, the archive/wiki viewer) shares this shape: a dimmed overlay
+   centering a card that's capped well under the viewport height, with
+   its own header (title + close) pinned outside the scroll so the close
+   control is always reachable no matter how long the body content gets. */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modal-panel {
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* only .modal-body scrolls */
+  box-sizing: border-box;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0; /* never scrolls out of reach */
+}
+
+.modal-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-grow: 1;
+  min-height: 0; /* required for a flex child to actually shrink and scroll */
+}
+
+@media (max-width: 480px) {
+  .modal-overlay { padding: 10px; }
+  .modal-panel { max-height: 94vh; }
+}
+
 /* --- DICE ROLL ANIMATION --- */
 @keyframes dice-pulse {
   0%, 100% { box-shadow: 0 0 4px var(--pip-green); border-color: var(--pip-green); }

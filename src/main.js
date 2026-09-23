@@ -12,6 +12,13 @@ window.liveData = null;
 window.currentUser = null;
 window.userRole = null;
 window.currentTab = 'DASHBOARD';
+// Whether the GM's character-management modal (id="gm-modal") is open,
+// and on whom. Every GM action re-renders the whole GM screen from
+// scratch (Firestore write -> onSnapshot -> render()), which used to
+// blow away the modal's "open" state along with everything else in its
+// markup — read by renderGMScreen() so a re-render reproduces the same
+// open/closed state instead of resetting it. See openGMModal/closeGMModal.
+window.gmModalOpen = false;
 
 // --- TEXT SIZE (per-device preference, not synced — CSS uses fixed px
 // everywhere, so rather than rewrite ~450 lines to rem units, this scales
@@ -132,14 +139,23 @@ window.resolveTreatLimbDraft = Controllers.resolveTreatLimbDraft;
 
 window.openGMModal = (charId) => {
   window.selectedCharId = charId; // Store who we are editing globally
-  // Re-render so anything baked into the modal's HTML at render time (e.g.
-  // the active status effects list) reflects the character just selected,
-  // not whoever was selected the last time a render happened.
+  window.gmModalOpen = true;
+  // Re-render so everything baked into the modal's HTML (title, active
+  // status effects list, etc.) reflects the character just selected, and
+  // the "open" flag above — renderGMScreen() reads both directly, so a
+  // later re-render (e.g. after granting an item) reproduces the same
+  // open modal instead of resetting to closed.
   window.render();
-  document.getElementById('gm-modal-title').innerText = "MANAGING: " + charId.toUpperCase();
-  const modal = document.getElementById('gm-modal');
-  modal.classList.remove('hidden');
-  modal.style.display = 'flex'; // Force flex to center it
+};
+
+// Closes the GM modal without navigating away from the GM screen — the
+// only way it should close is this, or Escape (see the keydown listener
+// below). A grant/apply/adjust action must NOT close it: those all just
+// re-render via the normal Firestore round-trip, which leaves
+// window.gmModalOpen untouched.
+window.closeGMModal = () => {
+  window.gmModalOpen = false;
+  window.render();
 };
 
 // --- EXPOSE UI HELPERS ---
@@ -208,6 +224,14 @@ window.switchTab = (tabName) => {
 };
 
 window.closeWiki = () => { document.getElementById('wiki-overlay').classList.add('hidden'); };
+
+// --- ESCAPE CLOSES WHICHEVER MODAL IS OPEN ---
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (window.gmModalOpen) { window.closeGMModal(); return; }
+  const wikiOverlay = document.getElementById('wiki-overlay');
+  if (wikiOverlay && !wikiOverlay.classList.contains('hidden')) window.closeWiki();
+});
 
 // --- TOOLTIP SETUP ---
 if (!document.getElementById('global-tooltip')) {
@@ -377,7 +401,11 @@ function showBigAnnouncement(headline, sublines) {
   if (!el) {
     el = document.createElement('div');
     el.id = 'turn-announcement';
-    el.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:5000; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; color:var(--pip-green); font-family:VT323, monospace;';
+    // overflow-y + padding: a long list of status-effect proc sublines
+    // can in principle outgrow the viewport height; without this the
+    // DISMISS button (and the rest of the message) would be pushed off
+    // screen with no way to scroll down to it.
+    el.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:5000; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; color:var(--pip-green); font-family:VT323, monospace; overflow-y:auto; padding:20px; box-sizing:border-box;';
     document.body.appendChild(el);
   }
 
