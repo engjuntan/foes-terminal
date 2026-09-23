@@ -1,6 +1,6 @@
 // Endurance (and other SPECIAL) saves, shared by poison damage and by
 // attack-applied status effects (Screech's Ears Ringing). See
-// SCOPE_DECISIONS.md "Heist economics, Faiz, and the Sakai (2026-09-23)":
+// SCOPE_DECISIONS.md "Heist economics, Faiz, and the Beruk (2026-09-23)":
 // a Screech is "on a failed Endurance difficulty check, -2 PER for 1
 // turn", and "poison attacks use the same shape... an Endurance
 // difficulty check, not an ad-hoc roll".
@@ -66,8 +66,8 @@ describe('resolveCombatantSave — monster', () => {
   });
 
   it('falls back to the bestiary entry when the instance has no special block (older combat instance)', () => {
-    // Ibu Sakai's bestiary END is 6 (src/bestiary.js).
-    const result = resolveCombatantSave({ ref_type: 'monster', source_id: 'ibu_sakai', special: {} }, {}, 7);
+    // Ibu Beruk's bestiary END is 6 (src/bestiary.js).
+    const result = resolveCombatantSave({ ref_type: 'monster', source_id: 'ibu_beruk', special: {} }, {}, 7);
     expect(result.statValue).toBe(6);
     expect(result.success).toBe(false); // roll 7 > threshold 6
   });

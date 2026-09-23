@@ -55,7 +55,7 @@ Design reasoning for most of it lives in `SCOPE_DECISIONS.md` and the
 
 ## v0.6 — Systems build (2026-09-23)
 
-Everything since v0.5, tested in the app and covered by 96 Vitest specs.
+Everything since v0.5, tested in the app and covered by 57 Vitest specs.
 
 ### Systems
 - **Status section**: always-visible CONDITION block on the dashboard plus a
@@ -85,7 +85,7 @@ Everything since v0.5, tested in the app and covered by 96 Vitest specs.
   GM's Visual Standard Bible.
 
 ### Tooling
-- Vitest with 96 specs; agents build test-first.
+- Vitest with 57 specs; agents build test-first.
 - `npm run art` pipeline: prompt sheets, Imgur upload, vault write-back,
   staging in the vault's `Media/New items/`.
 - `sync-obsidian.js --once`, `VAULT_INDEX.tsv`, GM-only `[!gm]` callouts.
