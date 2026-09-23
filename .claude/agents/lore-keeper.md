@@ -34,6 +34,17 @@ when it matters, and **footnote every inference**.
 
 ## The checks
 
+- **Visual canon:** `FOES Visual Standard Bible.md` and `FOES Visual Standard
+  Guide.md`, in the Drive folder one level **above** the vault
+  (`…/My Drive/FOES Wiki/`). They set the house grade (Monsoon Gold), the
+  time rule (factory-made = frozen 1957; hand-made = post-war salvage), the
+  wet-climate decay rules (no dust, no sand — mould, weeping rust, laterite
+  mud), faction dress, and the prompt kit. Read them before writing or
+  judging any image prompt. Anything established since the Organization Map
+  is fresher canon than either file.
+- **Every image is photorealistic, 1080x1080 square.** Items sit on a plain,
+  generic post-apocalyptic background that never competes with the subject.
+
 **1. Canon.** Does it contradict a vault fact: names, dates, who controls
 what, how factions behave? Does it reveal a GM secret? Does it touch the
 off-limits themes (the labour camp, the slave trade, the player

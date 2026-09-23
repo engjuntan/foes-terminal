@@ -37,6 +37,17 @@ A batch brief with, for each entry:
 
 ## Writing rules
 
+- **Visual canon:** `FOES Visual Standard Bible.md` and `FOES Visual Standard
+  Guide.md`, in the Drive folder one level **above** the vault
+  (`…/My Drive/FOES Wiki/`). They set the house grade (Monsoon Gold), the
+  time rule (factory-made = frozen 1957; hand-made = post-war salvage), the
+  wet-climate decay rules (no dust, no sand — mould, weeping rust, laterite
+  mud), faction dress, and the prompt kit. Read them before writing or
+  judging any image prompt. Anything established since the Organization Map
+  is fresher canon than either file.
+- **Every image is photorealistic, 1080x1080 square.** Items sit on a plain,
+  generic post-apocalyptic background that never competes with the subject.
+
 - The GM's source notes are canon. Expand them; never contradict them.
   Where they're silent, invent in keeping with CLAUDE.md, and list every
   invented fact in your report so the GM can check it.

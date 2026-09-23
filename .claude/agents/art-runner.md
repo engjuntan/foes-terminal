@@ -47,6 +47,9 @@ Stop when the brief's count is done, and report.
   this one stopped, because anything already in `art/inbox/` is skipped.
 - Prompts are the GM's own words — paste them as written. Don't improvise
   extra style wording.
+- **Stop when the free quota runs out.** Gemini's free allowance is the
+  budget; when it is spent, stop and report rather than looking for another
+  way through.
 
 ## Report
 
