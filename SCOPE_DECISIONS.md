@@ -962,3 +962,19 @@ Answers to `reviews/lore-audit-org-map.md`. These override older vault notes.
   retropunk / cassette-futurism VIP lounge) and the Lockpick (sneak in
   and crack the vault). More alternatives to follow, after the vault's
   security is designed.
+
+## Heist economics, Faiz, and the Sakai (2026-09-23)
+
+- **Pre-War ringgits are honoured only once stamped into RMR.** The
+  heisters know this. Finding ways to stamp — or counterfeit — the vault's
+  money is part of the job, and it is the **Ghoul King's second prize**:
+  the forged notes deepen the RMR's hyperinflation and damage trust in the
+  Federation, with the crew doing it for their own reasons.
+- **Faiz wants the data because the Caliphate reveres knowledge.** He
+  believes the servers hold pre-War historical records for the Grand
+  Library. He doesn't know they are a map to US Army caches.
+- **The Sakai** are aggressive mutated monkeys. Monyet Sakai and Ibu Sakai
+  both fight with Claw and Bite; only the mother has the **Screech**.
+- **Screech:** on a failed Endurance difficulty check, −2 PER for 1 turn.
+- **Poison attacks use the same shape**: an Endurance difficulty check,
+  not an ad-hoc roll.

@@ -40,6 +40,21 @@ for a Fallout TTRPG. CLAUDE.md is loaded: follow its conventions.
 - GM-only controls live in the GM views. Check which role can call each
   controller.
 
+## Tests first
+
+The project runs **Vitest** (`npm test`, specs in `test/*.test.js` — see
+`test/needs.test.js` for the house style: plain language names, one
+behaviour each, `vi.spyOn(Math, 'random')` to pin dice).
+
+For anything with real logic — a formula, a save, a table lookup, a state
+transition — **write the failing test before the implementation**, then
+make it pass. Cover the boundary cases and the "nothing set yet" case,
+since every character doc can be missing any new field. UI wiring doesn't
+need a test; the logic behind it does.
+
+`npm test` must pass before you commit, and say in your report which
+behaviours you covered.
+
 ## Verify
 
 - `npx vite build` must pass.

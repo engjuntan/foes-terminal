@@ -61,6 +61,17 @@ export const statusEffectDatabase = {
       "skip_turn": true
     }
   },
+  ears_ringing: {
+    "id": "ears_ringing",
+    "name": "Ears Ringing",
+    "type": "status_effect",
+    "description": "A scream at close range, pitched to hurt. The world comes back one sound at a time.",
+    "effect": "-2 Perception for 1 turn",
+    "ticking": false,
+    "modifiers": {
+      "special_per": -2
+    }
+  },
   jammed: {
     "id": "jammed",
     "name": "Jammed",

@@ -6,6 +6,7 @@
 //   npm run art -- sheet [--limit N]      write art/prompt-sheet.md for manual generation (free)
 //   npm run art -- ingest [--limit N]     upload art/inbox/<item_id>.png|jpg to Imgur, link into the vault
 //   npm run art -- generate --limit N     PAID: generate N images with the Gemini API into art/inbox/
+//   npm run art -- collect <id>          file the newest browser download as art/inbox/<id>.png
 //   npm run art -- link <id> <url>       attach an already-uploaded image to an item or slot
 //   npm run art -- set-prompts <file.json>  write {id: prompt} into the vault's image_prompt fields
 //
@@ -321,6 +322,30 @@ async function generate() {
 // Attach a url to any target by hand — for images uploaded outside this
 // script. Same write-back path `ingest` uses, so it's also the quickest way
 // to check a slot writes where it should.
+// Files the newest image sitting in a download folder as art/inbox/<id>.png,
+// so images made by hand in a browser join the same pipeline. Used by the
+// art-runner agent after each generated image, and fine to run yourself.
+function collect() {
+  const id = args[1];
+  if (!id) fail('collect needs a target id: npm run art -- collect rep_idolized');
+  const target = allTargets().find(t => t.id === id);
+  if (!target) fail(`nothing with id "${id}".`);
+  const dir = option('from') || path.join(process.env.HOME || '', 'Downloads');
+  const maxAgeMin = Number(option('max-age') || 10);
+  const pick = fs.existsSync(dir) ? fs.readdirSync(dir)
+    .filter(f => /\.(png|jpe?g|webp)$/i.test(f))
+    .map(f => ({ f, at: fs.statSync(path.join(dir, f)).mtimeMs }))
+    .filter(x => (Date.now() - x.at) / 60000 <= maxAgeMin)
+    .sort((a, b) => b.at - a.at)[0] : null;
+  if (!pick) fail(`no image newer than ${maxAgeMin} min in ${dir} — download it first, or pass --from <dir>.`);
+  const ext = path.extname(pick.f).toLowerCase() === '.jpeg' ? '.jpg' : path.extname(pick.f).toLowerCase();
+  const dest = path.join(INBOX, `${id}${ext}`);
+  if (DRY) { console.log(`[dry run] would move ${pick.f} → ${path.relative(ROOT, dest)}`); return; }
+  fs.mkdirSync(INBOX, { recursive: true });
+  fs.renameSync(path.join(dir, pick.f), dest);
+  console.log(`Collected ${pick.f} → ${path.relative(ROOT, dest)} (${target.name})`);
+}
+
 function link() {
   const id = args[1], url = args[2];
   if (!id || !/^https?:\/\//.test(url || '')) fail('link needs an id and an http(s) url: npm run art -- link rep_idolized https://…');
@@ -346,7 +371,7 @@ function setPrompts() {
   console.log(`${DRY ? '[dry run] would write' : 'Wrote'} ${written} prompts; skipped ${skipped}.`);
 }
 
-const commands = { status, sheet, ingest, generate, link, 'set-prompts': setPrompts };
+const commands = { status, sheet, ingest, generate, link, collect, 'set-prompts': setPrompts };
 if (!commands[command]) { console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(0, 9).join('\n')); process.exit(command ? 1 : 0); }
 fs.mkdirSync(INBOX, { recursive: true });
 await commands[command]();

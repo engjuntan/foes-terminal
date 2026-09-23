@@ -835,8 +835,17 @@ export const bestiaryDatabase = {
         "hit_percent": 100,
         "action": "SM",
         "damage": "0",
-        "effect": "Every Monyet Sakai in earshot joins the fight on her next turn. Foes make a CH throw or lose their small action to the noise.",
-        "dmgType": "true"
+        "effect": "Every Monyet Sakai in earshot joins the fight on her next turn. Each foe in earshot makes an Endurance check or takes Ears Ringing (-2 PER for 1 turn).",
+        "dmgType": "true",
+        "save": {
+          "stat": "end",
+          "tier": "normal"
+        },
+        "apply_effect": {
+          "id": "ears_ringing",
+          "duration_turns": 1,
+          "on": "save_failed"
+        }
       }
     ]
   },
@@ -1214,8 +1223,8 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
-    "description": "A curious oddity you found. It has been modified to spew UCL propaganda, yet seemingly has a mind of its own. It has been refurbished. May be upgraded with specific parts.",
-    "notes": "Can attack and move. NOTE: this description text is identical to 'Liberator Robot (Follower)' in the source manual — likely a copy-paste artifact worth checking against the real page.",
+    "description": "A mutated Sakai monkey — lean, grey-furred and permanently furious. They travel in troops, take what they want, and bite anyone slow about handing it over.",
+    "notes": "Can attack and move. Never alone: troops of three or more, and an Ibu Sakai is usually close by.",
     "stats": {
       "hp": 40,
       "variance_bias": "normal",
@@ -1224,65 +1233,57 @@ export const bestiaryDatabase = {
       "ac": 15,
       "dtdr": {
         "normal": {
-          "dt": 1,
-          "dr": 25
-        },
-        "laser": {
           "dt": 0,
           "dr": 10
         },
+        "laser": {
+          "dt": 0,
+          "dr": 0
+        },
         "fire": {
           "dt": 0,
-          "dr": 5
+          "dr": -10
         },
         "plasma": {
           "dt": 0,
-          "dr": 15
+          "dr": 0
         },
         "explosive": {
           "dt": 0,
-          "dr": 20
+          "dr": 5
         }
       },
       "resistances": {
         "energy": 0,
-        "poison": 100,
-        "rad": 100,
+        "poison": 20,
+        "rad": 40,
         "gas": 0,
         "emp": 0
       },
       "special": {
-        "str": 5,
-        "per": 5,
+        "str": 4,
+        "per": 6,
         "end": 4,
         "cha": 3,
-        "int": 2,
-        "agi": 7,
+        "int": 3,
+        "agi": 9,
         "luk": 5
       }
     },
     "attacks": [
       {
-        "name": "Swipe",
-        "hit_percent": 75,
+        "name": "Claw",
+        "hit_percent": 65,
         "action": "Attack",
-        "damage": "1d6+3",
+        "damage": "1d4+1",
         "effect": "none",
         "dmgType": "normal"
       },
       {
         "name": "Bite",
-        "hit_percent": 70,
+        "hit_percent": 55,
         "action": "Attack",
-        "damage": "1d4+4",
-        "effect": "Foe rolls an EN check of +1. On failure knock the opponent down.",
-        "dmgType": "normal"
-      },
-      {
-        "name": "Throw",
-        "hit_percent": 60,
-        "action": "Attack",
-        "damage": "1d4+4",
+        "damage": "1d4+2",
         "effect": "none",
         "dmgType": "normal"
       }
