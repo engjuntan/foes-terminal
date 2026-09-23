@@ -5,7 +5,7 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
 import { RACE_RULES, calculateDerivedStats, deriveCharacter, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
 import { getMonster } from './bestiary.js';
-import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES, COVER_LEVELS, isMonsterAttackMelee, effectiveTargetAC } from './combat.js';
+import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES, COVER_LEVELS, isMonsterAttackMelee, effectiveTargetAC, resolveCombatantSave } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { questDatabase } from './quests.js';
 import { mapDatabase } from './maps.js';
@@ -1833,7 +1833,7 @@ function setDeepPath(obj, keys, value) {
 // recomputed result, instead of re-deriving (and inevitably drifting
 // from) the real resolution logic. Returns null, having already
 // alerted, if the draft doesn't describe a resolvable action.
-function computeAttackResolution(combat, attacker, target, draft, roll) {
+export function computeAttackResolution(combat, attacker, target, draft, roll) {
   // Aimed shots are attacker-agnostic — a called shot works the same
   // whether a PC targets a monster or a monster (GM-controlled) targets a
   // PC. Torso is just the default normal attack, unchanged either way.
@@ -2215,14 +2215,23 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
         // is a no-op (x1) there.
         rawDamage = Math.round(rolledDamage * damageMultiplier * conditionMultiplier(weaponMarks));
         if (attackDef.damageType === 'poison') {
-          // Job 3 (manual: "Poison Resistance... Roll EN. Success = half
-          // poison damage."): a d10 against the target's END, success
-          // halves it. Bypasses DT/DR entirely — a toxin isn't stopped by
-          // armor the way a physical hit is, same reasoning as True.
-          const endStat = target.ref_type === 'monster'
-            ? ((target.special && target.special.end) || 0)
-            : deriveCharacter(window.liveData.characters[target.char_id]).special.end;
-          if (rollD10() <= endStat) rawDamage = Math.floor(rawDamage / 2);
+          // SCOPE_DECISIONS.md "Heist economics, Faiz, and the Sakai":
+          // "poison attacks use the same shape [as Screech] — an
+          // Endurance difficulty check, not an ad-hoc roll" (manual:
+          // "Poison Resistance... Roll EN. Success = half poison
+          // damage."). The attack can carry its own save shape
+          // (`save: { stat, tier }`); defaults to END/Normal — the
+          // manual's plain "Roll EN" — when it doesn't. Bypasses DT/DR
+          // entirely either way — a toxin isn't stopped by armor the way
+          // a physical hit is, same reasoning as True.
+          const poisonSave = attackDef.save || { stat: 'end', tier: 'normal' };
+          const save = resolveCombatantSave(target, window.liveData.characters, rollD10(), poisonSave.stat || 'end', poisonSave.tier || 'normal');
+          if (save.success) {
+            rawDamage = Math.floor(rawDamage / 2);
+            effectAppliedMsg += ` ${targetName} resists the poison (${save.stat.toUpperCase()} save ${save.roll} vs ${save.threshold}) — damage halved.`;
+          } else {
+            effectAppliedMsg += ` ${targetName} fails to resist the poison (${save.stat.toUpperCase()} save ${save.roll} vs ${save.threshold}).`;
+          }
           bypassMitigation = true;
         } else if (attackDef.damageType === 'true') {
           bypassMitigation = true; // manual: "Ignores DT and DR and directly affects HP."
@@ -2263,6 +2272,30 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
     const stillUp = !newInitiativeOrder[idxCheck].is_down;
     if (bodyPart.effectId && stillUp && !killedOutright) {
       effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, bodyPart.effectId)}!`;
+    }
+
+    // Attack-applied effects (bestiary `apply_effect` — e.g. Ibu Sakai's
+    // Screech granting Ears Ringing): layered on top of, not instead of,
+    // the aimed-shot body-part effect above, since an attack could carry
+    // both. `"on": "save_failed"` (the default) gates it behind the same
+    // SPECIAL save poison damage uses — the attack's own `save` shape,
+    // defaulting to END/Normal when absent; `"on": "hit"` applies it
+    // unconditionally once the attack connects (no save rolled). No
+    // other `"on"` value is supported yet.
+    if (attackDef.apply_effect && stillUp && !killedOutright) {
+      const effectSpec = attackDef.apply_effect;
+      let effectApplies = effectSpec.on === 'hit';
+      if (!effectApplies) {
+        const effectSave = attackDef.save || { stat: 'end', tier: 'normal' };
+        const save = resolveCombatantSave(target, window.liveData.characters, rollD10(), effectSave.stat || 'end', effectSave.tier || 'normal');
+        effectApplies = !save.success;
+        effectAppliedMsg += effectApplies
+          ? ` ${targetName}'s ${save.stat.toUpperCase()} save fails (${save.roll} vs ${save.threshold}) against ${attackDef.name}.`
+          : ` ${targetName} resists ${attackDef.name} (${save.stat.toUpperCase()} save ${save.roll} vs ${save.threshold}).`;
+      }
+      if (effectApplies) {
+        effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, effectSpec.id, effectSpec.duration_turns)}!`;
+      }
     }
   }
 
@@ -2326,7 +2359,7 @@ function computeAttackResolution(combat, attacker, target, draft, roll) {
   const message = buildAttackLogMessage({
     isHit, attackerName: attacker.name, targetName, weaponName: attackDef.name,
     partTag, burstTag: burstTag + critTag, damage: finalDamage, roll, chance: effectiveChance, effectAppliedMsg,
-    damageType: attackDef.damageType
+    damageType: attackDef.damageType, isEffectOnly: attackDef.damage === '0'
   });
 
   const updatedCombat = {
