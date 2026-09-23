@@ -35,9 +35,16 @@ const SKIPLIST = path.join(ART, 'skip.json');
 const MAX_PER_RUN = 25;          // no single run can exceed this, whatever --limit says
 const LIFETIME_GENERATE_CAP = 400; // total paid generations ever; raise deliberately if needed
 
-// The shared look. Prompts in the vault describe only the object, so the
-// whole set can be restyled by editing this one line and regenerating.
-const STYLE = 'Post-apocalyptic retropunk meets dieselpunk item illustration. Single object, centered, entire item visible, square composition, plain dark background, no text, no watermark, no hands.';
+// The shared look — the FOES Visual Standard Bible's stacking formula
+// (render register + grade + place/climate + negatives), applied to every
+// prompt so the whole set holds one aesthetic. Items use the Bible's
+// "object plate" register; the GM's overarching rules are photorealism,
+// 1080x1080 square, and a plain post-apocalyptic ground that never
+// competes with the subject. Edit here to restyle everything.
+const GRADE = 'Monsoon Gold grade: blown-out near-white hazy sky light, hot golden key light, cyan-green bounced shadows, heavy humid air.';
+const CLIMATE = 'Equatorial Malaya after 170 years of rain: black-green mould and algae staining from the top down, rust weeping in dark streaks, damp surfaces, red laterite mud. No dust, no sand, no arid cracked earth.';
+const NEGATIVES = 'No text, no lettering, no watermark, no signature, no hands, no people, no modern plastics, no flat screens, no Vault-Tec or other Bethesda marks.';
+const STYLE = `Photorealistic photograph, 1:1 square, 1080x1080. Single object centred and filling the frame, shot as a museum object plate with one soft key light, shallow depth of field. Background: a plain, generic post-apocalyptic surface — weathered concrete, bare scrap-metal bench or damp ground — simple and out of focus, never busy or distracting. ${GRADE} ${CLIMATE} ${NEGATIVES}`;
 // Older prompts carried their own style tail; drop it so it can't fight STYLE.
 const LEGACY_TAIL = /,?\s*isolated on dark background,?\s*game icon style\.?\s*$/i;
 

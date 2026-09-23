@@ -8,7 +8,10 @@
 // Each group has its own STYLE, because a reputation card is a scene and a
 // SPECIAL card is an emblem — neither is an item on a dark background.
 
-const CARD_STYLE = 'Post-apocalyptic retropunk meets dieselpunk. Square 1:1 composition, painted poster art, muted wasteland palette with one strong accent, no text, no lettering, no watermark.';
+// Cards are scenes, not objects, so they take the Bible's "scene
+// photograph" register instead of the object plate — same grade, same
+// climate, same negatives, same square format.
+const CARD_STYLE = 'Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. Monsoon Gold grade: blown-out near-white hazy sky light, hot golden key light, cyan-green bounced shadows, heavy humid air. Equatorial Malaya after 170 years of rain: black-green mould and algae staining from the top down, rust weeping in dark streaks, damp surfaces, red laterite mud, jungle reclaiming every structure. No dust, no sand, no arid cracked earth. No text, no lettering, no watermark, no people in the foreground unless the subject names them, no modern plastics, no Bethesda marks.';
 
 export const SLOT_GROUPS = {
   rep: {
