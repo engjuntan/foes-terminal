@@ -6,6 +6,7 @@
 //   npm run art -- sheet [--limit N]      write art/prompt-sheet.md for manual generation (free)
 //   npm run art -- ingest [--limit N]     upload art/inbox/<item_id>.png|jpg to Imgur, link into the vault
 //   npm run art -- generate --limit N     PAID: generate N images with the Gemini API into art/inbox/
+//   npm run art -- skip <id|prefix*|slots> leave art you already made out of the runs (--undo to restore)
 //   npm run art -- collect <id>          file the newest browser download as art/inbox/<id>.png
 //   npm run art -- link <id> <url>       attach an already-uploaded image to an item or slot
 //   npm run art -- set-prompts <file.json>  write {id: prompt} into the vault's image_prompt fields
@@ -29,6 +30,7 @@ const ART = path.join(ROOT, 'art');
 const INBOX = path.join(ART, 'inbox');
 const DONE = path.join(ART, 'done');
 const LEDGER = path.join(ART, 'ledger.json');
+const SKIPLIST = path.join(ART, 'skip.json');
 
 const MAX_PER_RUN = 25;          // no single run can exceed this, whatever --limit says
 const LIFETIME_GENERATE_CAP = 400; // total paid generations ever; raise deliberately if needed
@@ -193,6 +195,8 @@ function status() {
   report('Content slots:', targets.filter(t => t.kind === 'slot'));
   const inInbox = fs.existsSync(INBOX) ? fs.readdirSync(INBOX).filter(f => !f.startsWith('.')).length : 0;
   const ledger = readLedger();
+  const skipped = readSkipList().length;
+  if (skipped) console.log(`Skipped (made elsewhere): ${skipped}`);
   console.log(`Waiting in inbox: ${inInbox}`);
   console.log(`Paid generations so far: ${ledger.generated} / ${LIFETIME_GENERATE_CAP} lifetime cap`);
 }
@@ -212,9 +216,34 @@ function sheet() {
 function pendingTargets() {
   const only = option('only');
   if (only && !['items', 'slots'].includes(only)) fail(`--only takes "items" or "slots".`);
+  const skipped = readSkipList();
   return allTargets()
     .filter(t => !only || t.kind === only.slice(0, -1))
-    .filter(t => !t.hasArt && t.hasPrompt && !inboxFileFor(t.id));
+    .filter(t => !t.hasArt && t.hasPrompt && !inboxFileFor(t.id) && !skipped.includes(t.id));
+}
+
+// Art the GM made outside this pipeline. Skipped targets never appear in a
+// sheet or a generate run; `skip --undo` puts them back.
+function readSkipList() {
+  try { return JSON.parse(fs.readFileSync(SKIPLIST, 'utf8')); } catch { return []; }
+}
+
+function skip() {
+  const ids = args.slice(1).filter(a => !a.startsWith('--'));
+  const undo = flag('undo');
+  const known = new Set(allTargets().map(t => t.id));
+  const groups = { slots: t => t.kind === 'slot', items: t => t.kind === 'item' };
+  const expanded = ids.flatMap(id => {
+    if (groups[id]) return allTargets().filter(groups[id]).map(t => t.id);
+    if (id.endsWith('*')) return [...known].filter(k => k.startsWith(id.slice(0, -1)));
+    return [id];
+  });
+  const unknown = expanded.filter(id => !known.has(id));
+  if (!expanded.length || unknown.length) fail(unknown.length ? `unknown id(s): ${unknown.join(', ')}` : 'skip needs ids, a prefix like "rep_*", or "items"/"slots".');
+  const next = undo ? readSkipList().filter(id => !expanded.includes(id))
+    : [...new Set([...readSkipList(), ...expanded])];
+  if (!DRY) { fs.mkdirSync(ART, { recursive: true }); fs.writeFileSync(SKIPLIST, JSON.stringify(next, null, 2)); }
+  console.log(`${DRY ? '[dry run] ' : ''}${undo ? 'Un-skipped' : 'Skipping'} ${expanded.length}: ${expanded.slice(0, 6).join(', ')}${expanded.length > 6 ? '…' : ''}. Skip list now holds ${next.length}.`);
 }
 
 async function imgurAccessToken() {
@@ -371,7 +400,7 @@ function setPrompts() {
   console.log(`${DRY ? '[dry run] would write' : 'Wrote'} ${written} prompts; skipped ${skipped}.`);
 }
 
-const commands = { status, sheet, ingest, generate, link, collect, 'set-prompts': setPrompts };
+const commands = { status, sheet, ingest, generate, link, collect, skip, 'set-prompts': setPrompts };
 if (!commands[command]) { console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(0, 9).join('\n')); process.exit(command ? 1 : 0); }
 fs.mkdirSync(INBOX, { recursive: true });
 await commands[command]();
