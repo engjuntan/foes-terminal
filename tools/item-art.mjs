@@ -45,7 +45,30 @@ const LIFETIME_GENERATE_CAP = 400; // total paid generations ever; raise deliber
 const GRADE = 'Monsoon Gold grade: blown-out near-white hazy sky light, hot golden key light, cyan-green bounced shadows, heavy humid air.';
 const CLIMATE = 'Equatorial Malaya after 170 years of rain: black-green mould and algae staining from the top down, rust weeping in dark streaks, damp surfaces, red laterite mud. No dust, no sand, no arid cracked earth.';
 const NEGATIVES = 'No text, no lettering, no watermark, no signature, no hands, no people, no modern plastics, no flat screens, no Vault-Tec or other Bethesda marks.';
-const STYLE = `Photorealistic photograph, 1:1 square, 1080x1080. Single object centred and filling the frame, shot as a museum object plate with one soft key light, shallow depth of field. Background: a plain, generic post-apocalyptic surface — weathered concrete, bare scrap-metal bench or damp ground — simple and out of focus, never busy or distracting. ${GRADE} ${CLIMATE} ${NEGATIVES}`;
+// The backdrop varies so 287 icons don't all sit on the same slab of
+// concrete, but every option is a plain surface that falls away out of
+// focus — variety without clutter. Chosen by a stable hash of the item's
+// id, so an item keeps its backdrop across regenerations.
+const BACKDROPS = [
+  'a weathered concrete ledge',
+  'a scarred scrap-metal workbench',
+  'bare damp laterite ground',
+  'a rusted steel shelf',
+  'a folded canvas tarpaulin',
+  'worn hardwood planking',
+  'a chipped enamel tabletop',
+  'a cracked ceramic tiled floor',
+  'a sheet of corrugated zinc laid flat',
+  'a stack of damp hessian sacking'
+];
+// djb2, mixed over the whole id before the modulo — a per-character
+// modulo collapses ids onto the same few buckets.
+const backdropFor = id => {
+  let h = 5381;
+  for (const c of String(id)) h = ((h * 33) ^ c.charCodeAt(0)) >>> 0;
+  return BACKDROPS[h % BACKDROPS.length];
+};
+const styleFor = item => `Photorealistic photograph, 1:1 square, 1080x1080. Single object centred and filling the frame, shot as a museum object plate with one soft key light, shallow depth of field. Background: ${backdropFor(item.id)} in a post-apocalyptic setting — plain, uncluttered and thrown out of focus, never busy or competing with the object. ${GRADE} ${CLIMATE} ${NEGATIVES}`;
 // Older prompts carried their own style tail; drop it so it can't fight STYLE.
 const LEGACY_TAIL = /,?\s*isolated on dark background,?\s*game icon style\.?\s*$/i;
 
@@ -95,7 +118,7 @@ function loadItems() {
 }
 
 const hasArt = item => /^https?:\/\//.test(item.icon || '') && !/placehold\.co/.test(item.icon);
-const fullPrompt = item => `${STYLE} Subject: ${(item.image_prompt || '').replace(LEGACY_TAIL, '').trim()}`;
+const fullPrompt = item => `${styleFor(item)} Subject: ${(item.image_prompt || '').replace(LEGACY_TAIL, '').trim()}`;
 
 // Edits one field inside the file's json block as a single-line text edit,
 // leaving the GM's formatting everywhere else untouched. Re-parses the block
