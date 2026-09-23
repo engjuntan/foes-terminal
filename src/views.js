@@ -360,7 +360,7 @@ export function getStatusView(charId, liveData) {
       </div>`).join('');
 
   return `
-    <div class="dashboard-container" style="grid-template-columns: 1fr 1fr; max-width:900px; margin:0 auto;">
+    <div class="dashboard-container" style="grid-template-columns: minmax(240px, 1fr) minmax(240px, 1fr); max-width:900px; margin:0 auto;">
       <div class="panel">
         <h2 style="color:var(--pip-dim);">CONDITION</h2>
         ${renderConditionRows(conditionRows)}
@@ -1123,7 +1123,7 @@ export function getCombatView(liveData, userRole, currentUser) {
     </div>` : '';
 
   return `
-    <div class="dashboard-container" style="grid-template-columns: 320px 320px 1fr; justify-content:center;">
+    <div class="dashboard-container" style="grid-template-columns: minmax(240px, 320px) minmax(240px, 320px) minmax(220px, 1fr);">
       <div class="panel">
         ${headerHtml}
         <div style="margin-top:15px;">${initiativeHtml}</div>
@@ -1580,7 +1580,7 @@ export function getMessagesView(liveData, userRole, currentUser) {
         <div style="color:#ccc; margin-top:2px;">${escapeHtml(m.body)}</div>
       </div>`).join('');
     return `
-      <div class="dashboard-container" style="grid-template-columns: 340px 1fr; justify-content:center;">
+      <div class="dashboard-container" style="grid-template-columns: minmax(260px, 340px) minmax(220px, 1fr);">
         <div class="panel">
           <h2 style="color:cyan;">SEND MESSAGE</h2>
           <label style="font-size:11px; color:#666;">TO</label>

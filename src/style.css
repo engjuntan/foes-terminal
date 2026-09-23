@@ -145,10 +145,14 @@ body {
 /* --- DASHBOARD GRID --- */
 .dashboard-container {
   display: grid;
-  /* STRICT COLUMNS: 250px fixed, the rest, 420px fixed. Won't budge.
-     Rightmost column (equipped gear/wallet/inventory) widened from 300px
-     so item names and stack counts have more room to breathe. */
-  grid-template-columns: minmax(250px, 250px) 1fr minmax(420px, 420px);
+  /* Same visual proportions as before (~250 / flexible middle / ~420) on
+     a wide screen, but every track can now shrink instead of holding a
+     hard floor — that hard floor was forcing horizontal scroll on any
+     window narrower than ~1050px, because a fixed px column never
+     yields space back no matter how little room is left. Right column
+     (equipped gear/wallet/inventory) still gets the most room so item
+     names and stack counts have space to breathe. */
+  grid-template-columns: minmax(180px, 250px) minmax(180px, 1fr) minmax(260px, 420px);
   gap: 20px;
   height: 100%;
   overflow: hidden;
@@ -221,12 +225,35 @@ body {
 .skill-item:hover { background: rgba(51, 255, 51, 0.1); }
 .skill-item.tagged { color: yellow; font-weight: bold; }
 
-/* MOBILE RESPONSIVE (Restored) */
-@media (max-width: 768px) {
+/* RESPONSIVE COLLAPSE — stacks the sidebar above the content and forces
+   every dashboard-container down to one column below this width. Several
+   screens (combat, the GM dashboard, checks…) set their own fixed-px
+   grid-template-columns inline for the desktop layout; an inline style
+   normally beats anything in a stylesheet, `!important` here is what
+   lets this single rule still override every one of them rather than
+   needing a bespoke breakpoint per screen. 1050px (not the old 768px)
+   because a few of those inline layouts need ~1040px of raw content
+   width before they stop fighting each other for space — below that,
+   collapsing to one column is more comfortable than a cramped multi-col
+   squeeze, and it's what keeps things from ever forcing a horizontal
+   scrollbar. */
+@media (max-width: 1050px) {
   .app-container { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .sidebar { border-right: none; border-bottom: 2px solid var(--pip-green); padding: 10px; }
   .nav-btn { display: inline-block; width: auto; margin-right: 5px; font-size: 16px; padding: 8px; }
-  .dashboard-container { grid-template-columns: 1fr; overflow-y: auto; height: auto; }
+  .dashboard-container {
+    grid-template-columns: 1fr !important;
+    justify-content: normal !important;
+    overflow-y: auto;
+    height: auto;
+  }
+}
+
+/* Phones specifically — tighter outer padding so content isn't fighting
+   the sidebar/viewport gutter for its already-scarce width. */
+@media (max-width: 480px) {
+  #main-viewport { padding: 10px; }
+  .sidebar { padding: 8px; }
 }
 
 /* --- SCROLLBAR STYLING --- */
