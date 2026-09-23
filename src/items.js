@@ -54,7 +54,7 @@ export const itemDatabase = {
     "name": "2mm EC",
     "type": "ammo",
     "icon": "",
-    "image_prompt": "A small clear plastic sleeve of tiny metallic 2mm EC capsules, each casing etched with fine grooves, the sleeve's corner melted and resealed with tape, a faded manufacturer code printed along the edge.",
+    "image_prompt": "A small cellophane sleeve of tiny metallic 2mm EC capsules, each casing etched with fine grooves, the sleeve's corner torn and resealed with tape, a faded manufacturer code printed along the edge.",
     "description": "Ammunition for Gauss-class weapons (Gauss Rifle, Gauss Pistol). Distinct from Energy Cell and Plasma Cartridge.",
     "ammo_type": "2mm_ec",
     "stackable": true,
@@ -186,7 +186,7 @@ export const itemDatabase = {
     "type": "ammo",
     "icon": "",
     "description": "Framing nails for the Pneumatic Nail Driver. Easy to find, easy to straighten and reuse.",
-    "image_prompt": "A dented tin of loose steel framing nails, some bent and hand-straightened, rust spots, isolated on dark background, game icon style",
+    "image_prompt": "A dented tin of loose steel framing nails, some bent and hand-straightened, rust spots",
     "ammo_type": "nails",
     "stackable": true,
     "weight": 0.005,
@@ -209,7 +209,7 @@ export const itemDatabase = {
     "name": "Shotgun Shells",
     "type": "ammo",
     "icon": "",
-    "image_prompt": "A handful of shotgun shells with cracked plastic hulls in mismatched red and green, brass bases dulled, one hull split at the crimp, loose inside a torn paper sleeve.",
+    "image_prompt": "A handful of shotgun shells with waxed paper hulls in mismatched red and green, brass bases dulled, one hull split at the crimp, loose inside a torn paper sleeve.",
     "description": "Ammunition for all shotgun-class weapons — unified bucket regardless of specific gauge, per campaign simplification.",
     "ammo_type": "shotgun_shells",
     "stackable": true,
@@ -223,7 +223,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "image_prompt": "A dark tailored suit jacket with narrow lapels, the fabric faded but pressed, gold thread embroidery of the 1414 Triad crest worn thin at the breast pocket, cuffs slightly frayed.",
+    "image_prompt": "A tailored suit jacket in deep lacquered red, narrow lapels, the fabric faded but kept pressed, clan-gold thread embroidery of the 1414 Triad crest worn thin at the breast pocket, brass buttons, cuffs slightly frayed.",
     "description": "Status armor worn by Tan/Choo subfamily members of the 1414 Triad. Low DR, social value instead. Mapped to the manual's Protectorate Officers Uniform tier (status armor, not combat armor).",
     "stats": {
       "ac": 3,
@@ -507,7 +507,7 @@ export const itemDatabase = {
     "size": "medium",
     "icon": "",
     "description": "Factory workwear with a hand-stitched padded lining. Cheap, basic protection.",
-    "image_prompt": "Worn blue factory coveralls with visible hand-stitched padding lining, patched knees and elbows, wasteland workwear, isolated on dark background, game icon style",
+    "image_prompt": "Worn blue factory coveralls with visible hand-stitched padding lining, patched knees and elbows, wasteland workwear",
     "stats": {
       "ac": 3,
       "dt_dr_normal": "0/8",
@@ -570,7 +570,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "image_prompt": "A heavy plated trooper armor in dark grey steel, thick shoulder guards scratched and scorched, a faded Protectorate eagle insignia on the chest, reinforced boots and gauntlets riveted to the frame.",
+    "image_prompt": "A heavy plated trooper armor in Protectorate navy-blue enamel, thick shoulder guards scratched and scorched down to bare steel, a faded brass Protectorate eagle insignia on the chest, reinforced boots and gauntlets riveted to the frame.",
     "description": "From the manual — top tier of the faction-armor progression. Grants LR+2, imposes -20 to Sneak and Steal while worn.",
     "stats": {
       "ac": 25,
@@ -599,7 +599,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "image_prompt": "A segmented grey infantry armor vest, overlapping plates scuffed and dented, a small stencilled Protectorate insignia on the shoulder, buckled canvas straps worn at the edges.",
+    "image_prompt": "A segmented armor vest in Protectorate navy-blue enamel, overlapping plates chipped and dented down to bare steel at the edges, a small brass-stencilled Protectorate insignia on the shoulder, bone-cream canvas straps buckled and worn.",
     "description": "From the manual — note: distinct from the existing 'Protectorate Infantry' bestiary/monster entry, which uses this armor implicitly but didn't have it as its own item note until now.",
     "stats": {
       "ac": 20,
@@ -623,7 +623,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "image_prompt": "A crisp dark uniform jacket with silver buttons, a faded Protectorate rank bar on the collar, sleeves slightly frayed at the cuffs, a small ink stain near one pocket.",
+    "image_prompt": "A bone-cream lightweight cotton drill uniform shirt, open-necked with no tie, navy-blue shoulder boards and cuff rings, brass buttons down the front, a faded navy rank bar on the collar, sleeves rolled and slightly frayed at the cuffs, a small ink stain near one pocket, sweat-darkened at the collar.",
     "description": "From the manual.",
     "stats": {
       "ac": 3,
@@ -647,7 +647,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "image_prompt": "A cheap gang-colored windbreaker jacket in faded red and black nylon, a cracked zipper, a hand-painted Rakan Watch emblem on the back peeling at the edges, frayed cuffs.",
+    "image_prompt": "A cheap windbreaker jacket in faded municipal mint green and off-white nylon, a cracked zipper, a hand-painted Rakan Watch emblem on the back peeling at the edges, frayed cuffs.",
     "description": "Cheap, gang-colored, instantly recognizable jacket of The Rakan Watch. Mapped to the manual's Clothes tier, barely above rags.",
     "stats": {
       "ac": 1,
@@ -692,7 +692,7 @@ export const itemDatabase = {
     "size": "medium",
     "icon": "",
     "description": "Tightly woven rattan panels lashed over a wooden frame — traditional weaving technique repurposed as armor.",
-    "image_prompt": "Armor made of tightly woven rattan cane panels lashed to a wooden frame with rope, traditional Southeast Asian basketweave pattern, isolated on dark background, game icon style",
+    "image_prompt": "Armor made of tightly woven rattan cane panels lashed to a wooden frame with rope, traditional Southeast Asian basketweave pattern",
     "stats": {
       "ac": 4,
       "dt_dr_normal": "1/10",
@@ -732,7 +732,7 @@ export const itemDatabase = {
     "size": "oversized",
     "icon": "",
     "description": "Multiple layers of tarpaulin and padding wound and lashed around the torso — bulky, improvised, the 'wear the whole pile of scrap you found' option.",
-    "image_prompt": "Torso wrapped in multiple layers of blue and grey tarpaulin bound with rope and cargo straps, bulky improvised padded armor, wasteland aesthetic, isolated on dark background, game icon style",
+    "image_prompt": "Torso wrapped in multiple layers of blue and grey tarpaulin bound with rope and cargo straps, bulky improvised padded armor, wasteland aesthetic",
     "stats": {
       "ac": 5,
       "dt_dr_normal": "1/15",
@@ -752,7 +752,7 @@ export const itemDatabase = {
     "size": "oversized",
     "icon": "",
     "description": "A riot shield converted into wearable armor, strapped across the torso. High flat damage reduction, mediocre against sustained fire — a shield, not a suit.",
-    "image_prompt": "A large rusted riot shield with Federation crowd-control markings, converted with leather straps into wearable chest armor, scratched polycarbonate window, oversized and bulky, isolated on dark background, game icon style",
+    "image_prompt": "A large rusted riot shield with Federation crowd-control markings, converted with leather straps into wearable chest armor, scratched polycarbonate window, oversized and bulky",
     "stats": {
       "ac": 10,
       "dt_dr_normal": "4/15",
@@ -772,7 +772,7 @@ export const itemDatabase = {
     "size": "oversized",
     "icon": "",
     "description": "A genuine Power Armor chestplate, found without its frame or servos — worn as heavy standalone plate rather than a powered suit. Best AC in the game, at a real weight cost. Rare find.",
-    "image_prompt": "A massive military power armor chestplate, dead servo motors visible at the joints, rust patches over hardened alloy plating, disconnected from its frame, oversized and imposing, isolated on dark background, game icon style",
+    "image_prompt": "A massive military power armor chestplate, dead servo motors visible at the joints, rust patches over hardened alloy plating, disconnected from its frame, oversized and imposing",
     "condition": "disrepair",
     "stats": {
       "ac": 14,
@@ -794,7 +794,7 @@ export const itemDatabase = {
     "size": "oversized",
     "icon": "",
     "description": "A Power Armor helmet with a dead HUD and cracked seal. Pairs with the Chestplate, sold and found separately on purpose. Rare find.",
-    "image_prompt": "A battered military power armor helmet, cracked visor seal, dead internal HUD display visible through the crack, rust streaks over dark metal, oversized and heavy, isolated on dark background, game icon style",
+    "image_prompt": "A battered military power armor helmet, cracked visor seal, dead internal HUD display visible through the crack, rust streaks over dark metal, oversized and heavy",
     "condition": "disrepair",
     "stats": {
       "ac": 4,
@@ -864,7 +864,7 @@ export const itemDatabase = {
     "size": "medium",
     "icon": "",
     "description": "A poncho cut from stall tarpaulin. Barely armor, but it's something.",
-    "image_prompt": "A simple poncho cut from blue plastic market tarpaulin, rope drawstring, weathered and patched, isolated on dark background, game icon style",
+    "image_prompt": "A simple poncho cut from blue plastic market tarpaulin, rope drawstring, weathered and patched",
     "stats": {
       "ac": 2,
       "dt_dr_normal": "0/5",
@@ -955,7 +955,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "",
-    "image_prompt": "A long rubberized rain slicker in faded Federation blue, cracked at the folds, a hood with a torn drawstring, a small stencilled water-drop emblem on the chest, damp stains along the hem.",
+    "image_prompt": "A long rubberized rain slicker in faded Federation lavender, cracked at the folds, a hood with a torn drawstring, a small stencilled orange water-drop emblem on the chest, damp stains and creeping black mould along the hem.",
     "description": "Worn by those who guard/control Federation water distribution. Mapped to the manual's UCL Officers Uniform tier: light, breathable rainwear rather than combat armor.",
     "stats": {
       "ac": 2,
@@ -984,7 +984,7 @@ export const itemDatabase = {
     "name": "Chemicals",
     "type": "component",
     "icon": "",
-    "image_prompt": "A cluster of mismatched glass and plastic bottles holding cloudy chemical solvents, cracked caps, peeling handwritten labels, one bottle wrapped in tape to seal a hairline crack.",
+    "image_prompt": "A cluster of mismatched glass bottles and tins holding cloudy chemical solvents, cracked caps, peeling handwritten labels, one bottle wrapped in tape to seal a hairline crack.",
     "description": "Solvents, reagents, propellant — chems, stims, and explosives crafting.",
     "stackable": true,
     "weight": 0.2,
@@ -1150,7 +1150,7 @@ export const itemDatabase = {
     "name": "Buffout",
     "type": "consumable",
     "icon": "",
-    "image_prompt": "A small orange pill bottle of Buffout capsules, the childproof cap cracked, a peeling label with faded muscle-icon artwork, a few loose capsules rattling inside.",
+    "image_prompt": "A small amber glass pill bottle of Buffout capsules, the tin cap cracked, a peeling label with faded muscle-icon artwork, a few loose capsules rattling inside.",
     "description": "STR/END buff, addictive — mainline 'Buffout.'",
     "effect": "ST +2, AG +2, EN +3",
     "stats": {
@@ -1199,7 +1199,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "A rusted can of sweet winter melon drink. Cloudy but drinkable.",
-    "image_prompt": "A rusted aluminum drink can with faded winter melon illustration, one side corroded, condensation droplets, wasteland soft drink, isolated on dark background, game icon style",
+    "image_prompt": "A rusted aluminum drink can with faded winter melon illustration, one side corroded, condensation droplets, wasteland soft drink",
     "effect": "Restores 25 Thirst",
     "stats": {
       "thirst": 25
@@ -1213,7 +1213,7 @@ export const itemDatabase = {
     "name": "Cap Kilat Cola",
     "type": "consumable",
     "icon": "",
-    "image_prompt": "A glass soda bottle with a chipped crown cap, faded red-and-yellow Cap Kilat Cola label showing a lightning-bolt logo, condensation streaks down the dusty glass, a small dent near the base.",
+    "image_prompt": "A glass soda bottle with a chipped crown cap, faded red-and-yellow Cap Kilat Cola label showing a lightning-bolt logo, condensation streaks down glass filmed with faint mildew, a small dent near the base.",
     "description": "Fictional in-universe soda brand — Nuka-Cola-style icon/collectible. A rare 'Cap Kilat Emas' (Golden) variant could exist as a Quantum-equivalent (not authored as a separate item yet).",
     "effect": "+1 AGI for 30 minutes",
     "stats": {
@@ -1230,7 +1230,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "A compressed ration bar glazed to resemble barbecued pork. Better than it sounds.",
-    "image_prompt": "A compressed reddish-glazed ration bar resembling char siu barbecue pork, wrapped in waxed paper, wasteland food item, isolated on dark background, game icon style",
+    "image_prompt": "A compressed reddish-glazed ration bar resembling char siu barbecue pork, wrapped in waxed paper, wasteland food item",
     "effect": "Heals 1d4 HP, restores 30 Hunger",
     "stats": {
       "hunger": 30,
@@ -1246,7 +1246,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "A grilled house lizard on a skewer — street food born of necessity. There is always another cicak.",
-    "image_prompt": "A small grilled lizard skewered on a bamboo stick, charred and salted, street-food style presentation, isolated on dark background, game icon style",
+    "image_prompt": "A small grilled lizard skewered on a bamboo stick, charred and salted, street-food style presentation",
     "effect": "Restores 20 Hunger",
     "stats": {
       "hunger": 20
@@ -1261,7 +1261,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Grass jelly cubes in sweetened syrup water, a classic cooling dessert drink.",
-    "image_prompt": "A cup of black grass jelly cubes floating in translucent brown syrup water, condensation on plastic cup, Malaysian dessert drink, isolated on dark background, game icon style",
+    "image_prompt": "A cup of black grass jelly cubes floating in translucent brown syrup water, condensation beading on the glass, Malaysian dessert drink",
     "effect": "Restores 20 Thirst, restores 5 Hunger",
     "stats": {
       "thirst": 20,
@@ -1309,7 +1309,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "A cluster of dried longan fruit, still on the stem. Sweet, chewy, keeps forever.",
-    "image_prompt": "A small cluster of dried brown longan fruit still attached to a twig, wrinkled leathery skin, wasteland foraged snack, isolated on dark background, game icon style",
+    "image_prompt": "A small cluster of dried brown longan fruit still attached to a twig, wrinkled leathery skin, wasteland foraged snack",
     "effect": "Restores 10 Hunger",
     "stats": {
       "hunger": 10
@@ -1323,7 +1323,7 @@ export const itemDatabase = {
     "name": "Feral Suppressant",
     "type": "consumable",
     "icon": "",
-    "image_prompt": "A small auto-injector pen with a frosted plastic body, a faded warning label printed in Malay, the needle cap slightly bent, a green indicator light dulled with grime.",
+    "image_prompt": "A small auto-injector pen with a frosted glass barrel in a metal housing, a faded warning label printed in Malay, the needle cap slightly bent, a small green pilot lamp dulled with grime.",
     "description": "Not a mainline Fallout item — original to this campaign. Ghoul-specific: buys time before the feral roll at HIGH rad exposure, ties directly into the Ghoul is_radioactive flag and the manual's 600/1000 rad-threshold feral mechanic. The feral roll itself is GM-adjudicated narrative judgment, not a numeric formula, so this delay is a descriptive duration rather than a dice/percentage value.",
     "effect": "Delays the feral check by roughly one encounter",
     "stats": {
@@ -1339,7 +1339,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "A flask of home-fermented rice wine, aged well past anyone's original intention. Addictive.",
-    "image_prompt": "A battered metal flask with hand-painted Chinese characters, rice wine sloshing inside visible through a dent, wasteland trade good, isolated on dark background, game icon style",
+    "image_prompt": "A battered metal flask with hand-painted Chinese characters, rice wine sloshing inside visible through a dent, wasteland trade good",
     "effect": "Restores 15 Thirst",
     "stats": {
       "thirst": 15
@@ -1386,7 +1386,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "A small vial of dark, salty sauce, bottled and stamped with the old national sewerage utility's logo — a joke that got funnier once nobody was left to enforce a health code. One real flavor in a world of rations.",
-    "image_prompt": "A small dark glass vial of soy sauce, weathered label with a stylized water-utility logo, sealed with wax, wasteland trade curiosity, isolated on dark background, game icon style",
+    "image_prompt": "A small dark glass vial of soy sauce, weathered label with a stylized water-utility logo, sealed with wax, wasteland trade curiosity",
     "effect": "Restores 5 Hunger, costs 3 Thirst",
     "stats": {
       "hunger": 5,
@@ -1402,7 +1402,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Instant noodle brick, Tiger Soup flavor, packet long faded. Still edible, allegedly.",
-    "image_prompt": "A faded instant noodle packet, tiger mascot logo worn and peeling, 'Mee Sup Rimau' branding, wasteland ration item, isolated on dark background, game icon style",
+    "image_prompt": "A faded instant noodle packet, tiger mascot logo worn and peeling, 'Mee Sup Rimau' branding, wasteland ration item",
     "effect": "Restores 25 Hunger",
     "stats": {
       "hunger": 25
@@ -1416,7 +1416,7 @@ export const itemDatabase = {
     "name": "Jet",
     "type": "consumable",
     "icon": "",
-    "image_prompt": "A small aerosol inhaler canister with a chipped plastic nozzle, faded red lettering spelling JET across a scratched metal body, a dented cap hanging loose on a thin chain.",
+    "image_prompt": "A small aerosol inhaler canister with a chipped bakelite nozzle, faded red lettering spelling JET across a scratched metal body, a dented cap hanging loose on a thin chain.",
     "description": "AP/speed buff, highly addictive — mainline 'Jet.' Not in the manual's chem table and this game has no AP economy (one action per turn) — same caveat that already applies to Turbo's 'extra action' effect, which is also inert until an actions system exists. Numbered for consistency with the other chems; effect is reference-only for now.",
     "effect": "Slows perceived time, faster reactions",
     "stats": {
@@ -1466,7 +1466,7 @@ export const itemDatabase = {
     "name": "Med-X",
     "type": "consumable",
     "icon": "",
-    "image_prompt": "A glass syringe of pale liquid analgesic, the plunger scuffed, a faded label reading MED-X wrapped around the barrel, the needle capped with a bent plastic sheath.",
+    "image_prompt": "A glass syringe of pale liquid analgesic, the plunger scuffed, a faded label reading MED-X wrapped around the barrel, the needle capped with a bent rubber sheath.",
     "description": "Analgesic — temporary damage resistance buff, addictive.",
     "effect": "+3 DT, +20% DR to all damage types",
     "stats": {
@@ -1570,7 +1570,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "A century-egg-style preserved egg, cured in ash and salt. Keeps for years.",
-    "image_prompt": "A single preserved century egg with dark translucent shell, cut in half showing black-green interior, resting on ash-covered cloth, isolated on dark background, game icon style",
+    "image_prompt": "A single preserved century egg with dark translucent shell, cut in half showing black-green interior, resting on ash-covered cloth",
     "effect": "Restores 15 Hunger",
     "stats": {
       "hunger": 15
@@ -1619,7 +1619,7 @@ export const itemDatabase = {
     "name": "Rad-X",
     "type": "consumable",
     "icon": "",
-    "image_prompt": "A small orange pill bottle labelled RAD-X, the cap cracked, a faded radiation trefoil printed beneath the text, a few chalky tablets visible through the scratched plastic.",
+    "image_prompt": "A small amber glass pill bottle labelled RAD-X, the tin cap cracked, a faded radiation trefoil printed beneath the text, a few chalky tablets visible through the scratched glass.",
     "description": "Preventative counterpart to RadAway — buffs rad resistance before exposure, doesn't touch existing accumulated rads. Not in the manual's chem table; sized using the classic Fallout Rad-X convention (a flat percentage rad-resistance buff for a few hours) since the manual doesn't cover it.",
     "effect": "+25% Radiation Resistance for 4 hours",
     "stats": {
@@ -1635,7 +1635,7 @@ export const itemDatabase = {
     "name": "RadAway",
     "type": "consumable",
     "icon": "",
-    "image_prompt": "A hanging IV bag of pale yellow fluid attached to a coiled tube and needle, the plastic bag slightly clouded, a faded label reading RADAWAY printed near the top seal.",
+    "image_prompt": "A hanging glass IV bottle of pale yellow fluid attached to a coiled rubber tube and needle, the glass slightly clouded, a faded label reading RADAWAY printed near the top seal.",
     "description": "IV-drip rad cure. Highest value for non-Ghoul races given the Ghoul race's innate 80% RR. Sized against the manual's rad scale (600 = feral-check threshold, 1000 = full feral).",
     "effect": "Removes 300 rads",
     "stats": {
@@ -1651,7 +1651,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Iced coffee, reprocessed one too many times. Defers a rest that now costs real thirst.",
-    "image_prompt": "A scratched plastic cup of dark iced coffee with melting ice, condensation dripping, wasteland kopitiam relic, isolated on dark background, game icon style",
+    "image_prompt": "A dented enamel cup of dark iced coffee with melting ice, condensation dripping, wasteland kopitiam relic",
     "effect": "Restores 15 Thirst, costs 10 Sleep",
     "stats": {
       "thirst": 15,
@@ -1683,7 +1683,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "A sealed jar of bird's nest broth, a pre-War luxury good found improbably intact. Rare find.",
-    "image_prompt": "An ornate sealed glass jar of pale golden bird's nest broth, gold foil label peeling at the edges, luxury pre-war good, isolated on dark background, game icon style",
+    "image_prompt": "An ornate sealed glass jar of pale golden bird's nest broth, gold foil label peeling at the edges, luxury pre-war good",
     "effect": "Heals 1d8+2 HP, restores 20 Hunger and 15 Thirst",
     "stats": {
       "hunger": 20,
@@ -1700,7 +1700,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — field notes on charge weapons by a ghoul engineer.",
-    "image_prompt": "Loose technical notes on capacitors and charge weapons, faintly scorched at the edges, isolated on dark background, game icon style",
+    "image_prompt": "Loose technical notes on capacitors and charge weapons, faintly scorched at the edges",
     "effect": "Permanently grants +5 Energy Weapons skill",
     "stats": {
       "skill_energy_weapons": 5,
@@ -1716,7 +1716,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a working thief's private notes on lifting.",
-    "image_prompt": "A cramped little notebook in tight shorthand, hidden binding, no title, isolated on dark background, game icon style",
+    "image_prompt": "A cramped little notebook in tight shorthand, hidden binding, no title",
     "effect": "Permanently grants +5 Steal skill",
     "stats": {
       "skill_steal": 5,
@@ -1732,7 +1732,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a wanderer's running log of water, forage and terrain.",
-    "image_prompt": "A travel-worn log book with hand-drawn water maps, string-tied covers, isolated on dark background, game icon style",
+    "image_prompt": "A travel-worn log book with hand-drawn water maps, string-tied covers",
     "effect": "Permanently grants +5 Survival skill",
     "stats": {
       "skill_survival": 5,
@@ -1748,7 +1748,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a raider's crude primer on thrown explosives.",
-    "image_prompt": "A crude hand-stapled pamphlet on grenade handling, scrawled warnings in the margins, isolated on dark background, game icon style",
+    "image_prompt": "A crude hand-stapled pamphlet on grenade handling, scrawled warnings in the margins",
     "effect": "Permanently grants +5 Throwing skill",
     "stats": {
       "skill_throwing": 5,
@@ -1764,7 +1764,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a salvager's hard-won notes on disabled robots.",
-    "image_prompt": "A salvager's notebook with robot schematics and warning annotations, oil-smudged, isolated on dark background, game icon style",
+    "image_prompt": "A salvager's notebook with robot schematics and warning annotations, oil-smudged",
     "effect": "Permanently grants +5 Robotics skill",
     "stats": {
       "skill_robotics": 5,
@@ -1780,7 +1780,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a scout's field diary on moving unseen.",
-    "image_prompt": "A weathered field diary with terrain sketches and movement notes, elastic band closure, isolated on dark background, game icon style",
+    "image_prompt": "A weathered field diary with terrain sketches and movement notes, elastic band closure",
     "effect": "Permanently grants +5 Sneak skill",
     "stats": {
       "skill_sneak": 5,
@@ -1796,7 +1796,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a working thief's practical notes on locks.",
-    "image_prompt": "A slim pocket notebook of lock diagrams and timings, pencil smudges throughout, isolated on dark background, game icon style",
+    "image_prompt": "A slim pocket notebook of lock diagrams and timings, pencil smudges throughout",
     "effect": "Permanently grants +5 Lockpick skill",
     "stats": {
       "skill_lockpick": 5,
@@ -1812,7 +1812,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a merchant's collected techniques of persuasion.",
-    "image_prompt": "A merchant's leather-bound book of sales patter, ribbon bookmark, worn edges, isolated on dark background, game icon style",
+    "image_prompt": "A merchant's leather-bound book of sales patter, ribbon bookmark, worn edges",
     "effect": "Permanently grants +5 Speech skill",
     "stats": {
       "skill_speech": 5,
@@ -1828,7 +1828,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a trapper's hand-bound field guide.",
-    "image_prompt": "A hand-bound field guide of trap diagrams drawn in ink, twine binding, isolated on dark background, game icon style",
+    "image_prompt": "A hand-bound field guide of trap diagrams drawn in ink, twine binding",
     "effect": "Permanently grants +5 Traps skill",
     "stats": {
       "skill_traps": 5,
@@ -1844,7 +1844,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a field medic's working log.",
-    "image_prompt": "A field medic's log book with a faded red cross on the cover, tabbed pages, isolated on dark background, game icon style",
+    "image_prompt": "A field medic's log book with a faded red cross on the cover, tabbed pages",
     "effect": "Permanently grants +5 Medicine skill",
     "stats": {
       "skill_medicine": 5,
@@ -1860,7 +1860,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a loan shark's euphemistic handbook. No formal subject exists for this.",
-    "image_prompt": "A cheaply printed handbook with a smiling businessman on the cover, red and gold design, isolated on dark background, game icon style",
+    "image_prompt": "A cheaply printed handbook with a smiling businessman on the cover, red and gold design",
     "effect": "Permanently grants +5 Steal skill",
     "stats": {
       "skill_steal": 5,
@@ -1876,7 +1876,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — school Bahasa Malaysia textbook, speech and debate module.",
-    "image_prompt": "A school language textbook open to a public speaking chapter with podium illustrations, isolated on dark background, game icon style",
+    "image_prompt": "A school language textbook open to a public speaking chapter with podium illustrations",
     "effect": "Permanently grants +5 Speech skill",
     "stats": {
       "skill_speech": 5,
@@ -1892,7 +1892,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — pre-War spy serial, unexpectedly instructive.",
-    "image_prompt": "A pulp spy novel with a shadowed figure on the cover, cheap paper yellowed, isolated on dark background, game icon style",
+    "image_prompt": "A pulp spy novel with a shadowed figure on the cover, cheap paper yellowed",
     "effect": "Permanently grants +5 Sneak skill",
     "stats": {
       "skill_sneak": 5,
@@ -1908,7 +1908,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — pre-War regional medical journal.",
-    "image_prompt": "A pre-war medical journal with a clinical cover design, water-damaged corner, isolated on dark background, game icon style",
+    "image_prompt": "A pre-war medical journal with a clinical cover design, water-damaged corner",
     "effect": "Permanently grants +5 Medicine skill",
     "stats": {
       "skill_medicine": 5,
@@ -1940,7 +1940,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — small arms trade magazine, the Peninsula's edition of the pre-War standard. One-time read, permanent bonus.",
-    "image_prompt": "A worn pre-war firearms trade magazine, cover showing a rifle diagram, creased and water-stained, isolated on dark background, game icon style",
+    "image_prompt": "A worn pre-war firearms trade magazine, cover showing a rifle diagram, creased and water-stained",
     "effect": "Permanently grants +5 Small Guns skill",
     "stats": {
       "skill_small_guns": 5,
@@ -1956,7 +1956,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — heavy weapons trade quarterly.",
-    "image_prompt": "A heavy-stock trade magazine with a minigun on the cover, corner torn off, isolated on dark background, game icon style",
+    "image_prompt": "A heavy-stock trade magazine with a minigun on the cover, corner torn off",
     "effect": "Permanently grants +5 Big Guns skill",
     "stats": {
       "skill_big_guns": 5,
@@ -1972,7 +1972,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — pre-War outdoors magazine, now read very differently.",
-    "image_prompt": "A pre-war outdoor recreation magazine, jungle photograph cover, heavily thumbed, isolated on dark background, game icon style",
+    "image_prompt": "A pre-war outdoor recreation magazine, jungle photograph cover, heavily thumbed",
     "effect": "Permanently grants +5 Survival skill",
     "stats": {
       "skill_survival": 5,
@@ -1988,7 +1988,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — pre-War regional engineering journal.",
-    "image_prompt": "A dense technical engineering journal, structural diagrams, institutional cover design, isolated on dark background, game icon style",
+    "image_prompt": "A dense technical engineering journal, structural diagrams, institutional cover design",
     "effect": "Permanently grants +5 Engineering skill",
     "stats": {
       "skill_engineering": 5,
@@ -2004,7 +2004,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — school local studies textbook, environment module.",
-    "image_prompt": "A school local studies textbook open to a regional map and rainfall chart, isolated on dark background, game icon style",
+    "image_prompt": "A school local studies textbook open to a regional map and rainfall chart",
     "effect": "Permanently grants +5 Survival skill",
     "stats": {
       "skill_survival": 5,
@@ -2020,7 +2020,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — the surviving first lesson of a mail-order course. No formal subject exists for this.",
-    "image_prompt": "A single mail-order correspondence lesson in a torn envelope, official-looking letterhead, isolated on dark background, game icon style",
+    "image_prompt": "A single mail-order correspondence lesson in a torn envelope, official-looking letterhead",
     "effect": "Permanently grants +5 Instinct skill",
     "stats": {
       "skill_instinct": 5,
@@ -2036,7 +2036,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — primary school Living Skills textbook, metalcraft module.",
-    "image_prompt": "A school Living Skills textbook open to a metalwork module with hand-tool diagrams, isolated on dark background, game icon style",
+    "image_prompt": "A school Living Skills textbook open to a metalwork module with hand-tool diagrams",
     "effect": "Permanently grants +5 Melee Weapons skill",
     "stats": {
       "skill_melee_weapons": 5,
@@ -2052,7 +2052,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — school Living Skills textbook, simple mechanisms module.",
-    "image_prompt": "A school textbook open to a simple mechanisms chapter showing levers and pin diagrams, isolated on dark background, game icon style",
+    "image_prompt": "A school textbook open to a simple mechanisms chapter showing levers and pin diagrams",
     "effect": "Permanently grants +5 Lockpick skill",
     "stats": {
       "skill_lockpick": 5,
@@ -2100,7 +2100,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a sentimental story collection about trusting your gut.",
-    "image_prompt": "A sentimental inspirational story collection with a warm homely cover illustration, isolated on dark background, game icon style",
+    "image_prompt": "A sentimental inspirational story collection with a warm homely cover illustration",
     "effect": "Permanently grants +5 Instinct skill",
     "stats": {
       "skill_instinct": 5,
@@ -2116,7 +2116,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a pit fighter's personal diary.",
-    "image_prompt": "A small battered diary, bloodstained thumbprint on the cover, terse handwritten entries, isolated on dark background, game icon style",
+    "image_prompt": "A small battered diary, bloodstained thumbprint on the cover, terse handwritten entries",
     "effect": "Permanently grants +5 Unarmed skill",
     "stats": {
       "skill_unarmed": 5,
@@ -2132,7 +2132,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — pre-War athletics manual on throwing events.",
-    "image_prompt": "A pre-war athletics manual with a javelin thrower on the cover, olympic rings faded, isolated on dark background, game icon style",
+    "image_prompt": "A pre-war athletics manual with a javelin thrower on the cover, olympic rings faded",
     "effect": "Permanently grants +5 Throwing skill",
     "stats": {
       "skill_throwing": 5,
@@ -2148,7 +2148,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — school PE textbook, handball unit.",
-    "image_prompt": "A school PE textbook open to a handball unit, throwing-motion illustrations, isolated on dark background, game icon style",
+    "image_prompt": "A school PE textbook open to a handball unit, throwing-motion illustrations",
     "effect": "Permanently grants +5 Throwing skill",
     "stats": {
       "skill_throwing": 5,
@@ -2164,7 +2164,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — school PE textbook, silat unit.",
-    "image_prompt": "A school physical education textbook open to a silat unit with stance photographs, isolated on dark background, game icon style",
+    "image_prompt": "A school physical education textbook open to a silat unit with stance photographs",
     "effect": "Permanently grants +5 Unarmed skill",
     "stats": {
       "skill_unarmed": 5,
@@ -2180,7 +2180,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — illustrated silat form manual, blade chapter included.",
-    "image_prompt": "An illustrated martial arts form manual showing sequential stances, traditional Southeast Asian design, isolated on dark background, game icon style",
+    "image_prompt": "An illustrated martial arts form manual showing sequential stances, traditional Southeast Asian design",
     "effect": "Permanently grants +5 Melee Weapons skill",
     "stats": {
       "skill_melee_weapons": 5,
@@ -2196,7 +2196,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — school health education textbook, first aid module.",
-    "image_prompt": "A school health education textbook open to a first aid module with bandaging diagrams, isolated on dark background, game icon style",
+    "image_prompt": "A school health education textbook open to a first aid module with bandaging diagrams",
     "effect": "Permanently grants +5 Medicine skill",
     "stats": {
       "skill_medicine": 5,
@@ -2212,7 +2212,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — pre-War trapping quarterly.",
-    "image_prompt": "A trapping trade magazine with a snare diagram cover, damp-warped pages, isolated on dark background, game icon style",
+    "image_prompt": "A trapping trade magazine with a snare diagram cover, damp-warped pages",
     "effect": "Permanently grants +5 Traps skill",
     "stats": {
       "skill_traps": 5,
@@ -2228,7 +2228,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a student's tongue-in-cheek guide to truancy. No formal subject exists for this.",
-    "image_prompt": "A crudely photocopied student zine about skipping class, hand-drawn school map on the cover, isolated on dark background, game icon style",
+    "image_prompt": "A crudely photocopied student zine about skipping class, hand-drawn school map on the cover",
     "effect": "Permanently grants +5 Sneak skill",
     "stats": {
       "skill_sneak": 5,
@@ -2244,7 +2244,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — school Design & Technology textbook, metal workshop module.",
-    "image_prompt": "A school workshop textbook open to metalworking techniques with tool photographs, isolated on dark background, game icon style",
+    "image_prompt": "A school workshop textbook open to metalworking techniques with tool photographs",
     "effect": "Permanently grants +5 Gunsmith skill",
     "stats": {
       "skill_gunsmith": 5,
@@ -2260,7 +2260,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — school Design & Technology textbook, mechanisms module.",
-    "image_prompt": "A school design and technology textbook open to a mechanisms chapter with lever diagrams, isolated on dark background, game icon style",
+    "image_prompt": "A school design and technology textbook open to a mechanisms chapter with lever diagrams",
     "effect": "Permanently grants +5 Traps skill",
     "stats": {
       "skill_traps": 5,
@@ -2276,7 +2276,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — school Design & Technology textbook, complete.",
-    "image_prompt": "A thick school design and technology textbook, bright cover, annotated margins, isolated on dark background, game icon style",
+    "image_prompt": "A thick school design and technology textbook, bright cover, annotated margins",
     "effect": "Permanently grants +5 Engineering skill",
     "stats": {
       "skill_engineering": 5,
@@ -2292,7 +2292,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — pre-War robotics magazine.",
-    "image_prompt": "A retro-futurist robotics magazine with a friendly robot on the cover, optimistic design, isolated on dark background, game icon style",
+    "image_prompt": "A retro-futurist robotics magazine with a friendly robot on the cover, optimistic design",
     "effect": "Permanently grants +5 Robotics skill",
     "stats": {
       "skill_robotics": 5,
@@ -2308,7 +2308,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — primary school science textbook, Year 5.",
-    "image_prompt": "A primary school science textbook, bright cover with cartoon scientists, worn corners, isolated on dark background, game icon style",
+    "image_prompt": "A primary school science textbook, bright cover with cartoon scientists, worn corners",
     "effect": "Permanently grants +5 Science skill",
     "stats": {
       "skill_science": 5,
@@ -2324,7 +2324,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — primary school science textbook, electricity chapter.",
-    "image_prompt": "A primary school science textbook open to an electricity chapter, child's colouring on the diagram, isolated on dark background, game icon style",
+    "image_prompt": "A primary school science textbook open to an electricity chapter, child's colouring on the diagram",
     "effect": "Permanently grants +5 Energy Weapons skill",
     "stats": {
       "skill_energy_weapons": 5,
@@ -2356,7 +2356,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — school science textbook, future technology chapter.",
-    "image_prompt": "A school science textbook open to a cheerful future-technology chapter with robot illustrations, isolated on dark background, game icon style",
+    "image_prompt": "A school science textbook open to a cheerful future-technology chapter with robot illustrations",
     "effect": "Permanently grants +5 Robotics skill",
     "stats": {
       "skill_robotics": 5,
@@ -2372,7 +2372,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a scrapyard's running log of heavy weapons salvage.",
-    "image_prompt": "A thick ledger of handwritten heavy-weapon salvage notes, many entries struck through, isolated on dark background, game icon style",
+    "image_prompt": "A thick ledger of handwritten heavy-weapon salvage notes, many entries struck through",
     "effect": "Permanently grants +5 Big Guns skill",
     "stats": {
       "skill_big_guns": 5,
@@ -2388,7 +2388,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — pre-War energy weapons weekly.",
-    "image_prompt": "A glossy pre-war energy weapons magazine, laser rifle on the cover, sun-bleached, isolated on dark background, game icon style",
+    "image_prompt": "A glossy pre-war energy weapons magazine, laser rifle on the cover, sun-bleached",
     "effect": "Permanently grants +5 Energy Weapons skill",
     "stats": {
       "skill_energy_weapons": 5,
@@ -2420,7 +2420,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a bench gunsmith's running modification log.",
-    "image_prompt": "A workshop log book of weapon modifications, tick marks and crossings-out, oil stains, isolated on dark background, game icon style",
+    "image_prompt": "A workshop log book of weapon modifications, tick marks and crossings-out, oil stains",
     "effect": "Permanently grants +5 Gunsmith skill",
     "stats": {
       "skill_gunsmith": 5,
@@ -2436,7 +2436,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a hand-bound field notebook on improvised firearms.",
-    "image_prompt": "A hand-bound notebook stuffed with loose diagrams of improvised guns, grease-stained pages, isolated on dark background, game icon style",
+    "image_prompt": "A hand-bound notebook stuffed with loose diagrams of improvised guns, grease-stained pages",
     "effect": "Permanently grants +5 Small Guns skill",
     "stats": {
       "skill_small_guns": 5,
@@ -2452,7 +2452,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a pocket-sized trade guide to lifting.",
-    "image_prompt": "A tiny pocket-sized guidebook, comically small, worn cloth cover, isolated on dark background, game icon style",
+    "image_prompt": "A tiny pocket-sized guidebook, comically small, worn cloth cover",
     "effect": "Permanently grants +5 Steal skill",
     "stats": {
       "skill_steal": 5,
@@ -2468,7 +2468,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a working journal of post-collapse experiments.",
-    "image_prompt": "A thick handwritten research journal, taped spine, pressed samples between pages, isolated on dark background, game icon style",
+    "image_prompt": "A thick handwritten research journal, taped spine, pressed samples between pages",
     "effect": "Permanently grants +5 Science skill",
     "stats": {
       "skill_science": 5,
@@ -2484,7 +2484,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a working engineer's scrapyard workbook.",
-    "image_prompt": "A grease-stained workbook full of repair schematics, metal clip binding, isolated on dark background, game icon style",
+    "image_prompt": "A grease-stained workbook full of repair schematics, metal clip binding",
     "effect": "Permanently grants +5 Engineering skill",
     "stats": {
       "skill_engineering": 5,
@@ -2500,7 +2500,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a scrapyard smith's primer on improvised blades.",
-    "image_prompt": "A grubby workshop primer on improvised blade-making, metal shavings in the spine, isolated on dark background, game icon style",
+    "image_prompt": "A grubby workshop primer on improvised blade-making, metal shavings in the spine",
     "effect": "Permanently grants +5 Melee Weapons skill",
     "stats": {
       "skill_melee_weapons": 5,
@@ -2516,7 +2516,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — pre-War weaponsmithing trade journal.",
-    "image_prompt": "A weaponsmithing trade journal with exploded gun diagrams on the cover, isolated on dark background, game icon style",
+    "image_prompt": "A weaponsmithing trade journal with exploded gun diagrams on the cover",
     "effect": "Permanently grants +5 Gunsmith skill",
     "stats": {
       "skill_gunsmith": 5,
@@ -2532,7 +2532,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — pre-War fighting magazine.",
-    "image_prompt": "A pulp fighting magazine with two boxers on the cover, dog-eared and taped, isolated on dark background, game icon style",
+    "image_prompt": "A pulp fighting magazine with two boxers on the cover, dog-eared and taped",
     "effect": "Permanently grants +5 Unarmed skill",
     "stats": {
       "skill_unarmed": 5,
@@ -2548,7 +2548,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — bound university lecture notes on heavy weapon systems.",
-    "image_prompt": "Bound university lecture notes, faded institutional crest on the cover, technical diagrams, isolated on dark background, game icon style",
+    "image_prompt": "Bound university lecture notes, faded institutional crest on the cover, technical diagrams",
     "effect": "Permanently grants +5 Big Guns skill",
     "stats": {
       "skill_big_guns": 5,
@@ -2580,7 +2580,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — a study of intuition and threat perception.",
-    "image_prompt": "A sober academic-looking paperback on intuition, plain typographic cover, isolated on dark background, game icon style",
+    "image_prompt": "A sober academic-looking paperback on intuition, plain typographic cover",
     "effect": "Permanently grants +5 Instinct skill",
     "stats": {
       "skill_instinct": 5,
@@ -2596,7 +2596,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "Skill book — pre-War military training pamphlet, relentlessly cheerful.",
-    "image_prompt": "A thin pre-war military training pamphlet with a smiling cartoon soldier on the cover, isolated on dark background, game icon style",
+    "image_prompt": "A thin pre-war military training pamphlet with a smiling cartoon soldier on the cover",
     "effect": "Permanently grants +5 Small Guns skill",
     "stats": {
       "skill_small_guns": 5,
@@ -2612,7 +2612,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "",
     "description": "A bottle of sweetened soyabean milk, the classic roadside stall drink. Still made fresh where soy can be grown.",
-    "image_prompt": "A reused glass bottle filled with pale creamy soyabean milk, hand-tied plastic cap, condensation on the glass, roadside stall drink, isolated on dark background, game icon style",
+    "image_prompt": "A reused glass bottle filled with pale creamy soyabean milk, hand-tied plastic cap, condensation on the glass, roadside stall drink",
     "effect": "Restores 20 Thirst",
     "stats": {
       "thirst": 20
@@ -2626,7 +2626,7 @@ export const itemDatabase = {
     "name": "Stimpak",
     "type": "consumable",
     "icon": "",
-    "image_prompt": "A syringe of glowing red liquid housed in a scratched clear plastic casing, a metal plunger cap, a faded label reading STIMPAK wrapped around the barrel.",
+    "image_prompt": "A syringe of glowing red liquid housed in a scratched glass casing, a metal plunger cap, a faded label reading STIMPAK wrapped around the barrel.",
     "description": "Standard pre-war combat medical syringe — mainline 'Stimpak.' Baseline healing item; can_use_stimpaks flag already exists in RACE_RULES (Robots cannot use).",
     "effect": "Heals 1d10+10 HP",
     "stats": {
@@ -2780,7 +2780,7 @@ export const itemDatabase = {
     "name": "Caliphate Dinar",
     "type": "currency",
     "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
-    "image_prompt": "A trinitite-glazed ceramic token stamped with a mosque motif, its glassy surface faintly iridescent, edges chipped, a worn inscription in Arabic script circling the rim.",
+    "image_prompt": "A trinitite-glazed ceramic token stamped with the Caliphate's rising-sun quarter-circle device, its glassy surface faintly iridescent, edges chipped, a worn line of Jawi calligraphy circling the rim.",
     "description": "A trinitite-infused library token, granting temporary access to the Grand Library. Often treated as spiritual relics or symbols of honor ",
     "weight": 0,
     "value": 1,
@@ -2791,7 +2791,7 @@ export const itemDatabase = {
     "name": "Protectorate Dollar",
     "type": "currency",
     "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
-    "image_prompt": "A crisp rectangular banknote printed in green ink, a portrait of a Protectorate official at its centre, a holographic security strip catching the light, corners slightly worn.",
+    "image_prompt": "A crisp rectangular banknote printed in green ink, a portrait of a Protectorate official at its centre, an engraved guilloché border and a woven metallic security thread, corners slightly worn.",
     "description": "A tightly controlled currency distributed by the Protectorate.",
     "weight": 0,
     "value": 1,
@@ -2872,7 +2872,7 @@ export const itemDatabase = {
     "name": "Cracked LCD Panel",
     "type": "junk",
     "icon": "",
-    "image_prompt": "A shattered flat display panel with a spiderweb crack across dark glass, a bent metal bezel, exposed ribbon cable dangling from one edge, a faded shopfront brand logo in the corner.",
+    "image_prompt": "A large cracked glass-fronted display board from a pre-war shopfront, spiderweb fractures across a grid of small glass indicator windows, a bent bakelite-and-metal bezel, frayed cloth-sheathed wiring trailing from one edge, a faded shopfront brand plate in the corner.",
     "description": "A shattered display panel, scavenged from a pre-War shopfront or office.",
     "scrap_yield": {
       "electronics": 2
@@ -2931,7 +2931,7 @@ export const itemDatabase = {
     "name": "Dead Car Battery",
     "type": "junk",
     "icon": "",
-    "image_prompt": "A rectangular lead-acid car battery encased in cracked black plastic, corroded green-white crust crusted around the terminals, one post snapped off, the brand label long peeled away, acid stains crusting down one side.",
+    "image_prompt": "A rectangular lead-acid car battery encased in cracked black bakelite, corroded green-white crust crusted around the terminals, one post snapped off, the brand label long peeled away, acid stains crusting down one side.",
     "description": "A spent lead-acid battery, pulled from a wreck long since stripped of everything else.",
     "scrap_yield": {
       "chemicals": 2,
@@ -3093,7 +3093,7 @@ export const itemDatabase = {
     "name": "Spool of Fishing Line",
     "type": "junk",
     "icon": "",
-    "image_prompt": "A small plastic spool wound with tangled nylon fishing line, the line yellowed and brittle, salt crust caked around the edges, a faded brand label peeling off the hub.",
+    "image_prompt": "A small wooden spool wound with tangled nylon fishing line, the line yellowed and brittle, salt crust caked around the edges, a faded brand label peeling off the hub.",
     "description": "Nylon fishing line off a broken reel — common salvage near Bandawang's waterfront.",
     "scrap_yield": {
       "cloth": 1,
@@ -3122,7 +3122,7 @@ export const itemDatabase = {
     "name": "The Ishtar Device",
     "type": "junk",
     "icon": "",
-    "image_prompt": "A palm-sized plastic device with a small speaker grille and a single blinking status light, moulded casing scuffed and yellowed with age, a peeling sticker printed with a roaring animal crossed out in red, a hand-written price tag tied on with string.",
+    "image_prompt": "A palm-sized bakelite device with a small speaker grille and a single blinking status light, moulded casing scuffed and yellowed with age, a peeling sticker printed with a roaring animal crossed out in red, a hand-written price tag tied on with string.",
     "description": "A boxy unit that supposedly emits an ultrasonic screech to scare off dangerous creatures. Reads like a scam — but anyone with real Science knowledge can tell the internals are genuine pre-War hardware, even if nobody can say whether it ever worked.",
     "scrap_yield": {
       "electronics": 3,
@@ -3167,7 +3167,7 @@ export const itemDatabase = {
     "name": "Withered Herb Bundle",
     "type": "junk",
     "icon": "",
-    "image_prompt": "A small bundle of dried kitchen herbs tied with string, brittle pandan and serai stalks curled and browned, leaves crumbling to dust, a faded twine loop for hanging still knotted at the top.",
+    "image_prompt": "A small bundle of dried kitchen herbs tied with string, brittle pandan and serai stalks curled and browned, leaves crumbling to brittle flakes, a faded twine loop for hanging still knotted at the top.",
     "description": "A bundle of dried kitchen herbs, found hanging in an abandoned stall.",
     "scrap_yield": {
       "organics": 2
@@ -3205,7 +3205,7 @@ export const itemDatabase = {
     "skill": "melee_weapons",
     "icon": "",
     "description": "An industrial pipe wrench scaled for factory machinery, repurposed as a two-handed bludgeon. Heavy, slow, and it ends fights.",
-    "image_prompt": "A massive industrial pipe wrench, chipped red paint over rusted steel, factory brand markings, held two-handed, oversized wasteland weapon, isolated on dark background, game icon style",
+    "image_prompt": "A massive industrial pipe wrench, chipped red paint over rusted steel, factory brand markings, held two-handed, oversized wasteland weapon",
     "stats": {
       "dmg": "2d6+2",
       "dmgType": "normal",
@@ -3487,7 +3487,7 @@ export const itemDatabase = {
     "skill": "melee_weapons",
     "icon": "",
     "description": "A rotary minigun barrel cluster, seized solid with rust and repurposed as the heaviest melee weapon around.",
-    "image_prompt": "A rusted rotary minigun barrel cluster repurposed as a heavy improvised club, six fused barrels, welded handle grip, oversized wasteland weapon, isolated on dark background, game icon style",
+    "image_prompt": "A rusted rotary minigun barrel cluster repurposed as a heavy improvised club, six fused barrels, welded handle grip, oversized wasteland weapon",
     "stats": {
       "dmg": "2d6+4",
       "dmgType": "normal",
@@ -3506,7 +3506,7 @@ export const itemDatabase = {
     "skill": "small_guns",
     "icon": "",
     "description": "A single-shot improvised firearm built from PVC piping and a nail-strike mechanism.",
-    "image_prompt": "A crude single-shot pipe gun made from white PVC pipe, rubber bands and a nail firing pin, duct tape wrapped grip, isolated on dark background, game icon style",
+    "image_prompt": "A crude single-shot pipe gun made from white PVC pipe, rubber bands and a nail firing pin, duct tape wrapped grip",
     "stats": {
       "dmg": "1d4",
       "dmgType": "normal",
@@ -3841,7 +3841,7 @@ export const itemDatabase = {
     "skill": "energy_weapons",
     "icon": "",
     "description": "A genuine pre-War Laser Rifle, badly aged — cracked housing and a chipped focusing lens leave it recognizably special but mechanically weak. Disrepair, not pristine.",
-    "image_prompt": "A cracked and weathered pre-war laser rifle, chipped crystal focusing lens, exposed wiring, faded Federation markings, damaged but recognizable high-tech weapon, isolated on dark background, game icon style",
+    "image_prompt": "A cracked and weathered pre-war laser rifle, chipped crystal focusing lens, exposed wiring, faded Federation markings, damaged but recognizable high-tech weapon",
     "condition": "disrepair",
     "stats": {
       "dmg": "1d6",
@@ -4168,7 +4168,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "image_prompt": "A Federation-issue nightstick, black polymer worn matte-grey along the grip, a looped wrist strap frayed and graying, faint scuff marks and a chipped stenciled unit number near the base.",
+    "image_prompt": "A Federation-issue nightstick, black bakelite worn matte-grey along the grip, a looped wrist strap frayed and graying, faint scuff marks and a chipped stenciled unit number near the base.",
     "description": "Normal tier blunt weapon, Federation crowd-control issue. Tier 1 (Normal). Stats assigned via 7-10 round combat framework.",
     "stats": {
       "dmg": "1d8+MD",
@@ -4187,7 +4187,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "image_prompt": "A cracked pool cue with chalk dust ground into the worn wooden shaft, the tip's leather cap peeling away, a faded felt-and-brass joint at the midpoint, splintering visible along one broken edge.",
+    "image_prompt": "A cracked pool cue with blue chalk residue smudged into the worn wooden shaft, the tip's leather cap peeling and spotted with mildew, a faded felt-and-brass joint gone green at the seam, splintering visible along one broken edge.",
     "description": "Scrap tier improvised blunt weapon. Tier 0 (Scrap). Stats assigned via 7-10 round combat framework (target avg ~4-6).",
     "stats": {
       "dmg": "1d4+MD",
@@ -4360,7 +4360,7 @@ export const itemDatabase = {
     "skill": "melee_weapons",
     "icon": "",
     "description": "A plank of wood studded with bent nails — the archetypal wasteland weapon.",
-    "image_prompt": "A wooden plank bristling with rusty bent nails driven through it, wrapped cloth handle, dried blood stains, wasteland scavenge aesthetic, isolated on dark background, game icon style",
+    "image_prompt": "A wooden plank bristling with rusty bent nails driven through it, wrapped cloth handle, dried blood stains, wasteland scavenge aesthetic",
     "stats": {
       "dmg": "1d6+1",
       "dmgType": "normal",
@@ -4497,7 +4497,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "small_guns",
     "icon": "",
-    "image_prompt": "A compact 9mm pistol with a slim slide and a short barrel, worn matte finish scratched along the edges, a cracked polymer grip panel, a faded factory proof mark stamped near the muzzle.",
+    "image_prompt": "A compact 9mm pistol with a slim slide and a short barrel, worn matte finish scratched along the edges, a cracked bakelite grip panel, a faded factory proof mark stamped near the muzzle.",
     "description": "Normal tier factory sidearm, easily concealed. Tier 1 (Normal), low end.",
     "stats": {
       "dmg": "1d8+3",
@@ -4537,7 +4537,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "image_prompt": "A length of motorcycle chain wound tight and wrapped in layers of black electrical tape for a grip, links rusted at the exposed ends, a small strip of red cloth tied near the handle marking it Rakan Watch.",
+    "image_prompt": "A length of motorcycle chain wound tight and wrapped in layers of black electrical tape for a grip, links rusted at the exposed ends, a small strip of mint-green cloth tied near the handle marking it Rakan Watch.",
     "description": "Bicycle chain wrapped in tape, The Rakan Watch's signature improvised flail.",
     "stats": {
       "dmg": "TBA",
@@ -4636,7 +4636,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "image_prompt": "A faction-standard semi-automatic rifle with a ribbed polymer handguard and a straight magazine, worn matte-green finish scuffed to bare metal, a scratched optical sight mounted on the rail, a faded serial stamp near the receiver.",
+    "image_prompt": "A faction-standard semi-automatic rifle with a ribbed bakelite handguard and a straight magazine, worn matte-green finish scuffed to bare metal, a scratched optical sight mounted on the rail, a faded serial stamp near the receiver.",
     "description": "Normal tier semi-automatic rifle, faction-standard issue. Tier 2 (Faction-Issued).",
     "stats": {
       "dmg": "2d8+3",
@@ -4799,7 +4799,7 @@ export const itemDatabase = {
     "skill": "melee_weapons",
     "icon": "",
     "description": "A crude but effective greatsword welded together from flattened rebar lengths. The best pure damage a bench can currently produce.",
-    "image_prompt": "A large improvised greatsword forged from flattened rebar segments welded together, rough weld seams visible, wrapped leather grip, oversized wasteland weapon, isolated on dark background, game icon style",
+    "image_prompt": "A large improvised greatsword forged from flattened rebar segments welded together, rough weld seams visible, wrapped leather grip, oversized wasteland weapon",
     "stats": {
       "dmg": "2d8",
       "dmgType": "normal",
@@ -4877,7 +4877,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "image_prompt": "A common pump-action shotgun with a ribbed foregrip and a short barrel, worn matte finish scuffed to bare metal, a scarred polymer stock, a faded serial number stamped near the receiver, the most ordinary shotgun around.",
+    "image_prompt": "A common pump-action shotgun with a ribbed foregrip and a short barrel, worn matte finish scuffed to bare metal, a scarred bakelite stock, a faded serial number stamped near the receiver, the most ordinary shotgun around.",
     "description": "Normal tier shotgun, the most common variant in circulation. Tier 1 (Normal), most common variant.",
     "stats": {
       "dmg": "2d6+4",
