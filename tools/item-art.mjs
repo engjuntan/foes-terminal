@@ -24,6 +24,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { allSlots } from './art-slots.mjs';
 import { allLocationShots } from './art-locations.mjs';
+import crypto from 'crypto';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const VAULT = process.env.FOES_VAULT || '/Users/edge/Library/CloudStorage/GoogleDrive-fallouteasternshores@gmail.com/My Drive/FOES Wiki/FALLOUT_MASTER_ZIPv3';
@@ -439,6 +440,19 @@ function collect() {
     .filter(x => (Date.now() - x.at) / 60000 <= maxAgeMin)
     .sort((a, b) => b.at - a.at)[0] : null;
   if (!pick) fail(`no image newer than ${maxAgeMin} min in ${dir} — download it first, or pass --from <dir>.`);
+  // A browser download and this command can race: the newest file in
+  // Downloads may still be the PREVIOUS image if the new one hasn't landed.
+  // Refuse anything we've already filed rather than collecting a duplicate
+  // under the wrong id (this bit the art-runner once).
+  const digest = f => crypto.createHash('md5').update(fs.readFileSync(f)).digest('hex');
+  const incoming = digest(path.join(dir, pick.f));
+  for (const folder of [INBOX, DONE]) {
+    if (!fs.existsSync(folder)) continue;
+    const clash = fs.readdirSync(folder)
+      .filter(f => /\.(png|jpe?g|webp)$/i.test(f))
+      .find(f => digest(path.join(folder, f)) === incoming);
+    if (clash) fail(`${pick.f} is the same image as ${path.basename(folder)}/${clash} — the download for "${id}" probably hasn't finished. Wait for it and run collect again.`);
+  }
   const ext = path.extname(pick.f).toLowerCase() === '.jpeg' ? '.jpg' : path.extname(pick.f).toLowerCase();
   const dest = path.join(INBOX, `${id}${ext}`);
   if (DRY) { console.log(`[dry run] would move ${pick.f} → ${path.relative(ROOT, dest)}`); return; }
