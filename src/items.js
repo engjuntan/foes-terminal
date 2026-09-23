@@ -3302,8 +3302,8 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "",
-    "description": "Scrap-tier improvised spear, straightened rebar ground to a point.",
-    "image_prompt": "A crude spear made from a length of rusted rebar, hammered straight and ground to a point, wrapped grip, wasteland scavenge aesthetic, isolated on dark background, game icon style",
+    "description": "A long length of rebar ground to a point, with several scrap hand holds welded along one end that serve as grips and as counterweight.",
+    "image_prompt": "A long single length of ridged rusted rebar ground to a point at one end, with several short scrap-steel hand holds crudely welded along the other end as grips and counterweight, weld spatter and black-brown rust streaks.",
     "stats": {
       "dmg": "1d6",
       "dmgType": "normal",
@@ -3872,6 +3872,25 @@ export const itemDatabase = {
     },
     "weight": 0.8,
     "value": 50
+  },
+  kapak: {
+    "id": "kapak",
+    "name": "Kapak",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "medium",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "Wow an actual axe axe. Don't tell the axe gang.",
+    "image_prompt": "A homemade felling axe: a heavy wedge of scrap steel ground to an edge and bound with wire to a hardwood haft worn smooth by use, hammer marks across the head, damp black-green staining in the grain.",
+    "stats": {
+      "dmg": "1d10",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "weight": 2.5,
+    "value": 25
   },
   kitchen_knife: {
     "id": "kitchen_knife",
@@ -4908,6 +4927,45 @@ export const itemDatabase = {
     },
     "weight": 2.4,
     "value": 130
+  },
+  axe_gang_axe_melee: {
+    "id": "axe_gang_axe_melee",
+    "name": "The Axe Gang Axe (Melee)",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "melee_weapons",
+    "icon": "",
+    "description": "The choice weapon of the Axe Gang. Spits tunes and splits heads in equal measure. The melee variant.",
+    "image_prompt": "A salvaged electric guitar rebuilt as a melee weapon: the body reinforced with welded steel plate and studded with spikes along both edges, strings still strung over a scarred pickguard, hand-painted band lettering worn away by use, black-brown rust streaking the plate.",
+    "stats": {
+      "dmg": "2d6",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "weight": 5,
+    "value": 60
+  },
+  axe_gang_axe_ranged: {
+    "id": "axe_gang_axe_ranged",
+    "name": "The Axe Gang Axe (Ranged)",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "large",
+    "two_handed": true,
+    "skill": "small_guns",
+    "icon": "",
+    "description": "The choice weapon of the Axe Gang. Spits tunes and splits heads in equal measure. The ranged variant.",
+    "image_prompt": "A salvaged double-necked electric guitar rebuilt as a firearm: a scavenged gun barrel running the length of each neck, a handle protruding perpendicular from the body as a grip with the trigger set into it, strings still strung across a scorched pickguard, welded steel bracing and rust weeping from every seam.",
+    "stats": {
+      "dmg": "1d10+2",
+      "dmgType": "normal",
+      "range": 16,
+      "ammo_type": "makeshift_rounds"
+    },
+    "weight": 6,
+    "value": 90
   },
   water_pipe_cudgel: {
     "id": "water_pipe_cudgel",

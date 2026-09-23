@@ -963,7 +963,7 @@ Answers to `reviews/lore-audit-org-map.md`. These override older vault notes.
   and crack the vault). More alternatives to follow, after the vault's
   security is designed.
 
-## Heist economics, Faiz, and the Sakai (2026-09-23)
+## Heist economics, Faiz, and the Beruk (2026-09-23)
 
 - **Pre-War ringgits are honoured only once stamped into RMR.** The
   heisters know this. Finding ways to stamp — or counterfeit — the vault's
@@ -973,8 +973,22 @@ Answers to `reviews/lore-audit-org-map.md`. These override older vault notes.
 - **Faiz wants the data because the Caliphate reveres knowledge.** He
   believes the servers hold pre-War historical records for the Grand
   Library. He doesn't know they are a map to US Army caches.
-- **The Sakai** are aggressive mutated monkeys. Monyet Sakai and Ibu Sakai
-  both fight with Claw and Bite; only the mother has the **Screech**.
+- **The Beruk** are aggressive mutated monkeys (renamed from "Sakai" on
+  2026-09-23 — *sakai* is a live slur against Orang Asli). Beruk and Ibu
+  Beruk both fight with Claw and Bite and can **Throw Berak**; only the
+  mother has the **Screech**.
 - **Screech:** on a failed Endurance difficulty check, −2 PER for 1 turn.
 - **Poison attacks use the same shape**: an Endurance difficulty check,
   not an ad-hoc roll.
+
+## New items and tone (2026-09-23)
+
+- **The Axe Gang Axe (Melee)** and **(Ranged)** are the gang's signature
+  weapon: a salvaged electric guitar, reinforced and spiked for melee, or
+  double-necked with a barrel down each neck and a perpendicular grip and
+  trigger for the ranged version. The four earlier variants (Rifle, Sledge,
+  Volt, Flame Axe) remain — GM to say whether they stay as sub-variants.
+- **Kapak** — a plain homemade axe. "Wow an actual axe axe. Don't tell the
+  axe gang."
+- **Tone reminder for every agent:** Fallout's dark comedy is part of the
+  brief, not a garnish. Berak-throwing monkeys belong.

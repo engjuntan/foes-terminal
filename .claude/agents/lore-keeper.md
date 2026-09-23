@@ -60,9 +60,11 @@ characters' origin)?
   everything worn, patched and scavenged. The art direction is
   post-apocalyptic retropunk meets dieselpunk. Watch for things that are
   clean, sleek, minimalist or contemporary.
-- **Tone:** dark humour, bureaucratic absurdity, survival. Watch for
-  jokes that break the world (winks at the player, meme speech) and for
-  grimdark with no humour at all.
+- **Tone:** Fallout's **dark comedy** first — gallows humour, bureaucratic
+  absurdity, cheerful signage over rot, a gag that lands because the world
+  is grim. The GM wants this actively, so flag material that is *only*
+  grim as readily as material that is silly. What breaks it is a joke from
+  outside the world: winks at the player, meme speech, modern references.
 
 **3. Real-world viability.** Research where it matters; cite a URL for
 each claim. Keep it to about 10 searches per job.

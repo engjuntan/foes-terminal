@@ -176,6 +176,95 @@ export const bestiaryDatabase = {
       }
     ]
   },
+  beruk: {
+    "id": "beruk",
+    "name": "Beruk",
+    "type": "monster",
+    "creature_type": "Mutated Creature",
+    "icon": "",
+    "description": "A mutated beruk — lean, grey-furred and permanently furious. They travel in troops, take what they want, bite anyone slow about handing it over, and throw what they have been saving at anyone who argues.",
+    "notes": "Can attack and move. Never alone: troops of three or more, and an Ibu Beruk is usually close by.",
+    "stats": {
+      "hp": 40,
+      "variance_bias": "normal",
+      "sequence": 18,
+      "crit_chance": 5,
+      "ac": 15,
+      "dtdr": {
+        "normal": {
+          "dt": 0,
+          "dr": 10
+        },
+        "laser": {
+          "dt": 0,
+          "dr": 0
+        },
+        "fire": {
+          "dt": 0,
+          "dr": -10
+        },
+        "plasma": {
+          "dt": 0,
+          "dr": 0
+        },
+        "explosive": {
+          "dt": 0,
+          "dr": 5
+        }
+      },
+      "resistances": {
+        "energy": 0,
+        "poison": 20,
+        "rad": 40,
+        "gas": 0,
+        "emp": 0
+      },
+      "special": {
+        "str": 4,
+        "per": 6,
+        "end": 4,
+        "cha": 3,
+        "int": 3,
+        "agi": 9,
+        "luk": 5
+      }
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "hit_percent": 65,
+        "action": "Attack",
+        "damage": "1d4+1",
+        "effect": "none",
+        "dmgType": "normal"
+      },
+      {
+        "name": "Bite",
+        "hit_percent": 55,
+        "action": "Attack",
+        "damage": "1d4+2",
+        "effect": "none",
+        "dmgType": "normal"
+      },
+      {
+        "name": "Throw Berak",
+        "hit_percent": 55,
+        "action": "Attack",
+        "damage": "1d3",
+        "effect": "A handful of whatever was to hand. On a failed Endurance check the target is Distracted — too busy with what is on them to do anything useful.",
+        "dmgType": "normal",
+        "save": {
+          "stat": "end",
+          "tier": "normal"
+        },
+        "apply_effect": {
+          "id": "distracted",
+          "duration_turns": 1,
+          "on": "save_failed"
+        }
+      }
+    ]
+  },
   construction_protectron: {
     "id": "construction_protectron",
     "name": "Construction Protectron",
@@ -760,14 +849,14 @@ export const bestiaryDatabase = {
       }
     ]
   },
-  ibu_sakai: {
-    "id": "ibu_sakai",
-    "name": "Ibu Sakai",
+  ibu_beruk: {
+    "id": "ibu_beruk",
+    "name": "Ibu Beruk",
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
-    "description": "The matriarch of a troop of mutated monkeys. Grey-furred and heavy across the shoulders, she is far faster than her size suggests and fiercely protective of the troop. She screams once before she comes.",
-    "notes": "Can attack and move. Never found alone — a troop of Monyet Sakai is always nearby, and they join in once she engages.",
+    "description": "The matriarch of a troop of mutated beruk. Grey-furred and heavy across the shoulders, she is far faster than her size suggests and fiercely protective of the troop. She screams once before she comes.",
+    "notes": "Can attack and move. Never found alone — a troop of Beruk is always nearby, and they join in once she engages.",
     "stats": {
       "hp": 50,
       "variance_bias": "normal",
@@ -835,7 +924,7 @@ export const bestiaryDatabase = {
         "hit_percent": 100,
         "action": "SM",
         "damage": "0",
-        "effect": "Every Monyet Sakai in earshot joins the fight on her next turn. Each foe in earshot makes an Endurance check or takes Ears Ringing (-2 PER for 1 turn).",
+        "effect": "Every Beruk in earshot joins the fight on her next turn. Each foe in earshot makes an Endurance check or takes Ears Ringing (-2 PER for 1 turn).",
         "dmgType": "true",
         "save": {
           "stat": "end",
@@ -843,6 +932,23 @@ export const bestiaryDatabase = {
         },
         "apply_effect": {
           "id": "ears_ringing",
+          "duration_turns": 1,
+          "on": "save_failed"
+        }
+      },
+      {
+        "name": "Throw Berak",
+        "hit_percent": 60,
+        "action": "Attack",
+        "damage": "1d4",
+        "effect": "A handful of whatever was to hand. On a failed Endurance check the target is Distracted — too busy with what is on them to do anything useful.",
+        "dmgType": "normal",
+        "save": {
+          "stat": "end",
+          "tier": "normal"
+        },
+        "apply_effect": {
+          "id": "distracted",
           "duration_turns": 1,
           "on": "save_failed"
         }
@@ -1213,78 +1319,6 @@ export const bestiaryDatabase = {
         "action": "Attack",
         "damage": "2d6+4",
         "effect": "Has 25 shots. Burst of 5 rounds. -5 AC and -10 DR.",
-        "dmgType": "normal"
-      }
-    ]
-  },
-  monyet_sakai: {
-    "id": "monyet_sakai",
-    "name": "Monyet Sakai",
-    "type": "monster",
-    "creature_type": "Mutated Creature",
-    "icon": "",
-    "description": "A mutated Sakai monkey — lean, grey-furred and permanently furious. They travel in troops, take what they want, and bite anyone slow about handing it over.",
-    "notes": "Can attack and move. Never alone: troops of three or more, and an Ibu Sakai is usually close by.",
-    "stats": {
-      "hp": 40,
-      "variance_bias": "normal",
-      "sequence": 18,
-      "crit_chance": 5,
-      "ac": 15,
-      "dtdr": {
-        "normal": {
-          "dt": 0,
-          "dr": 10
-        },
-        "laser": {
-          "dt": 0,
-          "dr": 0
-        },
-        "fire": {
-          "dt": 0,
-          "dr": -10
-        },
-        "plasma": {
-          "dt": 0,
-          "dr": 0
-        },
-        "explosive": {
-          "dt": 0,
-          "dr": 5
-        }
-      },
-      "resistances": {
-        "energy": 0,
-        "poison": 20,
-        "rad": 40,
-        "gas": 0,
-        "emp": 0
-      },
-      "special": {
-        "str": 4,
-        "per": 6,
-        "end": 4,
-        "cha": 3,
-        "int": 3,
-        "agi": 9,
-        "luk": 5
-      }
-    },
-    "attacks": [
-      {
-        "name": "Claw",
-        "hit_percent": 65,
-        "action": "Attack",
-        "damage": "1d4+1",
-        "effect": "none",
-        "dmgType": "normal"
-      },
-      {
-        "name": "Bite",
-        "hit_percent": 55,
-        "action": "Attack",
-        "damage": "1d4+2",
-        "effect": "none",
         "dmgType": "normal"
       }
     ]
