@@ -208,11 +208,91 @@ function renderConditionRows(rows) {
     </div>`).join('');
 }
 
-// Full STATUS tab (STATUS_AND_CRIPPLE_SPEC.md Part C, GM adjustments
-// 2026-09-22): CONDITION (same rows as the dashboard's compact block),
-// ATTRIBUTES (full provenance — every modifier with its source, per
-// A.2/C.2), PASSIVE (things helping, not hurting). LIMBS is omitted —
-// there's no cripple system yet to have limb state to show.
+// LIMBS (STATUS_AND_CRIPPLE_SPEC.md Part B/C.2): only the arm/leg body
+// parts carry a persistent hit counter — combat.js's `crippleCounter`
+// flag on BODY_PARTS marks exactly these four, since eyes/groin stay
+// instant-on-hit and out of this system (see that flag's own comment).
+// The status effect itself (crippled_arm/crippled_leg) is generic to
+// "an arm"/"a leg", not a specific left/right key (B.4's "tracking is
+// positional, consequence is not") — active instances are handed to
+// matching rows in a fixed left-before-right order, so at most as many
+// rows show CRIPPLED as there are actual instances.
+const LIMB_PART_KEYS = Object.keys(BODY_PARTS).filter(k => BODY_PARTS[k].crippleCounter);
+function buildLimbRows(charData, derived) {
+  const limbDamage = charData.limb_damage || {};
+  const poolByEffect = {};
+  (charData.status_effects || []).forEach(fx => {
+    if (!poolByEffect[fx.source_id]) poolByEffect[fx.source_id] = [];
+    poolByEffect[fx.source_id].push(fx);
+  });
+  const rows = [];
+  LIMB_PART_KEYS.forEach(partKey => {
+    const bodyPart = BODY_PARTS[partKey];
+    const count = limbDamage[partKey] || 0;
+    const pool = poolByEffect[bodyPart.effectId] || [];
+    const crippleFx = pool.length > 0 ? pool.shift() : null;
+    if (count === 0 && !crippleFx) return; // C.2: only parts with hits or a cripple appear
+    rows.push({ partKey, label: bodyPart.label, count, resistance: derived.limbResistance || 1, crippleFx });
+  });
+  return rows;
+}
+// Reuses renderNeedGauge (C.2's own instruction) rather than inventing a
+// second bar idiom — the gauge shows remaining "limb health"
+// (resistance - hits taken), same drains-toward-red-as-it-worsens
+// language as HP/needs, bottoming out at 0/red once actually crippled.
+function renderLimbRows(rows, charId) {
+  if (rows.length === 0) return `<div style="color:#555; font-size:12px; padding:4px 0;">No limb damage — nothing to treat.</div>`;
+  return rows.map(r => {
+    const value = r.crippleFx ? 0 : Math.max(0, Math.round(((r.resistance - r.count) / r.resistance) * 100));
+    const tier = { label: r.crippleFx ? 'CRIPPLED' : `${r.count}/${r.resistance} hits taken`, modifiers: {} };
+    return `
+      ${renderNeedGauge(r.label.toUpperCase(), value, tier)}
+      <div style="margin:-6px 0 10px; text-align:right;">
+        <span onclick="window.openTreatLimbDraft('${charId}', '${r.partKey}')" style="cursor:pointer; font-size:11px; text-decoration:underline; color:var(--pip-dim);">[ TREAT ]</span>
+      </div>`;
+  }).join('');
+}
+// B.6's two routes, drawn inline under LIMBS when a TREAT link is
+// clicked (window.treatLimbDraft, set by openTreatLimbDraft). Kept to
+// self-treatment only for now (healer === target === the viewer) — the
+// controllers underneath (treatLimbWithDoctorsBag/treatLimbWithMedicine)
+// already take independent healer/target ids for a teammate treating
+// someone else, but exposing that needs a target-picker UI this tab
+// doesn't have yet (see this agent's report).
+function renderTreatLimbForm(charData, charId) {
+  const draft = window.treatLimbDraft;
+  if (!draft || draft.targetCharId !== charId) return '';
+  const bodyPart = BODY_PARTS[draft.partKey];
+  if (!bodyPart) return '';
+  const hasBag = getInventoryQuantity(charData.inventory, 'doctors_bag') > 0;
+  return `
+    <div style="border:1px solid var(--pip-dim); padding:8px; margin:6px 0 14px; background:rgba(0,20,0,0.3);">
+      <div style="font-size:12px; margin-bottom:6px;">Treating <strong>${escapeHtml(bodyPart.label)}</strong></div>
+      <div style="display:flex; gap:6px; margin-bottom:6px;">
+        <select onchange="window.setTreatLimbField('method', this.value)" style="flex-grow:1; background:black; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:'VT323';">
+          <option value="medicine" ${draft.method === 'medicine' ? 'selected' : ''}>Medicine check (DC 20)</option>
+          <option value="doctors_bag" ${draft.method === 'doctors_bag' ? 'selected' : ''} ${hasBag ? '' : 'disabled'}>Doctor's Bag${hasBag ? '' : ' (none owned)'}</option>
+        </select>
+      </div>
+      ${draft.method === 'medicine' ? `
+      <div style="display:flex; gap:6px; margin-bottom:6px;">
+        <input type="number" min="1" max="100" value="${draft.roll}" placeholder="ROLL 1-100"
+               oninput="window.setTreatLimbField('roll', this.value)"
+               style="flex-grow:1; background:black; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:'VT323';">
+        <button class="gm-btn" onclick="window.rollForTreatLimb()">ROLL</button>
+      </div>` : ''}
+      <div style="display:flex; gap:6px;">
+        <button class="gm-btn" style="border-color:var(--pip-green); color:var(--pip-green);" onclick="window.resolveTreatLimbDraft()">CONFIRM</button>
+        <button class="gm-btn" onclick="window.cancelTreatLimbDraft()">CANCEL</button>
+      </div>
+    </div>`;
+}
+
+// Full STATUS tab (STATUS_AND_CRIPPLE_SPEC.md Part C): CONDITION (same
+// rows as the dashboard's compact block), LIMBS (per-limb hit counters
+// and cripples, C.2/Part B), ATTRIBUTES (full provenance — every
+// modifier with its source, per A.2/C.2), PASSIVE (things helping, not
+// hurting).
 export function getStatusView(charId, liveData) {
   const charData = liveData.characters[charId];
   if (!charData) return `<h1>&gt; ERROR: IDENTITY NOT FOUND</h1>`;
@@ -220,6 +300,7 @@ export function getStatusView(charId, liveData) {
   const breakdown = derived.breakdown || { baseSpecial: {}, skillsBase: {}, special: {}, skills: {}, other: [] };
 
   const conditionRows = buildConditionRows(charData);
+  const limbRows = buildLimbRows(charData, derived);
 
   // ATTRIBUTES — SPECIAL stats first (only ones with at least one
   // modifier, per C.2's "a clean character should see a short screen"
@@ -283,6 +364,9 @@ export function getStatusView(charId, liveData) {
       <div class="panel">
         <h2 style="color:var(--pip-dim);">CONDITION</h2>
         ${renderConditionRows(conditionRows)}
+        <h2 style="color:var(--pip-dim); margin-top:20px;">LIMBS</h2>
+        ${renderLimbRows(limbRows, charId)}
+        ${renderTreatLimbForm(charData, charId)}
       </div>
       <div class="panel">
         <h2 style="color:var(--pip-dim);">ATTRIBUTES</h2>
@@ -2192,6 +2276,30 @@ export function renderGMScreen(liveData) {
               <span style="display:none;">${Math.round(val)}</span>
             </div>`;
           }).join('')}
+        </div>
+
+        <h4 style="color:red; border-bottom:1px dashed red;">LIMB DAMAGE</h4>
+        <p style="font-size:10px; color:#666; margin:2px 0 6px;">Direct hit-counter control (STATUS_AND_CRIPPLE_SPEC.md C.3) — sets the raw count only, no auto-cripple. Use STATUS EFFECTS above to actually apply/remove Crippled Arm/Leg.</p>
+        <div style="margin-bottom:10px;">
+          ${(() => {
+            const limbResistance = targetChar ? deriveCharacter(targetChar).limbResistance : 1;
+            const limbDamage = (targetChar && targetChar.limb_damage) || {};
+            return LIMB_PART_KEYS.map(partKey => {
+              const bodyPart = BODY_PARTS[partKey];
+              const val = limbDamage[partKey] || 0;
+              return `
+              <div style="margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
+                  <span>${bodyPart.label.toUpperCase()}</span>
+                  <span style="color:red;">${val} / ${limbResistance}</span>
+                </div>
+                <input type="range" min="0" max="${limbResistance}" value="${val}" style="width:100%;"
+                       oninput="this.nextElementSibling.textContent = this.value"
+                       onchange="window.gmSetLimbDamage('${partKey}', Number(this.value))">
+                <span style="display:none;">${val}</span>
+              </div>`;
+            }).join('');
+          })()}
         </div>
 
         <h4 style="color:var(--pip-gold); border-bottom:1px dashed var(--pip-gold);">KARMA</h4>
