@@ -4,10 +4,10 @@
 //
 //   npm run art -- status                 what's done, what's pending
 //   npm run art -- sheet [--limit N]      write art/prompt-sheet.md for manual generation (free)
-//   npm run art -- ingest [--limit N]     upload art/inbox/<item_id>.png|jpg to Imgur, link into the vault
-//   npm run art -- generate --limit N     PAID: generate N images with the Gemini API into art/inbox/
+//   npm run art -- ingest [--limit N]     upload the vault's Media/New items/<id>.png|jpg to Imgur and link them
+//   npm run art -- generate --limit N     PAID: generate N images with the Gemini API into Media/New items/
 //   npm run art -- skip <id|prefix*|slots> leave art you already made out of the runs (--undo to restore)
-//   npm run art -- collect <id>          file the newest browser download as art/inbox/<id>.png
+//   npm run art -- collect <id>          file the newest browser download as Media/New items/<id>.png
 //   npm run art -- link <id> <url>       attach an already-uploaded image to an item or slot
 //   npm run art -- set-prompts <file.json>  write {id: prompt} into the vault's image_prompt fields
 //
@@ -29,8 +29,13 @@ import crypto from 'crypto';
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const VAULT = process.env.FOES_VAULT || '/Users/edge/Library/CloudStorage/GoogleDrive-fallouteasternshores@gmail.com/My Drive/FOES Wiki/FALLOUT_MASTER_ZIPv3';
 const ART = path.join(ROOT, 'art');
-const INBOX = path.join(ART, 'inbox');
-const DONE = path.join(ART, 'done');
+// Generated images land in the vault's Media folder so they ride Google
+// Drive with everything else and the GM can see them without leaving
+// Obsidian. "New items" is the staging tray: approved art gets dragged out
+// of it by hand; `ingest` moves what it uploads into `uploaded/`.
+const MEDIA = process.env.FOES_MEDIA || path.join(VAULT, 'Media', 'New items');
+const INBOX = MEDIA;
+const DONE = path.join(MEDIA, 'uploaded');
 const LEDGER = path.join(ART, 'ledger.json');
 const SKIPLIST = path.join(ART, 'skip.json');
 
@@ -270,7 +275,7 @@ function status() {
   const ledger = readLedger();
   const skipped = readSkipList().length;
   if (skipped) console.log(`Skipped (made elsewhere): ${skipped}`);
-  console.log(`Waiting in inbox: ${inInbox}`);
+  console.log(`Waiting for review:        ${inInbox}  (${path.relative(VAULT, MEDIA)} in the vault)`);
   console.log(`Paid generations so far: ${ledger.generated} / ${LIFETIME_GENERATE_CAP} lifetime cap`);
 }
 
@@ -278,7 +283,7 @@ function sheet() {
   const limit = option('limit') ? requireLimit() : Infinity;
   const pending = pendingTargets().slice(0, limit);
   const lines = [`# Art — prompt sheet`, ``,
-    `Generate each image, save it into \`art/inbox/\` named exactly as the **file name** below, then run \`npm run art -- ingest --limit N\`.`, ``];
+    `Generate each image, save it into the vault's \`Media/New items/\` folder, named exactly as the **file name** below, then run \`npm run art -- ingest --limit N\`.`, ``];
   pending.forEach(t => lines.push(`## ${t.name}${t.kind === 'slot' ? ' *(content slot)*' : ''}`, `File name: \`${t.id}.png\``, '', '```', t.prompt, '```', ''));
   if (!DRY) fs.writeFileSync(path.join(ART, 'prompt-sheet.md'), lines.join('\n'));
   console.log(`${DRY ? '[dry run] would write' : 'Wrote'} art/prompt-sheet.md with ${pending.length} prompts.`);
@@ -418,13 +423,13 @@ async function generate() {
     writeLedger(ledger);
     console.log(`  ✓ ${item.name}`);
   }
-  console.log('\nImages are in art/inbox/. Look through them, delete any you don\'t like, then run ingest.');
+  console.log(`\nImages are in ${path.relative(VAULT, MEDIA)} in the vault. Look through them, delete any you don't like, then run ingest.`);
 }
 
 // Attach a url to any target by hand — for images uploaded outside this
 // script. Same write-back path `ingest` uses, so it's also the quickest way
 // to check a slot writes where it should.
-// Files the newest image sitting in a download folder as art/inbox/<id>.png,
+// Files the newest image sitting in a download folder as Media/New items/<id>.png,
 // so images made by hand in a browser join the same pipeline. Used by the
 // art-runner agent after each generated image, and fine to run yourself.
 function collect() {

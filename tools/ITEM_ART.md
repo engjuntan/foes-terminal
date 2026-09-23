@@ -62,7 +62,7 @@ npm run art -- sheet --limit 20
 
 Opens nothing, writes `art/prompt-sheet.md`: each prompt with the exact file
 name to save it as. Generate them in the Gemini app or AI Studio, save each
-into `art/inbox/` under that name (e.g. `angkasa_wrench.png`), then:
+into the vault's `Media/New items/` folder under that name (e.g. `angkasa_wrench.png`), then:
 
 ```bash
 npm run art -- ingest --limit 20
@@ -74,7 +74,7 @@ npm run art -- ingest --limit 20
 npm run art -- generate --limit 5
 ```
 
-Look through `art/inbox/`, delete any image you don't like (it'll be
+Look through `Media/New items/` in the vault, delete any image you don't like (it'll be
 regenerated next run), then `ingest` as above.
 
 **Already uploaded an image yourself?** Attach it without re-uploading:
@@ -99,6 +99,9 @@ node sync-obsidian.js --once
 - A rate limit ends the run cleanly. Running the same command again resumes:
   anything already linked, or already in the inbox, is skipped.
 - `--dry-run` on any command shows what it would do and changes nothing.
+- Images live in the vault at `Media/New items/`, so they sync to Drive.
+  Approved art gets dragged out of that folder by hand; `ingest` moves what
+  it uploads into `Media/New items/uploaded/`.
 - The ledger records each upload's Imgur `deletehash`, so any image can be
   removed later.
 
