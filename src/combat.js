@@ -4,6 +4,7 @@
 // that file is about a single character's derived stats, not encounters.
 import { getMonster } from './bestiary.js';
 import { deriveCharacter } from './formulas.js';
+import { resolveSpecialCheck } from './checks.js';
 
 // Rolls a real HP value for a monster instance within +/-30% of its
 // bestiary "hp" value, respecting variance_bias ("upper"/"lower"/"normal").
@@ -350,18 +351,32 @@ export const DAMAGE_TYPE_LABELS = {
 // (e.g. " (aimed at Head)", " [BURST FIRE, 21/24 ammo left]"). Every hit
 // template contains exactly one "DMG damage" phrase — `damageType` gets
 // folded into that single spot rather than rewriting all 8 templates.
-export function buildAttackLogMessage({ isHit, attackerName, targetName, weaponName, partTag, burstTag, damage, roll, chance, effectAppliedMsg, damageType }) {
-  const templates = isHit ? HIT_TEMPLATES : MISS_TEMPLATES;
-  const template = templates[Math.floor(Math.random() * templates.length)];
-  let sentence = template({ attacker: attackerName, target: targetName, weapon: weaponName, part: partTag || '' });
-  if (isHit) {
-    if (damageType === 'emp') {
-      // Not damage — the stun/no-effect message is already in
-      // effectAppliedMsg, so this just avoids a nonsensical "0 damage".
-      sentence = sentence.replace('DMG damage', 'an EMP pulse');
-    } else {
-      const label = DAMAGE_TYPE_LABELS[damageType] || '';
-      sentence = sentence.replace('DMG damage', `${damage} ${label ? label + ' ' : ''}damage`);
+export function buildAttackLogMessage({ isHit, attackerName, targetName, weaponName, partTag, burstTag, damage, roll, chance, effectAppliedMsg, damageType, isEffectOnly }) {
+  let sentence;
+  if (isEffectOnly) {
+    // Zero-damage, effect-only attacks (bestiary `damage: "0"`, e.g. Ibu
+    // Sakai's Screech) aren't a "hit" or a "miss" in the damage sense —
+    // whatever they actually do (a save, an applied status effect) is
+    // already spelled out in effectAppliedMsg. Neither the "X damage"
+    // hit templates nor the "misses completely" miss templates read
+    // sensibly for these, so both are skipped in favour of one flat
+    // connects/doesn't-connect line.
+    sentence = isHit
+      ? `${attackerName}'s ${weaponName}${partTag || ''} reaches ${targetName}.`
+      : `${targetName} is out of range of ${attackerName}'s ${weaponName}${partTag || ''}.`;
+  } else {
+    const templates = isHit ? HIT_TEMPLATES : MISS_TEMPLATES;
+    const template = templates[Math.floor(Math.random() * templates.length)];
+    sentence = template({ attacker: attackerName, target: targetName, weapon: weaponName, part: partTag || '' });
+    if (isHit) {
+      if (damageType === 'emp') {
+        // Not damage — the stun/no-effect message is already in
+        // effectAppliedMsg, so this just avoids a nonsensical "0 damage".
+        sentence = sentence.replace('DMG damage', 'an EMP pulse');
+      } else {
+        const label = DAMAGE_TYPE_LABELS[damageType] || '';
+        sentence = sentence.replace('DMG damage', `${damage} ${label ? label + ' ' : ''}damage`);
+      }
     }
   }
   // effectAppliedMsg used to only ever get set on a hit (aimed-shot
@@ -393,4 +408,33 @@ export function effectiveTargetAC(target, characters) {
   const charStance = STANCES[targetChar.stance || 'standing'] || STANCES.standing;
   const charCapped = charStance.agiCap !== null && charStance.agiCap !== undefined;
   return charCapped ? derived.armorClass - derived.special.agi + Math.min(derived.special.agi, charStance.agiCap) : derived.armorClass;
+}
+
+// --- SAVES (SCOPE_DECISIONS.md "Heist economics, Faiz, and the Sakai":
+// a Screech is "on a failed Endurance difficulty check, -2 PER for 1
+// turn", and "poison attacks use the same shape... an Endurance
+// difficulty check, not an ad-hoc roll") ---
+// One helper for every SPECIAL save a combatant — PC or monster — has to
+// make, so poison damage and attack-applied status effects (Screech's
+// Ears Ringing, and whatever else gets authored the same way) all read
+// off the same numbers. Pure, like resolveSpecialCheck itself: the roll
+// is passed in rather than made here, so callers keep using rollD10()
+// and tests can pin it without stubbing Math.random through two layers.
+// A PC's stat comes from deriveCharacter (so race/status modifiers on
+// SPECIAL apply to the save too); a monster's comes from its combat
+// instance's `special` block, falling back to the bestiary entry the
+// same way effectiveTargetAC does above (for an instance made before
+// monsters carried `special`).
+export function resolveCombatantSave(combatantRef, characters, roll, statKey = 'end', tierKey = 'normal') {
+  let statValue;
+  if (combatantRef.ref_type === 'monster') {
+    const special = (combatantRef.special && Object.keys(combatantRef.special).length) ? combatantRef.special
+      : ((getMonster(combatantRef.source_id) || {}).stats || {}).special || {};
+    statValue = special[statKey] || 0;
+  } else {
+    const char = characters[combatantRef.char_id];
+    statValue = (deriveCharacter(char).special || {})[statKey] || 0;
+  }
+  const result = resolveSpecialCheck(statValue, tierKey, roll);
+  return { ...result, stat: statKey, statValue, tier: tierKey, roll };
 }
