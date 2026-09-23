@@ -45,8 +45,18 @@ A batch brief with, for each entry:
   mud), faction dress, and the prompt kit. Read them before writing or
   judging any image prompt. Anything established since the Organization Map
   is fresher canon than either file.
-- **Every image is photorealistic, 1080x1080 square.** Items sit on a plain,
-  generic post-apocalyptic background that never competes with the subject.
+- **Every image is photorealistic, 1080x1080 square.**
+- **Each item's prompt names its own setting** — a place that item would
+  plausibly be found (a roadside verge, a workshop bench, a market stall, a
+  kitchen shelf, a flooded stairwell), varied across the set and always
+  simple enough to fall out of focus behind the object.
+- **No logos, insignia, emblems or crests** in any prompt. The GM hasn't
+  settled the factions' marks yet; an item that would carry one gets
+  flagged for later instead.
+- **A 1:1 Fallout name is a 1:1 Fallout object.** Stimpak, Fat Man, Mini
+  Nuke, Mentats, Rad-X, Jet, Pip-Boy-era gear and so on must look exactly
+  like their Fallout counterparts — same silhouette, same construction.
+  Only the setting and the wear are ours.
 
 - The GM's source notes are canon. Expand them; never contradict them.
   Where they're silent, invent in keeping with CLAUDE.md, and list every

@@ -992,3 +992,21 @@ Answers to `reviews/lore-audit-org-map.md`. These override older vault notes.
   axe gang."
 - **Tone reminder for every agent:** Fallout's dark comedy is part of the
   brief, not a garnish. Berak-throwing monkeys belong.
+
+## Art direction — GM rulings (2026-09-23, later)
+
+- **No logos.** No faction mark, insignia, emblem, crest or badge appears in
+  any generated image until the GM has settled them. Items that would carry
+  one are listed in `reviews/items-needing-logos.md` to revisit. Faction
+  *colours* still apply. (The Protectorate's flag already uses its mark, so
+  that one exists; the Federation's does not.)
+- **Each item names its own setting** in its prompt — somewhere that item
+  would plausibly be, varied across the set, tropical outdoor settings as
+  common as indoor ones. The shared style keeps it simple and out of focus.
+- **A 1:1 Fallout name means a 1:1 Fallout object.** Stimpak, Fat Man, Mini
+  Nuke, Mentats and the rest look exactly like their Fallout counterparts;
+  only the setting and the wear are ours.
+- **The Chukai Desert is dry** — the deliberate exception to the wet-climate
+  rule, and the art script already gives it its own climate line.
+- **The four earlier Axe Gang variants** (Rifle, Sledge, Volt, Flame Axe)
+  are deleted. The Melee and Ranged Axe Gang Axes are the canon pair.
