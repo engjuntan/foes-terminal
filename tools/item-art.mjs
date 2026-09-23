@@ -23,6 +23,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { allSlots } from './art-slots.mjs';
+import { allLocationShots } from './art-locations.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const VAULT = process.env.FOES_VAULT || '/Users/edge/Library/CloudStorage/GoogleDrive-fallouteasternshores@gmail.com/My Drive/FOES Wiki/FALLOUT_MASTER_ZIPv3';
@@ -188,7 +189,65 @@ function slotTargets() {
   });
 }
 
-function allTargets() { return [...itemTargets(), ...slotTargets()]; }
+// Locations get two shots each (entrance + interior). The prompt lives in
+// art-locations.mjs; the url is written into the vault note's frontmatter as
+// `image_entrance` / `image_interior`, so the note stays the one place that
+// knows about its own art.
+// Locations keep the item negatives except "no hands, no people" — a
+// market or a checkpoint reads wrong with nobody in it, and the prompts
+// themselves say when figures belong.
+const SCENE_NEGATIVES = NEGATIVES.replace(' no hands, no people,', '');
+const LOCATION_STYLE = `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. ${GRADE} ${CLIMATE} ${SCENE_NEGATIVES}`;
+// The Chukai Desert is the GM's deliberate exception to the wet-climate rule
+// — a sacred desert in canon — so those shots swap the monsoon clauses for
+// their own rather than being forced to contradict the note.
+const DESERT_CLIMATE = 'Storm-scoured equatorial desert: salt-crusted dunes, scorched soil, wind-polished concrete, bleached debris, heat haze. Dry, not tropical.';
+const locationStyleFor = shot => shot.notePath.includes('Chukai')
+  ? `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. ${GRADE} ${DESERT_CLIMATE} ${SCENE_NEGATIVES}`
+  : LOCATION_STYLE;
+
+// Reads or writes one key in a note's YAML frontmatter, creating the block
+// when the note has none. Leaves the body untouched either way.
+function frontmatterValue(text, key) {
+  const fm = text.match(/^---\n([\s\S]*?)\n---/);
+  if (!fm) return null;
+  const line = fm[1].match(new RegExp(`^${key}:\\s*(.+)$`, 'm'));
+  return line ? line[1].trim().replace(/^["']|["']$/g, '') : null;
+}
+
+function setFrontmatterValue(file, key, value) {
+  const text = fs.readFileSync(file, 'utf8');
+  const fm = text.match(/^---\n([\s\S]*?)\n---/);
+  let next;
+  if (!fm) {
+    next = `---\n${key}: ${value}\n---\n${text}`;
+  } else if (new RegExp(`^${key}:`, 'm').test(fm[1])) {
+    next = text.replace(new RegExp(`^${key}:.*$`, 'm'), `${key}: ${value}`);
+  } else {
+    next = text.replace(fm[0], `---\n${fm[1]}\n${key}: ${value}\n---`);
+  }
+  if (!DRY) fs.writeFileSync(file, next);
+}
+
+function locationTargets() {
+  return allLocationShots().map(shot => {
+    const file = path.join(VAULT, shot.notePath);
+    const key = `image_${shot.shot}`;
+    const current = fs.existsSync(file) ? frontmatterValue(fs.readFileSync(file, 'utf8'), key) : null;
+    return {
+      id: shot.id,
+      name: `${shot.name} — ${shot.shot}`,
+      kind: 'location',
+      hasArt: /^https?:\/\//.test(current || ''),
+      hasPrompt: !!shot.prompt,
+      prompt: `${locationStyleFor(shot)} Subject: ${shot.prompt}`,
+      description: shot.prompt,
+      setUrl: url => setFrontmatterValue(file, key, url)
+    };
+  });
+}
+
+function allTargets() { return [...itemTargets(), ...slotTargets(), ...locationTargets()]; }
 
 // ---------- commands ----------
 function status() {
@@ -200,6 +259,7 @@ function status() {
   };
   report('Items:', targets.filter(t => t.kind === 'item'));
   report('Content slots:', targets.filter(t => t.kind === 'slot'));
+  report('Location shots:', targets.filter(t => t.kind === 'location'));
   const inInbox = fs.existsSync(INBOX) ? fs.readdirSync(INBOX).filter(f => !f.startsWith('.')).length : 0;
   const ledger = readLedger();
   const skipped = readSkipList().length;
@@ -222,10 +282,10 @@ function sheet() {
 // sitting in the inbox waiting to be ingested. `--only items|slots` narrows it.
 function pendingTargets() {
   const only = option('only');
-  if (only && !['items', 'slots'].includes(only)) fail(`--only takes "items" or "slots".`);
+  if (only && !['items', 'slots', 'locations'].includes(only)) fail(`--only takes "items", "slots" or "locations".`);
   const skipped = readSkipList();
   return allTargets()
-    .filter(t => !only || t.kind === only.slice(0, -1))
+    .filter(t => !only || t.kind === only.replace(/s$/, ''))
     .filter(t => !t.hasArt && t.hasPrompt && !inboxFileFor(t.id) && !skipped.includes(t.id));
 }
 
@@ -239,7 +299,7 @@ function skip() {
   const ids = args.slice(1).filter(a => !a.startsWith('--'));
   const undo = flag('undo');
   const known = new Set(allTargets().map(t => t.id));
-  const groups = { slots: t => t.kind === 'slot', items: t => t.kind === 'item' };
+  const groups = { slots: t => t.kind === 'slot', items: t => t.kind === 'item', locations: t => t.kind === 'location' };
   const expanded = ids.flatMap(id => {
     if (groups[id]) return allTargets().filter(groups[id]).map(t => t.id);
     if (id.endsWith('*')) return [...known].filter(k => k.startsWith(id.slice(0, -1)));
