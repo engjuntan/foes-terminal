@@ -121,6 +121,14 @@ window.toggleCreationTag = Controllers.toggleCreationTag;
 window.finalizeCharacter = Controllers.finalizeCharacter;
 window.gmFactoryReset = () => Controllers.gmFactoryReset(window.selectedCharId);
 
+// --- CRIPPLE SYSTEM (STATUS_AND_CRIPPLE_SPEC.md Part B/C) ---
+window.gmSetLimbDamage = (partKey, val) => Controllers.gmSetLimbDamage(window.selectedCharId, partKey, val);
+window.openTreatLimbDraft = Controllers.openTreatLimbDraft;
+window.setTreatLimbField = Controllers.setTreatLimbField;
+window.rollForTreatLimb = Controllers.rollForTreatLimb;
+window.cancelTreatLimbDraft = Controllers.cancelTreatLimbDraft;
+window.resolveTreatLimbDraft = Controllers.resolveTreatLimbDraft;
+
 window.openGMModal = (charId) => {
   window.selectedCharId = charId; // Store who we are editing globally
   // Re-render so anything baked into the modal's HTML at render time (e.g.
