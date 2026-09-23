@@ -5,7 +5,7 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
 import { RACE_RULES, calculateDerivedStats, deriveCharacter, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
 import { getMonster } from './bestiary.js';
-import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES, COVER_LEVELS, isMonsterAttackMelee, effectiveTargetAC, resolveCombatantSave } from './combat.js';
+import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES, COVER_LEVELS, isMonsterAttackMelee, effectiveTargetAC, resolveCombatantSave, combatantLimbResistance } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { questDatabase } from './quests.js';
 import { mapDatabase } from './maps.js';
@@ -750,6 +750,167 @@ export async function gmSetNeed(targetCharId, needKey, value) {
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
+// --- CRIPPLE SYSTEM: limb damage counters + treatment (STATUS_AND_CRIPPLE_SPEC.md B.5/B.6/C.3) ---
+
+// C.3: the GM's direct control — same shape as gmSetNeed's slider, no
+// side effects beyond the raw counter (setting it to a limb's own
+// resistance does NOT auto-cripple; the GM already has the status-effect
+// tools above for actually applying/removing crippled_arm etc., and this
+// stays a plain number so "break a limb narratively" doesn't also have
+// to reason about grantEffect's instance shape). 0 (or below) clears the
+// key outright — B.2's "never write a zero".
+export async function gmSetLimbDamage(targetCharId, partKey, value) {
+  const char = window.liveData.characters[targetCharId];
+  if (!char || !BODY_PARTS[partKey]) return;
+  const clamped = Math.max(0, Math.round(Number(value) || 0));
+  const limbDamage = { ...(char.limb_damage || {}) };
+  if (clamped > 0) limbDamage[partKey] = clamped; else delete limbDamage[partKey];
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.limb_damage`] = limbDamage;
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// B.6: all the actual treatment math, with NO Firestore write of its own
+// — same Firestore-free/pure shape as computeAttackResolution, and for
+// the same reason: testable without mocking Firestore, and the two
+// thin async wrappers below can't drift from what this actually computes.
+// `method` is 'doctors_bag' (automatic) or 'medicine' (DC 20 — the
+// manual's "Average" tier, read here as DIFFICULTY_TIERS.normal, its
+// zero-modifier tier — a roll is required). Both routes treat exactly
+// one limb: they clear that limb's accumulated hit counter, and if the
+// limb is actually crippled, also remove the status effect and heal
+// 1d6+4 (manual p.652). Returns `{ error }` instead of writing anything
+// if the action can't go through (no bag, bad limb key).
+export function computeLimbTreatment({ method, healer, healerCharId, target, targetCharId, partKey, roll }) {
+  const bodyPart = BODY_PARTS[partKey];
+  if (!bodyPart) return { error: "NOT A TREATABLE LIMB" };
+
+  const charUpdates = {};
+
+  if (method === 'doctors_bag') {
+    const owned = getInventoryQuantity(healer.inventory, 'doctors_bag');
+    if (owned < 1) return { error: `${(healer.name || 'THIS CHARACTER').toUpperCase()} DOESN'T HAVE A DOCTOR'S BAG` };
+    charUpdates[`characters.${healerCharId}.inventory`] = removeFromInventory(healer.inventory, 'doctors_bag', 1);
+  }
+
+  let threshold = null;
+  if (method === 'medicine') {
+    const medicineSkill = deriveCharacter(healer).skills.medicine;
+    const result = resolveSkillCheck(medicineSkill, 'normal', roll);
+    threshold = result.threshold;
+    if (!result.success) {
+      // Failure: nothing changes except the Doctor's Bag branch's own
+      // inventory spend above, which never happens on this branch — a
+      // failed Medicine check costs nothing but the attempt.
+      return { charUpdates: {}, message: `${healer.name} fails to treat ${target.name}'s ${bodyPart.label} (Medicine ${roll} vs ${threshold}).` };
+    }
+  }
+
+  // Clear the accumulated hit counter — the whole point of either route.
+  const limbDamage = { ...(target.limb_damage || {}) };
+  delete limbDamage[partKey];
+  charUpdates[`characters.${targetCharId}.limb_damage`] = limbDamage;
+
+  const crippleFx = bodyPart.effectId ? (target.status_effects || []).find(fx => fx.source_id === bodyPart.effectId) : null;
+  const msgParts = [`clears ${bodyPart.label}'s accumulated damage`];
+  const maxHp = (target.hp && target.hp.max) || 0;
+  let hp = (target.hp && target.hp.current) || 0;
+
+  if (crippleFx) {
+    charUpdates[`characters.${targetCharId}.status_effects`] = (target.status_effects || []).filter(fx => fx.id !== crippleFx.id);
+    const healed = rollDamage('1d6+4'); // manual p.652
+    hp = Math.max(0, Math.min(maxHp, hp + healed));
+    msgParts.push(`cures ${crippleFx.name}`, `heals ${healed} HP`);
+  }
+
+  // The Doctor's Bag's own direct heal (kept as a secondary effect per
+  // B.6 — the limb treatment is now its reason to exist, not this).
+  if (method === 'doctors_bag') {
+    const bagHealDice = (getItem('doctors_bag') || {}).stats?.heal || '2d10+10';
+    const bagHealed = rollDamage(bagHealDice);
+    hp = Math.max(0, Math.min(maxHp, hp + bagHealed));
+    msgParts.push(`bag heals ${bagHealed} HP`);
+  }
+
+  if (hp !== ((target.hp && target.hp.current) || 0)) {
+    charUpdates[`characters.${targetCharId}.hp.current`] = hp;
+  }
+
+  const verb = method === 'doctors_bag'
+    ? `uses a Doctor's Bag on ${target.name}'s ${bodyPart.label}`
+    : `treats ${target.name}'s ${bodyPart.label} (Medicine ${roll} vs ${threshold})`;
+  const message = `${healer.name} ${verb} — ${msgParts.join(', ')}.`;
+
+  return { charUpdates, message };
+}
+
+export async function treatLimbWithDoctorsBag(healerCharId, targetCharId, partKey) {
+  if (!window.liveData) return;
+  const healer = window.liveData.characters[healerCharId];
+  const target = window.liveData.characters[targetCharId];
+  if (!healer || !target) return;
+  const result = computeLimbTreatment({ method: 'doctors_bag', healer, healerCharId, target, targetCharId, partKey });
+  if (result.error) { alert(result.error); return; }
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, result.charUpdates); alert(result.message); }
+  catch (err) { alert("ERROR: " + err.message); }
+}
+
+export async function treatLimbWithMedicine(healerCharId, targetCharId, partKey, roll) {
+  if (!window.liveData) return;
+  const healer = window.liveData.characters[healerCharId];
+  const target = window.liveData.characters[targetCharId];
+  if (!healer || !target) return;
+  const r = Number(roll);
+  if (isNaN(r) || r < 1 || r > 100) { alert("ROLL MUST BE 1-100"); return; }
+  const result = computeLimbTreatment({ method: 'medicine', healer, healerCharId, target, targetCharId, partKey, roll: r });
+  if (result.error) { alert(result.error); return; }
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, result.charUpdates); alert(result.message); }
+  catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Player-facing draft for the STATUS tab's [ TREAT ] buttons — same
+// commit-on-click convention as the combat action draft, minus the
+// per-keystroke render suppression (a d100 roll field is the only thing
+// typed into here, same as combat/player-check drafts).
+function getTreatLimbDraft() {
+  if (!window.treatLimbDraft) window.treatLimbDraft = { targetCharId: '', partKey: '', method: 'medicine', roll: '' };
+  return window.treatLimbDraft;
+}
+export function openTreatLimbDraft(targetCharId, partKey) {
+  window.treatLimbDraft = { targetCharId, partKey, method: 'medicine', roll: '' };
+  window.render();
+}
+export function setTreatLimbField(field, value) {
+  const draft = getTreatLimbDraft();
+  draft[field] = value;
+  if (field !== 'roll') window.render();
+}
+export function rollForTreatLimb() {
+  const draft = getTreatLimbDraft();
+  draft.roll = rollPercentile();
+  window.render();
+}
+export function cancelTreatLimbDraft() {
+  window.treatLimbDraft = null;
+  window.render();
+}
+export async function resolveTreatLimbDraft() {
+  if (!window.currentUser) return;
+  const draft = getTreatLimbDraft();
+  if (!draft.targetCharId || !draft.partKey) { alert("PICK A LIMB TO TREAT"); return; }
+  if (draft.method === 'doctors_bag') {
+    await treatLimbWithDoctorsBag(window.currentUser, draft.targetCharId, draft.partKey);
+  } else {
+    if (draft.roll === '' || draft.roll === null || draft.roll === undefined) { alert("ENTER OR ROLL A DICE VALUE"); return; }
+    await treatLimbWithMedicine(window.currentUser, draft.targetCharId, draft.partKey, draft.roll);
+  }
+  window.treatLimbDraft = null;
+  window.render();
+}
+
 // The single core time-advance transaction — every clock movement in the
 // app (GM travel buttons, GM's marked-as-rest presets, and a player's own
 // Rest action) routes through this one function so there is only one place
@@ -818,6 +979,23 @@ export async function advanceTime(minutes, opts = {}) {
     const netHp = newHp - currentHp;
     if (netHp !== 0) parts.push(`${netHp > 0 ? '+' : ''}${netHp} HP (${newHp}/${maxHp})`);
     reportLines.push(`  ${char.name}   ${parts.join('  ')}`);
+
+    // B.6 "Perk route": Cancerous Growth (Ghoul-only) "regenerate[s] a
+    // crippled limb in 1 day" — one time advance of 24h+ clears one
+    // active cripple, on top of everything else this advance already
+    // did. The limb's own hit counter is never touched here — B.4
+    // already clears it the moment a limb actually cripples, so by the
+    // time a crippled_* status exists there's nothing left on the
+    // counter to clear (see setLimbDamage's call site in
+    // computeAttackResolution).
+    if (hoursElapsed >= 24 && (char.perks || []).includes('cancerous_growth')) {
+      const currentEffects = updatePayload[`characters.${charId}.status_effects`] || char.status_effects || [];
+      const cured = currentEffects.find(fx => (fx.source_id || '').startsWith('crippled_'));
+      if (cured) {
+        updatePayload[`characters.${charId}.status_effects`] = currentEffects.filter(fx => fx.id !== cured.id);
+        reportLines.push(`  ${char.name}   Cancerous Growth regenerates ${cured.name} overnight.`);
+      }
+    }
   });
 
   const fromLabel = formatGameTime(currentMinutes).label;
@@ -2034,6 +2212,43 @@ export function computeAttackResolution(combat, attacker, target, draft, roll) {
     return name;
   };
 
+  // B.2/B.4: reads one limb's current hit counter — PC off the character
+  // doc (where B.2 says it persists), monster off its own inline
+  // combatant entry. Mirrors setLimbDamage's PC/monster split just below
+  // so a read always agrees with what a write just before/after it
+  // would see.
+  const getLimbDamageCount = (combatantRef, partKey) => {
+    if (combatantRef.ref_type === 'monster') {
+      return (combatantRef.limb_damage || {})[partKey] || 0;
+    }
+    const path = `characters.${combatantRef.char_id}.limb_damage`;
+    const char = window.liveData.characters[combatantRef.char_id];
+    const current = charUpdates[path] || (char && char.limb_damage) || {};
+    return current[partKey] || 0;
+  };
+
+  // Writes (or, via `value === undefined`, clears) one limb's
+  // accumulated hit counter. Same PC-via-charUpdates / monster-inline
+  // split as grantEffect just above, so it composes with everything else
+  // this resolution touches (and rides along in the reroll's `before`
+  // snapshot the same way). Never writes a zero — an absent key IS zero,
+  // per B.2, so the Status screen doesn't render a "0/2" row for a limb
+  // nobody's touched.
+  const setLimbDamage = (combatantRef, partKey, value) => {
+    if (combatantRef.ref_type === 'monster') {
+      const idx = newInitiativeOrder.findIndex(c => c.combatant_id === combatantRef.combatant_id);
+      const current = { ...(newInitiativeOrder[idx].limb_damage || {}) };
+      if (value === undefined) delete current[partKey]; else current[partKey] = value;
+      newInitiativeOrder[idx] = { ...newInitiativeOrder[idx], limb_damage: current };
+    } else {
+      const path = `characters.${combatantRef.char_id}.limb_damage`;
+      const char = window.liveData.characters[combatantRef.char_id];
+      const current = { ...(charUpdates[path] || char.limb_damage || {}) };
+      if (value === undefined) delete current[partKey]; else current[partKey] = value;
+      charUpdates[path] = current;
+    }
+  };
+
   const applyHpDamage = (combatantRef, dmg, bypassMitigation) => {
     const idx = newInitiativeOrder.findIndex(c => c.combatant_id === combatantRef.combatant_id);
     // Mitigation belongs to whoever's actually taking the damage — the
@@ -2271,7 +2486,29 @@ export function computeAttackResolution(combat, attacker, target, draft, roll) {
     const idxCheck = newInitiativeOrder.findIndex(c => c.combatant_id === target.combatant_id);
     const stillUp = !newInitiativeOrder[idxCheck].is_down;
     if (bodyPart.effectId && stillUp && !killedOutright) {
-      effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, bodyPart.effectId)}!`;
+      if (bodyPart.crippleCounter) {
+        // B.4: hits to a limb accumulate against limbResistance instead
+        // of an instant cripple. A crit success already resolved its own
+        // cripple through the crit table above (entries 2/3) — skip the
+        // counter entirely so the same attack doesn't double-cripple.
+        if (critResult !== 'success') {
+          const resistance = combatantLimbResistance(target, window.liveData.characters);
+          const nextCount = getLimbDamageCount(target, bodyPartKey) + 1;
+          if (nextCount >= resistance) {
+            // Crippled — the status effect now carries the injury, so
+            // the counter clears (B.2: never leave a stale count behind).
+            setLimbDamage(target, bodyPartKey, undefined);
+            effectAppliedMsg += ` ${targetName}'s ${bodyPart.label} is crippled! ${targetName} is afflicted by ${grantEffect(target, bodyPart.effectId)}!`;
+          } else {
+            setLimbDamage(target, bodyPartKey, nextCount);
+            // The near-miss message IS the point (B.4) — a counter
+            // nobody can see is just a random cripple with extra steps.
+            effectAppliedMsg += ` ${targetName}'s ${bodyPart.label} takes a hard hit. (${nextCount}/${resistance})`;
+          }
+        }
+      } else {
+        effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, bodyPart.effectId)}!`;
+      }
     }
 
     // Attack-applied effects (bestiary `apply_effect` — e.g. Ibu Sakai's

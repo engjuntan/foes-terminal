@@ -100,14 +100,22 @@ export const COVER_LEVELS = {
 // convention. effectId now applies to PC and monster targets alike —
 // monster combat instances carry their own status_effects array too,
 // same shape as a PC's (see the critical hit section below).
+// `crippleCounter: true` marks the parts whose effectId is a genuine
+// manual-p.652 CRIPPLE (STATUS_AND_CRIPPLE_SPEC.md Part B) — these route
+// through the hit-counter/limbResistance system below instead of firing
+// their effect on the first hit. Eyes and groin are deliberately left
+// out: a crippled eye needs a replacement eye, not Medicine/a Doctor's
+// Bag (spec's "Out of scope" — blinded stays GM-cleared), and Stunned is
+// a plain turn-based status, not a persisting injury, so neither belongs
+// in a system built around "persists until treated".
 export const BODY_PARTS = {
   torso: { label: 'Torso', penalty: 0 },
   head: { label: 'Head', penalty: 20, damageMultiplier: 1.5 },
   eyes: { label: 'Eyes', penalty: 40, effectId: 'blinded' },
-  left_arm: { label: 'Left Arm', penalty: 20, effectId: 'crippled_arm' },
-  right_arm: { label: 'Right Arm', penalty: 20, effectId: 'crippled_arm' },
-  left_leg: { label: 'Left Leg', penalty: 15, effectId: 'crippled_leg' },
-  right_leg: { label: 'Right Leg', penalty: 15, effectId: 'crippled_leg' },
+  left_arm: { label: 'Left Arm', penalty: 20, effectId: 'crippled_arm', crippleCounter: true },
+  right_arm: { label: 'Right Arm', penalty: 20, effectId: 'crippled_arm', crippleCounter: true },
+  left_leg: { label: 'Left Leg', penalty: 15, effectId: 'crippled_leg', crippleCounter: true },
+  right_leg: { label: 'Right Leg', penalty: 15, effectId: 'crippled_leg', crippleCounter: true },
   groin: { label: 'Groin', penalty: 20, effectId: 'stunned' }
 };
 
@@ -437,4 +445,23 @@ export function resolveCombatantSave(combatantRef, characters, roll, statKey = '
   }
   const result = resolveSpecialCheck(statValue, tierKey, roll);
   return { ...result, stat: statKey, statValue, tier: tierKey, roll };
+}
+
+// --- CRIPPLE COUNTERS (STATUS_AND_CRIPPLE_SPEC.md B.1-B.4) ---
+// A PC's own Limb Resistance already comes back from deriveCharacter
+// (manual p.446: EN/2, floored at 1 — see formulas.js). A monster combat
+// instance has no derived-stats pipeline of its own, so this mirrors
+// that exact formula off the monster's own EN, falling back to 2 (B.2's
+// ruling) for the common case where the bestiary entry carries no
+// SPECIAL block at all — checked directly rather than assumed, since
+// most monster entries don't author one.
+export function combatantLimbResistance(combatantRef, characters) {
+  if (combatantRef.ref_type === 'monster') {
+    const special = (combatantRef.special && Object.keys(combatantRef.special).length) ? combatantRef.special
+      : ((getMonster(combatantRef.source_id) || {}).stats || {}).special || {};
+    const en = special.end;
+    return typeof en === 'number' ? Math.max(1, Math.floor(en / 2)) : 2;
+  }
+  const char = characters[combatantRef.char_id];
+  return deriveCharacter(char).limbResistance;
 }
