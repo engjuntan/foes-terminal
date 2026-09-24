@@ -291,7 +291,7 @@ window.render = function() {
   }
 
   // 4. Sync sidebar active state to the current tab, plus unread badges
-  const navMap = { DASHBOARD: 'btn-dashboard', QUESTS: 'btn-quests', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks', STATUS: 'btn-status', REPUTATION: 'btn-reputation' };
+  const navMap = { DASHBOARD: 'btn-dashboard', QUESTS: 'btn-quests', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks', COMBAT: 'btn-combat', STATUS: 'btn-status', REPUTATION: 'btn-reputation' };
   Object.entries(navMap).forEach(([tab, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', window.currentTab === tab);
