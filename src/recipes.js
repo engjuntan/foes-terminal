@@ -11,8 +11,7 @@ export const recipeDatabase = {
     },
     "inputs": {
       "gun_parts": 6,
-      "scrap_metal": 6,
-      "adhesive": 4
+      "scrap_metal": 10
     },
     "station": "weapons_bench",
     "skill": {
@@ -32,7 +31,7 @@ export const recipeDatabase = {
     },
     "inputs": {
       "gun_parts": 4,
-      "chemicals": 4
+      "scrap_metal": 4
     },
     "station": "field_kit",
     "skill": {
@@ -40,26 +39,6 @@ export const recipeDatabase = {
       "min": 20
     },
     "description": "A pressure-sensitive trap, built from scratch."
-  },
-  recipe_can_of_food: {
-    "id": "recipe_can_of_food",
-    "type": "recipe",
-    "name": "Can of Food",
-    "category": "food",
-    "produces": {
-      "item": "can_of_food",
-      "qty": 1
-    },
-    "inputs": {
-      "organics": 3,
-      "scrap_metal": 1
-    },
-    "station": "field_kit",
-    "skill": {
-      "key": "survival",
-      "min": 5
-    },
-    "description": "Basic field rationing."
   },
   recipe_combat_knife: {
     "id": "recipe_combat_knife",
@@ -72,8 +51,7 @@ export const recipeDatabase = {
     },
     "inputs": {
       "gun_parts": 6,
-      "scrap_metal": 6,
-      "adhesive": 4
+      "scrap_metal": 10
     },
     "station": "weapons_bench",
     "skill": {
@@ -92,9 +70,8 @@ export const recipeDatabase = {
       "qty": 1
     },
     "inputs": {
-      "cloth": 6,
-      "scrap_metal": 6,
-      "adhesive": 6
+      "clothing_scrap": 12,
+      "scrap_metal": 6
     },
     "station": "armour_bench",
     "skill": {
@@ -102,25 +79,6 @@ export const recipeDatabase = {
       "min": 35
     },
     "description": "A wearable, combat-practical leather jacket."
-  },
-  recipe_dirty_water: {
-    "id": "recipe_dirty_water",
-    "type": "recipe",
-    "name": "Dirty Water",
-    "category": "food",
-    "produces": {
-      "item": "dirty_water",
-      "qty": 1
-    },
-    "inputs": {
-      "organics": 2
-    },
-    "station": "field_kit",
-    "skill": {
-      "key": "survival",
-      "min": 0
-    },
-    "description": "The cheap, risky option — anyone can scrounge this together."
   },
   recipe_healing_poultice: {
     "id": "recipe_healing_poultice",
@@ -133,7 +91,7 @@ export const recipeDatabase = {
     },
     "inputs": {
       "chemicals": 4,
-      "cloth": 4
+      "clothing_scrap": 4
     },
     "station": "field_kit",
     "skill": {
@@ -182,26 +140,6 @@ export const recipeDatabase = {
     },
     "description": "Scrap-tier rifle, built at the bench."
   },
-  recipe_ikan_masin_jerky: {
-    "id": "recipe_ikan_masin_jerky",
-    "type": "recipe",
-    "name": "Ikan Masin Jerky",
-    "category": "food",
-    "produces": {
-      "item": "ikan_masin_jerky",
-      "qty": 1
-    },
-    "inputs": {
-      "organics": 3,
-      "chemicals": 1
-    },
-    "station": "field_kit",
-    "skill": {
-      "key": "survival",
-      "min": 10
-    },
-    "description": "Salt-curing fish the old way."
-  },
   recipe_jet: {
     "id": "recipe_jet",
     "type": "recipe",
@@ -213,7 +151,7 @@ export const recipeDatabase = {
     },
     "inputs": {
       "chemicals": 5,
-      "electronics": 2
+      "scrap_electronics": 2
     },
     "station": "chem_station",
     "skill": {
@@ -232,8 +170,7 @@ export const recipeDatabase = {
       "qty": 1
     },
     "inputs": {
-      "scrap_metal": 2,
-      "adhesive": 2
+      "scrap_metal": 4
     },
     "station": "weapons_bench",
     "skill": {
@@ -252,9 +189,8 @@ export const recipeDatabase = {
       "qty": 1
     },
     "inputs": {
-      "cloth": 6,
-      "scrap_metal": 6,
-      "adhesive": 6
+      "clothing_scrap": 12,
+      "scrap_metal": 6
     },
     "station": "armour_bench",
     "skill": {
@@ -273,7 +209,7 @@ export const recipeDatabase = {
       "qty": 10
     },
     "inputs": {
-      "chemicals": 2,
+      "gun_parts": 2,
       "scrap_metal": 2
     },
     "station": "field_kit",
@@ -293,8 +229,7 @@ export const recipeDatabase = {
       "qty": 1
     },
     "inputs": {
-      "chemicals": 6,
-      "organics": 4
+      "chemicals": 10
     },
     "station": "chem_station",
     "skill": {
@@ -313,8 +248,7 @@ export const recipeDatabase = {
       "qty": 1
     },
     "inputs": {
-      "chemicals": 6,
-      "organics": 3
+      "chemicals": 9
     },
     "station": "chem_station",
     "skill": {
@@ -322,26 +256,6 @@ export const recipeDatabase = {
       "min": 35
     },
     "description": "Intelligence/Perception-boosting chem."
-  },
-  recipe_nasi_lemak_ration_brick: {
-    "id": "recipe_nasi_lemak_ration_brick",
-    "type": "recipe",
-    "name": "Nasi Lemak Ration Brick",
-    "category": "food",
-    "produces": {
-      "item": "nasi_lemak_ration_brick",
-      "qty": 1
-    },
-    "inputs": {
-      "organics": 4,
-      "cloth": 4
-    },
-    "station": "field_kit",
-    "skill": {
-      "key": "survival",
-      "min": 20
-    },
-    "description": "Compressing a real meal down into ration-brick form takes some practice."
   },
   recipe_nightstick: {
     "id": "recipe_nightstick",
@@ -354,8 +268,7 @@ export const recipeDatabase = {
     },
     "inputs": {
       "gun_parts": 6,
-      "scrap_metal": 6,
-      "adhesive": 2
+      "scrap_metal": 8
     },
     "station": "weapons_bench",
     "skill": {
@@ -374,8 +287,7 @@ export const recipeDatabase = {
       "qty": 1
     },
     "inputs": {
-      "adhesive": 4,
-      "cloth": 2
+      "clothing_scrap": 6
     },
     "station": "weapons_bench",
     "skill": {
@@ -383,26 +295,6 @@ export const recipeDatabase = {
       "min": 15
     },
     "description": "Improvised blunt weapon."
-  },
-  recipe_purified_water: {
-    "id": "recipe_purified_water",
-    "type": "recipe",
-    "name": "Purified Water",
-    "category": "food",
-    "produces": {
-      "item": "purified_water",
-      "qty": 1
-    },
-    "inputs": {
-      "chemicals": 2,
-      "organics": 1
-    },
-    "station": "field_kit",
-    "skill": {
-      "key": "survival",
-      "min": 10
-    },
-    "description": "Basic field water purification."
   },
   recipe_rad_x: {
     "id": "recipe_rad_x",
@@ -414,8 +306,7 @@ export const recipeDatabase = {
       "qty": 1
     },
     "inputs": {
-      "chemicals": 4,
-      "organics": 2
+      "chemicals": 6
     },
     "station": "chem_station",
     "skill": {
@@ -435,7 +326,7 @@ export const recipeDatabase = {
     },
     "inputs": {
       "chemicals": 6,
-      "electronics": 2
+      "scrap_electronics": 2
     },
     "station": "chem_station",
     "skill": {
@@ -455,7 +346,7 @@ export const recipeDatabase = {
     },
     "inputs": {
       "scrap_metal": 6,
-      "cloth": 6
+      "clothing_scrap": 6
     },
     "station": "armour_bench",
     "skill": {
@@ -474,9 +365,8 @@ export const recipeDatabase = {
       "qty": 1
     },
     "inputs": {
-      "hardened_alloy": 2,
-      "cloth": 4,
-      "scrap_metal": 4
+      "scrap_metal": 6,
+      "clothing_scrap": 4
     },
     "station": "armour_bench",
     "skill": {
@@ -495,9 +385,8 @@ export const recipeDatabase = {
       "qty": 1
     },
     "inputs": {
-      "cloth": 6,
-      "scrap_metal": 6,
-      "adhesive": 6
+      "clothing_scrap": 12,
+      "scrap_metal": 6
     },
     "station": "armour_bench",
     "skill": {

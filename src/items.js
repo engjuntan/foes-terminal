@@ -968,17 +968,6 @@ export const itemDatabase = {
     "weight": 1,
     "value": "TBA"
   },
-  adhesive: {
-    "id": "adhesive",
-    "name": "Adhesive",
-    "type": "component",
-    "icon": "",
-    "image_prompt": "A dented tin of thick amber adhesive paste, the lid crusted with dried residue, a peeling label with faded Malay text, a wooden spatula stuck halfway into the opening, on a rusted oil drum in a scrapyard clearing.",
-    "description": "Glue, resin, tape — the universal binder. Small amounts appear in almost every recipe.",
-    "stackable": true,
-    "weight": 0.1,
-    "value": 3
-  },
   chemicals: {
     "id": "chemicals",
     "name": "Chemicals",
@@ -990,27 +979,16 @@ export const itemDatabase = {
     "weight": 0.2,
     "value": 5
   },
-  cloth: {
-    "id": "cloth",
-    "name": "Cloth & Hide",
+  clothing_scrap: {
+    "id": "clothing_scrap",
+    "name": "Clothing Scrap",
     "type": "component",
     "icon": "",
     "image_prompt": "A folded bundle of assorted fabric and cured hide scraps, frayed edges and patched holes, mismatched colours and textures stacked together, one strip stamped with a faded factory mark, scattered on a tarp beside a stripped-down rifle.",
-    "description": "Fabric, leather, webbing — armor, bandages, and packs.",
+    "description": "Fabric, leather, webbing — clothing and cloth armor crafting.",
     "stackable": true,
     "weight": 0.1,
     "value": 2
-  },
-  electronics: {
-    "id": "electronics",
-    "name": "Electronics",
-    "type": "component",
-    "icon": "",
-    "image_prompt": "A small tangle of salvaged electronics — coiled wiring, a cracked circuit board, and a couple of corroded battery cells — bundled together with a rubber band, solder points tarnished green, in a woven rattan basket on a kampung porch.",
-    "description": "Wiring, boards, cells — energy weapons, tech, and robotics crafting.",
-    "stackable": true,
-    "weight": 0.2,
-    "value": 6
   },
   gun_parts: {
     "id": "gun_parts",
@@ -1023,38 +1001,16 @@ export const itemDatabase = {
     "weight": 0.3,
     "value": 5
   },
-  hardened_alloy: {
-    "id": "hardened_alloy",
-    "name": "Hardened Alloy",
+  scrap_electronics: {
+    "id": "scrap_electronics",
+    "name": "Scrap Electronics",
     "type": "component",
     "icon": "",
-    "image_prompt": "A heavy slab of dense military-grade alloy plate, its surface scarred with deep scratches and a few bullet dents, edges machined clean despite the wear, a faint stamped serial number, tucked into a drawer of a gunsmith's cabinet.",
-    "description": "Ballistic plate, military-grade steel — gates top-tier weapons and armor. Rare: the GM drops this deliberately, not as regular loot.",
-    "stackable": true,
-    "weight": 0.8,
-    "value": 30
-  },
-  organics: {
-    "id": "organics",
-    "name": "Organics",
-    "type": "component",
-    "icon": "",
-    "image_prompt": "A small pile of assorted organic scraps — dried plant matter, a few bones, and strips of cured meat — bundled in a torn cloth sack tied with twine, laid across a mechanic's workbench beside a half-stripped kapcai engine.",
-    "description": "Plant matter, meat, bone — food, water purification, and primitive gear crafting.",
+    "image_prompt": "A small tangle of salvaged electronics — coiled wiring, a cracked circuit board, and a couple of corroded battery cells — bundled together with a rubber band, solder points tarnished green, in a woven rattan basket on a kampung porch.",
+    "description": "Wiring, boards, cells — generic electronics crafting.",
     "stackable": true,
     "weight": 0.2,
-    "value": 2
-  },
-  prewar_tech: {
-    "id": "prewar_tech",
-    "name": "Pre-War Tech",
-    "type": "component",
-    "icon": "",
-    "image_prompt": "A compact block of intact pre-war circuitry, its casing pristine chrome compared to the wasteland's rust, dense internal wiring visible through a cracked viewport, a faded manufacturer's engraving on top, in an open toolbox on a workshop floor.",
-    "description": "Intact circuitry, military-grade electronics — gates energy weapons and advanced mods. Rare: the GM drops this deliberately, not as regular loot.",
-    "stackable": true,
-    "weight": 0.2,
-    "value": 25
+    "value": 6
   },
   scrap_metal: {
     "id": "scrap_metal",
@@ -2712,7 +2668,7 @@ export const itemDatabase = {
     "image_prompt": "A broken fragment of a green circuit board, snapped copper traces and a few desoldered component pads, one corner scorched black, edges jagged where it was pried loose, abandoned in the long grass of a jungle verge.",
     "description": "Robotics/science crafting component, sourced from North Bandawang factory equipment.",
     "scrap_yield": {
-      "electronics": 2
+      "scrap_electronics": 2
     },
     "stackable": true,
     "weight": 0.1,
@@ -2726,7 +2682,7 @@ export const itemDatabase = {
     "image_prompt": "A small wooden spool wound with tarnished copper wire, several strands unraveling loose, the wood cracked and stained, a faded factory tag tied to the spindle, washed up on a muddy riverbank.",
     "description": "Electronics crafting component, sourced from North Bandawang factory wiring.",
     "scrap_yield": {
-      "electronics": 2,
+      "scrap_electronics": 2,
       "scrap_metal": 1
     },
     "stackable": true,
@@ -2741,7 +2697,7 @@ export const itemDatabase = {
     "image_prompt": "A half-used roll of grey duct tape, the outer layer peeling and curled at the edge, adhesive residue crusted along the torn strip, the cardboard core slightly crushed, on the tailgate of a wrecked pickup truck swallowed by ferns.",
     "description": "Universal crafting binder — mainline staple.",
     "scrap_yield": {
-      "adhesive": 3
+      "chemicals": 3
     },
     "stackable": true,
     "weight": 0.1,
@@ -2845,7 +2801,7 @@ export const itemDatabase = {
     "image_prompt": "A household radio set with a cracked wooden-veneer casing, dial glass shattered, exposed tubes and wiring visible through a broken panel, a tuning knob missing, in the flooded silt of a collapsed stairwell.",
     "description": "A household radio set, casing cracked, innards mostly intact.",
     "scrap_yield": {
-      "electronics": 3,
+      "scrap_electronics": 3,
       "scrap_metal": 1
     },
     "stackable": true,
@@ -2861,7 +2817,7 @@ export const itemDatabase = {
     "description": "A fallen streetlamp head, casing dented, bulb long gone.",
     "scrap_yield": {
       "scrap_metal": 2,
-      "electronics": 1
+      "scrap_electronics": 1
     },
     "stackable": true,
     "weight": 1.8,
@@ -2875,7 +2831,7 @@ export const itemDatabase = {
     "image_prompt": "A large cracked glass-fronted display board from a pre-war shopfront, spiderweb fractures across a grid of small glass indicator windows, a bent bakelite-and-metal bezel, frayed cloth-sheathed wiring trailing from one edge, a faded shopfront brand plate in the corner, tangled in vines at the edge of a scrapyard.",
     "description": "A shattered display panel, scavenged from a pre-War shopfront or office.",
     "scrap_yield": {
-      "electronics": 2
+      "scrap_electronics": 2
     },
     "stackable": true,
     "weight": 0.3,
@@ -2890,7 +2846,7 @@ export const itemDatabase = {
     "description": "A snapped-off wing mirror, still on its mounting arm.",
     "scrap_yield": {
       "scrap_metal": 1,
-      "electronics": 1
+      "scrap_electronics": 1
     },
     "stackable": true,
     "weight": 0.2,
@@ -2905,7 +2861,7 @@ export const itemDatabase = {
     "description": "A shattered helmet shell, padding and strap still attached.",
     "scrap_yield": {
       "scrap_metal": 1,
-      "cloth": 1
+      "clothing_scrap": 1
     },
     "stackable": true,
     "weight": 0.9,
@@ -2919,8 +2875,7 @@ export const itemDatabase = {
     "image_prompt": "A tall blue plastic rain-collection barrel split down one side, sun-bleached to a chalky white along the crack, streaked with algae and mineral crust, a molded Bahasa Malaysia capacity marking worn illegible near the rim, propped against a rusted fence post in tall grass.",
     "description": "A plastic rain-collection barrel, split down one side.",
     "scrap_yield": {
-      "scrap_metal": 1,
-      "organics": 1
+      "scrap_metal": 1
     },
     "stackable": true,
     "weight": 1.2,
@@ -2949,7 +2904,7 @@ export const itemDatabase = {
     "image_prompt": "A small heap of dried salted fish bones and papery skin, ikan masin remains bleached pale grey-white, curling and brittle, a few grains of coarse salt still clinging to the spine, on a riverside jetty plank, fishing nets drying nearby.",
     "description": "The remains of a salted-fish meal — ikan masin's leftovers, everywhere along the coast.",
     "scrap_yield": {
-      "organics": 2
+      "chemicals": 1
     },
     "stackable": true,
     "weight": 0.1,
@@ -2978,8 +2933,7 @@ export const itemDatabase = {
     "image_prompt": "A dented steel ration tin, olive-drab paint chipped to bare metal, a painted lavender stripe and lot number faded on the lid, pull-ring long snapped off, rust freckling the seams, half-buried in wet leaf litter at the edge of a jungle trail.",
     "description": "A discarded Federation-issue ration tin. Common wherever Federation patrols have passed through.",
     "scrap_yield": {
-      "scrap_metal": 1,
-      "organics": 1
+      "scrap_metal": 1
     },
     "stackable": true,
     "weight": 0.15,
@@ -3008,7 +2962,7 @@ export const itemDatabase = {
     "image_prompt": "A woven prayer mat riddled with moth holes, once-green pile faded to dull khaki, fringed edges frayed and unraveling, a geometric mihrab pattern still visible through the wear and grime, abandoned in the long grass of a jungle verge.",
     "description": "A woven prayer mat, faded and holed through but still real fabric.",
     "scrap_yield": {
-      "cloth": 3
+      "clothing_scrap": 3
     },
     "stackable": true,
     "weight": 0.4,
@@ -3022,8 +2976,8 @@ export const itemDatabase = {
     "image_prompt": "A single snapped rubber sandal strap, moulded dark brown and cracked with age, the Y-shaped thong torn free of its post, a sole fragment still attached, gritty with dried mud, tangled in vines at the edge of a scrapyard.",
     "description": "A snapped rubber sandal strap — the most common footwear in the pre-War Peninsula, still lying everywhere.",
     "scrap_yield": {
-      "cloth": 1,
-      "adhesive": 1
+      "clothing_scrap": 1,
+      "chemicals": 1
     },
     "stackable": true,
     "weight": 0.05,
@@ -3037,8 +2991,7 @@ export const itemDatabase = {
     "image_prompt": "A small motorcycle carburettor stripped off a wrecked kapcai, aluminium body pitted and rusted orange-brown, float bowl cracked, throttle cable snapped short, dried fuel residue crusted around the intake, on a heap of scrap in a Bandawang junkyard corner.",
     "description": "Scavenged straight off a wrecked kapcai — Bandawang's old commuter bike of choice.",
     "scrap_yield": {
-      "scrap_metal": 2,
-      "adhesive": 1
+      "scrap_metal": 3
     },
     "stackable": true,
     "weight": 0.8,
@@ -3067,7 +3020,7 @@ export const itemDatabase = {
     "image_prompt": "A torn sheet of blue plastic tarpaulin, shredded edges fraying into ribbons, sun-bleached patches gone pale and brittle, a faded warung stall's hand-painted name still legible across one corner, set on a market stall counter beside stacked enamel bowls.",
     "description": "Blue plastic tarp, the kind every stall and stockroom in Bandawang used to have rolls of.",
     "scrap_yield": {
-      "cloth": 3
+      "clothing_scrap": 3
     },
     "stackable": true,
     "weight": 0.5,
@@ -3081,8 +3034,7 @@ export const itemDatabase = {
     "image_prompt": "A burlap sack stuffed with coarse coconut husk fibre, the weave stained dark and mildewed, one corner split and spilling brown fibre, a faded plantation number painted on the fabric, in the flooded silt of a collapsed stairwell.",
     "description": "A burlap sack of coconut husk fibre — old plantation waste, still tough as rope.",
     "scrap_yield": {
-      "organics": 2,
-      "cloth": 1
+      "clothing_scrap": 3
     },
     "stackable": true,
     "weight": 0.7,
@@ -3096,8 +3048,8 @@ export const itemDatabase = {
     "image_prompt": "A small wooden spool wound with tangled nylon fishing line, the line yellowed and brittle, salt crust caked around the edges, a faded brand label peeling off the hub, on a rusted oil drum in a scrapyard clearing.",
     "description": "Nylon fishing line off a broken reel — common salvage near Bandawang's waterfront.",
     "scrap_yield": {
-      "cloth": 1,
-      "adhesive": 1
+      "clothing_scrap": 1,
+      "chemicals": 1
     },
     "stackable": true,
     "weight": 0.1,
@@ -3125,8 +3077,7 @@ export const itemDatabase = {
     "image_prompt": "A palm-sized bakelite device with a small speaker grille and a single blinking status light, moulded casing scuffed and yellowed with age, a peeling sticker printed with a roaring animal crossed out in red, a hand-written price tag tied on with string, tangled in vines at the edge of a scrapyard.",
     "description": "A boxy unit that supposedly emits an ultrasonic screech to scare off dangerous creatures. Reads like a scam — but anyone with real Science knowledge can tell the internals are genuine pre-War hardware, even if nobody can say whether it ever worked.",
     "scrap_yield": {
-      "electronics": 3,
-      "pre_war_tech": 1
+      "scrap_electronics": 3
     },
     "stackable": true,
     "weight": 1.2,
@@ -3141,7 +3092,7 @@ export const itemDatabase = {
     "description": "A collapsed umbrella's metal ribs — useless as shelter, useful as scrap.",
     "scrap_yield": {
       "scrap_metal": 1,
-      "cloth": 1
+      "clothing_scrap": 1
     },
     "stackable": true,
     "weight": 0.2,
@@ -3156,7 +3107,7 @@ export const itemDatabase = {
     "description": "A roadside stall's old tin signboard — every Bandawang street had a dozen of these once.",
     "scrap_yield": {
       "scrap_metal": 2,
-      "cloth": 1
+      "clothing_scrap": 1
     },
     "stackable": true,
     "weight": 1.2,
@@ -3170,7 +3121,7 @@ export const itemDatabase = {
     "image_prompt": "A small bundle of dried kitchen herbs tied with string, brittle pandan and serai stalks curled and browned, leaves crumbling to brittle flakes, a faded twine loop for hanging still knotted at the top, on the floor of a scrapyard shed.",
     "description": "A bundle of dried kitchen herbs, found hanging in an abandoned stall.",
     "scrap_yield": {
-      "organics": 2
+      "chemicals": 2
     },
     "stackable": true,
     "weight": 0.05,

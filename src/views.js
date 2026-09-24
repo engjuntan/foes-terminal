@@ -2040,7 +2040,7 @@ export function getWorkshopView(charId, liveData) {
         if (generic) {
           const component = genericScrapComponent(j);
           yieldText = component === 'power_armor'
-            ? `1 ${(getItem('hardened_alloy') || {}).name || 'Hardened Alloy'} + 1–3 ${(getItem('scrap_metal') || {}).name || 'Scrap Metal'}`
+            ? `1 ${(getItem('scrap_electronics') || {}).name || 'Scrap Electronics'} + 1–3 ${(getItem('scrap_metal') || {}).name || 'Scrap Metal'}`
             : `1–3 ${(getItem(component) || {}).name || component}`;
         } else {
           const previewYield = durable ? scrapYieldFor(j.scrap_yield, worstMarks) : j.scrap_yield;

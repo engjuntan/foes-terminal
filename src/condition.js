@@ -228,13 +228,17 @@ export function scrapYieldFor(scrapYield, marks) {
 // that exist are salvaged_power_armor_*), and light/heavy off weight
 // (>=8kg reads as heavy) since that's the one numeric armor field every
 // piece already carries. Stated as an assumption in this agent's report.
+// Five components only (GM ruling 2026-09-24): gun_parts, clothing_scrap,
+// scrap_metal, scrap_electronics, chemicals. The retired adhesive,
+// organics, hardened_alloy and prewar_tech are gone, so energy gear and
+// power armor no longer have a rare gate here.
 const REPAIR_COMPONENTS = {
   guns: { primary: 'gun_parts', secondary: 'scrap_metal' },
-  energy: { primary: 'electronics', secondary: 'gun_parts', rare: 'prewar_tech' },
-  melee: { primary: 'scrap_metal', secondary: 'adhesive' },
-  light_armor: { primary: 'cloth', secondary: 'adhesive' },
-  heavy_armor: { primary: 'scrap_metal', secondary: 'cloth' },
-  power_armor: { primary: 'scrap_metal', secondary: 'electronics', rare: 'hardened_alloy' }
+  energy: { primary: 'scrap_electronics', secondary: 'gun_parts' },
+  melee: { primary: 'scrap_metal', secondary: 'gun_parts' },
+  light_armor: { primary: 'clothing_scrap', secondary: 'scrap_metal' },
+  heavy_armor: { primary: 'scrap_metal', secondary: 'clothing_scrap' },
+  power_armor: { primary: 'scrap_metal', secondary: 'scrap_electronics' }
 };
 const HEAVY_ARMOR_WEIGHT_KG = 8;
 
@@ -268,7 +272,7 @@ export function repairCategory(item) {
 export function genericScrapComponent(item) {
   if (!item) return null;
   if (item.type === 'weapon') {
-    if (item.skill === 'energy_weapons') return 'electronics';
+    if (item.skill === 'energy_weapons') return 'scrap_electronics';
     if (item.skill === 'melee_weapons' || item.skill === 'unarmed' || item.skill === 'throwing') return 'scrap_metal';
     return 'gun_parts'; // small_guns, big_guns, or unspecified — "a gun"
   }
@@ -276,7 +280,7 @@ export function genericScrapComponent(item) {
     const id = item.id || '';
     if (id.includes('power_armor')) return 'power_armor'; // special-cased in genericScrapYield below
     const heavy = typeof item.weight === 'number' && item.weight >= HEAVY_ARMOR_WEIGHT_KG;
-    return heavy ? 'scrap_metal' : 'cloth';
+    return heavy ? 'scrap_metal' : 'clothing_scrap';
   }
   return null;
 }
@@ -296,13 +300,13 @@ export function genericScrapQty(repairSkill) {
 
 // { componentId: qty }, or null if this item isn't a weapon/armor this
 // build knows how to classify. Power armor is the one two-component
-// case: 1 Hardened Alloy (the "and" the brief calls for) plus the
+// case: 1 Scrap Electronics (its servos and wiring) plus the
 // Repair-weighted Scrap Metal roll.
 export function genericScrapYield(item, repairSkill) {
   const component = genericScrapComponent(item);
   if (!component) return null;
   const qty = genericScrapQty(repairSkill);
-  if (component === 'power_armor') return { hardened_alloy: 1, scrap_metal: qty };
+  if (component === 'power_armor') return { scrap_electronics: 1, scrap_metal: qty };
   return { [component]: qty };
 }
 
