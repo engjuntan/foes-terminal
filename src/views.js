@@ -555,9 +555,13 @@ function buildParentTree(entries) {
   return roots;
 }
 
-export function renderWikiLink(name, description) {
+// `iconUrl` puts a small square picture in the tooltip's top-left with the
+// text wrapping around it (see .tip-icon in style.css) — used for the
+// SPECIAL stats, which have their own art.
+export function renderWikiLink(name, description, iconUrl) {
   if (!description) description = "No data available.";
-  const safeDesc = description.replace(/"/g, "&quot;").replace(/'/g, "\\'");
+  const body = iconUrl ? `<img src="${iconUrl}" class="tip-icon" alt="">${description}` : description;
+  const safeDesc = body.replace(/"/g, "&quot;").replace(/'/g, "\\'");
   // One line, no whitespace around the name: this is dropped inline into
   // white-space:pre-wrap bodies (data logs, people, quests), where any
   // newline or indent in the markup renders as a real line break.
@@ -614,7 +618,7 @@ export function getRegistrationView(charId, liveData) {
     const isFocused = (draft.lastTouched || 'str') === stat;
     return `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; border-bottom:1px dashed ${isFocused ? 'var(--pip-green)' : '#333'}; padding:5px;">
-        <span style="width:50px; font-weight:bold; color:var(--pip-dim); cursor:pointer;" onclick="window.setCreationFocus('${stat}')">${renderWikiLink(label, SPECIAL_INFO[stat])}</span>
+        <span style="width:50px; font-weight:bold; color:var(--pip-dim); cursor:pointer;" onclick="window.setCreationFocus('${stat}')">${renderWikiLink(label, SPECIAL_INFO[stat], (SPECIAL_FLAVOR[stat] || {}).image_url)}</span>
         <div style="display:flex; align-items:center; gap:10px;">
           <button ${canMinus} onclick="window.adjustCreationStat('${stat}', -1)">[-]</button>
           <span style="color:${val >= 10 ? 'gold' : 'var(--pip-green)'}; width:30px; text-align:center;">${val}</span>
@@ -725,7 +729,7 @@ export function getGoatReviewView(charId, liveData) {
   const tags = Object.keys(char.tags || {});
 
   const specialRows = SPECIAL_ORDER
-    .map(k => `<div class="special-row"><span>${renderWikiLink(k.toUpperCase(), SPECIAL_INFO[k])}</span><span>${(char.special || {})[k] ?? '-'}</span></div>`)
+    .map(k => `<div class="special-row"><span>${renderWikiLink(k.toUpperCase(), SPECIAL_INFO[k], (SPECIAL_FLAVOR[k] || {}).image_url)}</span><span>${(char.special || {})[k] ?? '-'}</span></div>`)
     .join('');
 
   const tagsHtml = tags.length > 0
@@ -1999,7 +2003,7 @@ export function getPlayerView(charId, liveData) {
         <div style="margin-bottom:10px;">${renderConditionRows(buildConditionRows(charData))}</div>
 
         <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px;">S.P.E.C.I.A.L.</h3>
-        ${SPECIAL_ORDER.map(k => `<div class="special-row"><span>${renderWikiLink(k.toUpperCase(), SPECIAL_INFO[k])}</span><span>${charData.special[k] ?? '-'}</span></div>`).join("")}
+        ${SPECIAL_ORDER.map(k => `<div class="special-row"><span>${renderWikiLink(k.toUpperCase(), SPECIAL_INFO[k], (SPECIAL_FLAVOR[k] || {}).image_url)}</span><span>${charData.special[k] ?? '-'}</span></div>`).join("")}
         
         <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px;">TRAITS</h3>
         ${traitsHtml || "> NONE"}
