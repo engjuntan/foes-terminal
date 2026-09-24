@@ -478,3 +478,37 @@ export function shouldAnimateInitiative(char, combat) {
   if (!combat || !combat.is_active || !combat.started_at) return false;
   return (char && char.seen_initiative_for) !== combat.started_at;
 }
+
+// --- DOWN / DEATH STATE MACHINE (job 5, GM's live-session notes,
+// 2026-09-24: "0 HP is unconscious, not dead"... "on each of their turns
+// while down, they roll to get back up"... "two failures in a row is
+// permanent death"... "a successful roll resets the count") ---
+// Tier chosen: Normal. The manual gives no special guidance for a
+// "shake it off and stand up" roll, and Normal (no modifier either way)
+// is this codebase's own default whenever a save's difficulty isn't
+// otherwise specified — see the poison save's `{ stat: 'end', tier:
+// 'normal' }` default in controllers.js. Pure and roll-agnostic like
+// resolveCombatantSave itself: `success` is the ALREADY-RESOLVED result
+// of that Endurance check (see endTurn()'s call site in controllers.js,
+// which rolls it via resolveCombatantSave the same way a poison save
+// does), so this function is just the streak bookkeeping — trivially
+// testable without any character/combat fixture at all.
+export const DOWN_RECOVERY_TIER = 'normal';
+
+export function resolveDownedRecovery(success, priorFailStreak = 0) {
+  if (success) return { revived: true, dies: false, nextFailStreak: 0 };
+  const nextFailStreak = (priorFailStreak || 0) + 1;
+  return { revived: false, dies: nextFailStreak >= 2, nextFailStreak };
+}
+
+// GM revive (job 5: "a GM control that restores them at a stated HP") —
+// clamps whatever the GM typed to a sane range: never above the
+// character's own max HP, and never below 1 (0 would just mean "still
+// down", which isn't what reviving someone means). A blank/non-numeric
+// field defaults to 1 HP rather than rejecting the action outright.
+export function clampReviveHp(requestedHp, maxHp) {
+  const max = Math.max(1, maxHp || 1);
+  const requested = Number(requestedHp);
+  if (!Number.isFinite(requested)) return 1;
+  return Math.max(1, Math.min(max, Math.round(requested)));
+}

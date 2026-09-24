@@ -5,7 +5,7 @@ import { statusEffectDatabase } from './statusEffects.js';
 import { getItem } from './items.js';
 import { RACE_RULES, calculateDerivedStats, deriveCharacter, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
 import { getMonster } from './bestiary.js';
-import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES, COVER_LEVELS, isMonsterAttackMelee, effectiveTargetAC, resolveCombatantSave, combatantLimbResistance } from './combat.js';
+import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES, COVER_LEVELS, isMonsterAttackMelee, effectiveTargetAC, resolveCombatantSave, combatantLimbResistance, DOWN_RECOVERY_TIER, resolveDownedRecovery, clampReviveHp } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { questDatabase } from './quests.js';
 import { mapDatabase } from './maps.js';
@@ -783,6 +783,38 @@ export async function gmAdjustHP(targetCharId, amount) {
   }
 
   await updateDoc(charRef, updatePayload);
+}
+
+// Job 5 (GM's live-session notes, 2026-09-24): "Dead characters are never
+// deleted... only the GM can bring one back — a GM control that restores
+// them at a stated HP." Clears both is_dead and the down_fail_streak
+// (a revived character isn't mid-streak toward a second death) and, if
+// they're still sitting in an active fight's initiative order, clears
+// is_down there too so they're immediately playable again this combat.
+export async function gmReviveCharacter(targetCharId, requestedHp) {
+  if (!targetCharId || !window.liveData) return;
+  const char = window.liveData.characters[targetCharId];
+  if (!char) return;
+
+  const hp = clampReviveHp(requestedHp, char.hp && char.hp.max);
+  const updatePayload = {
+    [`characters.${targetCharId}.is_dead`]: false,
+    [`characters.${targetCharId}.down_fail_streak`]: 0,
+    [`characters.${targetCharId}.hp.current`]: hp
+  };
+
+  const combat = window.liveData.active_combat;
+  if (combat && combat.is_active) {
+    const idx = combat.initiative_order.findIndex(c => c.ref_type === 'pc' && c.char_id === targetCharId);
+    if (idx !== -1) {
+      updatePayload['active_combat.initiative_order'] = combat.initiative_order.map((c, i) => i === idx ? { ...c, is_down: false } : c);
+    }
+  }
+
+  updatePayload.event_log = pushEventLog(window.liveData.event_log, { text: `${char.name || targetCharId} was revived by the GM at ${hp} HP.`, actor: 'GM' });
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // GM sets a PC's radiation directly, at will — not an automatic
@@ -2118,8 +2150,15 @@ export async function gmAdjustCombatantHP(combatantId, delta, reason) {
     log: [...combat.log, { id: `log_${Date.now()}`, type: 'action', message, timestamp: Date.now() }]
   };
 
+  const updatePayload = { active_combat: updatedCombat, ...charUpdates };
+  // Job 5: this tool doubles as manual combat damage (see its own header
+  // comment) — a knockout dealt this way goes to the event log too.
+  if (!target.is_down && newCurrent <= 0) {
+    updatePayload.event_log = pushEventLog(window.liveData.event_log, { text: `${target.name} is down — 0 HP.`, actor: 'GM' });
+  }
+
   const charRef = doc(db, "prisoncampaign", "alpha_team");
-  try { await updateDoc(charRef, { active_combat: updatedCombat, ...charUpdates }); } catch (err) { alert("ERROR: " + err.message); }
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // --- COMBAT: TURN ACTIONS ---
@@ -2169,7 +2208,7 @@ export async function resolveAttack() {
 
   const resolved = computeAttackResolution(combat, attacker, target, draft, roll);
   if (!resolved) return; // computeAttackResolution already alerted (e.g. no weapon/attack picked, out of ammo)
-  const { updatedCombat, charUpdates, message } = resolved;
+  const { updatedCombat, charUpdates, message, eventLogMessages } = resolved;
 
   // GM reroll (SCOPE_DECISIONS.md "Next systems" ruling, 2026-09-21):
   // resolution already applies HP damage, AP/ammo and status effects, so
@@ -2196,9 +2235,19 @@ export async function resolveAttack() {
     at: Date.now()
   };
 
+  // Job 5: knockouts/deaths this resolution caused (see
+  // computeAttackResolution's own comment) — only touches event_log at
+  // all when there's actually something to log.
+  const updatePayload = { active_combat: updatedCombat, ...charUpdates, last_resolution };
+  if (eventLogMessages && eventLogMessages.length) {
+    let eventLog = window.liveData.event_log;
+    eventLogMessages.forEach(text => { eventLog = pushEventLog(eventLog, { text, actor: attacker.name }); });
+    updatePayload.event_log = eventLog;
+  }
+
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   try {
-    await updateDoc(charRef, { active_combat: updatedCombat, ...charUpdates, last_resolution });
+    await updateDoc(charRef, updatePayload);
     window.combatActionDraft = null;
   } catch (err) { alert("ERROR: " + err.message); }
 }
@@ -2397,6 +2446,16 @@ export function computeAttackResolution(combat, attacker, target, draft, roll) {
   let critTag = '';
   const newInitiativeOrder = combat.initiative_order.map(c => ({ ...c }));
   const charUpdates = {};
+  // Job 5 (GM's live-session notes, 2026-09-24): "Deaths and knockouts go
+  // to the event log, including from combat damage — the previous pass
+  // deliberately left combat unhooked, so hook it here." Collected here
+  // (not written directly — this function stays Firestore-free, see its
+  // own header comment) and applied by resolveAttack()/
+  // gmRerollLastResolution() alongside everything else this resolution
+  // touches. `deathHandledIds` lets the instant-kill branch post its own
+  // "was killed instantly!" line instead of the generic knockout one.
+  const eventLogMessages = [];
+  const deathHandledIds = new Set();
 
   // Ammo is spent on firing, hit or miss — the rounds left the barrel
   // either way. Applied regardless of isHit, once we know we're actually
@@ -2607,17 +2666,26 @@ export function computeAttackResolution(combat, attacker, target, draft, roll) {
             effectAppliedMsg += ` ${targetName} shrugs off the killing blow (boss) but takes 20 true damage!`;
           } else {
             const idx = newInitiativeOrder.findIndex(c => c.combatant_id === target.combatant_id);
+            // "One Shot One Kill" is the one crit effect that's a genuine
+            // outright kill, not a knockout — job 5's "0 HP is down, not
+            // dead" ruling covers ordinary damage bringing someone to 0;
+            // this named effect is explicitly a kill by its own flavor
+            // text, so it sets is_dead directly and skips the down/
+            // recovery cycle entirely.
             if (target.ref_type === 'monster') {
               finalDamage = target.hp.current;
-              newInitiativeOrder[idx] = { ...newInitiativeOrder[idx], hp: { ...target.hp, current: 0 }, is_down: true };
+              newInitiativeOrder[idx] = { ...newInitiativeOrder[idx], hp: { ...target.hp, current: 0 }, is_down: true, is_dead: true };
             } else {
               const targetChar = window.liveData.characters[target.char_id];
               finalDamage = targetChar.hp.current;
               charUpdates[`characters.${target.char_id}.hp.current`] = 0;
+              charUpdates[`characters.${target.char_id}.is_dead`] = true;
               newInitiativeOrder[idx] = { ...newInitiativeOrder[idx], is_down: true };
             }
             effectAppliedMsg += ` ONE SHOT, ONE KILL!`;
             killedOutright = true;
+            deathHandledIds.add(target.combatant_id);
+            eventLogMessages.push(`${targetName} was killed instantly!`);
           }
           damageAlreadyApplied = true;
           break;
@@ -2827,6 +2895,18 @@ export function computeAttackResolution(combat, attacker, target, draft, roll) {
     damageType: attackDef.damageType, isEffectOnly: attackDef.damage === '0'
   });
 
+  // Job 5: generic knockout detection — anyone who crossed from up to
+  // down THIS resolution (whether the original target, a self-hit
+  // attacker, or a crit-fail's redirected target) gets logged, skipping
+  // anyone the instant-kill branch above already gave its own death line.
+  newInitiativeOrder.forEach(c => {
+    if (deathHandledIds.has(c.combatant_id)) return;
+    const before = combat.initiative_order.find(o => o.combatant_id === c.combatant_id);
+    if (before && !before.is_down && c.is_down) {
+      eventLogMessages.push(`${c.name} is down — 0 HP.`);
+    }
+  });
+
   const updatedCombat = {
     ...combat,
     turn_acted: true,
@@ -2834,7 +2914,7 @@ export function computeAttackResolution(combat, attacker, target, draft, roll) {
     log: [...combat.log, { id: `log_${Date.now()}`, type: 'action', message, timestamp: Date.now() }]
   };
 
-  return { updatedCombat, charUpdates, message };
+  return { updatedCombat, charUpdates, message, eventLogMessages };
 }
 
 // GM-only: rerolls the most recent resolved roll (attack or skill/SPECIAL
@@ -2900,6 +2980,13 @@ export async function gmRerollLastResolution() {
         active_combat: { ...resolved.updatedCombat, log: [...resolved.updatedCombat.log, rerollNote] },
         last_resolution: deleteField()
       };
+      // Job 5: a reroll can knock someone out (or kill them) just like a
+      // fresh action can — same event-log hookup as resolveAttack().
+      if (resolved.eventLogMessages && resolved.eventLogMessages.length) {
+        let eventLog = restored.event_log;
+        resolved.eventLogMessages.forEach(text => { eventLog = pushEventLog(eventLog, { text, actor: attacker.name }); });
+        payload.event_log = eventLog;
+      }
     } else if (last.kind === 'player_check' || last.kind === 'gm_check') {
       payload = rerollCheckResolution(last);
       if (!payload) return;
@@ -3018,6 +3105,10 @@ export async function endTurn() {
   const charUpdates = {};
   const log = [...combat.log];
   const turnEvents = [];
+  // Job 5: deaths/knockouts this turn advance causes (a failed recovery
+  // roll going to 2-in-a-row) — same event-log hookup as combat damage,
+  // see computeAttackResolution's comment.
+  const eventLogMessages = [];
 
   let nextIndex = combat.turn_index;
   let nextRound = combat.round;
@@ -3033,14 +3124,64 @@ export async function endTurn() {
     }
 
     const candidate = newInitiativeOrder[nextIndex];
-    if (candidate.is_down) continue;
-
     // Ticking works the same for a PC or a monster now — the only
     // difference is where the effects array and HP actually live: a PC's
     // are in characters.<id>, a monster's are inline on its own
     // initiative_order entry (it's a self-contained instance already).
     const isPcCombatant = candidate.ref_type === 'pc';
     const char = isPcCombatant ? window.liveData.characters[candidate.char_id] : null;
+    const isDead = isPcCombatant ? !!(char && char.is_dead) : !!candidate.is_dead;
+    if (isDead) continue; // permanently out of the turn order
+
+    // Job 5 ("0 HP is unconscious, not dead"... "on each of their turns
+    // while down, they roll to get back up"): a down (not dead)
+    // combatant's "turn" IS this roll — auto-resolved here the same way
+    // a damage_per_turn tick is, rather than an interactive action panel
+    // (there's nothing for them to choose; they either stand up or they
+    // don't). Success stands them at 1 HP; two failures in a row is
+    // permanent death; any success resets the streak.
+    if (candidate.is_down) {
+      const enduranceRoll = rollD10();
+      const save = resolveCombatantSave(candidate, window.liveData.characters, enduranceRoll, 'end', DOWN_RECOVERY_TIER);
+      const priorStreak = isPcCombatant ? (char.down_fail_streak || 0) : (candidate.down_fail_streak || 0);
+      const attempt = resolveDownedRecovery(save.success, priorStreak);
+
+      if (attempt.revived) {
+        const msg = `${candidate.name} fights through it and gets back up! (END save ${enduranceRoll} vs ${save.threshold}, now 1 HP)`;
+        log.push({ id: `log_${Date.now()}_up${safety}`, type: 'status', message: msg, timestamp: Date.now() });
+        turnEvents.push(msg);
+        eventLogMessages.push(`${candidate.name} gets back up at 1 HP.`);
+        if (isPcCombatant) {
+          charUpdates[`characters.${candidate.char_id}.hp.current`] = 1;
+          charUpdates[`characters.${candidate.char_id}.down_fail_streak`] = 0;
+          newInitiativeOrder[nextIndex] = { ...candidate, is_down: false };
+        } else {
+          newInitiativeOrder[nextIndex] = { ...candidate, hp: { ...candidate.hp, current: 1 }, is_down: false, down_fail_streak: 0 };
+        }
+      } else if (attempt.dies) {
+        const msg = `${candidate.name} fails to get back up (END save ${enduranceRoll} vs ${save.threshold})... and dies.`;
+        log.push({ id: `log_${Date.now()}_dead${safety}`, type: 'status', message: msg, timestamp: Date.now() });
+        turnEvents.push(msg);
+        eventLogMessages.push(`${candidate.name} has died.`);
+        if (isPcCombatant) {
+          charUpdates[`characters.${candidate.char_id}.is_dead`] = true;
+          charUpdates[`characters.${candidate.char_id}.down_fail_streak`] = attempt.nextFailStreak;
+        } else {
+          newInitiativeOrder[nextIndex] = { ...candidate, is_dead: true, down_fail_streak: attempt.nextFailStreak };
+        }
+      } else {
+        const msg = `${candidate.name} fails to get back up (END save ${enduranceRoll} vs ${save.threshold}) — ${attempt.nextFailStreak}/2 failures.`;
+        log.push({ id: `log_${Date.now()}_downfail${safety}`, type: 'status', message: msg, timestamp: Date.now() });
+        turnEvents.push(msg);
+        if (isPcCombatant) {
+          charUpdates[`characters.${candidate.char_id}.down_fail_streak`] = attempt.nextFailStreak;
+        } else {
+          newInitiativeOrder[nextIndex] = { ...candidate, down_fail_streak: attempt.nextFailStreak };
+        }
+      }
+      continue; // never becomes the active turn — settled stays false
+    }
+
     const effects = isPcCombatant ? ((char && char.status_effects) || []) : (candidate.status_effects || []);
     // "ticking" defaults to true if unset, so nothing authored before
     // this field existed silently stops working — false is opt-out.
@@ -3135,12 +3276,19 @@ export async function endTurn() {
     last_turn_events: turnEvents,
     last_turn_key: `${nextRound}_${nextIndex}_${Date.now()}`
   };
+  const updatePayload = { active_combat: updatedCombat, ...charUpdates, last_resolution: deleteField() };
+  if (eventLogMessages.length) {
+    let eventLog = window.liveData.event_log;
+    eventLogMessages.forEach(text => { eventLog = pushEventLog(eventLog, { text, actor: 'GM' }); });
+    updatePayload.event_log = eventLog;
+  }
+
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   window.combatActionDraft = null;
   // Ending the turn moves initiative/round state on — any pending reroll
   // snapshot no longer matches what it would need to restore, so clear
   // it rather than let a later reroll click revert past this turn.
-  try { await updateDoc(charRef, { active_combat: updatedCombat, ...charUpdates, last_resolution: deleteField() }); } catch (err) { alert("ERROR: " + err.message); }
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // Changes a combatant's stance — free-form, any time, not gated to whose
@@ -3276,7 +3424,9 @@ export async function gmFactoryReset(targetCharId) {
   updatePayload[`characters.${targetCharId}.skill_points`] = 0;
   updatePayload[`characters.${targetCharId}.level`] = 1;
   updatePayload[`characters.${targetCharId}.hp`] = { current: 15, max: 15 };
-  
+  updatePayload[`characters.${targetCharId}.is_dead`] = false;
+  updatePayload[`characters.${targetCharId}.down_fail_streak`] = 0;
+
   await updateDoc(charRef, updatePayload);
   alert("CHARACTER RESET. NEXT LOGIN WILL TRIGGER CREATION.");
 }
