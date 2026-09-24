@@ -17,7 +17,7 @@ import { DIFFICULTY_TIERS } from './checks.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
-import { BODY_PARTS, BURST_HIT_PENALTY, STANCES, COVER_LEVELS, DAMAGE_TYPE_LABELS, isMonsterAttackMelee, effectiveTargetAC } from './combat.js';
+import { BODY_PARTS, BURST_HIT_PENALTY, STANCES, COVER_LEVELS, DAMAGE_TYPE_LABELS, isMonsterAttackMelee, effectiveTargetAC, getCombatDisplayState } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { peopleDatabase } from './people.js';
 import { questDatabase } from './quests.js';
@@ -773,7 +773,11 @@ export function getCombatView(liveData, userRole, currentUser) {
   // just the "GO TO COMBAT"/"⚔ TAP TO JOIN" banners), so "nothing's
   // happened yet" needs to read as a real, on-brand screen rather than
   // an empty page or a bare heading.
-  if (!combat) return `
+  // getCombatDisplayState (combat.js, unit-tested) is the pure decision
+  // behind the three things this tab can show — see its own header
+  // comment for why "finished" and "none" are different states.
+  const displayState = getCombatDisplayState(combat);
+  if (displayState === 'none') return `
     <div class="dashboard-container">
       <div class="panel" style="text-align:center; padding:40px 20px;">
         <h2 style="color:#888; background:none;">⚔ NO COMBAT ACTIVE</h2>
@@ -781,7 +785,7 @@ export function getCombatView(liveData, userRole, currentUser) {
       </div>
     </div>`;
 
-  const isLive = combat.is_active;
+  const isLive = displayState === 'live';
   const currentActor = isLive ? combat.initiative_order[combat.turn_index] : null;
 
   // Job 5 ("Dead characters... rendered greyed out and unmistakably dead
@@ -907,7 +911,11 @@ export function getCombatView(liveData, userRole, currentUser) {
   const headerHtml = isLive
     ? `<h2 style="color:red;">⚔ COMBAT — ROUND ${combat.round}</h2>
        <p style="color:var(--pip-dim); font-size:13px;">CURRENT TURN: <strong style="color:var(--pip-green);">${currentActor ? currentActor.name : '—'}</strong></p>`
-    : `<h2 style="color:#888;">⚔ COMBAT ENDED</h2>
+    // "Finished encounter" — GM ruling: the last fight stays readable
+    // after it ends, clearly marked as over rather than reading like a
+    // live one. Same view for GM and players (no isLive/userRole gate
+    // below this point besides the controls that only make sense mid-fight).
+    : `<h2 style="color:#888; background:none;">⚔ COMBAT ENDED — FINISHED ENCOUNTER</h2>
        <p style="color:var(--pip-dim); font-size:13px;">${combat.summary || 'No summary recorded.'}</p>`;
 
   // --- Whose turn can THIS viewer act for? GM can always act; a player
