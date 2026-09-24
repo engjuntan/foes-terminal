@@ -24,6 +24,7 @@ import { questDatabase } from './quests.js';
 import { glossaryDatabase } from './glossary.js';
 import { mapDatabase } from './maps.js';
 import { normalizeNeeds, getNeedTier, formatGameTime, NEED_RATES } from './needs.js';
+import { visibleEventLog } from './eventLog.js';
 import {
   REPUTATION_TIERS, REPUTATION_MIN, REPUTATION_MAX, KARMA_TIERS, KARMA_MIN, KARMA_MAX,
   getReputationTier, getReputationModifiers, getKarmaTier, getKarmaValue,
@@ -1172,6 +1173,56 @@ function formatCheckResultLine(r) {
   return `<span style="color:${r.success ? 'var(--pip-green)' : '#d4574a'};">${r.success ? 'SUCCESS' : 'FAILURE'}</span>${critTag} <span style="color:#666; font-size:11px;">(rolled ${r.roll} vs ${r.threshold})</span>`;
 }
 
+// GM: HIDDEN ROLL — distinct from the GM check's own "reveal" checkbox
+// (which hides a check from players entirely until/unless revealed).
+// This roll's outcome is ALWAYS GM-only, but resolving it always posts an
+// event-log line every player sees, naming nothing: "a hidden check was
+// rolled," never what it was or how it went (GM ruling 2026-09-24).
+function renderHiddenRollPanel(chars) {
+  const draft = window.hiddenCheckDraft || { scope: 'single', targetCharId: '', kind: 'special', key: 'str', tier: 'normal', useD20: false, customName: '', customValue: '', roll: '' };
+  window.hiddenCheckDraft = draft;
+  const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
+  const charOptions = Object.entries(chars).filter(([, c]) => c.is_finalized)
+    .map(([id, c]) => `<option value="${id}" ${draft.targetCharId === id ? 'selected' : ''}>${c.name}</option>`).join('');
+
+  return `
+      <div class="panel" style="margin-bottom:15px; border-color:#a33;">
+        <h3 style="color:#f66; margin-top:0;">GM: HIDDEN ROLL</h3>
+        <p style="font-size:11px; color:#888; margin-top:-4px;">Only you ever see the result. Every player is told a hidden check happened — never for what, never the outcome.</p>
+        <label style="font-size:11px; color:#666;">TARGET</label>
+        <select onchange="window.setHiddenCheckField('scope', this.value)" style="width:100%; background:black; color:#f66; border:1px solid #a33; margin-bottom:8px;">
+          <option value="single" ${draft.scope === 'single' ? 'selected' : ''}>SINGLE CHARACTER</option>
+          <option value="custom" ${draft.scope === 'custom' ? 'selected' : ''}>CUSTOM / NPC</option>
+        </select>
+        ${draft.scope === 'single' ? `
+        <select onchange="window.setHiddenCheckField('targetCharId', this.value)" style="width:100%; background:black; color:#f66; border:1px solid #a33; margin-bottom:8px;">
+          <option value="">— choose —</option>${charOptions}
+        </select>` : ''}
+        ${draft.scope === 'custom' ? `
+        <input type="text" placeholder="NAME (e.g. Raider Lookout)" value="${draft.customName || ''}" oninput="window.setHiddenCheckField('customName', this.value)" style="width:100%; background:black; color:#f66; border:1px solid #a33; margin-bottom:6px;">
+        <input type="number" placeholder="CHECK VALUE (stat or skill %)" value="${draft.customValue ?? ''}" oninput="window.setHiddenCheckField('customValue', this.value)" style="width:100%; background:black; color:#f66; border:1px solid #a33; margin-bottom:8px;">` : ''}
+        <label style="font-size:11px; color:#666;">WHAT ${draft.scope === 'custom' ? '(picks which modifier column applies)' : ''}</label>
+        <select onchange="window.setHiddenCheckWhat(this.value)" style="width:100%; background:black; color:#f66; border:1px solid #a33; margin-bottom:8px;">
+          ${buildWhatOptions(draft.kind, draft.key)}
+        </select>
+        <label style="font-size:11px; color:#666;">DIFFICULTY</label>
+        <select onchange="window.setHiddenCheckField('tier', this.value)" style="width:100%; background:black; color:#f66; border:1px solid #a33; margin-bottom:8px;">
+          ${buildTierOptions(draft.tier)}
+        </select>
+        ${draft.kind === 'special' ? `
+        <label style="font-size:11px; color:#666; display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+          <input type="checkbox" ${draft.useD20 ? 'checked' : ''} onchange="window.setHiddenCheckField('useD20', this.checked)">
+          Especially difficult task — roll 1d20 instead of 1d10
+        </label>` : ''}
+        <label style="font-size:11px; color:#666;">ROLL (1-${maxRoll})</label>
+        <div style="display:flex; gap:6px; margin-bottom:10px;">
+          <input type="number" id="hiddenCheckRollInput" min="1" max="${maxRoll}" value="${draft.roll ?? ''}" oninput="window.setHiddenCheckField('roll', this.value)" style="flex-grow:1; background:black; color:#f66; border:1px solid #a33;">
+          <button class="gm-btn" style="border-color:#f66; color:#f66;" onclick="window.rollForHiddenCheck()">🎲 ROLL</button>
+        </div>
+        <button style="width:100%; padding:10px; background:#a33; color:white; font-weight:bold; border:none; cursor:pointer;" onclick="window.resolveHiddenCheck()">RESOLVE HIDDEN ROLL</button>
+      </div>`;
+}
+
 export function getChecksView(liveData, userRole, currentUser) {
   const checks = liveData.checks || [];
   const chars = liveData.characters || {};
@@ -1255,6 +1306,8 @@ export function getChecksView(liveData, userRole, currentUser) {
         </label>
         <button style="width:100%; padding:10px; background:orange; color:black; font-weight:bold; border:none; cursor:pointer;" onclick="window.resolveGmCheck()">RESOLVE CHECK</button>
       </div>`;
+
+    gmPanelHtml += renderHiddenRollPanel(chars);
   }
 
   const visibleChecks = checks.filter(c => userRole === 'gm' || !c.hidden);
@@ -1856,13 +1909,17 @@ export function getPlayerView(charId, liveData) {
         </div>
 
         <div style="border:1px solid var(--pip-dim); padding:8px; margin-bottom:15px;">
+          <div style="font-size:11px; color:#888; margin-bottom:6px;">Healing Rate: <span style="color:var(--pip-green);">${derived.healingRate}</span> per full 6h resting &mdash; &times;2 declared, &times;4 at a proper place of rest.</div>
           ${inCombat
             ? `<div style="font-size:11px; color:#888; text-align:center;">CAN'T REST — COMBAT IN PROGRESS</div>`
-            : `<div style="display:flex; gap:6px; align-items:center;">
+            : `<div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
                  <input type="number" id="restHours" min="0.5" max="24" step="0.5" value="8" style="width:60px; background:black; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:'VT323'; font-size:16px; padding:4px;">
-                 <span style="font-size:11px; color:#888; flex-grow:1;">hours &mdash; 6+ restores Sleep &amp; heals &times;1.5</span>
-                 <button class="gm-btn" style="border-color:var(--pip-green); color:var(--pip-green);" onclick="window.requestRest(Number(document.getElementById('restHours').value))">REST</button>
-               </div>`}
+                 <span style="font-size:11px; color:#888; flex-grow:1;">hours &mdash; 6+ restores Sleep</span>
+                 <button class="gm-btn" style="border-color:var(--pip-green); color:var(--pip-green);" onclick="window.requestRest(Number(document.getElementById('restHours').value), document.getElementById('restProperPlace').checked)">REST</button>
+               </div>
+               <label style="font-size:11px; color:#888; display:flex; align-items:center; gap:6px;">
+                 <input type="checkbox" id="restProperPlace" style="width:auto;"> at a proper place of rest (bed, inn, infirmary) &mdash; heals &times;4 instead of &times;2
+               </label>`}
         </div>
 
         <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px dashed var(--pip-dim); padding-bottom:5px;">
@@ -1938,8 +1995,28 @@ export function getPlayerView(charId, liveData) {
         <h2>INVENTORY</h2>
         <div style="overflow-y:auto; flex-grow:1;">${inventoryHtml}</div>
       </div>
+
+      <div class="panel">
+        <h2>EVENT LOG</h2>
+        <p style="font-size:11px; color:#666; margin-top:-4px;">What's happened — the fact of a hidden check, items granted or given, statuses applied, time passing, rests, standing shifting, the party going down. Not the combat log (see COMBAT).</p>
+        ${renderEventLog(liveData.event_log, 'player')}
+      </div>
     </div>
   `;
+}
+
+// Shared by the player's Character Sheet and the GM Dashboard — newest
+// first, capped display of the last 100 entries the doc already keeps
+// (see eventLog.js's pushEventLog). Player role never sees a 'gm'-only
+// entry (none are written yet, but the field is honoured here regardless).
+function renderEventLog(log, userRole) {
+  const entries = visibleEventLog(log, userRole).slice().reverse();
+  if (entries.length === 0) return `<div style="color:#555; font-size:12px;">Nothing logged yet.</div>`;
+  return `<div style="max-height:260px; overflow-y:auto;">${entries.map(e => `
+    <div style="padding:4px 0; border-bottom:1px dashed #222; font-size:12px;">
+      <span style="color:#555; font-size:10px;">${new Date(e.timestamp).toLocaleTimeString()}</span>
+      <span style="color:#ccc;"> ${escapeHtml(e.text)}</span>
+    </div>`).join('')}</div>`;
 }
 
 // --- WORKSHOP (CRAFTING) ---
@@ -1983,8 +2060,13 @@ export function getWorkshopView(charId, liveData) {
   // RECIPES — grouped by category, craftable ones sorted above blocked
   // ones within each group. A blocked recipe stays visible and dimmed
   // with every blocking reason shown, never hidden — discovering what
-  // you COULD build if you found the parts is half the appeal.
-  const recipes = Object.values(recipeDatabase);
+  // you COULD build if you found the parts is half the appeal. Recipes
+  // are unlockable (GM ruling 2026-09-24, "granted the way the GM grants
+  // data logs") — a character with no unlocked_recipes list at all knows
+  // nothing, and the Workshop only ever offers what's actually been
+  // taught, never the full authored catalogue.
+  const unlockedRecipes = new Set(charData.unlocked_recipes || []);
+  const recipes = Object.values(recipeDatabase).filter(r => unlockedRecipes.has(r.id));
   const categoryLabels = { weapons: 'WEAPONS', armour: 'ARMOUR', ammo: 'AMMO', chems: 'CHEMS', food: 'FOOD', gear: 'GEAR' };
   const byCategory = {};
   recipes.forEach(r => {
@@ -1993,7 +2075,7 @@ export function getWorkshopView(charId, liveData) {
   });
 
   const recipesHtml = Object.keys(byCategory).length === 0
-    ? `<div style="color:#555; font-size:12px;">No recipes authored yet.</div>`
+    ? `<div style="color:#555; font-size:12px;">No recipes known — your GM will teach you some as the story unfolds.</div>`
     : Object.entries(byCategory).map(([cat, list]) => {
         const scored = list.map(r => ({ r, result: canCraft(r, charData, derived.skills) }))
           .sort((a, b) => (a.result.ok === b.result.ok) ? 0 : (a.result.ok ? -1 : 1));
@@ -2135,6 +2217,200 @@ function equipLike(charData) {
   return charData.equipment || { head: null, body: null, right_hand: null, left_hand: null, back: null };
 }
 
+// --- GM: character picker shared by the GRANT ITEMS and STATUS tabs ---
+// Both tabs act on "whichever character the GM currently has selected" —
+// the same window.selectedCharId the MANAGE modal itself uses, so
+// picking someone here and opening their modal (or vice versa) always
+// agree on who's targeted.
+function renderGMCharPicker(chars, color) {
+  const options = Object.entries(chars)
+    .filter(([, c]) => c.is_finalized)
+    .map(([id, c]) => `<option value="${id}" ${window.selectedCharId === id ? 'selected' : ''}>${c.name}</option>`)
+    .join('');
+  return `
+    <div class="panel" style="margin-bottom:15px;">
+      <label style="font-size:11px; color:#666;">CHARACTER</label>
+      <select onchange="window.setGMStatusTarget(this.value)" style="width:100%; background:black; color:${color}; border:1px solid ${color}; font-family:'VT323'; font-size:16px; padding:4px;">
+        <option value="">— choose —</option>${options}
+      </select>
+    </div>`;
+}
+
+// --- GM: GRANT ITEMS (its own tab, GM ruling 2026-09-24 — items grouped
+// by category rather than one long select; the MANAGE modal keeps its
+// own single-select grant control unchanged alongside this) ---
+const GRANT_ITEM_CATEGORIES = [
+  ['weapon', 'WEAPONS'], ['armor', 'ARMOR'], ['consumable', 'CONSUMABLES'], ['ammo', 'AMMO'],
+  ['component', 'COMPONENTS'], ['junk', 'JUNK'], ['accessory', 'ACCESSORIES'], ['currency', 'CURRENCY']
+];
+export function getGrantItemsView(liveData) {
+  const chars = liveData.characters || {};
+  const target = window.selectedCharId;
+  const targetChar = target ? chars[target] : null;
+
+  const byCategory = {};
+  Object.values(itemDatabase).forEach(item => {
+    (byCategory[item.type] = byCategory[item.type] || []).push(item);
+  });
+
+  const categoriesHtml = GRANT_ITEM_CATEGORIES.map(([type, label]) => {
+    const items = (byCategory[type] || []).sort((a, b) => a.name.localeCompare(b.name));
+    if (items.length === 0) return '';
+    const rows = items.map(item => `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #222; padding:4px 0;">
+        <span style="font-size:13px;">${renderWikiLink(item.name, item.description)}</span>
+        <button class="gm-btn" style="padding:0 8px; font-size:11px;" ${target ? '' : 'disabled'} onclick="window.gmGrantItemToTarget('${item.id}')">GRANT</button>
+      </div>`).join('');
+    return `<h4 style="color:var(--pip-dim); border-bottom:1px dashed var(--pip-dim); margin-top:14px;">${label}</h4>${rows}`;
+  }).join('');
+
+  // RECIPES — granted the way data logs are (GM ruling 2026-09-24): its
+  // own per-row target picker (single character or ALL), since a recipe
+  // grant makes sense to hand the whole party at once (everyone learns a
+  // recipe together from the same book/mentor) in a way a physical item
+  // grant doesn't.
+  const players = Object.entries(chars).filter(([, c]) => c.is_finalized);
+  const recipesHtml = Object.values(recipeDatabase).sort((a, b) => a.name.localeCompare(b.name)).map(r => {
+    const alreadyKnownBy = target && targetChar ? (targetChar.unlocked_recipes || []).includes(r.id) : false;
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #222; padding:5px 0;">
+        <span>${r.name}${alreadyKnownBy ? ' <span style="color:#555; font-size:10px;">(known)</span>' : ''}</span>
+        <div style="display:flex; gap:4px;">
+          <select id="grantRecipeTarget_${r.id}" style="background:black; color:lime; border:1px solid #333; font-size:11px;">
+            <option value="all">ALL PLAYERS</option>
+            ${players.map(([id, c]) => `<option value="${id}" ${target === id ? 'selected' : ''}>${c.name}</option>`).join('')}
+          </select>
+          <button class="gm-btn" style="padding:0 8px; font-size:11px;" onclick="window.gmGrantRecipe('${r.id}', document.getElementById('grantRecipeTarget_${r.id}').value)">GRANT</button>
+        </div>
+      </div>`;
+  }).join('') || `<div style="color:#555; font-size:12px;">No recipes authored yet.</div>`;
+
+  return `
+    <div class="dashboard-container">
+      ${renderGMCharPicker(chars, 'lime')}
+      <div class="panel">
+        <h2>GRANT ITEMS</h2>
+        ${target ? '' : `<p style="font-size:11px; color:#888;">Pick a character above to grant them items.</p>`}
+        <div style="overflow-y:auto; flex-grow:1;">${categoriesHtml}</div>
+      </div>
+      <div class="panel">
+        <h2>RECIPES</h2>
+        <p style="font-size:11px; color:#666;">Recipes are unlockable — the Workshop only offers what a character's been taught.</p>
+        <div style="overflow-y:auto; flex-grow:1;">${recipesHtml}</div>
+      </div>
+    </div>`;
+}
+
+// --- GM: STATUS (its own tab, GM ruling 2026-09-24 — needs, radiation,
+// karma and limb damage moved out of the MANAGE modal, plus TIME CONTROL
+// moved off the Dashboard) ---
+export function getGMStatusView(liveData) {
+  const chars = liveData.characters || {};
+  const target = window.selectedCharId;
+  const targetChar = target ? chars[target] : null;
+
+  const statusPanelHtml = !targetChar ? `<div class="panel"><p style="color:#888; font-size:12px;">Pick a character above to adjust their status.</p></div>` : `
+    <div class="panel">
+      <h3 style="color:yellow; border-bottom:1px dashed yellow; margin-top:0;">RADIATION</h3>
+      <div style="font-size:12px; color:#aaa; margin-bottom:6px;">
+        Exact count (only you see this): <span style="color:yellow; font-weight:bold;">${targetChar.rads || 0} rads</span>
+        — <span style="font-style:italic;">${getRadiationTier(targetChar.rads || 0).description}</span>
+      </div>
+      <div style="display:flex; gap:6px; margin-bottom:10px;">
+        <input type="number" id="gmRadInput" min="0" max="1000" placeholder="SET RADS" style="flex-grow:1; background:black; color:yellow; border:1px solid yellow;">
+        <button class="gm-btn" style="border-color:yellow; color:yellow;" onclick="window.gmSetRadiation(Number(document.getElementById('gmRadInput').value))">SET</button>
+      </div>
+
+      <h3 style="color:var(--pip-green); border-bottom:1px dashed var(--pip-green);">SURVIVAL NEEDS</h3>
+      <div style="margin-bottom:10px;">
+        ${['hunger', 'thirst', 'sleep'].map(key => {
+          const needs = normalizeNeeds(targetChar.needs);
+          const val = needs[key];
+          const tier = getNeedTier(key, val);
+          return `
+          <div style="margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
+              <span>${key.toUpperCase()}</span>
+              <span style="color:var(--pip-green);">${Math.round(val)} — ${tier.label}</span>
+            </div>
+            <input type="range" min="0" max="100" value="${val}" style="width:100%;"
+                   oninput="this.nextElementSibling.textContent = this.value"
+                   onchange="window.gmSetNeed('${key}', Number(this.value))">
+            <span style="display:none;">${Math.round(val)}</span>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <h3 style="color:red; border-bottom:1px dashed red;">LIMB DAMAGE</h3>
+      <p style="font-size:10px; color:#666; margin:2px 0 6px;">Direct hit-counter control (STATUS_AND_CRIPPLE_SPEC.md C.3) — sets the raw count only, no auto-cripple. Use the STATUS EFFECTS control in this character's MANAGE modal to actually apply/remove Crippled Arm/Leg.</p>
+      <div style="margin-bottom:10px;">
+        ${(() => {
+          const limbResistance = deriveCharacter(targetChar).limbResistance;
+          const limbDamage = targetChar.limb_damage || {};
+          return LIMB_PART_KEYS.map(partKey => {
+            const bodyPart = BODY_PARTS[partKey];
+            const val = limbDamage[partKey] || 0;
+            return `
+            <div style="margin-bottom:8px;">
+              <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
+                <span>${bodyPart.label.toUpperCase()}</span>
+                <span style="color:red;">${val} / ${limbResistance}</span>
+              </div>
+              <input type="range" min="0" max="${limbResistance}" value="${val}" style="width:100%;"
+                     oninput="this.nextElementSibling.textContent = this.value"
+                     onchange="window.gmSetLimbDamage('${partKey}', Number(this.value))">
+              <span style="display:none;">${val}</span>
+            </div>`;
+          }).join('');
+        })()}
+      </div>
+
+      <h3 style="color:var(--pip-gold); border-bottom:1px dashed var(--pip-gold);">KARMA</h3>
+      <div>
+        ${(() => {
+          const karmaVal = getKarmaValue(targetChar);
+          const karmaTier = getKarmaTier(karmaVal);
+          return `
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
+            <span>PERSONAL KARMA</span>
+            <span style="color:var(--pip-gold);">${karmaVal} — ${karmaTier.name}</span>
+          </div>
+          <input type="range" min="${KARMA_MIN}" max="${KARMA_MAX}" value="${karmaVal}" style="width:100%;"
+                 oninput="this.nextElementSibling.textContent = this.value"
+                 onchange="window.gmSetKarma(Number(this.value))">
+          <span style="display:none;">${karmaVal}</span>
+          <p style="font-size:10px; color:#555; margin:4px 0 0;">Only visible to this player and you. Posts a message to them if the tier changes.</p>`;
+        })()}
+      </div>
+    </div>`;
+
+  return `
+    <div class="dashboard-container">
+      ${renderGMCharPicker(chars, 'var(--pip-green)')}
+      <div class="panel">
+        <h3 style="color:var(--pip-green); margin-top:0;">TIME CONTROL</h3>
+        <div style="display:flex; gap:4px; margin-bottom:8px;">
+          <button class="gm-btn" onclick="window.advanceTime(60, {initiatedBy:'GM'})">+1h</button>
+          <button class="gm-btn" onclick="window.advanceTime(240, {initiatedBy:'GM'})">+4h</button>
+          <button class="gm-btn" style="border-color:var(--pip-green); color:var(--pip-green);" onclick="window.advanceTime(480, {isRest:true, initiatedBy:'GM'})">+8h REST</button>
+          <button class="gm-btn" onclick="window.advanceTime(1440, {initiatedBy:'GM'})">+1 DAY</button>
+        </div>
+        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+          <input type="number" id="gmTimeHours" min="0.5" step="0.5" placeholder="HRS" style="width:60px; background:black; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:'VT323'; font-size:16px; padding:4px;">
+          <label style="font-size:11px; color:#888; display:flex; align-items:center; gap:4px;">
+            <input type="checkbox" id="gmTimeIsRest" style="width:auto;"> rest
+          </label>
+          <label style="font-size:11px; color:#888; display:flex; align-items:center; gap:4px; flex-grow:1;">
+            <input type="checkbox" id="gmTimeIsProperRest" style="width:auto;"> proper place (&times;4 heal)
+          </label>
+          <button class="gm-btn" onclick="window.gmAdvanceTimeAction()">GO</button>
+        </div>
+        <p style="font-size:11px; color:#555; margin-bottom:0;">Blocked automatically while combat is active. Healing (Fallout 1/2 Healing Rate) applies once per full 6 hours elapsed — &times;1 normally, &times;2 for a declared rest, &times;4 at a proper place of rest. 6+ hours of rest also restores Sleep.</p>
+      </div>
+      ${statusPanelHtml}
+    </div>`;
+}
+
 // --- GM SCREEN ---
 export function renderGMScreen(liveData) {
   const chars = liveData.characters || {};
@@ -2260,77 +2536,7 @@ export function renderGMScreen(liveData) {
           <button class="gm-btn" onclick="window.gmAdjustHP(999)">FULL HEAL</button>
         </div>
 
-        <h4 style="color:yellow; border-bottom:1px dashed yellow;">RADIATION</h4>
-        <div style="font-size:12px; color:#aaa; margin-bottom:6px;">
-          Exact count (only you see this): <span style="color:yellow; font-weight:bold;">${(targetChar && targetChar.rads) || 0} rads</span>
-          — <span style="font-style:italic;">${getRadiationTier((targetChar && targetChar.rads) || 0).description}</span>
-        </div>
-        <div style="display:flex; gap:6px; margin-bottom:10px;">
-          <input type="number" id="gmRadInput" min="0" max="1000" placeholder="SET RADS" style="flex-grow:1; background:black; color:yellow; border:1px solid yellow;">
-          <button class="gm-btn" style="border-color:yellow; color:yellow;" onclick="window.gmSetRadiation(Number(document.getElementById('gmRadInput').value))">SET</button>
-        </div>
-
-        <h4 style="color:var(--pip-green); border-bottom:1px dashed var(--pip-green);">SURVIVAL NEEDS</h4>
-        <div style="margin-bottom:10px;">
-          ${['hunger', 'thirst', 'sleep'].map(key => {
-            const needs = normalizeNeeds(targetChar && targetChar.needs);
-            const val = needs[key];
-            const tier = getNeedTier(key, val);
-            return `
-            <div style="margin-bottom:8px;">
-              <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
-                <span>${key.toUpperCase()}</span>
-                <span style="color:var(--pip-green);">${Math.round(val)} — ${tier.label}</span>
-              </div>
-              <input type="range" min="0" max="100" value="${val}" style="width:100%;"
-                     oninput="this.nextElementSibling.textContent = this.value"
-                     onchange="window.gmSetNeed('${key}', Number(this.value))">
-              <span style="display:none;">${Math.round(val)}</span>
-            </div>`;
-          }).join('')}
-        </div>
-
-        <h4 style="color:red; border-bottom:1px dashed red;">LIMB DAMAGE</h4>
-        <p style="font-size:10px; color:#666; margin:2px 0 6px;">Direct hit-counter control (STATUS_AND_CRIPPLE_SPEC.md C.3) — sets the raw count only, no auto-cripple. Use STATUS EFFECTS above to actually apply/remove Crippled Arm/Leg.</p>
-        <div style="margin-bottom:10px;">
-          ${(() => {
-            const limbResistance = targetChar ? deriveCharacter(targetChar).limbResistance : 1;
-            const limbDamage = (targetChar && targetChar.limb_damage) || {};
-            return LIMB_PART_KEYS.map(partKey => {
-              const bodyPart = BODY_PARTS[partKey];
-              const val = limbDamage[partKey] || 0;
-              return `
-              <div style="margin-bottom:8px;">
-                <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
-                  <span>${bodyPart.label.toUpperCase()}</span>
-                  <span style="color:red;">${val} / ${limbResistance}</span>
-                </div>
-                <input type="range" min="0" max="${limbResistance}" value="${val}" style="width:100%;"
-                       oninput="this.nextElementSibling.textContent = this.value"
-                       onchange="window.gmSetLimbDamage('${partKey}', Number(this.value))">
-                <span style="display:none;">${val}</span>
-              </div>`;
-            }).join('');
-          })()}
-        </div>
-
-        <h4 style="color:var(--pip-gold); border-bottom:1px dashed var(--pip-gold);">KARMA</h4>
-        <div style="margin-bottom:10px;">
-          ${(() => {
-            const karmaVal = getKarmaValue(targetChar);
-            const karmaTier = getKarmaTier(karmaVal);
-            return `
-            <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
-              <span>PERSONAL KARMA</span>
-              <span style="color:var(--pip-gold);">${karmaVal} — ${karmaTier.name}</span>
-            </div>
-            <input type="range" min="${KARMA_MIN}" max="${KARMA_MAX}" value="${karmaVal}" style="width:100%;"
-                   oninput="this.nextElementSibling.textContent = this.value"
-                   onchange="window.gmSetKarma(Number(this.value))">
-            <span style="display:none;">${karmaVal}</span>
-            <p style="font-size:10px; color:#555; margin:4px 0 0;">Only visible to this player and you. Posts a message to them if the tier changes.</p>`;
-          })()}
-        </div>
+        <p style="font-size:11px; color:#888; border:1px dashed #444; padding:6px;">Radiation, survival needs, limb damage and karma moved to the <span onclick="window.switchTab('STATUS')" style="color:var(--pip-green); text-decoration:underline; cursor:pointer;">STATUS tab</span> (pick this character there).</p>
 
         <h4 style="color:var(--pip-green); border-bottom:1px dashed var(--pip-green);">CRAFTING STATIONS</h4>
         <div style="margin-bottom:10px;">
@@ -2450,25 +2656,17 @@ export function renderGMScreen(liveData) {
       <div class="panel">
         <h2 style="color:var(--pip-gold);">>> GAMEMASTER DASHBOARD</h2>
 
-        <h3 style="color:var(--pip-green);">TIME CONTROL</h3>
-        <div style="display:flex; gap:4px; margin-bottom:8px;">
-          <button class="gm-btn" onclick="window.advanceTime(60, {initiatedBy:'GM'})">+1h</button>
-          <button class="gm-btn" onclick="window.advanceTime(240, {initiatedBy:'GM'})">+4h</button>
-          <button class="gm-btn" style="border-color:var(--pip-green); color:var(--pip-green);" onclick="window.advanceTime(480, {isRest:true, initiatedBy:'GM'})">+8h REST</button>
-          <button class="gm-btn" onclick="window.advanceTime(1440, {initiatedBy:'GM'})">+1 DAY</button>
-        </div>
-        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
-          <input type="number" id="gmTimeHours" min="0.5" step="0.5" placeholder="HRS" style="width:60px; background:black; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:'VT323'; font-size:16px; padding:4px;">
-          <label style="font-size:11px; color:#888; display:flex; align-items:center; gap:4px; flex-grow:1;">
-            <input type="checkbox" id="gmTimeIsRest" style="width:auto;"> mark as rest (restores Sleep, &times;1.5 heal if &ge;6h)
-          </label>
-          <button class="gm-btn" onclick="window.gmAdvanceTimeAction()">GO</button>
-        </div>
-        <p style="font-size:11px; color:#555; margin-bottom:14px;">Blocked automatically while combat is active. Every advance heals the party a little (manual p.446); marking a rest additionally restores Sleep and boosts healing &times;1.5 once the span hits 6+ hours.</p>
+        <p style="font-size:11px; color:#888; border:1px dashed #444; padding:6px; margin-bottom:14px;">Time control moved to the <span onclick="window.switchTab('STATUS')" style="color:var(--pip-green); text-decoration:underline; cursor:pointer;">STATUS tab</span>.</p>
 
         <h3>SQUAD MONITOR</h3>
         <p style="font-size:12px; color:#666;">(CLICK CARD TO MANAGE)</p>
         <div class="gm-grid">${squadHtml}</div>
+      </div>
+
+      <div class="panel">
+        <h3>EVENT LOG</h3>
+        <p style="font-size:11px; color:#666; margin-top:-4px;">Everything — including hidden-check rolls and any GM-only entries no player sees.</p>
+        ${renderEventLog(liveData.event_log, 'gm')}
       </div>
 
       <div class="panel">
