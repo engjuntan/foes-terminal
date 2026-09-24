@@ -466,6 +466,20 @@ export function combatantLimbResistance(combatantRef, characters) {
   return deriveCharacter(char).limbResistance;
 }
 
+// --- COMBAT TAB DISPLAY STATE (GM ruling: "the last combat should stay
+// readable after it ends") ---
+// getCombatView() (views.js) has exactly three things to show: nothing
+// has ever happened, a fight in progress, or the most recent fight after
+// endCombat() flips is_active false. endCombat() deliberately never
+// clears active_combat — only that flag — so this can tell "finished"
+// apart from "never happened" at all. An old combat record predating the
+// is_active field reads as finished (there's nothing live about it), not
+// live — "live" only ever means a fight actually in progress right now.
+export function getCombatDisplayState(activeCombat) {
+  if (!activeCombat) return 'none';
+  return activeCombat.is_active ? 'live' : 'finished';
+}
+
 // --- INITIATIVE REVEAL ANIMATION (job 3, GM's live-session notes,
 // 2026-09-24) — "the first time a player opens the Combat tab in a given
 // fight". `active_combat.started_at` (set once by startCombat) is the

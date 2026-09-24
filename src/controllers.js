@@ -3381,7 +3381,11 @@ export async function endCombat() {
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   try {
     await updateDoc(charRef, { active_combat: finalized });
-    window.currentTab = 'DASHBOARD';
+    // Stay on the Combat tab — it now renders the finished-encounter view
+    // (see getCombatView/getCombatDisplayState) with the final initiative
+    // order and the full log, exactly what the confirm dialog above just
+    // promised. Bouncing to DASHBOARD here would hide it the instant the
+    // GM most wants to see it.
     window.render();
   } catch (err) { alert("ERROR: " + err.message); }
 }
