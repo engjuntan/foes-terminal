@@ -1384,17 +1384,22 @@ export async function gmAdvanceTimeAction() {
 // parser combat damage uses), stats.hunger/thirst/sleep (food, water,
 // and rest-adjacent items — see needs.js; clamped 0-100, so a negative
 // value like Ikan Masin Jerky's thirst cost just can't push a need below
-// zero on its own), and skill books (stats.permanent + any skill_<name>
-// key — see below). Everything else a consumable can carry right now
-// (SPECIAL buffs/duration, addiction, cures_addiction/cures_status) has
-// no tracked state to act on yet — no duration timers, no addiction
-// counter — so those stay reference-only until that system exists.
+// zero on its own), skill books (stats.permanent + any skill_<name> key
+// — see below, capped per SKILL_BOOK_SKILL_CAP), and chems (duration_hours
+// / withdrawal / addiction_chance — see chems.js's header and the block
+// near the end of this function). stats.cures_status stays handled
+// elsewhere (poison etc. — see the status-effect cure path); stats.
+// cures_addiction (Addictol) is handled inline below.
 // Callable by the character themselves or the GM on their behalf, same
 // permission shape as everything else here.
 // Reading a skill book takes in-game time (GM ruling, 2026-09-22). The
 // clock is shared, so a read advances it for the whole party — hunger and
 // thirst tick for everyone. A book can override this with `read_minutes`.
 const SKILL_BOOK_READ_MINUTES = 60;
+
+// A skill book teaches nothing once the skill it targets is already at
+// or above this value (GM ruling, 2026-09-24) — one named place to tune.
+export const SKILL_BOOK_SKILL_CAP = 90;
 
 export async function useItem(targetCharId, itemId) {
   const char = window.liveData.characters[targetCharId];
@@ -1409,6 +1414,25 @@ export async function useItem(targetCharId, itemId) {
   if (isSkillBook && window.liveData.active_combat && window.liveData.active_combat.is_active) {
     alert("NO TIME TO READ DURING COMBAT"); return;
   }
+
+  // Skill book cap (Job 2, 2026-09-24 ruling): checked BEFORE any
+  // inventory or time cost, so a capped-out read truly changes nothing —
+  // no copy consumed, no reading hours spent. Below the cap, behaviour is
+  // unchanged (+5, one copy per character, SKILL_BOOK_READ_MINUTES).
+  let skillBookModKey = null;
+  let skillBookSkillKey = null;
+  if (isSkillBook) {
+    skillBookModKey = Object.keys(item.stats).find(k => k.startsWith('skill_'));
+    skillBookSkillKey = skillBookModKey && skillBookModKey.replace('skill_', '');
+    if (skillBookSkillKey) {
+      const currentValue = deriveCharacter(char).skills[skillBookSkillKey];
+      if (typeof currentValue === 'number' && currentValue >= SKILL_BOOK_SKILL_CAP) {
+        alert(`${item.name}: your ${skillBookSkillKey.replace(/_/g, ' ')} is already past what any book can teach.`);
+        return;
+      }
+    }
+  }
+
   let readMinutes = 0;
 
   const updatePayload = {};
@@ -1447,8 +1471,10 @@ export async function useItem(targetCharId, itemId) {
     // the exact key calculateDerivedStats()'s existing skill_<name>
     // merge loop already reads for traits/perks, so permanent_skill_
     // bonuses rides that loop with no transformation on either end.
-    const modKey = Object.keys(item.stats).find(k => k.startsWith('skill_'));
-    const skillKey = modKey && modKey.replace('skill_', '');
+    // (modKey/skillKey reuse the cap check's own lookup above — the cap
+    // has already refused and returned by this point if it applied.)
+    const modKey = skillBookModKey;
+    const skillKey = skillBookSkillKey;
     const alreadyRead = (char.read_skill_books || []).includes(itemId);
     if (modKey && !alreadyRead) {
       const bonus = Number(item.stats[modKey]) || 0;
