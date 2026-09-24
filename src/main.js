@@ -5,6 +5,7 @@ import * as Views from './views.js'; // All HTML generators
 import * as Controllers from './controllers.js'; // All Actions
 import { formatGameTime } from './needs.js';
 import { captureScrollPositions, restoreScrollPositions } from './scrollUtil.js';
+import { shouldAnimateInitiative } from './combat.js';
 import './style.css';
 
 // --- GLOBAL STATE ---
@@ -124,6 +125,9 @@ window.endTurn = Controllers.endTurn;
 window.addCombatantMidFight = Controllers.addCombatantMidFight;
 window.gmAdjustCombatantHP = Controllers.gmAdjustCombatantHP;
 window.gmApplyStatusEffectInCombat = Controllers.gmApplyStatusEffectInCombat;
+// Job 4 (weapon-swap approval).
+window.gmApproveWeaponSwap = Controllers.gmApproveWeaponSwap;
+window.gmDenyWeaponSwap = Controllers.gmDenyWeaponSwap;
 // Direct (charId, instanceId) form — for removing an effect from a
 // context (like the Combat view) that isn't scoped to a "selected
 // character" the way the GM modal is.
@@ -291,7 +295,7 @@ window.render = function() {
   }
 
   // 4. Sync sidebar active state to the current tab, plus unread badges
-  const navMap = { DASHBOARD: 'btn-dashboard', QUESTS: 'btn-quests', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks', STATUS: 'btn-status', REPUTATION: 'btn-reputation' };
+  const navMap = { DASHBOARD: 'btn-dashboard', QUESTS: 'btn-quests', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks', COMBAT: 'btn-combat', STATUS: 'btn-status', REPUTATION: 'btn-reputation' };
   Object.entries(navMap).forEach(([tab, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', window.currentTab === tab);
@@ -405,9 +409,12 @@ window.render = function() {
   restoreScrollPositions(viewport, savedScrollPositions);
 
   maybeAnnounceTurn();
+  maybeAnnounceWeaponSwap();
+  maybeAnimateInitiative();
 }
 
-// --- BIG ANNOUNCEMENTS (turn changes + status-effect procs) ---
+// --- BIG ANNOUNCEMENTS (combat start + turn changes + status-effect procs
+// + weapon-swap results) ---
 // Every connected client watches the same active_combat state and reacts
 // independently — there's no "everyone's screen closes together" signal,
 // each viewer's overlay is local to their own browser, driven off the
@@ -415,18 +422,51 @@ window.render = function() {
 // who clicked it: there's nothing to broadcast, everyone already saw
 // (or is seeing) the same underlying announcement from the same write.
 window.lastAnnouncedTurnKey = null;
+window.lastAnnouncedCombatStartKey = null;
+// Job 2: "the first thing everyone sees is an announcement... This
+// replaces the first turn announcement only; every later turn keeps
+// today's behaviour." startCombat() never sets last_turn_key — only
+// endTurn() does, on the FIRST advance past turn 1 — so "no last_turn_key
+// yet" is exactly the pre-first-turn state, and started_at (also set only
+// by startCombat) is a stable identity for that particular fight.
 function maybeAnnounceTurn() {
   const combat = window.liveData && window.liveData.active_combat;
   if (!combat || !combat.is_active) return;
   const currentActor = combat.initiative_order[combat.turn_index];
   if (!currentActor) return;
-  const key = combat.last_turn_key || `${combat.round}_${combat.turn_index}_${currentActor.combatant_id}`;
+
+  if (!combat.last_turn_key) {
+    const startKey = combat.started_at || 'unknown';
+    if (window.lastAnnouncedCombatStartKey === startKey) return;
+    window.lastAnnouncedCombatStartKey = startKey;
+    showBigAnnouncement('COMBAT IS STARTING — ROLL FOR INITIATIVE', [], {
+      label: 'GO TO COMBAT',
+      onClick: () => window.switchTab('COMBAT')
+    });
+    return;
+  }
+
+  const key = combat.last_turn_key;
   if (window.lastAnnouncedTurnKey === key) return;
   window.lastAnnouncedTurnKey = key;
   showBigAnnouncement(`${currentActor.name}'S TURN`, combat.last_turn_events || []);
 }
 
-function showBigAnnouncement(headline, sublines) {
+// Job 4: "everyone sees 'Weapon swap success!'... 'Weapon swap failed!'" —
+// same "every client reacts independently to the same write" pattern as
+// the turn announcement, keyed off combat.last_swap_result's own `key`
+// (set fresh by gmApproveWeaponSwap/gmDenyWeaponSwap every time).
+window.lastAnnouncedSwapKey = null;
+function maybeAnnounceWeaponSwap() {
+  const combat = window.liveData && window.liveData.active_combat;
+  const result = combat && combat.last_swap_result;
+  if (!result || !result.key) return;
+  if (window.lastAnnouncedSwapKey === result.key) return;
+  window.lastAnnouncedSwapKey = result.key;
+  showBigAnnouncement(result.success ? 'WEAPON SWAP SUCCESS!' : 'WEAPON SWAP FAILED!', []);
+}
+
+function showBigAnnouncement(headline, sublines, actionButton) {
   let el = document.getElementById('turn-announcement');
   if (!el) {
     el = document.createElement('div');
@@ -443,22 +483,35 @@ function showBigAnnouncement(headline, sublines) {
     .map(line => `<div style="font-size:16px; color:#ff5555; text-align:center;">${line}</div>`)
     .join('');
 
+  const actionHtml = actionButton ? `
+    <button id="turn-announcement-action" style="padding:10px 34px; background:var(--pip-green); color:black; border:none; font-family:'VT323', monospace; font-size:18px; font-weight:bold; cursor:pointer;">${actionButton.label}</button>` : '';
+
   el.innerHTML = `
     <div style="font-size:48px; text-align:center; text-shadow:0 0 10px rgba(51,255,51,0.6); max-width:80vw;">${headline}</div>
     ${sublinesHtml ? `<div style="display:flex; flex-direction:column; gap:4px; max-width:70vw;">${sublinesHtml}</div>` : ''}
-    <button id="turn-announcement-dismiss" style="position:relative; overflow:hidden; padding:10px 34px; background:#111; border:1px solid var(--pip-green); color:var(--pip-green); font-family:'VT323', monospace; font-size:18px; cursor:pointer;">
-      <span id="turn-announcement-fill" style="position:absolute; inset:0; width:0%; background:rgba(51,255,51,0.35); z-index:0;"></span>
-      <span style="position:relative; z-index:1;">DISMISS</span>
-    </button>
+    <div style="display:flex; gap:12px;">
+      ${actionHtml}
+      <button id="turn-announcement-dismiss" style="position:relative; overflow:hidden; padding:10px 34px; background:#111; border:1px solid var(--pip-green); color:var(--pip-green); font-family:'VT323', monospace; font-size:18px; cursor:pointer;">
+        <span id="turn-announcement-fill" style="position:absolute; inset:0; width:0%; background:rgba(51,255,51,0.35); z-index:0;"></span>
+        <span style="position:relative; z-index:1;">DISMISS</span>
+      </button>
+    </div>
   `;
   el.style.display = 'flex';
 
   let closed = false;
   const close = () => { if (closed) return; closed = true; el.style.display = 'none'; clearTimeout(autoTimer); };
   document.getElementById('turn-announcement-dismiss').onclick = close;
+  // Job 2: the action button both navigates AND dismisses — clicking it
+  // is a complete response to the announcement, same as DISMISS.
+  const actionEl = document.getElementById('turn-announcement-action');
+  if (actionEl) actionEl.onclick = () => { close(); actionButton.onClick(); };
 
   // Fill the button over 5s via a CSS transition (starts after a paint
   // so the browser actually animates from 0, rather than snapping to 100%).
+  // If nobody clicks anything before it fills, close() just dismisses —
+  // no action fires (job 2: "If the countdown runs out and nobody
+  // clicks, nothing happens — it just dismisses").
   const fillEl = document.getElementById('turn-announcement-fill');
   requestAnimationFrame(() => {
     if (fillEl) {
@@ -468,6 +521,105 @@ function showBigAnnouncement(headline, sublines) {
   });
 
   const autoTimer = setTimeout(close, 5000);
+}
+
+// --- INITIATIVE REVEAL ANIMATION (job 3) ---
+// Purely cosmetic client-side JS, same spirit as animateDiceRoll — no
+// Firestore write per frame, just one write (markInitiativeSeen) once the
+// whole reveal finishes. shouldAnimateInitiative (combat.js, pure and
+// unit-tested) decides WHETHER to run; everything below is DOM-only.
+window.__initiativeAnimatingKey = null;
+function maybeAnimateInitiative() {
+  if (window.userRole !== 'player' || window.currentTab !== 'COMBAT') return;
+  const combat = window.liveData && window.liveData.active_combat;
+  const char = window.liveData && window.liveData.characters && window.liveData.characters[window.currentUser];
+  if (!combat || !char) return;
+  if (!shouldAnimateInitiative(char, combat)) return;
+
+  const key = combat.started_at;
+  // Guards against re-triggering on every re-render while the animation
+  // is mid-flight (another player's action can re-render this client at
+  // any moment) — set BEFORE the async animation starts, cleared only by
+  // markInitiativeSeen() actually landing (which changes char's own
+  // seen_initiative_for and makes shouldAnimateInitiative false on its own).
+  if (window.__initiativeAnimatingKey === key) return;
+  window.__initiativeAnimatingKey = key;
+  runInitiativeAnimation(combat.initiative_order, key);
+}
+
+function runInitiativeAnimation(order, key) {
+  const container = document.getElementById('initiative-list');
+  const rows = order.map(c => document.getElementById(`init-row-${c.combatant_id}`)).filter(Boolean);
+  if (!container || rows.length === 0) { Controllers.markInitiativeSeen(key); return; }
+
+  // Reveal order is shuffled (not the final sorted order) so the reveal
+  // genuinely "sorts itself into order" once every roll's landed, rather
+  // than just fading in an already-correct list top to bottom.
+  const shuffled = [...rows].sort(() => Math.random() - 0.5);
+  shuffled.forEach(row => {
+    row.style.transition = 'opacity 0.3s, transform 0.3s';
+    row.style.opacity = '0';
+    row.style.transform = 'translateY(-6px)';
+    container.appendChild(row); // re-inserted in shuffled order first
+  });
+
+  let i = 0;
+  function revealNext() {
+    if (i >= shuffled.length) {
+      flipToFinalOrder(container, rows); // `rows` is already in combat's final sorted order
+      setTimeout(() => Controllers.markInitiativeSeen(key), 500);
+      return;
+    }
+    const row = shuffled[i];
+    const rollSpan = row.querySelector('span[id^="init-roll-val-"]');
+    const finalValue = row.dataset.roll;
+    row.style.opacity = '1';
+    row.style.transform = 'translateY(0)';
+    if (!rollSpan) { i++; setTimeout(revealNext, 150); return; }
+
+    // Ticks through random values before landing on the real one — the
+    // real value was already decided server-side (combat.initiative_order
+    // is stored final); this just delays revealing it, same idea as
+    // animateDiceRoll.
+    let ticks = 0;
+    const maxTicks = 6 + Math.floor(Math.random() * 5);
+    const tickTimer = setInterval(() => {
+      ticks++;
+      if (ticks >= maxTicks) {
+        clearInterval(tickTimer);
+        rollSpan.textContent = finalValue;
+        i++;
+        setTimeout(revealNext, 150);
+      } else {
+        rollSpan.textContent = 1 + Math.floor(Math.random() * 20);
+      }
+    }, 55);
+  }
+  revealNext();
+}
+
+// Classic FLIP (First/Last/Invert/Play): records each row's CURRENT
+// on-screen position, moves the DOM nodes into `finalOrderRows`' order,
+// then animates from where they visually WERE to where they now are —
+// so the reorder reads as the list sliding into place instead of
+// snapping.
+function flipToFinalOrder(container, finalOrderRows) {
+  const first = new Map();
+  finalOrderRows.forEach(row => first.set(row, row.getBoundingClientRect()));
+  finalOrderRows.forEach(row => container.appendChild(row));
+  finalOrderRows.forEach(row => {
+    const last = row.getBoundingClientRect();
+    const firstRect = first.get(row);
+    const dy = firstRect.top - last.top;
+    if (dy) {
+      row.style.transition = 'none';
+      row.style.transform = `translateY(${dy}px)`;
+      requestAnimationFrame(() => {
+        row.style.transition = 'transform 0.4s ease';
+        row.style.transform = 'translateY(0)';
+      });
+    }
+  });
 }
 
 // --- LOGIN CONTROLLER ---

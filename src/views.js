@@ -769,10 +769,33 @@ export function getGoatReviewView(charId, liveData) {
 // --- COMBAT VIEW ---
 export function getCombatView(liveData, userRole, currentUser) {
   const combat = liveData.active_combat;
-  if (!combat) return `<h1>> NO COMBAT RECORDED YET</h1>`;
+  // Job 1: this tab is now reachable any time (its own nav entry, not
+  // just the "GO TO COMBAT"/"⚔ TAP TO JOIN" banners), so "nothing's
+  // happened yet" needs to read as a real, on-brand screen rather than
+  // an empty page or a bare heading.
+  if (!combat) return `
+    <div class="dashboard-container">
+      <div class="panel" style="text-align:center; padding:40px 20px;">
+        <h2 style="color:#888; background:none;">⚔ NO COMBAT ACTIVE</h2>
+        <p style="color:var(--pip-dim); font-size:13px;">Nothing's happening here right now. Check back once the GM starts a fight.</p>
+      </div>
+    </div>`;
 
   const isLive = combat.is_active;
   const currentActor = isLive ? combat.initiative_order[combat.turn_index] : null;
+
+  // Job 5 ("Dead characters... rendered greyed out and unmistakably dead
+  // everywhere they appear"): a PC's death lives on their character doc
+  // (survives the roster after combat ends); a monster instance carries
+  // its own is_dead inline (see computeAttackResolution's instant-kill
+  // branch and endTurn()'s down-recovery loop in controllers.js).
+  const isCombatantDead = (c) => {
+    if (c.ref_type === 'pc') {
+      const liveChar = liveData.characters[c.char_id];
+      return !!(liveChar && liveChar.is_dead);
+    }
+    return !!c.is_dead;
+  };
 
   // GM always sees exact HP; players need the "awareness" perk.
   let viewerHasAwareness = userRole === 'gm';
@@ -793,6 +816,7 @@ export function getCombatView(liveData, userRole, currentUser) {
   };
 
   const hpLabel = (c) => {
+    if (isCombatantDead(c)) return 'DECEASED';
     if (c.is_down) return 'DOWN';
     const hp = resolveHp(c);
     const pct = (hp.current / hp.max) * 100;
@@ -850,20 +874,26 @@ export function getCombatView(liveData, userRole, currentUser) {
 
   const initiativeHtml = combat.initiative_order.map((c, idx) => {
     const isCurrent = isLive && idx === combat.turn_index;
+    const isDead = isCombatantDead(c);
     const hp = resolveHp(c);
     const pct = c.is_down ? 0 : (hp.current / hp.max) * 100;
+    // Job 3 (initiative reveal animation): a stable id per row plus the
+    // roll value in its own span — main.js's runInitiativeAnimation()
+    // (client-side only, no per-frame write) reads/hides/reveals these
+    // directly off the DOM after this same sorted markup is inserted, so
+    // the "final" layout never has to be computed twice.
     return `
-      <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; margin-bottom:4px; border:1px solid ${isCurrent ? 'var(--pip-green)' : '#333'}; background:${isCurrent ? 'rgba(51,255,51,0.1)' : 'transparent'};">
+      <div id="init-row-${c.combatant_id}" data-roll="${c.initiative}" style="display:flex; justify-content:space-between; align-items:center; padding:8px; margin-bottom:4px; border:1px solid ${isCurrent ? 'var(--pip-green)' : '#333'}; background:${isCurrent ? 'rgba(51,255,51,0.1)' : 'transparent'}; ${isDead ? 'opacity:0.45; filter:grayscale(1);' : ''}">
         <div>
-          <strong style="color:${c.ref_type === 'pc' ? 'cyan' : 'red'};">${isCurrent ? '▶ ' : ''}${c.name}</strong>
+          <strong style="color:${isDead ? '#888' : (c.ref_type === 'pc' ? 'cyan' : 'red')};">${isCurrent ? '▶ ' : ''}${isDead ? '☠ ' : ''}${c.name}</strong>
           ${stanceHtml(c)}
           ${coverHtml(c)}
-          <div style="font-size:11px; color:#666;">INIT ${c.initiative}</div>
+          <div style="font-size:11px; color:#666;">INIT <span id="init-roll-val-${c.combatant_id}">${c.initiative}</span></div>
           ${afflictionTags(c)}
         </div>
         <div style="text-align:right;">
-          <div class="hp-bar-container" style="width:100px;"><div class="hp-fill" style="width:${pct}%"></div></div>
-          <div style="font-size:12px;">${hpLabel(c)}</div>
+          <div class="hp-bar-container" style="width:100px;"><div class="hp-fill" style="width:${pct}%; ${isDead ? 'background:#555;' : ''}"></div></div>
+          <div style="font-size:12px; ${isDead ? 'color:#888;' : ''}">${hpLabel(c)}</div>
         </div>
       </div>`;
   }).join('');
@@ -1123,21 +1153,43 @@ export function getCombatView(liveData, userRole, currentUser) {
       <button class="gm-btn" style="width:100%; border-color:#ff5555; color:#ff5555;" onclick="window.gmApplyStatusEffectInCombat()">APPLY</button>
     </div>` : '';
 
+  // Job 4 ("Weapon swapping costs a major action and needs GM approval"):
+  // pending requests, GM-only, with approve/deny — see requestWeaponSwap/
+  // gmApproveWeaponSwap/gmDenyWeaponSwap in controllers.js.
+  const pendingSwaps = (combat.pending_weapon_swaps || []);
+  const pendingSwapHtml = isLive && userRole === 'gm' && pendingSwaps.length > 0 ? `
+    <div class="panel" style="margin-bottom:15px; border-color:gold;">
+      <h4 style="color:gold; margin-top:0;">⚠ WEAPON SWAP REQUESTS</h4>
+      ${pendingSwaps.map(req => {
+        const reqChar = liveData.characters[req.char_id];
+        const reqItem = getItem(req.item_id);
+        return `
+        <div style="border:1px solid #444; padding:6px 8px; margin-bottom:6px;">
+          <div style="font-size:13px; margin-bottom:6px;">${(reqChar && reqChar.name) || req.char_id} wants to equip <strong>${(reqItem && reqItem.name) || req.item_id}</strong> (${req.target_slot === 'left_hand' ? 'L. hand' : 'R. hand'}).</div>
+          <div style="display:flex; gap:6px;">
+            <button class="gm-btn" style="flex-grow:1; border-color:lime; color:lime;" onclick="window.gmApproveWeaponSwap('${req.id}')">APPROVE</button>
+            <button class="gm-btn" style="flex-grow:1; border-color:red; color:red;" onclick="window.gmDenyWeaponSwap('${req.id}')">DENY</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
   return `
     <div class="dashboard-container" style="grid-template-columns: minmax(240px, 320px) minmax(240px, 320px) minmax(220px, 1fr);">
       <div class="panel">
         ${headerHtml}
-        <div style="margin-top:15px;">${initiativeHtml}</div>
+        <div id="initiative-list" style="margin-top:15px;">${initiativeHtml}</div>
         ${canEndTurn ? `<button style="width:100%; margin-top:15px; padding:10px; background:var(--pip-dim); color:black; font-weight:bold; border:none; cursor:pointer;" onclick="window.endTurn()">END TURN</button>` : ''}
         ${isLive && userRole === 'gm' ? `<button style="width:100%; margin-top:8px; padding:10px; background:red; color:white; border:none; cursor:pointer;" onclick="window.endCombat()">END COMBAT</button>` : ''}
         <button style="width:100%; margin-top:8px; padding:8px; background:#333; color:var(--pip-green); border:none; cursor:pointer;" onclick="window.switchTab('DASHBOARD')">BACK TO DASHBOARD</button>
       </div>
       <div>
+        ${pendingSwapHtml}
         ${actionPanelHtml}
         ${afflictPcHtml}
         ${adjustHpHtml}
         ${addCombatantHtml}
-        ${!actionPanelHtml && !afflictPcHtml && !adjustHpHtml && !addCombatantHtml ? `<div class="panel" style="color:#555; font-size:13px;">${isLive ? "Waiting on this combatant's turn." : 'Combat has ended.'}</div>` : ''}
+        ${!pendingSwapHtml && !actionPanelHtml && !afflictPcHtml && !adjustHpHtml && !addCombatantHtml ? `<div class="panel" style="color:#555; font-size:13px;">${isLive ? "Waiting on this combatant's turn." : 'Combat has ended.'}</div>` : ''}
       </div>
       <div class="panel">
         <h2>COMBAT LOG</h2>
@@ -1876,16 +1928,21 @@ export function getPlayerView(charId, liveData) {
   const thirstTier = getNeedTier('thirst', needs.thirst);
   const sleepTier = getNeedTier('sleep', needs.sleep);
   const inCombat = !!(liveData.active_combat && liveData.active_combat.is_active);
+  // Job 5 ("rendered greyed out and unmistakably dead everywhere they
+  // appear... squad list, combat, character sheet"): own sheet included.
+  const isDeceased = !!charData.is_dead;
 
   return `
-    <div class="dashboard-container">
+    <div class="dashboard-container" ${isDeceased ? 'style="filter:grayscale(1); opacity:0.8;"' : ''}>
       <div class="panel">
         <img src="${charData.avatar_url || 'https://placehold.co/200x200/333/white?text=NO+IMG'}" class="char-portrait">
-        
+
         <div style="display:flex; justify-content:space-between; align-items:center; background:var(--pip-green); padding:5px; margin:-10px -10px 10px -10px;">
            <h2 style="margin:0; background:none; color:black;">${charData.name}</h2>
            <span style="color:black; font-weight:bold; font-size:18px;">LVL ${charData.level || 1}</span>
         </div>
+        ${isDeceased ? `
+        <div style="text-align:center; padding:10px; margin-bottom:15px; background:#300; border:2px solid red; color:red; font-size:22px; letter-spacing:3px;">☠ DECEASED ☠</div>` : ''}
         <div style="text-align:right; margin-bottom:10px;">
           <span onclick="window.switchTab('GOAT_REVIEW')" style="cursor:pointer; font-size:11px; color:var(--pip-dim); text-decoration:underline;">[ REVIEW G.O.A.T. RESULTS ]</span>
         </div>
@@ -2439,18 +2496,21 @@ export function renderGMScreen(liveData) {
   const squadHtml = Object.entries(chars).map(([id, char]) => {
     const hpPercent = (char.hp.current / char.hp.max) * 100;
     const vp = char.vault_points || 0;
-    
+    // Job 5: dead characters stay in the roster forever — never deleted —
+    // but read as unmistakably dead here too.
+    const isDead = !!char.is_dead;
+
     return `
-      <div class="gm-char-card" onclick="window.openGMModal('${id}')" style="cursor:pointer;">
+      <div class="gm-char-card" onclick="window.openGMModal('${id}')" style="cursor:pointer; ${isDead ? 'opacity:0.5; filter:grayscale(1); border-color:#500;' : ''}">
         <img src="${char.avatar_url}" class="gm-avatar">
         <div style="flex-grow:1;">
           <div style="display:flex; justify-content:space-between;">
-             <strong style="color:var(--pip-green);">${char.name}</strong>
+             <strong style="color:${isDead ? '#888' : 'var(--pip-green)'};">${isDead ? '☠ ' : ''}${char.name}</strong>
              <span style="color:var(--pip-gold); font-size:12px;">LVL ${char.level || 1}</span>
           </div>
-          <div class="hp-bar-container"><div class="hp-fill" style="width:${hpPercent}%"></div></div>
+          <div class="hp-bar-container"><div class="hp-fill" style="width:${hpPercent}%; ${isDead ? 'background:#555;' : ''}"></div></div>
           <div style="display:flex; justify-content:space-between; font-size:12px;">
-             <span>HP: ${char.hp.current}/${char.hp.max}</span>
+             <span>${isDead ? 'DECEASED' : `HP: ${char.hp.current}/${char.hp.max}`}</span>
              <span style="color:cyan;">VP: ${vp}</span>
           </div>
         </div>
@@ -2530,11 +2590,20 @@ export function renderGMScreen(liveData) {
         </div>
         <div class="modal-body">
         <h4 style="color:red; border-bottom:1px dashed red;">VITALS</h4>
+        ${targetChar && targetChar.is_dead ? `
+        <div style="border:2px solid red; background:rgba(255,0,0,0.12); padding:8px; margin-bottom:10px; text-align:center;">
+          <strong style="color:red; letter-spacing:2px;">☠ DECEASED</strong>
+          <p style="font-size:11px; color:#ccc; margin:6px 0;">Only the GM can bring a character back — pick the HP to revive at.</p>
+          <div style="display:flex; gap:6px;">
+            <input type="number" id="reviveHpInput" min="1" max="${targetChar.hp.max}" value="1" style="width:60px; background:black; color:lime; border:1px solid #333; font-family:'VT323'; font-size:16px;">
+            <button class="gm-btn" style="border-color:lime; color:lime; flex-grow:1;" onclick="window.gmReviveCharacter(document.getElementById('reviveHpInput').value)">REVIVE</button>
+          </div>
+        </div>` : `
         <div style="display:flex; gap:10px; margin-bottom:10px;">
          <button class="gm-btn" onclick="window.gmAdjustHP(-1)">-1 HP</button>
          <button class="gm-btn" onclick="window.gmAdjustHP(1)">+1 HP</button>
           <button class="gm-btn" onclick="window.gmAdjustHP(999)">FULL HEAL</button>
-        </div>
+        </div>`}
 
         <p style="font-size:11px; color:#888; border:1px dashed #444; padding:6px;">Radiation, survival needs, limb damage and karma moved to the <span onclick="window.switchTab('STATUS')" style="color:var(--pip-green); text-decoration:underline; cursor:pointer;">STATUS tab</span> (pick this character there).</p>
 
