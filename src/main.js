@@ -48,6 +48,8 @@ window.reloadWeapon = Controllers.reloadWeapon;
 window.createAccessCode = Controllers.createAccessCode;
 window.forceReset = Controllers.forceReset;
 window.gmGrantItem = () => Controllers.gmGrantItem(window.selectedCharId);
+window.gmGrantItemToTarget = Controllers.gmGrantItemToTarget;
+window.setGMStatusTarget = (charId) => { window.selectedCharId = charId; window.render(); };
 window.gmUnequipItem = (slot) => Controllers.gmUnequipItem(window.selectedCharId, slot);
 window.gmSaveBiography = () => Controllers.gmSaveBiography(window.selectedCharId);
 window.savePlayerNotes = Controllers.savePlayerNotes;
@@ -60,6 +62,7 @@ window.openQuest = Controllers.openQuest;
 window.gmSetQuestStatus = Controllers.gmSetQuestStatus;
 window.toggleQuestObjective = Controllers.toggleQuestObjective;
 window.gmGrantMap = Controllers.gmGrantMap;
+window.gmGrantRecipe = Controllers.gmGrantRecipe;
 window.openMap = Controllers.openMap;
 window.sendMessage = Controllers.sendMessage;
 window.openMessage = Controllers.openMessage;
@@ -112,6 +115,10 @@ window.setGmCheckWhat = Controllers.setGmCheckWhat;
 window.rollForGmCheck = Controllers.rollForGmCheck;
 window.resolveGmCheck = Controllers.resolveGmCheck;
 window.revealCheck = Controllers.revealCheck;
+window.setHiddenCheckField = Controllers.setHiddenCheckField;
+window.setHiddenCheckWhat = Controllers.setHiddenCheckWhat;
+window.rollForHiddenCheck = Controllers.rollForHiddenCheck;
+window.resolveHiddenCheck = Controllers.resolveHiddenCheck;
 window.passTurn = Controllers.passTurn;
 window.endTurn = Controllers.endTurn;
 window.addCombatantMidFight = Controllers.addCombatantMidFight;
@@ -284,11 +291,30 @@ window.render = function() {
   }
 
   // 4. Sync sidebar active state to the current tab, plus unread badges
-  const navMap = { DASHBOARD: 'btn-dashboard', QUESTS: 'btn-quests', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks', WORKSHOP: 'btn-workshop', STATUS: 'btn-status', REPUTATION: 'btn-reputation' };
+  const navMap = { DASHBOARD: 'btn-dashboard', QUESTS: 'btn-quests', DATA_LOGS: 'btn-logs', MESSAGES: 'btn-messages', MAPS: 'btn-map', CHECKS: 'btn-checks', STATUS: 'btn-status', REPUTATION: 'btn-reputation' };
   Object.entries(navMap).forEach(([tab, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', window.currentTab === tab);
   });
+
+  // 4a. Two nav buttons mean something different per role — the shared
+  // sidebar has one DOM node per slot regardless of who's logged in, so
+  // relabel/repoint them here rather than templating two navs in
+  // index.html:
+  //  - "1. DASHBOARD" reads "1. CHARACTER SHEET" for players (GM ruling
+  //    2026-09-24) — same tab key (DASHBOARD), label only.
+  //  - The old WORKSHOP slot becomes the GM's "GRANT ITEMS" tab; players
+  //    keep WORKSHOP exactly as before.
+  const dashboardBtn = document.getElementById('btn-dashboard');
+  if (dashboardBtn) dashboardBtn.textContent = window.userRole === 'gm' ? '1. DASHBOARD' : '1. CHARACTER SHEET';
+  const workshopBtn = document.getElementById('btn-workshop');
+  if (workshopBtn) {
+    const isGm = window.userRole === 'gm';
+    const workshopTabName = isGm ? 'GRANT_ITEMS' : 'WORKSHOP';
+    workshopBtn.textContent = isGm ? '7. GRANT ITEMS' : '7. WORKSHOP';
+    workshopBtn.onclick = () => window.switchTab(workshopTabName);
+    workshopBtn.classList.toggle('active', window.currentTab === workshopTabName);
+  }
 
   if (window.userRole === 'player' && window.liveData.characters[window.currentUser]) {
     const char = window.liveData.characters[window.currentUser];
@@ -330,6 +356,10 @@ window.render = function() {
       viewport.innerHTML = Views.getMapsView(window.liveData, 'gm', window.currentUser);
     } else if (window.currentTab === 'CHECKS') {
       viewport.innerHTML = Views.getChecksView(window.liveData, 'gm', window.currentUser);
+    } else if (window.currentTab === 'GRANT_ITEMS') {
+      viewport.innerHTML = Views.getGrantItemsView(window.liveData);
+    } else if (window.currentTab === 'STATUS') {
+      viewport.innerHTML = Views.getGMStatusView(window.liveData);
     } else {
       viewport.innerHTML = Views.renderGMScreen(window.liveData);
     }

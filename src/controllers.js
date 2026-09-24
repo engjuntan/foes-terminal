@@ -14,6 +14,8 @@ import { DIFFICULTY_TIERS, rollD10, rollD20, resolveSpecialCheck, resolveSkillCh
 import { normalizeNeeds, decayNeeds, rollRestHealing, formatGameTime } from './needs.js';
 import { getRecipe } from './recipes.js';
 import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
+import { planListGrant, describeNoOpGrant } from './grants.js';
+import { pushEventLog } from './eventLog.js';
 import {
   REPUTATION_MIN, REPUTATION_MAX, KARMA_MIN, KARMA_MAX,
   getReputationTier, getReputationValue, getKarmaTier, getKarmaValue,
@@ -330,15 +332,19 @@ export async function savePlayerNotes() {
 }
 
 // --- DATA LOGS ---
+// Duplicate grants are refused, not silently re-added (GM ruling
+// 2026-09-24) — planListGrant (src/grants.js) splits the resolved
+// targets into who actually gets it and who already had it; if NOBODY
+// ends up getting it (single target who already has it, or 'all' when
+// the whole party already has it), this says so and writes nothing.
 export async function gmGrantDataLog(logId, target) {
   const characters = window.liveData.characters || {};
-  const targets = target === 'all' ? Object.keys(characters).filter(id => characters[id].is_finalized) : [target];
+  const { toGrant, alreadyHave } = planListGrant(characters, target, 'unlocked_logs', logId);
+  if (toGrant.length === 0) { if (alreadyHave.length) alert(describeNoOpGrant(characters, alreadyHave, 'log')); return; }
   const updatePayload = {};
-  targets.forEach(charId => {
-    const current = characters[charId].unlocked_logs || [];
-    if (!current.includes(logId)) updatePayload[`characters.${charId}.unlocked_logs`] = [...current, logId];
+  toGrant.forEach(charId => {
+    updatePayload[`characters.${charId}.unlocked_logs`] = [...(characters[charId].unlocked_logs || []), logId];
   });
-  if (Object.keys(updatePayload).length === 0) return;
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
@@ -466,15 +472,31 @@ export async function toggleQuestObjective(targetCharId, questId, objectiveIndex
 }
 
 // --- MAPS ---
+// Same duplicate-refusal shape as gmGrantDataLog above.
 export async function gmGrantMap(mapId, target) {
   const characters = window.liveData.characters || {};
-  const targets = target === 'all' ? Object.keys(characters).filter(id => characters[id].is_finalized) : [target];
+  const { toGrant, alreadyHave } = planListGrant(characters, target, 'unlocked_maps', mapId);
+  if (toGrant.length === 0) { if (alreadyHave.length) alert(describeNoOpGrant(characters, alreadyHave, 'map')); return; }
   const updatePayload = {};
-  targets.forEach(charId => {
-    const current = characters[charId].unlocked_maps || [];
-    if (!current.includes(mapId)) updatePayload[`characters.${charId}.unlocked_maps`] = [...current, mapId];
+  toGrant.forEach(charId => {
+    updatePayload[`characters.${charId}.unlocked_maps`] = [...(characters[charId].unlocked_maps || []), mapId];
   });
-  if (Object.keys(updatePayload).length === 0) return;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// --- RECIPES (unlockable, GM ruling 2026-09-24: "granted the way the GM
+// grants data logs") --- same duplicate-refusal shape as the two above;
+// a character with no unlocked_recipes list at all knows nothing, per
+// planListGrant reading a missing array as empty.
+export async function gmGrantRecipe(recipeId, target) {
+  const characters = window.liveData.characters || {};
+  const { toGrant, alreadyHave } = planListGrant(characters, target, 'unlocked_recipes', recipeId);
+  if (toGrant.length === 0) { if (alreadyHave.length) alert(describeNoOpGrant(characters, alreadyHave, 'recipe')); return; }
+  const updatePayload = {};
+  toGrant.forEach(charId => {
+    updatePayload[`characters.${charId}.unlocked_recipes`] = [...(characters[charId].unlocked_recipes || []), recipeId];
+  });
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
@@ -552,12 +574,14 @@ export async function openMessage(messageId) {
 // "disrepair" loot — without it defaulting to the item's own start_marks
 // (see condition.js's startMarksForItem). Left blank, it uses that
 // default (pristine unless the item itself is authored pre-worn).
-export async function gmGrantItem(targetCharId) {
-  const select = document.getElementById('gmItemSelect');
-  const itemId = select.value;
-  if (!itemId) return;
+// Shared core for both grant entry points below — the modal's INVENTORY
+// select (gmGrantItem) and the standalone GRANT ITEMS tab
+// (gmGrantItemToTarget), grouped by category (GM ruling 2026-09-24).
+// Both end up doing exactly the same write, they just source itemId/marks
+// differently.
+async function grantItemCore(targetCharId, itemId, marksRaw) {
   const item = getItem(itemId);
-
+  if (!item) return;
   const charRef = doc(db, "prisoncampaign", "alpha_team");
 
   try {
@@ -566,6 +590,7 @@ export async function gmGrantItem(targetCharId) {
     if (!charSnap.exists()) return;
 
     const targetCharDoc = charSnap.data().characters[targetCharId];
+    if (!targetCharDoc) { alert("TARGET NOT FOUND"); return; }
     // Inventory is a stacked { itemId: quantity } map now — normalizes
     // and upgrades transparently even if this character still has the
     // old flat-array shape from before stacking existed.
@@ -579,18 +604,40 @@ export async function gmGrantItem(targetCharId) {
 
     if (isDurable(item)) {
       const condition = normalizeCondition(targetCharDoc);
-      const marksInput = document.getElementById('gmItemMarks');
-      const marksRaw = marksInput ? marksInput.value : '';
-      const marks = (marksRaw !== '' && !isNaN(Number(marksRaw))) ? clampMarks(Number(marksRaw)) : startMarksForItem(item);
+      const marks = (marksRaw !== '' && marksRaw !== null && marksRaw !== undefined && !isNaN(Number(marksRaw))) ? clampMarks(Number(marksRaw)) : startMarksForItem(item);
       updatePayload[`${charPath}.condition`] = {
         inv: { ...condition.inv, [itemId]: [...(condition.inv[itemId] || []), marks].sort((a, b) => a - b) },
         worn: condition.worn
       };
     }
 
+    updatePayload.event_log = pushEventLog(window.liveData.event_log, {
+      text: `GM grants ${item.name} to ${targetCharDoc.name || targetCharId}.`, actor: 'GM'
+    });
+
     await updateDoc(charRef, updatePayload);
     alert(`GRANTED ${itemId.toUpperCase()} TO ${targetCharId.toUpperCase()}`);
   } catch (err) { alert(err.message); }
+}
+
+export async function gmGrantItem(targetCharId) {
+  const select = document.getElementById('gmItemSelect');
+  const itemId = select.value;
+  if (!itemId) return;
+  const marksInput = document.getElementById('gmItemMarks');
+  const marksRaw = marksInput ? marksInput.value : '';
+  await grantItemCore(targetCharId, itemId, marksRaw);
+}
+
+// GRANT ITEMS tab (GM ruling 2026-09-24): a character picker up top
+// (window.selectedCharId, same "currently targeted PC" state the modal
+// and STATUS tab use) plus one GRANT button per item, grouped by
+// category — no marks input here, granted pristine/at the item's own
+// default (same as leaving the modal's marks field blank).
+export async function gmGrantItemToTarget(itemId) {
+  const targetCharId = window.selectedCharId;
+  if (!targetCharId) { alert("PICK A CHARACTER FIRST"); return; }
+  await grantItemCore(targetCharId, itemId, '');
 }
 
 // 2. Adjust HP
@@ -600,13 +647,17 @@ export async function gmAdjustHP(targetCharId, amount) {
   const char = window.liveData.characters[targetCharId];
   if (!char) return;
 
-  let newCurrent = (char.hp.current || 0) + amount;
+  const before = char.hp.current || 0;
+  let newCurrent = before + amount;
   if (newCurrent > char.hp.max) newCurrent = char.hp.max;
   if (newCurrent < 0) newCurrent = 0;
 
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
   updatePayload[`characters.${targetCharId}.hp.current`] = newCurrent;
+  if (before > 0 && newCurrent === 0) {
+    updatePayload.event_log = pushEventLog(window.liveData.event_log, { text: `${char.name || targetCharId} is down — 0 HP.`, actor: 'GM' });
+  }
 
   await updateDoc(charRef, updatePayload);
 }
@@ -658,6 +709,7 @@ export async function gmSetReputation(entityId, value) {
       body: `Your standing with ${entityName} is now: ${afterTier.name}.`,
       timestamp: Date.now()
     }];
+    updatePayload.event_log = pushEventLog(window.liveData.event_log, { text: `Standing with ${entityName} shifts to ${afterTier.name}.`, actor: 'GM' });
   }
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
@@ -916,18 +968,22 @@ export async function resolveTreatLimbDraft() {
 // Rest action) routes through this one function so there is only one place
 // that can get the party-wide math wrong.
 //
-// opts.isRest gates two things ONLY: whether a rest of >=6h restores Sleep
-// to 100, and whether natural healing gets the manual's 1.5x long-rest
-// bonus. Base healing itself (1d10 capped at EN, manual p.446) fires on
-// EVERY advance regardless of isRest — ordinary GM travel time heals a
-// little too, it just never gets the bonus or the free sleep reset.
+// opts.isRest/opts.properRest gate two things: whether a rest of >=6h
+// restores Sleep to 100, and the multiplier on natural healing (see
+// needs.js's rollRestHealing — Fallout 1/2 Healing Rate, GM ruling
+// 2026-09-24). `properRest` (a bed, an inn, a settlement's infirmary —
+// the GM's call) implies `isRest` even if the caller only set the former.
+// Every advance heals the party a LITTLE regardless (1x, no rest
+// declared) — ordinary GM travel time heals a little too, it just never
+// gets the multiplier or the free sleep reset.
 //
 // Never call this from inside combat — combat rounds are seconds, and
 // letting a round advance the clock would silently drain the whole party's
 // needs over what's fictionally a few minutes. Blocked below for that
 // reason, not just as a courtesy.
 export async function advanceTime(minutes, opts = {}) {
-  const { isRest = false, initiatedBy = 'GM', reason = '' } = opts;
+  const { isRest = false, properRest = false, initiatedBy = 'GM', reason = '' } = opts;
+  const restDeclared = isRest || properRest;
   if (!window.liveData) return;
   // active_combat is never cleared after combat ends, only its is_active
   // flag flips false (see endCombat()) — checking the object's mere
@@ -939,12 +995,14 @@ export async function advanceTime(minutes, opts = {}) {
   if (!mins || mins <= 0) { alert("ENTER A VALID DURATION"); return; }
 
   const hoursElapsed = mins / 60;
-  const isLongRest = isRest && hoursElapsed >= 6;
+  const isLongRest = restDeclared && hoursElapsed >= 6;
+  const healMultiplier = !restDeclared ? 1 : (properRest ? 4 : 2);
   const currentMinutes = (window.liveData.world && window.liveData.world.minutes) || 480;
   const updatePayload = { 'world.minutes': currentMinutes + mins };
 
   const characters = window.liveData.characters || {};
   const reportLines = [];
+  const deathNames = []; // characters this advance brought down to 0 HP, for the event log
 
   Object.entries(characters).forEach(([charId, char]) => {
     if (!char.is_finalized) return;
@@ -953,11 +1011,11 @@ export async function advanceTime(minutes, opts = {}) {
     const { needs: afterDecay, damage } = decayNeeds(char.needs, hoursElapsed);
     if (isLongRest) afterDecay.sleep = 100;
 
-    // healingRateCap depends on EN, which the needs tiers themselves can
+    // healingRate depends on EN, which the needs tiers themselves can
     // penalize (Famished/Starving hit END) — derive it from needs BEFORE
     // this tick's decay, since that's the state the character rested in.
     const derived = deriveCharacter(char);
-    const healed = rollRestHealing(derived.healingRateCap, hoursElapsed, isLongRest);
+    const healed = rollRestHealing(derived.healingRate, hoursElapsed, healMultiplier);
     const totalDamage = damage.hunger + damage.thirst + damage.sleep;
 
     const currentHp = (char.hp && char.hp.current) || 0;
@@ -966,6 +1024,7 @@ export async function advanceTime(minutes, opts = {}) {
 
     updatePayload[`characters.${charId}.needs`] = afterDecay;
     if (newHp !== currentHp) updatePayload[`characters.${charId}.hp.current`] = newHp;
+    if (currentHp > 0 && newHp === 0) deathNames.push(char.name || charId);
 
     const parts = [
       `thirst ${Math.round(before.thirst)}→${Math.round(afterDecay.thirst)}`,
@@ -1001,13 +1060,20 @@ export async function advanceTime(minutes, opts = {}) {
   const fromLabel = formatGameTime(currentMinutes).label;
   const toLabel = formatGameTime(currentMinutes + mins).label;
   const hoursLabel = Number.isInteger(hoursElapsed) ? `${hoursElapsed}h` : `${hoursElapsed.toFixed(1)}h`;
-  const header = isRest ? `${initiatedBy} calls for a rest (${hoursLabel}).`
+  const header = properRest ? `${initiatedBy} rests at a proper place of rest (${hoursLabel}).`
+    : isRest ? `${initiatedBy} calls for a rest (${hoursLabel}).`
     : reason ? `${initiatedBy} ${reason} (${hoursLabel}).`
     : `${initiatedBy} advances time by ${hoursLabel}.`;
   const body = `${header}\n${fromLabel} → ${toLabel}${reportLines.length ? '\n' + reportLines.join('\n') : ''}`;
 
   const currentMessages = window.liveData.messages || [];
   updatePayload.messages = [...currentMessages, { id: `msg_${Date.now()}`, from: initiatedBy, target: 'all', body, timestamp: Date.now() }];
+
+  let eventLog = pushEventLog(window.liveData.event_log, { text: header, actor: initiatedBy });
+  deathNames.forEach(name => {
+    eventLog = pushEventLog(eventLog, { text: `${name} is down — 0 HP.`, actor: initiatedBy });
+  });
+  updatePayload.event_log = eventLog;
 
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
@@ -1016,10 +1082,11 @@ export async function advanceTime(minutes, opts = {}) {
 // Player-facing Rest — any player can trigger this, not just the GM.
 // Instant, no accept step (same convention as useItem/giveItem): the
 // broadcast message IS the notification, not a request waiting on anyone
-// else's click. Hours are player-adjustable; hitting 6+ is what earns the
-// manual's long-rest bonus (1.5x healing, Sleep restored to 100) — under
-// 6h is just a breather that still costs the hour's hunger/thirst.
-export async function requestRest(hours) {
+// else's click. Hours are player-adjustable; hitting 6+ restores Sleep to
+// 100. `properRest` (a bed, an inn, a settlement's infirmary) quadruples
+// natural healing instead of doubling it — the GM's call, but the player
+// flags what they're claiming and the log shows it either way.
+export async function requestRest(hours, properRest = false) {
   const charId = window.currentUser;
   if (!charId || !window.liveData) return;
   const char = window.liveData.characters[charId];
@@ -1027,7 +1094,7 @@ export async function requestRest(hours) {
   const h = Number(hours);
   if (isNaN(h) || h <= 0) { alert("ENTER A VALID NUMBER OF HOURS"); return; }
   const clampedHours = Math.max(0.5, Math.min(24, h));
-  await advanceTime(clampedHours * 60, { isRest: true, initiatedBy: char.name || charId });
+  await advanceTime(clampedHours * 60, { isRest: true, properRest: !!properRest, initiatedBy: char.name || charId });
 }
 
 // DOM-read wrapper for the GM's free-form time panel — same pattern as
@@ -1036,9 +1103,14 @@ export async function requestRest(hours) {
 export async function gmAdvanceTimeAction() {
   const hoursInput = document.getElementById('gmTimeHours');
   const restCheckbox = document.getElementById('gmTimeIsRest');
+  const properRestCheckbox = document.getElementById('gmTimeIsProperRest');
   const hours = Number(hoursInput && hoursInput.value);
   if (isNaN(hours) || hours <= 0) { alert("ENTER A VALID NUMBER OF HOURS"); return; }
-  await advanceTime(hours * 60, { isRest: !!(restCheckbox && restCheckbox.checked), initiatedBy: 'GM' });
+  await advanceTime(hours * 60, {
+    isRest: !!(restCheckbox && restCheckbox.checked),
+    properRest: !!(properRestCheckbox && properRestCheckbox.checked),
+    initiatedBy: 'GM'
+  });
 }
 
 // Consumes one copy of an item from inventory and applies whatever
@@ -1170,6 +1242,11 @@ export async function craftItem(recipeId) {
   if (!recipe) return;
   const char = window.liveData.characters[charId];
   if (!char) return;
+  // Recipes are unlockable (GM ruling 2026-09-24) — a character with no
+  // unlocked_recipes list at all knows nothing. The Workshop only ever
+  // shows recipes this character knows, but this guard stops the action
+  // from going through if it's ever called directly.
+  if (!(char.unlocked_recipes || []).includes(recipeId)) { alert("YOU DON'T KNOW THAT RECIPE"); return; }
   const outputItem = getItem(recipe.produces && recipe.produces.item);
   if (!outputItem) { alert("THIS RECIPE'S OUTPUT ITEM IS MISSING — TELL YOUR GM"); return; }
 
@@ -1468,6 +1545,11 @@ export async function giveItem(itemId, qty, toCharId, copyIndex) {
     updatePayload[`characters.${toCharId}.condition`] = { inv: newToCondInv, worn: toCondition.worn };
   }
 
+  updatePayload.event_log = pushEventLog(window.liveData.event_log, {
+    text: `${fromChar.name || fromCharId} gives ${qty > 1 ? `${qty}x ` : ''}${item.name} to ${toChar.name || toCharId}.`,
+    actor: fromChar.name || fromCharId
+  });
+
   try {
     await updateDoc(charRef, updatePayload);
     alert(`GAVE ${qty > 1 ? `${qty}x ` : ''}${item.name.toUpperCase()} TO ${toChar.name.toUpperCase()}`);
@@ -1561,6 +1643,9 @@ async function writeStatusEffectToChar(targetCharId, instance) {
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
   updatePayload[`characters.${targetCharId}.status_effects`] = [...currentEffects, instance];
+  updatePayload.event_log = pushEventLog(window.liveData.event_log, {
+    text: `${(char && char.name) || targetCharId} is afflicted with ${instance.name}.`, actor: 'GM'
+  });
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
@@ -3299,5 +3384,101 @@ export async function revealCheck(checkId) {
       checks: newChecks,
       messages: [...currentMessages, { id: `msg_${Date.now()}`, from: 'GM', target: 'all', body: buildCheckRevealMessage(entry), timestamp: Date.now() }]
     });
+  } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// --- HIDDEN ROLL (Checks tab, GM ruling 2026-09-24) ---
+// Distinct from the GM check's own "reveal" checkbox above, which — when
+// left unchecked — hides a check from players ENTIRELY (they never learn
+// it happened until/unless the GM reveals it). This is different: the
+// GM alone ever sees the roll and the success/failure, but every player
+// is told, via the event log, that a hidden check WAS made — never what
+// it was for or how it went. Single target or a custom NPC/value, same
+// shape as gm_check minus the 'party'/'reveal' options that don't apply.
+function getHiddenCheckDraft() {
+  if (!window.hiddenCheckDraft) window.hiddenCheckDraft = {
+    scope: 'single', // 'single' | 'custom'
+    targetCharId: '',
+    kind: 'special', key: 'str', tier: 'normal', useD20: false,
+    customName: '', customValue: '', roll: ''
+  };
+  return window.hiddenCheckDraft;
+}
+export function setHiddenCheckField(field, value) {
+  const draft = getHiddenCheckDraft();
+  draft[field] = value;
+  if (field !== 'roll' && field !== 'customValue' && field !== 'customName') window.render();
+}
+export function rollForHiddenCheck() {
+  const draft = getHiddenCheckDraft();
+  const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
+  const finalValue = draft.kind === 'special' ? (draft.useD20 ? rollD20() : rollD10()) : rollPercentile();
+  window.animateDiceRoll('hiddenCheckRollInput', finalValue, maxRoll, () => {
+    draft.roll = finalValue;
+    window.render();
+  });
+}
+export function setHiddenCheckWhat(value) {
+  const [kind, key] = value.split(':');
+  const draft = getHiddenCheckDraft();
+  draft.kind = kind; draft.key = key;
+  window.render();
+}
+
+export async function resolveHiddenCheck() {
+  if (!window.liveData) return;
+  const draft = getHiddenCheckDraft();
+  const tier = draft.tier;
+  let result, entryResult;
+
+  if (draft.scope === 'custom') {
+    const name = (draft.customName || '').trim();
+    const value = Number(draft.customValue);
+    if (!name) { alert("ENTER A NAME"); return; }
+    if (draft.customValue === '' || isNaN(value)) { alert("ENTER A CHECK VALUE"); return; }
+    if (draft.roll === '' || draft.roll === null || draft.roll === undefined) { alert("ENTER OR ROLL A DICE VALUE"); return; }
+    const roll = Number(draft.roll);
+    const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
+    if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
+    result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
+    entryResult = { char_id: null, name, roll, threshold: result.threshold, success: result.success, critType: result.critType || null };
+  } else {
+    if (!draft.targetCharId) { alert("PICK A TARGET"); return; }
+    const char = window.liveData.characters[draft.targetCharId];
+    if (!char) { alert("TARGET NOT FOUND"); return; }
+    if (draft.roll === '' || draft.roll === null || draft.roll === undefined) { alert("ENTER OR ROLL A DICE VALUE"); return; }
+    const roll = Number(draft.roll);
+    const maxRoll = draft.kind === 'special' ? (draft.useD20 ? 20 : 10) : 100;
+    if (isNaN(roll) || roll < 1 || roll > maxRoll) { alert(`ROLL MUST BE 1-${maxRoll}`); return; }
+    const derived = deriveCharacter(char);
+    const value = draft.kind === 'special' ? char.special[draft.key] : derived.skills[draft.key];
+    result = draft.kind === 'special' ? resolveSpecialCheck(value, tier, roll, draft.useD20) : resolveSkillCheck(value, tier, roll);
+    entryResult = { char_id: draft.targetCharId, name: char.name, roll, threshold: result.threshold, success: result.success, critType: result.critType || null };
+  }
+
+  const entry = {
+    id: `check_${Date.now()}`,
+    mode: 'gm_hidden',
+    scope: draft.scope,
+    tier,
+    kind: draft.kind,
+    key: draft.scope === 'custom' ? null : draft.key,
+    useD20: draft.useD20,
+    hidden: true, // always — this roll type has no "reveal immediately" option
+    results: [entryResult],
+    timestamp: Date.now()
+  };
+
+  const currentChecks = window.liveData.checks || [];
+  const updatePayload = { checks: [...currentChecks, entry] };
+  // The fact, not the result — every player sees this line, but it names
+  // no target and gives no outcome, per the GM ruling.
+  updatePayload.event_log = pushEventLog(window.liveData.event_log, { text: 'The GM rolls a hidden check.', actor: 'GM' });
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try {
+    await updateDoc(charRef, updatePayload);
+    window.hiddenCheckDraft = null;
+    window.render();
   } catch (err) { alert("ERROR: " + err.message); }
 }
