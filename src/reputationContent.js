@@ -121,13 +121,13 @@ export function getReputationModifiers(entityId, liveData) {
 // normalizeReputationEntities. The GM can add/rename/remove from here in
 // the GM view; nothing about this list is hardcoded elsewhere.
 export const DEFAULT_REPUTATION_ENTITIES = [
-  { id: "rakan_watch", name: "Rakan Watch" },
-  { id: "triad_1414", name: "1414 Triad" },
-  { id: "axe_gang", name: "Axe Gang" },
-  { id: "bandawang_enforcers", name: "Bandawang Enforcers" },
-  { id: "the_federation", name: "The Federation" },
-  { id: "the_protectorate", name: "The Protectorate" },
-  { id: "the_caliphate", name: "The Caliphate" }
+  { id: "rakan_watch", name: "Rakan Watch" , image_url: "" },
+  { id: "triad_1414", name: "1414 Triad" , image_url: "" },
+  { id: "axe_gang", name: "Axe Gang" , image_url: "" },
+  { id: "bandawang_enforcers", name: "Bandawang Enforcers" , image_url: "" },
+  { id: "the_federation", name: "The Federation" , image_url: "" },
+  { id: "the_protectorate", name: "The Protectorate" , image_url: "" },
+  { id: "the_caliphate", name: "The Caliphate" , image_url: "" }
 ];
 
 export function normalizeReputationEntities(raw) {

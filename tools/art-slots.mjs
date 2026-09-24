@@ -41,6 +41,21 @@ export const SLOT_GROUPS = {
       menace: 'A burnt-out doorway in a settlement wall, a handprint in soot beside it, scavenger birds gathered on the roofline above.'
     }
   },
+  faction: {
+    label: 'Faction card',
+    file: 'src/reputationContent.js',
+    anchor: id => new RegExp(`id:\\s*["']${id}["']`),
+    style: CARD_STYLE + ' Three figures together, full length, in dynamic poses with expressive faces — caught mid-moment, not lined up for a portrait. Their setting is the place this faction belongs to.',
+    slots: {
+      rakan_watch: 'Three Rakan Watch neighbourhood volunteers outside a repainted community hall in Bandawang Baru: homemade matching municipal mint-green and off-white shirts with hand-sewn name tags, swept step, hand-painted signboard, farming tools and homemade weapons, performing respectability — one laughing, one wary, one mid-instruction with an arm out.',
+      triad_1414: 'Three 1414 Triad men on the roof pagoda of the Tiger Palace casino: sharp black pinstripe suits, red lacquer and gilded carved timber behind them, vertical black and gold name plaques, embroidered silk banners, incense haze, ancestral-hall formality — one seated and amused, one standing guard, one leaning in mid-threat.',
+      axe_gang: 'Three Axe Gang rockers in the ProTiga HQ lobby stage: oil-black and factory safety-yellow salvaged from a pre-war car plant, cut-off denim and leather, hand-painted helmets, modified electric guitars slung as weapons, a race-numbered pedal kapcai behind them — one mid-shout, one grinning, one stamping a boot.',
+      bandawang_enforcers: 'Three Bandawang Enforcers on the graffiti-covered steps of the old police station: drab light-brown pre-war private-security armour over mismatched clothes, batons and a shotgun, a shrine with burning incense in the doorway behind — one bored, one shouting an order, one already walking away.',
+      the_federation: 'Three Federation figures at a checkpoint of pressed lavender and orange: immaculately laundered 1950s formal dress, high-collared tunic, songkok, enamelled orange starburst order, beside a sun-faded lavender field uniform and WW1-pattern steel helmet — one smiling for the camera, one saluting, one impatient.',
+      the_protectorate: 'Three Protectorate personnel on a scaffolded rail works: bone-cream lightweight cotton drill, sleeves rolled, navy shoulder boards and collar facings, navy sash, brass buttons, tool bandoliers across the chest, canvas gaiters — one mid-measurement with brass instruments, one gesturing at a plan, one watching impassively.',
+      the_caliphate: 'Three Caliphate Pahlawan on the steps of a timber meru-roofed hall: unbleached linen scholar robes over travel clothes, waxed-cloth-wrapped manuscripts in bandolier satchels, tooled leather, keris at the hip, sand and ochre with turquoise accents, carved openwork screens casting filigree shadows — one reading aloud, one hand raised in greeting, one alert to the road.'
+    }
+  },
   special: {
     label: 'SPECIAL card',
     file: 'src/goatContent.js',
