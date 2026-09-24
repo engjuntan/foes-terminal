@@ -1010,3 +1010,33 @@ Answers to `reviews/lore-audit-org-map.md`. These override older vault notes.
   rule, and the art script already gives it its own climate line.
 - **The four earlier Axe Gang variants** (Rifle, Sledge, Volt, Flame Axe)
   are deleted. The Melee and Ranged Axe Gang Axes are the canon pair.
+
+## Crafting, resting and tabs — GM rulings (2026-09-24)
+
+**Components: five, not nine.**
+- `gun_parts` (guns), `clothing_scrap` (clothing and cloth armor),
+  `scrap_metal` (generic), `scrap_electronics` (generic), `chemicals`
+  (medical crafting only).
+- Retired: adhesive, organics, hardened_alloy, prewar_tech. Every recipe,
+  junk `scrap_yield` and repair cost moves onto the five.
+- **Cooking is not a crafting path.** Chemicals exist for a short list of
+  medical consumables — healing poultice, stimpak, kampung anti-venom and
+  the like — not for food or drink.
+
+**Resting follows Fallout 1/2, doubled for rest.**
+- **Healing Rate = floor(EN / 3), minimum 1**, plus perk bonuses (Faster
+  Healing +2 per rank, Cancerous Growth +2).
+- **Every full 6 hours of game time heals HR** — travel included.
+- **A declared rest doubles it** (2 × HR per 6 hours).
+- **A rest at a proper place of rest quadruples it** (4 × HR per 6 hours) —
+  a bed, an inn, a settlement's infirmary; the GM's call, flagged on the
+  rest action.
+- This replaces the manual's 1d10-capped-at-EN-per-hour rule, and is about
+  a tenth as fast, which is deliberate: stimpaks and the Doctor's Bag
+  matter again.
+
+**Tabs.** Workshop stays its own tab. Combat becomes its own tab alongside
+it, for players and GM.
+
+**Recipes are unlockable.** The GM grants recipes like data logs; the
+Workshop only offers what a character has been taught.
