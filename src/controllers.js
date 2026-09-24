@@ -45,38 +45,47 @@ function withoutUndefined(obj) {
 }
 
 // --- GAME ACTIONS ---
-// `copyIndex` (new, durability system) picks which owned copy of `itemId`
-// gets equipped, by position ascending-sorted-by-marks — the inventory
-// view renders one row per copy for a durable item, so each row's EQUIP
-// button passes its own row index. Omitted/out-of-range falls back to
-// the lowest-marks (best-condition) copy, §2.1's stated default.
-export async function equipItem(itemId, targetSlot, copyIndex) {
-  if (!window.currentUser || !window.liveData) return;
+// The actual equip math (race gating, inventory move, durability/condition
+// bookkeeping, ammo reset), factored out of equipItem() so job 4's GM-
+// approved mid-combat swap (gmApproveWeaponSwap) can reuse the exact same
+// logic instead of re-deriving it. Pure aside from reading window.liveData
+// and alert() on a rejected swap — no Firestore write of its own, same
+// "compute the payload, let the caller write it" split as
+// computeAttackResolution(). Returns null (having already alerted) when
+// the swap can't happen; otherwise a dot-path update payload ready to
+// merge into an updateDoc() call.
+// `copyIndex` (durability system) picks which owned copy of `itemId` gets
+// equipped, by position ascending-sorted-by-marks — the inventory view
+// renders one row per copy for a durable item, so each row's EQUIP button
+// passes its own row index. Omitted/out-of-range falls back to the
+// lowest-marks (best-condition) copy, §2.1's stated default.
+export function buildEquipUpdate(charId, itemId, targetSlot, copyIndex) {
+  const char = window.liveData.characters[charId];
+  if (!char) return null;
 
   // Race-based size gating (e.g. Gergasi/Robot can't use human-sized gear).
-  const char = window.liveData.characters[window.currentUser];
   const item = getItem(itemId);
   const raceDef = RACE_RULES[char.race || 'human'] || RACE_RULES.human;
 
   if (item && item.size === 'small') {
     if (item.type === 'weapon' && raceDef.flags?.can_use_small_weapons === false) {
       alert(`${(char.name || 'THIS CHARACTER').toUpperCase()} CANNOT USE SMALL WEAPONS.`);
-      return;
+      return null;
     }
     if (item.type === 'armor' && raceDef.flags?.can_wear_small_armor === false) {
       alert(`${(char.name || 'THIS CHARACTER').toUpperCase()} CANNOT WEAR SMALL ARMOR.`);
-      return;
+      return null;
     }
   }
 
   const previousId = (char.equipment || {})[targetSlot];
-  if (previousId === itemId) return; // already equipped here — nothing to do
+  if (previousId === itemId) return null; // already equipped here — nothing to do
 
   // Weapons/armor/accessories aren't consumed like ammo or Stimpaks, but
   // they do move: equipping takes one copy out of the pack and onto the
   // body, so you can't equip something you don't actually own.
   const owned = getInventoryQuantity(char.inventory, itemId);
-  if (owned < 1) { alert(`YOU DON'T HAVE ${(item && item.name) || itemId.toUpperCase()} IN YOUR INVENTORY`); return; }
+  if (owned < 1) { alert(`${(char.name || charId).toUpperCase()} DOESN'T HAVE ${(item && item.name) || itemId.toUpperCase()} IN INVENTORY`); return null; }
 
   let newInv = removeFromInventory(char.inventory, itemId, 1);
   // Whatever was already in that slot comes back to the pack — swapping
@@ -100,8 +109,7 @@ export async function equipItem(itemId, targetSlot, copyIndex) {
     newCondInv[previousId] = putCopy(newCondInv[previousId], previousMarks);
   }
 
-  const charRef = doc(db, "prisoncampaign", "alpha_team");
-  const charPath = `characters.${window.currentUser}`;
+  const charPath = `characters.${charId}`;
   const updatePayload = {};
   updatePayload[`${charPath}.equipment.${targetSlot}`] = itemId;
   updatePayload[`${charPath}.inventory`] = newInv;
@@ -111,8 +119,123 @@ export async function equipItem(itemId, targetSlot, copyIndex) {
   // with a clip_size always assumes a fresh, full magazine; a weapon with
   // no clip_size (melee, unarmed-type gear) just has no ammo entry at all.
   updatePayload[`${charPath}.ammo.${targetSlot}`] = (item && item.stats && item.stats.clip_size) || null;
+  return updatePayload;
+}
+
+const WEAPON_SLOTS = ['right_hand', 'left_hand'];
+
+export async function equipItem(itemId, targetSlot, copyIndex) {
+  if (!window.currentUser || !window.liveData) return;
+
+  // Job 4 (GM's live-session notes, 2026-09-24): swapping an equipped
+  // WEAPON while combat is active needs a confirm + GM approval instead
+  // of happening instantly. Armor/head/back gear, and any equip outside
+  // combat, is untouched — "stays instant and unapproved as it is today".
+  const combat = window.liveData.active_combat;
+  if (combat && combat.is_active && WEAPON_SLOTS.includes(targetSlot)) {
+    await requestWeaponSwap(itemId, targetSlot, copyIndex);
+    return;
+  }
+
+  const updatePayload = buildEquipUpdate(window.currentUser, itemId, targetSlot, copyIndex);
+  if (!updatePayload) return; // buildEquipUpdate already alerted, or nothing changed
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
   try { await updateDoc(charRef, updatePayload); }
   catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Job 4: the confirm + pending-request half of a mid-combat weapon swap.
+// One request at a time per requester isn't specially deduped — a second
+// click before the GM acts just queues another entry, which is harmless
+// (the GM sees both, and buildEquipUpdate on approval is a no-op if
+// nothing's actually changed by then).
+async function requestWeaponSwap(itemId, targetSlot, copyIndex) {
+  const confirmed = window.confirm('Swapping a weapon will cost a major action. Are you sure you want to swap?');
+  if (!confirmed) return;
+
+  const combat = window.liveData.active_combat;
+  const request = {
+    id: `swap_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
+    char_id: window.currentUser,
+    item_id: itemId,
+    target_slot: targetSlot,
+    copy_index: copyIndex === undefined ? null : copyIndex,
+    requested_at: Date.now()
+  };
+  const pending = [...(combat.pending_weapon_swaps || []), request];
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, { 'active_combat.pending_weapon_swaps': pending }); }
+  catch (err) { alert("ERROR: " + err.message); }
+}
+
+// GM-only: approves a pending weapon-swap request — performs the swap
+// (via the same buildEquipUpdate() logic an instant equip uses), spends
+// the requester's major action for their CURRENT turn if it's actually
+// their turn right now (mirrors resolveAttack()/passTurn() setting
+// turn_acted — a request made off-turn has no turn to spend yet, so it's
+// just applied without touching turn_acted), and announces the result to
+// everyone via combat.last_swap_result (see main.js's
+// maybeAnnounceWeaponSwap, the same "everyone's client reacts to the same
+// write" pattern the turn announcement uses).
+export async function gmApproveWeaponSwap(requestId) {
+  const combat = window.liveData.active_combat;
+  if (!combat || !combat.is_active) return;
+  const request = (combat.pending_weapon_swaps || []).find(r => r.id === requestId);
+  if (!request) return;
+  const remaining = (combat.pending_weapon_swaps || []).filter(r => r.id !== requestId);
+
+  const equipUpdate = buildEquipUpdate(request.char_id, request.item_id, request.target_slot, request.copy_index);
+  const char = window.liveData.characters[request.char_id];
+  const charName = (char && char.name) || request.char_id;
+  const itemName = (getItem(request.item_id) || {}).name || request.item_id;
+
+  const currentActor = combat.initiative_order[combat.turn_index];
+  const spendsTurn = !!(currentActor && currentActor.ref_type === 'pc' && currentActor.char_id === request.char_id && !combat.turn_acted);
+
+  const success = !!equipUpdate;
+  const message = success
+    ? `${charName} swaps to ${itemName} (GM approved).`
+    : `${charName}'s weapon swap to ${itemName} failed on approval — the swap was no longer possible.`;
+
+  const updatedCombat = {
+    ...combat,
+    pending_weapon_swaps: remaining,
+    turn_acted: spendsTurn ? true : combat.turn_acted,
+    log: [...combat.log, { id: `log_${Date.now()}`, type: 'system', message, timestamp: Date.now() }],
+    last_swap_result: { success, char_id: request.char_id, key: `${Date.now()}_${Math.random()}` }
+  };
+
+  const updatePayload = { active_combat: updatedCombat, ...(equipUpdate || {}) };
+  if (success) {
+    updatePayload.event_log = pushEventLog(window.liveData.event_log, { text: `${charName} swaps weapons mid-combat (GM approved).`, actor: 'GM' });
+  }
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// GM-only: denies a pending weapon-swap request — nothing changes except
+// the request disappearing and everyone seeing "Weapon swap failed!".
+export async function gmDenyWeaponSwap(requestId) {
+  const combat = window.liveData.active_combat;
+  if (!combat || !combat.is_active) return;
+  const request = (combat.pending_weapon_swaps || []).find(r => r.id === requestId);
+  if (!request) return;
+  const remaining = (combat.pending_weapon_swaps || []).filter(r => r.id !== requestId);
+  const char = window.liveData.characters[request.char_id];
+  const charName = (char && char.name) || request.char_id;
+
+  const updatedCombat = {
+    ...combat,
+    pending_weapon_swaps: remaining,
+    log: [...combat.log, { id: `log_${Date.now()}`, type: 'system', message: `${charName}'s weapon swap was denied by the GM.`, timestamp: Date.now() }],
+    last_swap_result: { success: false, char_id: request.char_id, key: `${Date.now()}_${Math.random()}` }
+  };
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, { active_combat: updatedCombat }); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 export async function unequipItem(targetSlot) {
@@ -1916,6 +2039,11 @@ export async function startCombat() {
     round: 1,
     turn_index: 0,
     turn_acted: false,
+    // This fight's own identity — job 2's start banner keys off "has
+    // last_turn_key ever been set" (untouched by this call, only by
+    // endTurn()), and job 3's initiative-reveal animation keys off this
+    // value directly (see combat.js's shouldAnimateInitiative).
+    started_at: Date.now(),
     initiative_order,
     log: [{
       id: `log_${Date.now()}`,
@@ -1932,6 +2060,21 @@ export async function startCombat() {
     window.currentTab = 'COMBAT';
     window.render();
   } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Job 3: one write, made once the client-side reveal animation finishes
+// (not per-frame — the animation itself is pure cosmetic JS in main.js).
+// Records THIS fight's `started_at` as seen, same "read marker" shape as
+// read_logs/read_quests. A stale/duplicate call (already marked, or a
+// second tab racing the first) is a harmless no-op rather than a wasted
+// write.
+export async function markInitiativeSeen(combatStartedAt) {
+  if (!window.currentUser || !window.liveData || !combatStartedAt) return;
+  const char = window.liveData.characters[window.currentUser];
+  if (!char || char.seen_initiative_for === combatStartedAt) return;
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, { [`characters.${window.currentUser}.seen_initiative_for`]: combatStartedAt }); }
+  catch (err) { /* cosmetic-only — don't interrupt the player over this */ }
 }
 
 // GM-only, works on any combatant (PC or monster), any time — not gated

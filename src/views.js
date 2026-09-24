@@ -1123,21 +1123,43 @@ export function getCombatView(liveData, userRole, currentUser) {
       <button class="gm-btn" style="width:100%; border-color:#ff5555; color:#ff5555;" onclick="window.gmApplyStatusEffectInCombat()">APPLY</button>
     </div>` : '';
 
+  // Job 4 ("Weapon swapping costs a major action and needs GM approval"):
+  // pending requests, GM-only, with approve/deny — see requestWeaponSwap/
+  // gmApproveWeaponSwap/gmDenyWeaponSwap in controllers.js.
+  const pendingSwaps = (combat.pending_weapon_swaps || []);
+  const pendingSwapHtml = isLive && userRole === 'gm' && pendingSwaps.length > 0 ? `
+    <div class="panel" style="margin-bottom:15px; border-color:gold;">
+      <h4 style="color:gold; margin-top:0;">⚠ WEAPON SWAP REQUESTS</h4>
+      ${pendingSwaps.map(req => {
+        const reqChar = liveData.characters[req.char_id];
+        const reqItem = getItem(req.item_id);
+        return `
+        <div style="border:1px solid #444; padding:6px 8px; margin-bottom:6px;">
+          <div style="font-size:13px; margin-bottom:6px;">${(reqChar && reqChar.name) || req.char_id} wants to equip <strong>${(reqItem && reqItem.name) || req.item_id}</strong> (${req.target_slot === 'left_hand' ? 'L. hand' : 'R. hand'}).</div>
+          <div style="display:flex; gap:6px;">
+            <button class="gm-btn" style="flex-grow:1; border-color:lime; color:lime;" onclick="window.gmApproveWeaponSwap('${req.id}')">APPROVE</button>
+            <button class="gm-btn" style="flex-grow:1; border-color:red; color:red;" onclick="window.gmDenyWeaponSwap('${req.id}')">DENY</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
   return `
     <div class="dashboard-container" style="grid-template-columns: minmax(240px, 320px) minmax(240px, 320px) minmax(220px, 1fr);">
       <div class="panel">
         ${headerHtml}
-        <div style="margin-top:15px;">${initiativeHtml}</div>
+        <div id="initiative-list" style="margin-top:15px;">${initiativeHtml}</div>
         ${canEndTurn ? `<button style="width:100%; margin-top:15px; padding:10px; background:var(--pip-dim); color:black; font-weight:bold; border:none; cursor:pointer;" onclick="window.endTurn()">END TURN</button>` : ''}
         ${isLive && userRole === 'gm' ? `<button style="width:100%; margin-top:8px; padding:10px; background:red; color:white; border:none; cursor:pointer;" onclick="window.endCombat()">END COMBAT</button>` : ''}
         <button style="width:100%; margin-top:8px; padding:8px; background:#333; color:var(--pip-green); border:none; cursor:pointer;" onclick="window.switchTab('DASHBOARD')">BACK TO DASHBOARD</button>
       </div>
       <div>
+        ${pendingSwapHtml}
         ${actionPanelHtml}
         ${afflictPcHtml}
         ${adjustHpHtml}
         ${addCombatantHtml}
-        ${!actionPanelHtml && !afflictPcHtml && !adjustHpHtml && !addCombatantHtml ? `<div class="panel" style="color:#555; font-size:13px;">${isLive ? "Waiting on this combatant's turn." : 'Combat has ended.'}</div>` : ''}
+        ${!pendingSwapHtml && !actionPanelHtml && !afflictPcHtml && !adjustHpHtml && !addCombatantHtml ? `<div class="panel" style="color:#555; font-size:13px;">${isLive ? "Waiting on this combatant's turn." : 'Combat has ended.'}</div>` : ''}
       </div>
       <div class="panel">
         <h2>COMBAT LOG</h2>

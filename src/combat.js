@@ -465,3 +465,16 @@ export function combatantLimbResistance(combatantRef, characters) {
   const char = characters[combatantRef.char_id];
   return deriveCharacter(char).limbResistance;
 }
+
+// --- INITIATIVE REVEAL ANIMATION (job 3, GM's live-session notes,
+// 2026-09-24) — "the first time a player opens the Combat tab in a given
+// fight". `active_combat.started_at` (set once by startCombat) is the
+// fight's identity; a PC's own `seen_initiative_for` records the last
+// fight they've already watched animate, same "read marker" shape as
+// `read_logs`/`read_quests` elsewhere in this app. No combat identity
+// (an old combat predating this field, or none active) means nothing to
+// animate — never re-trigger for data that can't be told apart.
+export function shouldAnimateInitiative(char, combat) {
+  if (!combat || !combat.is_active || !combat.started_at) return false;
+  return (char && char.seen_initiative_for) !== combat.started_at;
+}
