@@ -7,6 +7,7 @@
 //   npm run art -- ingest [--limit N]     upload the vault's Media/New items/<id>.png|jpg to Imgur and link them
 //   npm run art -- generate --limit N     PAID: generate N images with the Gemini API into Media/New items/
 //   npm run art -- queue [--limit N]     export the pending queue (art/queue.json + .md) for another image tool
+//     …add --only items|slots|locations and --group faction|karma|rep|special to narrow any of these
 //   npm run art -- skip <id|prefix*|slots> leave art you already made out of the runs (--undo to restore)
 //   npm run art -- collect <id>          file the newest browser download as Media/New items/<id>.png
 //   npm run art -- link <id> <url>       attach an already-uploaded image to an item or slot
@@ -296,8 +297,12 @@ function pendingTargets() {
   const only = option('only');
   if (only && !['items', 'slots', 'locations'].includes(only)) fail(`--only takes "items", "slots" or "locations".`);
   const skipped = readSkipList();
+  // --group narrows slots to one family (faction, karma, rep, special),
+  // which is how a single set gets handed to another tool on its own.
+  const group = option('group');
   return allTargets()
     .filter(t => !only || t.kind === only.replace(/s$/, ''))
+    .filter(t => !group || t.id.startsWith(`${group}_`))
     .filter(t => !t.hasArt && t.hasPrompt && !inboxFileFor(t.id) && !skipped.includes(t.id));
 }
 
@@ -384,6 +389,28 @@ async function imgurAccessToken() {
   return (await res.json()).access_token;
 }
 
+// Without Imgur keys, images can still go live: --local copies them into
+// public/art/ and writes a relative url, so they ship with the app on the
+// next deploy instead of depending on a third-party host.
+async function ingestLocal(batch) {
+  const dir = path.join(ROOT, 'public', 'art');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.mkdirSync(DONE, { recursive: true });
+  const ledger = readLedger();
+  for (const { file, item } of batch) {
+    const ext = path.extname(file).toLowerCase() === '.jpeg' ? '.jpg' : path.extname(file).toLowerCase();
+    const name = `${item.id}${ext}`;
+    fs.copyFileSync(file, path.join(dir, name));
+    item.setUrl(`art/${name}`);
+    fs.renameSync(file, path.join(DONE, path.basename(file)));
+    ledger.uploaded++;
+    ledger.history.push({ at: new Date().toISOString(), action: 'local', id: item.id, url: `art/${name}` });
+    writeLedger(ledger);
+    console.log(`  ✓ ${item.name} → public/art/${name}`);
+  }
+  console.log('\nDone. These ship with the app — commit public/art and deploy. Item icons also need `node sync-obsidian.js --once`.');
+}
+
 async function ingest() {
   const limit = requireLimit();
   const targets = Object.fromEntries(allTargets().map(t => [t.id, t]));
@@ -397,8 +424,9 @@ async function ingest() {
   }
   const batch = queue.slice(0, limit);
   console.log(`Inbox: ${queue.length} ready, uploading ${batch.length}.`);
-  if (DRY) { batch.forEach(b => console.log(`  [dry run] ${path.basename(b.file)} → ${b.item.name}`)); return; }
+  if (DRY) { batch.forEach(b => console.log(`  [dry run] ${path.basename(b.file)} → ${b.item.name}${flag('local') ? ' (local)' : ''}`)); return; }
   if (!batch.length) return;
+  if (flag('local')) return ingestLocal(batch);
 
   const token = await imgurAccessToken();
   const ledger = readLedger();
