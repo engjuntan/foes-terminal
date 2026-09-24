@@ -101,22 +101,31 @@ export function decayNeeds(needs, hours) {
   return result;
 }
 
-// Natural healing — manual p.136/446: "Roll a 1d10, and regain hp per hour
-// up to the maximum of your EN." Rolled once per FULL hour elapsed
-// (fractional leftover minutes don't generate a partial heal). A rest of
-// 6+ hours multiplies the TOTAL by 1.5x per the manual's long-rest bonus;
-// ordinary time advance (GM travel, not flagged as a rest) always heals at
-// the base 1x rate — ties healing to every clock advance per the GM's
-// call, while the long-rest bonus itself stays scoped to an actual rest.
-export function rollRestHealing(healingCap, hours, isLongRest) {
-  const fullHours = Math.floor(hours);
-  if (fullHours <= 0 || healingCap <= 0) return 0;
-  let total = 0;
-  for (let h = 0; h < fullHours; h++) {
-    total += Math.min(rollDamage("1d10"), healingCap);
-  }
-  if (isLongRest) total = Math.round(total * 1.5);
-  return total;
+// Natural healing — Fallout 1/2's Healing Rate system (GM ruling,
+// "Crafting, resting and tabs", 2026-09-24), replacing the manual's
+// 1d10-capped-at-EN-per-hour rule (about a tenth as fast, deliberately —
+// stimpaks and the Doctor's Bag matter again).
+//
+// Healing Rate (HR) = max(1, floor(EN / 3)), plus any healing_rate_bonus
+// perks (Faster Healing, Cancerous Growth — see formulas.js, which folds
+// those in before calling this). Exported separately from
+// calculateDerivedStats so the rate formula itself is unit-testable
+// without building a whole character.
+export function healingRateFromEndurance(endurance, bonus = 0) {
+  return Math.max(1, Math.floor((endurance || 0) / 3)) + (bonus || 0);
+}
+
+// Every FULL 6 hours of elapsed game time heals one HR — a partial block
+// (e.g. 5h, or the 2h left over after two full blocks) heals nothing.
+// `multiplier` is 1 for ordinary time passing (GM travel etc, not a
+// declared rest), 2 for a declared rest, and 4 for a rest at a proper
+// place of rest (a bed, an inn, a settlement's infirmary) — the GM's
+// call, flagged on the rest action itself. No dice involved — Fallout
+// 1/2's Healing Rate is a flat amount, not a roll.
+export function rollRestHealing(healingRate, hours, multiplier = 1) {
+  const blocks = Math.floor((hours || 0) / 6);
+  if (blocks <= 0 || healingRate <= 0) return 0;
+  return blocks * healingRate * multiplier;
 }
 
 // Single source of truth for turning a raw minute count into a display.

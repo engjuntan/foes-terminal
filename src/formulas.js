@@ -2,7 +2,7 @@
 import { getTrait } from './traits.js';
 import { getItem } from './items.js';
 import { normalizeInventory } from './inventory.js';
-import { getNeedTier } from './needs.js';
+import { getNeedTier, healingRateFromEndurance } from './needs.js';
 import { normalizeCondition, applyConditionToStat } from './condition.js';
 
 // How far over carryCapacity a character is allowed to go before
@@ -323,11 +323,11 @@ export function calculateDerivedStats(baseSpecial, level = 1, activeTraits = [],
     perksAllowed,
     skills,
     breakdown,
-    // Manual p.446: "Roll a 1d10, and regain hp per hour up to the maximum
-    // of your EN" — EN after all modifiers (including the needs tiers just
-    // folded in above), plus any healing_rate_bonus perks (Faster Healing,
-    // Rad Child, Cancerous Growth). Consumed by needs.js's rollRestHealing.
-    healingRateCap: Math.max(0, end + healingRateBonus),
+    // Fallout 1/2 Healing Rate (GM ruling 2026-09-24): max(1, floor(EN/3))
+    // — EN after all modifiers (including the needs tiers just folded in
+    // above) — plus any healing_rate_bonus perks (Faster Healing, Rad
+    // Child, Cancerous Growth). Consumed by needs.js's rollRestHealing.
+    healingRate: healingRateFromEndurance(end, healingRateBonus),
     needTiers: { hunger: hungerTier, thirst: thirstTier, sleep: sleepTier },
     raceDef // Export rules so View can check flags (like 'can_wear_small_armor')
   };

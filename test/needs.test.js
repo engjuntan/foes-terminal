@@ -2,7 +2,7 @@
 // the GM's TIME CONTROL panel and every Rest run through. Pure functions,
 // so they're checked here by hand-built values rather than by clicking.
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { NEED_RATES, normalizeNeeds, getNeedTier, decayNeeds, rollRestHealing, formatGameTime } from '../src/needs.js';
+import { NEED_RATES, normalizeNeeds, getNeedTier, decayNeeds, rollRestHealing, healingRateFromEndurance, formatGameTime } from '../src/needs.js';
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -87,23 +87,58 @@ describe('getNeedTier', () => {
   });
 });
 
-describe('rollRestHealing', () => {
-  it('heals once per full hour, capped at Endurance', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.99); // 1d10 -> 10
-    expect(rollRestHealing(4, 3, false)).toBe(12); // 3 hours x capped 4
+describe('healingRateFromEndurance (Fallout 1/2 Healing Rate)', () => {
+  it('floors EN/3, with a minimum of 1', () => {
+    expect(healingRateFromEndurance(1)).toBe(1); // floor(1/3)=0 -> min 1
+    expect(healingRateFromEndurance(2)).toBe(1); // floor(2/3)=0 -> min 1
+    expect(healingRateFromEndurance(0)).toBe(1); // floor(0/3)=0 -> min 1
   });
 
-  it('ignores part-hours', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.99);
-    expect(rollRestHealing(5, 0.9, false)).toBe(0);
+  it('floors EN/3 once it clears the minimum', () => {
+    expect(healingRateFromEndurance(3)).toBe(1);
+    expect(healingRateFromEndurance(5)).toBe(1);
+    expect(healingRateFromEndurance(6)).toBe(2);
+    expect(healingRateFromEndurance(9)).toBe(3);
+    expect(healingRateFromEndurance(10)).toBe(3);
   });
 
-  it('adds the manual’s 1.5x bonus on a long rest', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.99);
-    expect(rollRestHealing(4, 6, true)).toBe(Math.round(4 * 6 * 1.5));
+  it('adds perk bonuses (Faster Healing, Cancerous Growth) on top of the floor', () => {
+    expect(healingRateFromEndurance(1, 2)).toBe(3); // min-1 case + Faster Healing rank 1
+    expect(healingRateFromEndurance(9, 4)).toBe(7); // 3 + Faster Healing(+2) + Cancerous Growth(+2) stacked
   });
 
-  it('heals nothing for a character with no healing cap', () => {
-    expect(rollRestHealing(0, 8, true)).toBe(0);
+  it('treats a missing/undefined endurance as 0, not NaN', () => {
+    expect(healingRateFromEndurance(undefined)).toBe(1);
+  });
+});
+
+describe('rollRestHealing (Fallout 1/2: HR per full 6 hours)', () => {
+  it('heals nothing for anything under a full 6-hour block', () => {
+    expect(rollRestHealing(3, 5, 1)).toBe(0);
+  });
+
+  it('heals exactly one HR at the 6-hour mark', () => {
+    expect(rollRestHealing(3, 6, 1)).toBe(3);
+  });
+
+  it('only counts FULL 6-hour blocks — partial hours past a block heal nothing extra', () => {
+    expect(rollRestHealing(3, 11, 1)).toBe(3); // 1 full block, 5h leftover
+    expect(rollRestHealing(3, 12, 1)).toBe(6); // 2 full blocks
+  });
+
+  it('a declared rest doubles the total', () => {
+    expect(rollRestHealing(3, 6, 2)).toBe(6);
+  });
+
+  it('a rest at a proper place of rest quadruples the total', () => {
+    expect(rollRestHealing(3, 6, 4)).toBe(12);
+  });
+
+  it('multiplier defaults to 1x when not passed (ordinary time advance)', () => {
+    expect(rollRestHealing(3, 12)).toBe(6);
+  });
+
+  it('heals nothing for a character with no healing rate', () => {
+    expect(rollRestHealing(0, 24, 4)).toBe(0);
   });
 });
