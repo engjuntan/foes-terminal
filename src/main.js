@@ -148,6 +148,13 @@ window.rollForTreatLimb = Controllers.rollForTreatLimb;
 window.cancelTreatLimbDraft = Controllers.cancelTreatLimbDraft;
 window.resolveTreatLimbDraft = Controllers.resolveTreatLimbDraft;
 
+// --- CHEMS: addiction cure via Medicine check (Job 1, chem durations) ---
+window.openCureAddictionDraft = Controllers.openCureAddictionDraft;
+window.setCureAddictionRoll = Controllers.setCureAddictionRoll;
+window.rollForCureAddiction = Controllers.rollForCureAddiction;
+window.cancelCureAddictionDraft = Controllers.cancelCureAddictionDraft;
+window.resolveCureAddictionDraft = Controllers.resolveCureAddictionDraft;
+
 window.openGMModal = (charId) => {
   window.selectedCharId = charId; // Store who we are editing globally
   window.gmModalOpen = true;

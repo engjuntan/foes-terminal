@@ -24,6 +24,7 @@ import { questDatabase } from './quests.js';
 import { glossaryDatabase } from './glossary.js';
 import { mapDatabase } from './maps.js';
 import { normalizeNeeds, getNeedTier, formatGameTime, NEED_RATES } from './needs.js';
+import { CHEM_ADDICTION_MEDICINE_TIER } from './chems.js';
 import { visibleEventLog } from './eventLog.js';
 import {
   REPUTATION_TIERS, REPUTATION_MIN, REPUTATION_MAX, KARMA_TIERS, KARMA_MIN, KARMA_MAX,
@@ -155,15 +156,31 @@ function formatModifierList(modifiers) {
 // Radiation deliberately never carries the exact rads number here — the
 // player-facing views never show it (see renderRadiationGauge); only the
 // GM's own screens do.
-function buildConditionRows(charData) {
+// `worldMinutes` is the current world.minutes (optional — callers that
+// don't have liveData handy, if any ever exist, just fall back to the
+// old "until cured" wording for hour-based effects too). Chem buffs and
+// withdrawal both carry `expires_at_minutes` (chems.js) — a hard clock
+// value rather than a countdown — so remaining time is derived here at
+// render time, same as it's derived for the LIMBS gauges. A persistent
+// addiction (`is_addiction`, no expiry at all) reads as "until cured",
+// same wording as a cripple, since both only clear via deliberate
+// treatment, not the clock.
+function buildConditionRows(charData, worldMinutes) {
   const rows = [];
 
   (charData.status_effects || []).forEach(fx => {
     const hasEffect = Object.keys(fx.modifiers || {}).length > 0;
+    let detail = 'until cured';
+    if (fx.duration_turns) {
+      detail = `${fx.duration_turns} turn(s) left`;
+    } else if (fx.expires_at_minutes !== undefined && typeof worldMinutes === 'number') {
+      const minutesLeft = Math.max(0, fx.expires_at_minutes - worldMinutes);
+      detail = minutesLeft >= 60 ? `${(minutesLeft / 60).toFixed(1)}h left` : `${minutesLeft}m left`;
+    }
     rows.push({
       active: hasEffect,
       label: fx.name,
-      detail: fx.duration_turns ? `${fx.duration_turns} turn(s) left` : 'until cured',
+      detail,
       mods: hasEffect ? formatModifierList(fx.modifiers) : 'no numeric effect'
     });
   });
@@ -289,6 +306,44 @@ function renderTreatLimbForm(charData, charId) {
     </div>`;
 }
 
+// ADDICTIONS (Job 1, chem durations): every persistent `is_addiction`
+// status effect gets a [ TREAT ] link into a Medicine-check-only form
+// (Addictol goes through the ordinary USE ITEM button in inventory; the
+// third cure route — staying clean CHEM_ADDICTION_CLEAN_DAYS days — has
+// no UI at all, it just happens on the next time advance). Same
+// self-treatment-only scope note as renderTreatLimbForm above.
+const ADDICTION_MEDICINE_TIER_LABEL = (DIFFICULTY_TIERS[CHEM_ADDICTION_MEDICINE_TIER] || {}).label || CHEM_ADDICTION_MEDICINE_TIER;
+function renderAddictionRows(charData, charId) {
+  const addictions = (charData.status_effects || []).filter(fx => fx.is_addiction);
+  if (addictions.length === 0) return '';
+  return `
+    <h2 style="color:var(--pip-dim); margin-top:20px;">ADDICTIONS</h2>
+    ${addictions.map(fx => `
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; padding:4px 0; border-bottom:1px dashed #222;">
+        <span style="color:var(--danger, #ff5555);">● ${escapeHtml(fx.name)}</span>
+        <span onclick="window.openCureAddictionDraft('${charId}', '${fx.id}')" style="cursor:pointer; font-size:11px; text-decoration:underline; color:var(--pip-dim);">[ TREAT ]</span>
+      </div>`).join('')}
+    ${renderCureAddictionForm(charId)}`;
+}
+function renderCureAddictionForm(charId) {
+  const draft = window.cureAddictionDraft;
+  if (!draft || draft.targetCharId !== charId) return '';
+  return `
+    <div style="border:1px solid var(--pip-dim); padding:8px; margin:6px 0 14px; background:rgba(0,20,0,0.3);">
+      <div style="font-size:12px; margin-bottom:6px;">Medicine check (${escapeHtml(ADDICTION_MEDICINE_TIER_LABEL)}) to break this addiction</div>
+      <div style="display:flex; gap:6px; margin-bottom:6px;">
+        <input type="number" min="1" max="100" value="${draft.roll}" placeholder="ROLL 1-100"
+               oninput="window.setCureAddictionRoll(this.value)"
+               style="flex-grow:1; background:black; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:'VT323';">
+        <button class="gm-btn" onclick="window.rollForCureAddiction()">ROLL</button>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button class="gm-btn" style="border-color:var(--pip-green); color:var(--pip-green);" onclick="window.resolveCureAddictionDraft()">CONFIRM</button>
+        <button class="gm-btn" onclick="window.cancelCureAddictionDraft()">CANCEL</button>
+      </div>
+    </div>`;
+}
+
 // Full STATUS tab (STATUS_AND_CRIPPLE_SPEC.md Part C): CONDITION (same
 // rows as the dashboard's compact block), LIMBS (per-limb hit counters
 // and cripples, C.2/Part B), ATTRIBUTES (full provenance — every
@@ -300,7 +355,7 @@ export function getStatusView(charId, liveData) {
   const derived = deriveCharacter(charData);
   const breakdown = derived.breakdown || { baseSpecial: {}, skillsBase: {}, special: {}, skills: {}, other: [] };
 
-  const conditionRows = buildConditionRows(charData);
+  const conditionRows = buildConditionRows(charData, liveData.world && liveData.world.minutes);
   const limbRows = buildLimbRows(charData, derived);
 
   // ATTRIBUTES — SPECIAL stats first (only ones with at least one
@@ -365,6 +420,7 @@ export function getStatusView(charId, liveData) {
       <div class="panel">
         <h2 style="color:var(--pip-dim);">CONDITION</h2>
         ${renderConditionRows(conditionRows)}
+        ${renderAddictionRows(charData, charId)}
         <h2 style="color:var(--pip-dim); margin-top:20px;">LIMBS</h2>
         ${renderLimbRows(limbRows, charId)}
         ${renderTreatLimbForm(charData, charId)}
@@ -1988,7 +2044,7 @@ export function getPlayerView(charId, liveData) {
           CONDITION
           <span onclick="window.switchTab('STATUS')" style="cursor:pointer; font-size:11px; font-weight:normal; text-decoration:underline; color:var(--pip-dim);">[ FULL STATUS ]</span>
         </h3>
-        <div style="margin-bottom:10px;">${renderConditionRows(buildConditionRows(charData))}</div>
+        <div style="margin-bottom:10px;">${renderConditionRows(buildConditionRows(charData, liveData.world && liveData.world.minutes))}</div>
 
         <h3 style="color:var(--pip-dim); border-bottom:1px solid var(--pip-dim); margin-top:20px;">S.P.E.C.I.A.L.</h3>
         ${SPECIAL_ORDER.map(k => `<div class="special-row"><span>${renderWikiLink(k.toUpperCase(), SPECIAL_INFO[k])}</span><span>${charData.special[k] ?? '-'}</span></div>`).join("")}

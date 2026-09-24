@@ -12,6 +12,11 @@ import { mapDatabase } from './maps.js';
 import { normalizeInventory, getInventoryQuantity, addToInventory, removeFromInventory } from './inventory.js';
 import { DIFFICULTY_TIERS, rollD10, rollD20, resolveSpecialCheck, resolveSkillCheck } from './checks.js';
 import { normalizeNeeds, decayNeeds, rollRestHealing, formatGameTime } from './needs.js';
+import {
+  buildChemBuffInstance, buildWithdrawalInstance, splitExpiredByHour,
+  rollAddictionChance, addictionStatusId, buildAddictionInstance,
+  splitCuredAddictionsByTime, CHEM_ADDICTION_MEDICINE_TIER
+} from './chems.js';
 import { getRecipe } from './recipes.js';
 import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
 import { planListGrant, describeNoOpGrant } from './grants.js';
@@ -1118,6 +1123,83 @@ export async function resolveTreatLimbDraft() {
   window.render();
 }
 
+// --- CHEMS: addiction cure via Medicine check (Job 1, chem durations) ---
+// Third cure route alongside Addictol (useItem's cures_addiction branch)
+// and staying clean (advanceTime's splitCuredAddictionsByTime pass) —
+// "a Medicine check by another character", DIFFICULTY_TIERS
+// (CHEM_ADDICTION_MEDICINE_TIER, harder than the limb-treatment check).
+// Same Firestore-free/pure shape as computeLimbTreatment, for the same
+// reason: testable without mocking Firestore, and the async wrapper
+// below can't drift from what this actually computes. Anyone can attempt
+// it on anyone — a medic treating a teammate's habit is the point, same
+// as limb treatment.
+export function computeCureAddiction({ healer, healerCharId, target, targetCharId, addictionInstanceId, roll }) {
+  const effects = target.status_effects || [];
+  const addictionFx = effects.find(fx => fx.id === addictionInstanceId && fx.is_addiction);
+  if (!addictionFx) return { error: "NO SUCH ADDICTION TO TREAT" };
+
+  const medicineSkill = deriveCharacter(healer).skills.medicine;
+  const result = resolveSkillCheck(medicineSkill, CHEM_ADDICTION_MEDICINE_TIER, roll);
+  if (!result.success) {
+    return { charUpdates: {}, message: `${healer.name} fails to treat ${target.name}'s ${addictionFx.name} (Medicine ${roll} vs ${result.threshold}).` };
+  }
+
+  const charUpdates = {};
+  charUpdates[`characters.${targetCharId}.status_effects`] = effects.filter(fx => fx.id !== addictionInstanceId);
+  const message = `${healer.name} treats ${target.name}'s ${addictionFx.name} (Medicine ${roll} vs ${result.threshold}) — cured.`;
+  return { charUpdates, message };
+}
+
+export async function cureAddictionWithMedicine(healerCharId, targetCharId, addictionInstanceId, roll) {
+  if (!window.liveData) return;
+  const healer = window.liveData.characters[healerCharId];
+  const target = window.liveData.characters[targetCharId];
+  if (!healer || !target) return;
+  const r = Number(roll);
+  if (isNaN(r) || r < 1 || r > 100) { alert("ROLL MUST BE 1-100"); return; }
+  const result = computeCureAddiction({ healer, healerCharId, target, targetCharId, addictionInstanceId, roll: r });
+  if (result.error) { alert(result.error); return; }
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  try { await updateDoc(charRef, result.charUpdates); alert(result.message); }
+  catch (err) { alert("ERROR: " + err.message); }
+}
+
+// Player-facing draft for the STATUS tab's addiction [ TREAT ] link —
+// same commit-on-click shape as getTreatLimbDraft, and same "kept to
+// self-treatment only for now" scope note (healer === target === the
+// viewer; the controller underneath already takes independent
+// healer/target ids for a teammate treating someone else, this just has
+// no target-picker UI yet).
+function getCureAddictionDraft() {
+  if (!window.cureAddictionDraft) window.cureAddictionDraft = { targetCharId: '', instanceId: '', roll: '' };
+  return window.cureAddictionDraft;
+}
+export function openCureAddictionDraft(targetCharId, instanceId) {
+  window.cureAddictionDraft = { targetCharId, instanceId, roll: '' };
+  window.render();
+}
+export function setCureAddictionRoll(value) {
+  getCureAddictionDraft().roll = value;
+}
+export function rollForCureAddiction() {
+  const draft = getCureAddictionDraft();
+  draft.roll = rollPercentile();
+  window.render();
+}
+export function cancelCureAddictionDraft() {
+  window.cureAddictionDraft = null;
+  window.render();
+}
+export async function resolveCureAddictionDraft() {
+  if (!window.currentUser) return;
+  const draft = getCureAddictionDraft();
+  if (!draft.targetCharId || !draft.instanceId) { alert("PICK AN ADDICTION TO TREAT"); return; }
+  if (draft.roll === '' || draft.roll === null || draft.roll === undefined) { alert("ENTER OR ROLL A DICE VALUE"); return; }
+  await cureAddictionWithMedicine(window.currentUser, draft.targetCharId, draft.instanceId, draft.roll);
+  window.cureAddictionDraft = null;
+  window.render();
+}
+
 // The single core time-advance transaction — every clock movement in the
 // app (GM travel buttons, GM's marked-as-rest presets, and a player's own
 // Rest action) routes through this one function so there is only one place
@@ -1180,6 +1262,33 @@ export async function advanceTime(minutes, opts = {}) {
     updatePayload[`characters.${charId}.needs`] = afterDecay;
     if (newHp !== currentHp) updatePayload[`characters.${charId}.hp.current`] = newHp;
     if (currentHp > 0 && newHp === 0) deathNames.push(char.name || charId);
+
+    // Chem system (Fallout 1/2 model, GM-approved — promotes the "chem
+    // durations" parking-lot item): hour-based expiry for BUFF status
+    // effects (`expires_at_minutes`, a separate axis from combat's own
+    // duration_turns — see chems.js's header), the withdrawal hand-off
+    // when one expires, and the third addiction-cure route (staying
+    // clean long enough). `afterMinutes` is the clock AFTER this advance
+    // lands — every expiry/cure check below is measured against it.
+    const afterMinutes = currentMinutes + mins;
+    const startingEffects = char.status_effects || [];
+    const { remaining: afterHourExpiry, expired } = splitExpiredByHour(startingEffects, afterMinutes);
+    const withdrawalAdds = [];
+    expired.forEach(fx => {
+      if (fx.withdrawal_id) {
+        const def = statusEffectDatabase[fx.withdrawal_id];
+        const withdrawalFx = buildWithdrawalInstance(fx, def);
+        withdrawalAdds.push(withdrawalFx);
+        reportLines.push(`  ${char.name}   ${fx.name} wears off — withdrawal begins (${withdrawalFx.name}).`);
+      } else {
+        reportLines.push(`  ${char.name}   ${fx.name} wears off.`);
+      }
+    });
+    const { remaining: afterAddictionCure, cured } = splitCuredAddictionsByTime(afterHourExpiry, afterMinutes);
+    cured.forEach(fx => reportLines.push(`  ${char.name}   ${fx.name} clears — stayed clean long enough.`));
+    if (expired.length || cured.length) {
+      updatePayload[`characters.${charId}.status_effects`] = [...afterAddictionCure, ...withdrawalAdds];
+    }
 
     const parts = [
       `thirst ${Math.round(before.thirst)}→${Math.round(afterDecay.thirst)}`,
@@ -1370,6 +1479,49 @@ export async function useItem(targetCharId, itemId) {
       msgParts.push(`${key} ${delta > 0 ? '+' : ''}${delta} (${needs[key]}/100)`);
     });
     updatePayload[`characters.${targetCharId}.needs`] = needs;
+  }
+
+  // Chem buff (duration_hours) and addiction roll (addiction_chance) —
+  // Fallout 1/2 model, chems.js. `currentMinutes` is the world clock at
+  // the moment of use; the buff's expiry is stored as an absolute clock
+  // value (see chems.js) so it's correct no matter how advanceTime() is
+  // later chunked up. Withdrawal itself only ever happens later, inside
+  // advanceTime(), when the buff's expiry is actually crossed.
+  const currentMinutes = (window.liveData.world && window.liveData.world.minutes) || 480;
+  if (Number(item.duration_hours) > 0) {
+    const effectsSoFar = updatePayload[`characters.${targetCharId}.status_effects`] || char.status_effects || [];
+    const buffFx = buildChemBuffInstance(item, currentMinutes);
+    updatePayload[`characters.${targetCharId}.status_effects`] = [...effectsSoFar, buffFx];
+    msgParts.push(`${item.name}'s effects take hold for ${item.duration_hours}h`);
+  }
+
+  if (item.addictive && Number(item.addiction_chance) > 0) {
+    const effectsSoFar = updatePayload[`characters.${targetCharId}.status_effects`] || char.status_effects || [];
+    const existingAddiction = effectsSoFar.find(fx => fx.source_id === addictionStatusId(itemId));
+    if (existingAddiction) {
+      // Already addicted — using it again resets the "stayed clean"
+      // clock (splitCuredAddictionsByTime in advanceTime()) rather than
+      // rolling a second time for the same addiction.
+      updatePayload[`characters.${targetCharId}.status_effects`] = effectsSoFar.map(fx =>
+        fx.id === existingAddiction.id ? { ...fx, applied_at_minutes: currentMinutes } : fx);
+    } else if (rollAddictionChance(item.addiction_chance)) {
+      const addictionDef = statusEffectDatabase[addictionStatusId(itemId)];
+      const addictionFx = buildAddictionInstance(item, addictionDef, currentMinutes);
+      updatePayload[`characters.${targetCharId}.status_effects`] = [...effectsSoFar, addictionFx];
+      msgParts.push(`develops an addiction to ${item.name}`);
+    }
+  }
+
+  // Addictol and anything else authored with cures_addiction: clears
+  // every `is_addiction` status effect outright (all addictions, not
+  // just one — matches Addictol's own "cures addiction" text, no
+  // per-substance targeting in the manual either).
+  if (item.stats && item.stats.cures_addiction) {
+    const effectsSoFar = updatePayload[`characters.${targetCharId}.status_effects`] || char.status_effects || [];
+    const stillAddicted = effectsSoFar.filter(fx => !fx.is_addiction);
+    const curedCount = effectsSoFar.length - stillAddicted.length;
+    updatePayload[`characters.${targetCharId}.status_effects`] = stillAddicted;
+    msgParts.push(curedCount > 0 ? `cured of ${curedCount} addiction${curedCount > 1 ? 's' : ''}` : `no addiction to cure`);
   }
 
   const usedMsg = msgParts.length ? `Used ${item.name} — ${msgParts.join(', ')}.` : `Used ${item.name}.`;
