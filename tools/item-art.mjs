@@ -6,6 +6,7 @@
 //   npm run art -- sheet [--limit N]      write art/prompt-sheet.md for manual generation (free)
 //   npm run art -- ingest [--limit N]     upload the vault's Media/New items/<id>.png|jpg to Imgur and link them
 //   npm run art -- generate --limit N     PAID: generate N images with the Gemini API into Media/New items/
+//   npm run art -- queue [--limit N]     export the pending queue (art/queue.json + .md) for another image tool
 //   npm run art -- skip <id|prefix*|slots> leave art you already made out of the runs (--undo to restore)
 //   npm run art -- collect <id>          file the newest browser download as Media/New items/<id>.png
 //   npm run art -- link <id> <url>       attach an already-uploaded image to an item or slot
@@ -306,6 +307,53 @@ function readSkipList() {
   try { return JSON.parse(fs.readFileSync(SKIPLIST, 'utf8')); } catch { return []; }
 }
 
+// Hands the pending queue to another image tool (ChatGPT, Midjourney, a
+// person) in the shape they asked for: one row per asset with a stable id,
+// the full prompt, the aspect ratio, any reference image, and what the
+// image is for. Writes both a JSON file (for a tool to read) and a
+// markdown table (for a human to skim). Whatever comes back is filed by
+// saving it as <id>.png in the vault's Media/New items — the same path
+// everything else uses.
+function queue() {
+  const limit = option('limit') ? requireLimit() : Infinity;
+  const pending = pendingTargets().slice(0, limit);
+  const useFor = t => t.kind === 'item' ? 'Item icon, shown in inventory and equipped slots'
+    : t.kind === 'location' ? 'Location art, shown on the location note'
+    : 'Card art, shown on the reputation/SPECIAL card';
+  const rows = pending.map(t => ({
+    asset_id: t.id,
+    file_name: `${t.id}.png`,
+    prompt: t.prompt,
+    aspect_ratio: '1:1',
+    size: '1080x1080',
+    reference_image: referenceFor(t) || '',
+    intended_use: useFor(t)
+  }));
+  if (!DRY) {
+    fs.mkdirSync(ART, { recursive: true });
+    fs.writeFileSync(path.join(ART, 'queue.json'), JSON.stringify(rows, null, 2));
+    const md = ['# Art queue', '', `${rows.length} assets. Save each result as its **file name** into the vault's \`Media/New items/\` folder.`, '',
+      '| Asset ID | File name | Aspect | Reference | Intended use |', '|---|---|---|---|---|',
+      ...rows.map(r => `| \`${r.asset_id}\` | \`${r.file_name}\` | ${r.aspect_ratio} | ${r.reference_image || '—'} | ${r.intended_use} |`),
+      '', '## Prompts', '',
+      ...rows.flatMap(r => [`### ${r.asset_id}`, '', '```', r.prompt, '```', ''])].join('\n');
+    fs.writeFileSync(path.join(ART, 'queue.md'), md);
+  }
+  console.log(`${DRY ? '[dry run] would write' : 'Wrote'} art/queue.json and art/queue.md with ${rows.length} assets.`);
+}
+
+// An already-approved image to hold a subject consistent: the faction card
+// for a faction's people, the entrance shot for that location's interior.
+// Only returns one that actually exists yet.
+function referenceFor(target) {
+  const done = allTargets().filter(t => t.hasArt);
+  if (target.kind === 'location') {
+    const entrance = done.find(t => t.id === target.id.replace(/_interior$/, '_entrance'));
+    if (entrance && target.id.endsWith('_interior')) return entrance.id;
+  }
+  return '';
+}
+
 function skip() {
   const ids = args.slice(1).filter(a => !a.startsWith('--'));
   const undo = flag('undo');
@@ -491,7 +539,7 @@ function setPrompts() {
   console.log(`${DRY ? '[dry run] would write' : 'Wrote'} ${written} prompts; skipped ${skipped}.`);
 }
 
-const commands = { status, sheet, ingest, generate, link, collect, skip, 'set-prompts': setPrompts };
+const commands = { status, sheet, ingest, generate, link, collect, skip, queue, 'set-prompts': setPrompts };
 if (!commands[command]) { console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(0, 9).join('\n')); process.exit(command ? 1 : 0); }
 fs.mkdirSync(INBOX, { recursive: true });
 await commands[command]();

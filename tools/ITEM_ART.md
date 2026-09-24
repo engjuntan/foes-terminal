@@ -89,6 +89,19 @@ After ingesting, pull the icons into the app:
 node sync-obsidian.js --once
 ```
 
+## Handing the queue to another image tool
+
+```bash
+npm run art -- queue --limit 25
+```
+
+Writes `art/queue.json` and `art/queue.md`: one row per asset with its
+**asset id**, the **file name** to save the result as, the full **prompt**,
+**aspect ratio** (always 1:1, 1080x1080), a **reference image** id where one
+exists (an interior shot references its own entrance shot), and what the
+image is **for**. Whoever generates them saves each result as `<asset id>.png`
+into the vault's `Media/New items/` folder; `ingest` takes it from there.
+
 ## Safety rails
 
 - Every spending command needs an explicit `--limit`, and no run can go past

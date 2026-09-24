@@ -156,6 +156,18 @@ export const itemDatabase = {
     "weight": 0.015,
     "value": 2
   },
+  microfusion_cell: {
+    "id": "microfusion_cell",
+    "name": "Microfusion Cell",
+    "type": "ammo",
+    "icon": "",
+    "image_prompt": "A squat cylindrical microfusion cell, its metal casing scorched at one end, a small viewport showing a faint green glow, a worn hazard sticker peeling from the side, on a moss-slick storm drain ledge beside a roadside verge.",
+    "description": "Microfusion cell — ammunition for plasma-class energy weapons (Plasma Pistol/Rifle, Plasma Caster).",
+    "ammo_type": "microfusion_cell",
+    "stackable": true,
+    "weight": 0.08,
+    "value": "TBA"
+  },
   mini_nuke: {
     "id": "mini_nuke",
     "name": "Mini Nuke",
@@ -190,18 +202,6 @@ export const itemDatabase = {
     "ammo_type": "nails",
     "stackable": true,
     "weight": 0.005,
-    "value": "TBA"
-  },
-  plasma_cartridge: {
-    "id": "plasma_cartridge",
-    "name": "Plasma Cartridge",
-    "type": "ammo",
-    "icon": "",
-    "image_prompt": "A squat cylindrical plasma cartridge, its metal casing scorched at one end, a small viewport showing a faint green glow, a worn hazard sticker peeling from the side, on a moss-slick storm drain ledge beside a roadside verge.",
-    "description": "Ammunition for plasma-class energy weapons (Plasma Pistol/Rifle, Plasma Caster).",
-    "ammo_type": "plasma_cartridge",
-    "stackable": true,
-    "weight": 0.08,
     "value": "TBA"
   },
   ammo_shotgun_shells: {
@@ -3484,7 +3484,7 @@ export const itemDatabase = {
       "dmg": "TBA",
       "dmgType": "plasma",
       "range": "TBA",
-      "ammo_type": "plasma_cartridge"
+      "ammo_type": "microfusion_cell"
     },
     "weight": 9,
     "value": "TBA"
@@ -3504,7 +3504,7 @@ export const itemDatabase = {
       "dmg": "TBA",
       "dmgType": "plasma",
       "range": "TBA",
-      "ammo_type": "plasma_cartridge"
+      "ammo_type": "microfusion_cell"
     },
     "weight": 1.4,
     "value": "TBA"
@@ -3524,7 +3524,7 @@ export const itemDatabase = {
       "dmg": "TBA",
       "dmgType": "plasma",
       "range": "TBA",
-      "ammo_type": "plasma_cartridge"
+      "ammo_type": "microfusion_cell"
     },
     "weight": 4.8,
     "value": "TBA"
