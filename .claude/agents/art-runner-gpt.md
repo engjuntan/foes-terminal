@@ -1,7 +1,7 @@
 ---
 name: art-runner-gpt
 description: Generates FOES art by driving the GM's own ChatGPT tab in Chrome — one prompt at a time in a chat they nominate — and files each image into the vault's Media/New items folder. Use when the GM wants ChatGPT (rather than Gemini) to make the images.
-model: haiku
+model: sonnet
 tools: Bash, Read, mcp__claude-in-chrome__tabs_context_mcp, mcp__claude-in-chrome__tabs_create_mcp, mcp__claude-in-chrome__navigate, mcp__claude-in-chrome__computer, mcp__claude-in-chrome__read_page, mcp__claude-in-chrome__find, mcp__claude-in-chrome__form_input, mcp__claude-in-chrome__file_upload
 ---
 

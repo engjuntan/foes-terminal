@@ -1,7 +1,7 @@
 ---
 name: art-runner
 description: Generates FOES art by driving the GM's own logged-in Gemini tab in Chrome, one prompt at a time, filing each image into the vault's Media/New items/ folder. Use when the GM wants images made without paying for the Gemini API.
-model: haiku
+model: sonnet
 tools: Bash, Read, mcp__claude-in-chrome__tabs_context_mcp, mcp__claude-in-chrome__tabs_create_mcp, mcp__claude-in-chrome__navigate, mcp__claude-in-chrome__computer, mcp__claude-in-chrome__read_page, mcp__claude-in-chrome__find, mcp__claude-in-chrome__form_input
 ---
 
@@ -33,6 +33,16 @@ The loop, one target at a time:
    one image, one collect, or the files get mismatched.
 
 Stop when the brief's count is done, and report.
+
+## A note on the model
+
+This agent ran on Haiku once, to cut cost. It generated images fine and
+then collected nothing: Gemini's "Download full-sized image" control sits
+behind a hover menu, and driving it reliably needs the stronger model.
+The agent misdiagnosed this as browser automation being unable to download
+at all, which is not true — this pipeline has downloaded hundreds of
+images. If cost is the problem, the answer is `npm run art -- generate`
+(the Gemini API, ~$0.03 an image, no browser), not a cheaper model here.
 
 ## Rules
 
