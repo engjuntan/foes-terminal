@@ -613,6 +613,25 @@ function collect() {
       .find(f => digest(path.join(folder, f)) === incoming);
     if (clash) fail(`${pick.f} is the same image as ${path.basename(folder)}/${clash} — the download for "${id}" probably hasn't finished. Wait for it and run collect again.`);
   }
+  // Every asset in this pipeline is authored 1:1 and the app draws them
+  // in square frames. Gemini in particular will quietly return 1408x768
+  // for a prompt that says "1:1 square, 1080x1080" when the subject
+  // sounds landscape — a road, a railway, a skyline. Catch it here rather
+  // than hoping whoever is driving the browser spots it, because a wide
+  // shot crops badly and only shows up much later, next to 26 square ones.
+  const SQUARE_TOLERANCE = 0.02;
+  let dims = null;
+  // sips is macOS stock; if it isn't there, don't block the collect.
+  try {
+    const out = execSync(`sips -g pixelWidth -g pixelHeight ${JSON.stringify(path.join(dir, pick.f))}`, { encoding: 'utf8' });
+    const w = Number((out.match(/pixelWidth:\s*(\d+)/) || [])[1]);
+    const h = Number((out.match(/pixelHeight:\s*(\d+)/) || [])[1]);
+    if (w && h) dims = { w, h };
+  } catch { /* unreadable: skip the check rather than refuse the file */ }
+  if (dims && Math.abs(dims.w - dims.h) / Math.max(dims.w, dims.h) > SQUARE_TOLERANCE) {
+    fail(`${pick.f} is ${dims.w}x${dims.h}, not square. Every asset here is 1:1 — regenerate "${id}" at a square aspect ratio (set it in the generator's own aspect control if the prompt alone won't hold it).`);
+  }
+
   const ext = path.extname(pick.f).toLowerCase() === '.jpeg' ? '.jpg' : path.extname(pick.f).toLowerCase();
   const dest = path.join(INBOX, `${id}${ext}`);
   if (DRY) { console.log(`[dry run] would move ${pick.f} → ${path.relative(ROOT, dest)}`); return; }
