@@ -241,7 +241,18 @@ const LOCATION_STYLE = `Photorealistic photograph, 1:1 square, 1080x1080, 35mm f
 // — a sacred desert in canon — so those shots swap the monsoon clauses for
 // their own rather than being forced to contradict the note.
 const DESERT_CLIMATE = 'Storm-scoured equatorial desert: salt-crusted dunes, scorched soil, wind-polished concrete, bleached debris, heat haze. Dry, not tropical.';
-const locationStyleFor = shot => shot.notePath.includes('Chukai')
+// The Chukai Desert is the GM's deliberate exception to the wet-climate
+// rule, and so is everything standing in it. This used to match on the
+// note's PATH containing "Chukai", which quietly missed Round City —
+// the Caliphate capital sits in a desert crater but its note is
+// `Locations/Round City.md`, so it got the monsoon clause instead, the
+// one that ends "no dust, no sand, no arid cracked earth". The art came
+// back as a lush green city, correctly following a wrong prompt. Name
+// the desert places explicitly rather than inferring them from a path.
+const DESERT_LOCATIONS = [/chukai/i, /round city/i, /bandar bulat/i];
+const isDesertShot = shot =>
+  DESERT_LOCATIONS.some(re => re.test(shot.notePath || '') || re.test(shot.name || ''));
+const locationStyleFor = shot => isDesertShot(shot)
   ? `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. ${GRADE} ${DESERT_CLIMATE} ${SCENE_NEGATIVES}`
   : LOCATION_STYLE;
 
