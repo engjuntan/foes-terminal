@@ -121,18 +121,24 @@ export function getReputationModifiers(entityId, liveData) {
 // normalizeReputationEntities. The GM can add/rename/remove from here in
 // the GM view; nothing about this list is hardcoded elsewhere.
 export const DEFAULT_REPUTATION_ENTITIES = [
-  { id: "rakan_watch", name: "Rakan Watch" , image_url: "" },
-  { id: "triad_1414", name: "1414 Triad" , image_url: "" },
-  { id: "axe_gang", name: "Axe Gang" , image_url: "" },
-  { id: "bandawang_enforcers", name: "Bandawang Enforcers" , image_url: "" },
-  { id: "the_federation", name: "The Federation" , image_url: "" },
+  { id: "rakan_watch", name: "Rakan Watch" , image_url: "art/faction_rakan_watch.jpg" },
+  { id: "triad_1414", name: "1414 Triad" , image_url: "art/faction_triad_1414.jpg" },
+  { id: "axe_gang", name: "Axe Gang" , image_url: "art/faction_axe_gang.jpg" },
+  { id: "bandawang_enforcers", name: "Bandawang Enforcers" , image_url: "art/faction_bandawang_enforcers.jpg" },
+  { id: "the_federation", name: "The Federation" , image_url: "art/faction_the_federation.jpg" },
   { id: "the_protectorate", name: "The Protectorate" , image_url: "" },
   { id: "the_caliphate", name: "The Caliphate" , image_url: "" }
 ];
 
 export function normalizeReputationEntities(raw) {
-  if (Array.isArray(raw) && raw.length > 0) return raw;
-  return DEFAULT_REPUTATION_ENTITIES;
+  if (!Array.isArray(raw) || raw.length === 0) return DEFAULT_REPUTATION_ENTITIES;
+  // The roster the GM edits lives in Firestore and was written before any
+  // faction art existed, so a stored entity carries no image_url at all.
+  // Art is a property of the build, not of saved game state — backfill it
+  // by id so linking a new card shows up without the GM re-saving the
+  // roster, while anything the GM actually set stays untouched.
+  const artById = Object.fromEntries(DEFAULT_REPUTATION_ENTITIES.map(e => [e.id, e.image_url]));
+  return raw.map(e => (e && !e.image_url && artById[e.id]) ? { ...e, image_url: artById[e.id] } : e);
 }
 
 // --- KARMA (per character) ---

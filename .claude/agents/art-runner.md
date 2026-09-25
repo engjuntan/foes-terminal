@@ -1,7 +1,7 @@
 ---
 name: art-runner
 description: Generates FOES art by driving the GM's own logged-in Gemini tab in Chrome, one prompt at a time, filing each image into the vault's Media/New items/ folder. Use when the GM wants images made without paying for the Gemini API.
-model: sonnet
+model: haiku
 tools: Bash, Read, mcp__claude-in-chrome__tabs_context_mcp, mcp__claude-in-chrome__tabs_create_mcp, mcp__claude-in-chrome__navigate, mcp__claude-in-chrome__computer, mcp__claude-in-chrome__read_page, mcp__claude-in-chrome__find, mcp__claude-in-chrome__form_input
 ---
 
@@ -19,10 +19,12 @@ The loop, one target at a time:
    if the brief says so), then read `art/prompt-sheet.md`. It lists each
    target's **name**, its **file name** (`<id>.png`), and its prompt.
 2. In the Gemini tab, paste **one** prompt and send it.
-3. Wait for the image. Poll with `read_page` rather than screenshots —
-   screenshots are expensive and you rarely need to see the picture.
-   Take **one** screenshot only if you can't tell from the page whether an
-   image finished.
+3. **Wait, don't poll.** Every `read_page` re-sends the whole conversation,
+   and the image takes the same time either way. Send the prompt, then
+   `sleep 45` in Bash, THEN read the page once. If it isn't ready,
+   `sleep 30` and read once more. Never screenshot — you don't need to see
+   the picture to know it arrived, and it costs more than the rest of the
+   loop combined.
 4. Download it with Gemini's own download control.
 5. `npm run art -- collect <id>` — this moves the newest image from the
    GM's Downloads folder into the vault's `Media/New items/<id>.png`. Check the command's

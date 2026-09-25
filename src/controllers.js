@@ -2,9 +2,10 @@
 import { doc, updateDoc, setDoc, getDoc, deleteField } from "firebase/firestore";
 import { db } from './firebase.js'; // Imports the connection we made in File 1
 import { statusEffectDatabase } from './statusEffects.js';
-import { getItem } from './items.js';
+import { getItem, itemDatabase } from './items.js';
 import { RACE_RULES, calculateDerivedStats, deriveCharacter, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
 import { getMonster } from './bestiary.js';
+import { magazineOnEquip, refundMagazine, usesAmmo, resolveFireMode } from './ammo.js';
 import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES, COVER_LEVELS, isMonsterAttackMelee, effectiveTargetAC, resolveCombatantSave, combatantLimbResistance, DOWN_RECOVERY_TIER, resolveDownedRecovery, clampReviveHp } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { questDatabase } from './quests.js';
@@ -123,7 +124,18 @@ export function buildEquipUpdate(charId, itemId, targetSlot, copyIndex) {
   // doesn't track individual item copies anywhere). Equipping a weapon
   // with a clip_size always assumes a fresh, full magazine; a weapon with
   // no clip_size (melee, unarmed-type gear) just has no ammo entry at all.
-  updatePayload[`${charPath}.ammo.${targetSlot}`] = (item && item.stats && item.stats.clip_size) || null;
+  // Ammo tracking lives per equipped slot, not per item instance (the app
+  // doesn't track individual item copies anywhere). A weapon arrives with
+  // an EMPTY magazine and is loaded from the pack — it used to arrive
+  // full and free, which made unequip-then-re-equip an infinite reload.
+  // Whatever the outgoing weapon still held goes back to the pack in the
+  // same movement, so swapping guns never eats your rounds (src/ammo.js).
+  const roundsInOldGun = (char.ammo || {})[targetSlot] || 0;
+  if (previousId && usesAmmo(previousItem) && roundsInOldGun > 0) {
+    newInv = refundMagazine(newInv, previousItem, roundsInOldGun, itemDatabase);
+    updatePayload[`${charPath}.inventory`] = newInv;
+  }
+  updatePayload[`${charPath}.ammo.${targetSlot}`] = magazineOnEquip(item);
   return updatePayload;
 }
 
@@ -262,8 +274,16 @@ export async function unequipItem(targetSlot) {
   updatePayload[`characters.${window.currentUser}.equipment.${targetSlot}`] = null;
   updatePayload[`characters.${window.currentUser}.ammo.${targetSlot}`] = null;
   updatePayload[`characters.${window.currentUser}.condition`] = { inv: newCondInv, worn: newCondWorn };
-  // Unequipping returns the item to the pack — it doesn't vanish.
-  if (itemId) updatePayload[`characters.${window.currentUser}.inventory`] = addToInventory(char.inventory, itemId, 1);
+  // Unequipping returns the item to the pack — it doesn't vanish. Nor do
+  // the rounds still in it: ammo is only ever tracked for the weapon in
+  // your hands, so putting the gun away puts its magazine back in the bag
+  // as loose rounds (src/ammo.js).
+  if (itemId) {
+    let newInv = addToInventory(char.inventory, itemId, 1);
+    const roundsLeft = (char.ammo || {})[targetSlot] || 0;
+    if (usesAmmo(item) && roundsLeft > 0) newInv = refundMagazine(newInv, item, roundsLeft, itemDatabase);
+    updatePayload[`characters.${window.currentUser}.inventory`] = newInv;
+  }
   await updateDoc(charRef, updatePayload);
 }
 
@@ -288,7 +308,15 @@ export async function gmUnequipItem(targetCharId, targetSlot) {
   updatePayload[`characters.${targetCharId}.equipment.${targetSlot}`] = null;
   updatePayload[`characters.${targetCharId}.ammo.${targetSlot}`] = null;
   updatePayload[`characters.${targetCharId}.condition`] = { inv: newCondInv, worn: newCondWorn };
-  if (itemId) updatePayload[`characters.${targetCharId}.inventory`] = addToInventory(char.inventory, itemId, 1);
+  // Same ammo rule as the player's own unequip: the magazine comes back
+  // with the gun, so a GM taking a weapon away never quietly destroys the
+  // rounds in it.
+  if (itemId) {
+    let newInv = addToInventory(char.inventory, itemId, 1);
+    const roundsLeft = (char.ammo || {})[targetSlot] || 0;
+    if (usesAmmo(item) && roundsLeft > 0) newInv = refundMagazine(newInv, item, roundsLeft, itemDatabase);
+    updatePayload[`characters.${targetCharId}.inventory`] = newInv;
+  }
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
@@ -309,7 +337,10 @@ export async function reloadWeapon(targetCharId, slot) {
   const weaponStats = (item && item.stats) || {};
   if (!item || !weaponStats.clip_size) { alert("NO AMMO-USING WEAPON EQUIPPED IN THAT SLOT"); return; }
 
-  const currentAmmo = (char.ammo || {})[slot] ?? weaponStats.clip_size;
+  // Empty, not full, when there's no ammo entry — a weapon arrives
+  // unloaded now (src/ammo.js), so defaulting to a full clip here would
+  // make the first reload report "ALREADY FULLY LOADED" on an empty gun.
+  const currentAmmo = (char.ammo || {})[slot] ?? 0;
   const deficit = weaponStats.clip_size - currentAmmo;
   if (deficit <= 0) { alert("ALREADY FULLY LOADED"); return; }
 
@@ -2407,7 +2438,7 @@ export async function resolveAttack() {
     roll,
     params: withoutUndefined({
       attackerCombatantId: attacker.combatant_id, targetCombatantId: target.combatant_id,
-      attackKey: draft.attackKey, bodyPart: draft.bodyPart, burst: !!draft.burst
+      attackKey: draft.attackKey, bodyPart: draft.bodyPart, fireMode: draft.fireMode || 'single'
     }),
     before,
     at: Date.now()
@@ -2550,8 +2581,15 @@ export function computeAttackResolution(combat, attacker, target, draft, roll) {
         ammoSlot = equip.right_hand === draft.attackKey ? 'right_hand' : equip.left_hand === draft.attackKey ? 'left_hand' : null;
         if (ammoSlot) {
           ammoCharId = attacker.char_id;
-          const currentAmmo = (char.ammo || {})[ammoSlot] ?? weaponClipSize;
-          isBurstShot = !!(draft.burst && weaponBurstShots);
+          // A weapon now starts empty on equip, so a missing ammo entry
+          // means an empty magazine — not a full one. Defaulting to
+          // weaponClipSize here would have handed out a free first clip.
+          const currentAmmo = (char.ammo || {})[ammoSlot] ?? 0;
+          // The draft names a fire mode; resolveFireMode (src/ammo.js)
+          // decides whether the weapon can still honour it, so a burst
+          // selected when the magazine was full can't survive the
+          // magazine running down before the shot is taken.
+          isBurstShot = resolveFireMode(weaponItem, currentAmmo, draft.fireMode) === 'burst';
           const shotCost = isBurstShot ? weaponBurstShots : 1;
           if (currentAmmo < shotCost) {
             alert(`OUT OF AMMO (${currentAmmo}/${weaponClipSize}) — RELOAD FIRST`);
@@ -2647,7 +2685,13 @@ export function computeAttackResolution(combat, attacker, target, draft, roll) {
   // monster (mutated directly on their inline initiative_order entry,
   // same shape as a PC's status_effects now). durationTurns is optional;
   // omit for an effect that persists until cured, same as aimed shots.
-  const grantEffect = (combatantRef, effectId, durationTurns) => {
+  // `partKey` records WHICH body part an effect came from. The cripple
+  // effects themselves stay generic (one crippled_arm, not a left and a
+  // right — STATUS_AND_CRIPPLE_SPEC B.4), but the body wireframe needs
+  // to know which arm to paint red, and inferring it from ordering is a
+  // guess. Optional, so every instance saved before this field existed
+  // still loads; wireframe.js falls back to the old ordering for those.
+  const grantEffect = (combatantRef, effectId, durationTurns, partKey) => {
     const effectDef = statusEffectDatabase[effectId];
     const name = (effectDef && effectDef.name) || effectId;
     const instance = {
@@ -2657,6 +2701,7 @@ export function computeAttackResolution(combat, attacker, target, draft, roll) {
       modifiers: (effectDef && effectDef.modifiers) || {},
       ticking: effectDef ? effectDef.ticking !== false : true,
       applied_at: Date.now(),
+      ...(partKey ? { part: partKey } : {}),
       ...(durationTurns ? { duration_turns: durationTurns } : {})
     };
     if (combatantRef.ref_type === 'monster') {
@@ -2814,13 +2859,23 @@ export function computeAttackResolution(combat, attacker, target, draft, roll) {
     let damageAlreadyApplied = false; // artery/instant-kill deal their own fixed damage instead of the normal roll
     let killedOutright = false;
 
+    // The crit table's cripple isn't aimed — the manual just says "a leg".
+    // If the shot WAS aimed at a limb that matches, that's the one that
+    // breaks; otherwise pick a side here rather than leaving the effect
+    // sideless for the body wireframe to guess at later.
+    const critCrippleSide = effectId => {
+      if (bodyPart.effectId === effectId) return bodyPartKey;
+      const candidates = Object.keys(BODY_PARTS).filter(k => BODY_PARTS[k].effectId === effectId);
+      return candidates[Math.floor(Math.random() * candidates.length)];
+    };
+
     // --- Critical success effect (manual's table, amended with the user) ---
     if (critResult === 'success') {
       const entry = rollCritTableEntry(true);
       critTag = ` [CRITICAL SUCCESS: ${entry.label}]`;
       switch (entry.effect) {
-        case 'cripple_leg': effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'crippled_leg')}!`; break;
-        case 'cripple_arm': effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'crippled_arm')}!`; break;
+        case 'cripple_leg': effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'crippled_leg', undefined, critCrippleSide('crippled_leg'))}!`; break;
+        case 'cripple_arm': effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'crippled_arm', undefined, critCrippleSide('crippled_arm'))}!`; break;
         case 'bonus_damage': damageMultiplier = Math.max(damageMultiplier, 4); break; // +300% = 4x total, capped here per "cumulative bonuses cannot go higher"
         case 'artery': {
           const { newCurrent } = applyHpDamage(target, 20, true);
@@ -2832,7 +2887,7 @@ export function computeAttackResolution(combat, attacker, target, draft, roll) {
         }
         case 'stun': effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'stunned', 1 + Math.floor(Math.random() * 4))}!`; break;
         case 'ignore_mitigation': bypassMitigation = true; break;
-        case 'blind': effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'blinded', 1 + Math.floor(Math.random() * 4))}!`; break;
+        case 'blind': effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'blinded', 1 + Math.floor(Math.random() * 4), 'eyes')}!`; break;
         case 'knockdown': effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, 'knocked_down', 1)}!`; break;
         case 'instant_kill': {
           // Bosses shrug off "one shot one kill" — needs an is_boss flag
@@ -2972,7 +3027,7 @@ export function computeAttackResolution(combat, attacker, target, draft, roll) {
             // Crippled — the status effect now carries the injury, so
             // the counter clears (B.2: never leave a stale count behind).
             setLimbDamage(target, bodyPartKey, undefined);
-            effectAppliedMsg += ` ${targetName}'s ${bodyPart.label} is crippled! ${targetName} is afflicted by ${grantEffect(target, bodyPart.effectId)}!`;
+            effectAppliedMsg += ` ${targetName}'s ${bodyPart.label} is crippled! ${targetName} is afflicted by ${grantEffect(target, bodyPart.effectId, undefined, bodyPartKey)}!`;
           } else {
             setLimbDamage(target, bodyPartKey, nextCount);
             // The near-miss message IS the point (B.4) — a counter
@@ -2981,7 +3036,7 @@ export function computeAttackResolution(combat, attacker, target, draft, roll) {
           }
         }
       } else {
-        effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, bodyPart.effectId)}!`;
+        effectAppliedMsg += ` ${targetName} is afflicted by ${grantEffect(target, bodyPart.effectId, undefined, bodyPartKey)}!`;
       }
     }
 

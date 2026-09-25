@@ -29,8 +29,12 @@ VAULT_INDEX.tsv
 # Local copies of source material (rulebook text, GM PDFs)
 reference/
 
-# Item art pipeline: local images, ledger, and API keys
-art/
+# Item art pipeline: the queue/sheet/ledger scratch dir at the repo root.
+# Root-anchored on purpose — a bare `art/` also matched `public/art/`,
+# which is where `npm run art -- ingest --local` puts images that are
+# meant to SHIP with the app, so they were silently left out of git and a
+# clean checkout deployed with every local icon broken.
+/art/
 .env
 
 # Agent worktrees

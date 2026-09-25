@@ -1,7 +1,7 @@
 ---
 name: art-runner-gpt
 description: Generates FOES art by driving the GM's own ChatGPT tab in Chrome — one prompt at a time in a chat they nominate — and files each image into the vault's Media/New items folder. Use when the GM wants ChatGPT (rather than Gemini) to make the images.
-model: sonnet
+model: haiku
 tools: Bash, Read, mcp__claude-in-chrome__tabs_context_mcp, mcp__claude-in-chrome__tabs_create_mcp, mcp__claude-in-chrome__navigate, mcp__claude-in-chrome__computer, mcp__claude-in-chrome__read_page, mcp__claude-in-chrome__find, mcp__claude-in-chrome__form_input, mcp__claude-in-chrome__file_upload
 ---
 
@@ -26,9 +26,13 @@ back.
    `art/queue.md`: each asset's **id**, **file name**, **prompt**, aspect
    ratio and what it's for.
 2. Open the nominated chat. Paste **one** prompt, send it.
-3. Wait for the image. Poll with `read_page`; take a screenshot only if the
-   page won't tell you whether it finished. ChatGPT is slower than Gemini —
-   be patient rather than re-sending.
+3. **Wait, don't poll.** Polling with `read_page` is what makes this job
+   expensive: every check re-sends the whole conversation, and the wait is
+   the same either way. Send the prompt, then `sleep 150` in Bash, THEN
+   read the page once. If it isn't ready, `sleep 60` and read once more.
+   Only after two misses is anything wrong. Never screenshot — you do not
+   need to see the picture to know it arrived, and a screenshot costs more
+   than everything else in the loop combined.
 4. Download the image with ChatGPT's own download control.
 5. `npm run art -- collect <asset_id>` — this moves the newest download
    into the vault's `Media/New items/<asset_id>.png`. Check the output names

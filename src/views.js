@@ -17,7 +17,7 @@ import { DIFFICULTY_TIERS } from './checks.js';
 import { getTrait, traitDatabase } from './traits.js';
 import { statusEffectDatabase } from './statusEffects.js';
 import { bestiaryDatabase } from './bestiary.js';
-import { BODY_PARTS, BURST_HIT_PENALTY, STANCES, COVER_LEVELS, DAMAGE_TYPE_LABELS, isMonsterAttackMelee, effectiveTargetAC, getCombatDisplayState } from './combat.js';
+import { BODY_PARTS, BURST_HIT_PENALTY, STANCES, COVER_LEVELS, DAMAGE_TYPE_LABELS, isMonsterAttackMelee, effectiveTargetAC, getCombatDisplayState, combatantLimbResistance } from './combat.js';
 import { dataLogDatabase } from './dataLogs.js';
 import { peopleDatabase } from './people.js';
 import { questDatabase } from './quests.js';
@@ -31,6 +31,8 @@ import {
   getReputationTier, getReputationModifiers, getKarmaTier, getKarmaValue,
   normalizeReputationEntities
 } from './reputationContent.js';
+import { deriveBodyState, renderBodyWireframe } from './wireframe.js';
+import { clipState, heldRounds, availableFireModes, resolveFireMode } from './ammo.js';
 import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
 import { recipeDatabase } from './recipes.js';
 import {
@@ -226,6 +228,77 @@ function renderConditionRows(rows) {
     </div>`).join('');
 }
 
+// THE ITEM DETAIL PANE (GM's brief, 2026-09-26). The inventory row is a
+// 40px thumbnail and a name; with 100+ photographed icons now in the
+// build, that's the wrong place to look at what you own. Selecting a row
+// opens the item here at a readable size, with the stats that item type
+// actually has — a gun's magazine and damage, armour's AC and DT/DR, a
+// chem's duration — rather than one generic table with blanks in it.
+function statRow(label, value) {
+  return `<div style="display:flex; justify-content:space-between; gap:10px; font-size:12px; padding:3px 0; border-bottom:1px dashed #222;">
+    <span style="color:var(--pip-dim);">${escapeHtml(label)}</span>
+    <span style="text-align:right;">${escapeHtml(String(value))}</span>
+  </div>`;
+}
+
+export function renderItemDetail(itemDef, charData) {
+  if (!itemDef) {
+    return `<div style="color:#555; font-size:12px; padding:20px 4px; text-align:center;">Select an item to inspect it.</div>`;
+  }
+  const st = itemDef.stats || {};
+  const rows = [];
+
+  if (itemDef.type === 'weapon') {
+    if (st.dmg) rows.push(statRow('Damage', st.dmg));
+    // Authored as `dmgType` in the vault; `dmg_type` is accepted too so a
+    // note written either way still shows its damage type.
+    const dmgType = st.dmgType || st.dmg_type;
+    if (dmgType) rows.push(statRow('Damage type', DAMAGE_TYPE_LABELS[dmgType] || dmgType));
+    if (st.range) rows.push(statRow('Range', st.range));
+    const clip = clipState(itemDef, st.clip_size);
+    if (clip) {
+      rows.push(statRow('Magazine', `${clip.max} rounds`));
+      if (clip.ammoType) rows.push(statRow('Ammunition', clip.ammoType));
+      const held = heldRounds(normalizeInventory(charData && charData.inventory), itemDef, itemDatabase);
+      if (clip.ammoType) rows.push(statRow('In your pack', `${held} rounds`));
+      if (clip.burstShots) rows.push(statRow('Burst', `${clip.burstShots} rounds per pull`));
+    } else if (st.range && st.range > 1) {
+      rows.push(statRow('Magazine', 'None — never needs reloading'));
+    }
+    if (itemDef.skill) rows.push(statRow('Skill', itemDef.skill.replace(/_/g, ' ')));
+  } else if (itemDef.type === 'armor') {
+    if (st.ac) rows.push(statRow('Armor class', `+${st.ac}`));
+    [['dt_dr_normal', 'Normal'], ['dt_dr_laser', 'Laser'], ['dt_dr_fire', 'Fire'],
+     ['dt_dr_plasma', 'Plasma'], ['dt_dr_explosive', 'Explosive']].forEach(([k, label]) => {
+      if (st[k]) rows.push(statRow(`DT/DR ${label}`, st[k]));
+    });
+    if (st.rr) rows.push(statRow('Radiation resistance', `${st.rr}%`));
+  } else if (itemDef.type === 'consumable') {
+    if (st.hp_restore) rows.push(statRow('Heals', `${st.hp_restore} HP`));
+    if (st.duration_hours) rows.push(statRow('Lasts', `${st.duration_hours} hours`));
+    if (st.addiction_chance) rows.push(statRow('Addiction risk', `${st.addiction_chance}%`));
+  } else if (itemDef.type === 'ammo') {
+    if (itemDef.ammo_type) rows.push(statRow('Fits', itemDef.ammo_type));
+  }
+
+  if (itemDef.slot) rows.push(statRow('Worn on', itemDef.slot.replace(/_/g, ' ')));
+  if (itemDef.weight) rows.push(statRow('Weight', `${itemDef.weight} kg`));
+  if (itemDef.value && itemDef.value !== 'TBA') rows.push(statRow('Value', `${itemDef.value} RMR`));
+
+  const art = itemDef.icon
+    ? `<img src="${itemDef.icon}" alt="${escapeHtml(itemDef.name)}" loading="lazy" decoding="async" style="width:100%; aspect-ratio:1; object-fit:cover; display:block; border:1px solid var(--pip-dim);">`
+    : `<div style="width:100%; aspect-ratio:1; border:1px solid var(--pip-dim); display:flex; align-items:center; justify-content:center; color:#444; font-size:11px;">[ NO IMAGE ]</div>`;
+
+  return `
+    <div>
+      ${art}
+      <h3 style="color:var(--pip-green); font-size:16px; margin:10px 0 2px;">${escapeHtml(itemDef.name)}</h3>
+      <div style="font-size:10px; color:var(--pip-dim); letter-spacing:1px; text-transform:uppercase; margin-bottom:8px;">${escapeHtml(itemDef.type || '')}</div>
+      <div style="font-size:13px; color:#ccc; line-height:1.5; margin-bottom:10px; white-space:pre-wrap;">${applyGlossaryTooltips(escapeHtml(itemDef.description || ''))}</div>
+      ${rows.join('')}
+    </div>`;
+}
+
 // LIMBS (STATUS_AND_CRIPPLE_SPEC.md Part B/C.2): only the arm/leg body
 // parts carry a persistent hit counter — combat.js's `crippleCounter`
 // flag on BODY_PARTS marks exactly these four, since eyes/groin stay
@@ -270,6 +343,27 @@ function renderLimbRows(rows, charId) {
       </div>`;
   }).join('');
 }
+// The same limb data as a body, not a list. The gauges below only show a
+// limb once it has been hit, so there's no way to see at a glance that
+// everything else is fine — that's what this is for. Both read the very
+// same fields (deriveBodyState takes limb_damage/status_effects and the
+// derived limbResistance), so they can't drift apart.
+function renderConditionWireframe(charData, derived) {
+  const state = deriveBodyState(charData.limb_damage, charData.status_effects, derived.limbResistance);
+  const hurt = Object.entries(state).filter(([, v]) => v.state !== 'clear');
+  const caption = hurt.length === 0
+    ? 'All limbs intact.'
+    : hurt.map(([k, v]) => `${(BODY_PARTS[k] || {}).label || k}: ${v.note}`).join(' · ');
+  return `
+    <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+      <div style="width:96px; height:150px; flex-shrink:0;">${renderBodyWireframe(state, { idPrefix: 'status' })}</div>
+      <div style="font-size:11px; color:${hurt.length ? '#ffb000' : 'var(--pip-dim)'}; line-height:1.5; min-width:0;">
+        ${escapeHtml(caption)}
+        <div style="color:#555; margin-top:6px;">Limb Resistance ${derived.limbResistance} — a limb cripples on that many hits.</div>
+      </div>
+    </div>`;
+}
+
 // B.6's two routes, drawn inline under LIMBS when a TREAT link is
 // clicked (window.treatLimbDraft, set by openTreatLimbDraft). Kept to
 // self-treatment only for now (healer === target === the viewer) — the
@@ -422,6 +516,7 @@ export function getStatusView(charId, liveData) {
         ${renderConditionRows(conditionRows)}
         ${renderAddictionRows(charData, charId)}
         <h2 style="color:var(--pip-dim); margin-top:20px;">LIMBS</h2>
+        ${renderConditionWireframe(charData, derived)}
         ${renderLimbRows(limbRows, charId)}
         ${renderTreatLimbForm(charData, charId)}
       </div>
@@ -457,18 +552,33 @@ export function getReputationView(charId, liveData) {
   const entities = normalizeReputationEntities(liveData.reputation_entities);
   const entityCardsHtml = entities.map(entity => {
     const { tier } = getReputationModifiers(entity.id, liveData);
+    // Two different pictures, two different jobs: the faction's own card
+    // says WHO they are and runs as a wide banner (they're three-figure
+    // scenes — a thumbnail turns them to mush), while the tier square
+    // says where you stand with them. A faction with no card yet just
+    // loses the banner; nothing else about the row changes.
+    const bannerHtml = entity.image_url
+      ? `<div style="position:relative; height:120px; overflow:hidden; border-bottom:1px solid var(--pip-dim);">
+           <img src="${entity.image_url}" alt="${escapeHtml(entity.name)}" style="width:100%; height:100%; object-fit:cover; object-position:center 30%; display:block; filter:saturate(0.85) contrast(1.05);">
+           <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,12,0,0.92) 0%, rgba(0,12,0,0.15) 55%, rgba(0,12,0,0.05) 100%);"></div>
+           <strong style="position:absolute; left:10px; bottom:7px; color:var(--pip-green); text-shadow:0 1px 4px #000;">${escapeHtml(entity.name)}</strong>
+         </div>`
+      : '';
     return `
-      <div style="display:flex; gap:10px; border:1px solid var(--pip-dim); background:rgba(0,20,0,0.3); padding:10px; margin-bottom:10px;">
-        <div style="width:80px; height:80px; flex-shrink:0; border:1px solid var(--pip-dim); overflow:hidden;">
-          ${reputationArtFrame(tier.image_url, tier.name)}
-        </div>
-        <div style="flex-grow:1; min-width:0;">
-          <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:6px;">
-            <strong style="color:var(--pip-green);">${escapeHtml(entity.name)}</strong>
-            <span style="color:var(--pip-gold); font-size:12px; text-transform:uppercase; letter-spacing:1px;">${escapeHtml(tier.name)}</span>
+      <div style="border:1px solid var(--pip-dim); background:rgba(0,20,0,0.3); margin-bottom:10px;">
+        ${bannerHtml}
+        <div style="display:flex; gap:10px; padding:10px;">
+          <div style="width:80px; height:80px; flex-shrink:0; border:1px solid var(--pip-dim); overflow:hidden;">
+            ${reputationArtFrame(tier.image_url, tier.name)}
           </div>
-          <div style="font-size:13px; color:#ccc; margin:6px 0; line-height:1.4;">${escapeHtml(tier.description)}</div>
-          <div style="font-size:12px; color:var(--pip-dim); border-top:1px dashed #333; padding-top:5px;">${escapeHtml(tier.effect)}</div>
+          <div style="flex-grow:1; min-width:0;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:6px;">
+              ${bannerHtml ? '' : `<strong style="color:var(--pip-green);">${escapeHtml(entity.name)}</strong>`}
+              <span style="color:var(--pip-gold); font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-left:auto;">${escapeHtml(tier.name)}</span>
+            </div>
+            <div style="font-size:13px; color:#ccc; margin:6px 0; line-height:1.4;">${escapeHtml(tier.description)}</div>
+            <div style="font-size:12px; color:var(--pip-dim); border-top:1px dashed #333; padding-top:5px;">${escapeHtml(tier.effect)}</div>
+          </div>
         </div>
       </div>`;
   }).join('') || `<div style="color:#555; font-size:12px;">No known factions tracked yet.</div>`;
@@ -1032,11 +1142,19 @@ export function getCombatView(liveData, userRole, currentUser) {
       attackOptions = `<option value="unarmed" ${!draft.attackKey || draft.attackKey === 'unarmed' ? 'selected' : ''}>Unarmed</option>${weaponOpts}`;
     }
 
-    // Ammo/burst — a simplified stand-in for the manual's full multi-roll
-    // burst system (agreed with the user): one roll at a flat hit%
-    // penalty, roughly double damage, costs the weapon's burst_shots in
-    // ammo instead of 1. PC-only (matches resolveAttack() — monster
-    // attacks are hand-authored in the bestiary and don't carry ammo).
+    // THE WEAPON PANEL (GM's brief, 2026-09-26): the gun you're holding,
+    // what's in it, how you're firing it, and a reload — all in one block
+    // instead of a bare ammo count and an unlabelled checkbox.
+    //
+    // Fire mode is a named button rather than a checkbox because the GM's
+    // note was specific: players should be able to read what the control
+    // does without being told. availableFireModes() (src/ammo.js) decides
+    // what's offered and whether it can actually be fired right now, so a
+    // mode that would fail is disabled WITH ITS REASON rather than
+    // failing after the player commits.
+    //
+    // PC-only, matching resolveAttack() — monster attacks are authored in
+    // the bestiary and carry no ammo.
     let ammoHtml = '';
     let burstSelected = false;
     let equippedWeaponItem = null, equippedWeaponSlot = null;
@@ -1045,29 +1163,54 @@ export function getCombatView(liveData, userRole, currentUser) {
       const equip = (char && char.equipment) || {};
       equippedWeaponItem = getItem(draft.attackKey);
       equippedWeaponSlot = equip.right_hand === draft.attackKey ? 'right_hand' : equip.left_hand === draft.attackKey ? 'left_hand' : null;
-      // ammo_type/clip_size/burst_shots all live under the weapon's
-      // `stats` block, alongside dmg/range/dmgType.
-      const equippedStats = (equippedWeaponItem && equippedWeaponItem.stats) || {};
-      if (equippedWeaponItem && equippedStats.clip_size && equippedWeaponSlot) {
-        const currentAmmo = ((char.ammo || {})[equippedWeaponSlot]) ?? equippedStats.clip_size;
-        burstSelected = !!(draft.burst && equippedStats.burst_shots);
-        const burstOption = equippedStats.burst_shots ? `
-          <label style="font-size:11px; color:#666; display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-            <input type="checkbox" ${burstSelected ? 'checked' : ''} onchange="window.setCombatActionField('burst', this.checked)">
-            🔥 BURST FIRE (-${BURST_HIT_PENALTY}% hit, ~2x damage, uses ${equippedStats.burst_shots} ammo)
-          </label>` : '';
-        // Spare-rounds count only applies to weapons authored with an
-        // ammo_type — a weapon without one reloads for free (no real
-        // inventory ammo item to track), same as before this feature.
-        const spareTag = equippedStats.ammo_type
-          ? ` <span style="color:#666;">(spare: ${Object.keys(normalizeInventory(char.inventory)).filter(id => { const d = getItem(id); return d && d.type === 'ammo' && d.ammo_type === equippedStats.ammo_type; }).reduce((sum, id) => sum + getInventoryQuantity(char.inventory, id), 0)})</span>`
+      const clip = equippedWeaponSlot ? clipState(equippedWeaponItem, (char.ammo || {})[equippedWeaponSlot]) : null;
+
+      if (clip) {
+        const spare = heldRounds(normalizeInventory(char.inventory), equippedWeaponItem, itemDatabase);
+        const mode = resolveFireMode(equippedWeaponItem, clip.loaded, draft.fireMode);
+        burstSelected = mode === 'burst';
+
+        // A ten-cell bar reads as a magazine at any capacity — a 120-round
+        // belt drawn as 120 cells is just a green smear.
+        const CELLS = 10;
+        const lit = Math.ceil(clip.fraction * CELLS);
+        const cells = Array.from({ length: CELLS }, (_, i) => {
+          const on = i < lit;
+          return `<span style="flex:1; height:12px; background:${on ? (clip.fraction <= 0.25 ? '#ff3b30' : 'var(--pip-green)') : 'transparent'}; border:1px solid ${on ? 'transparent' : 'var(--pip-dim)'};"></span>`;
+        }).join('');
+
+        const modeButtons = availableFireModes(equippedWeaponItem, clip.loaded).map(m => {
+          const on = m.id === mode;
+          return `<button type="button" ${m.usable ? '' : 'disabled'}
+            title="${escapeHtml(m.usable ? m.blurb : m.reason)}"
+            onclick="window.setCombatActionField('fireMode', '${m.id}')"
+            style="flex:1 1 auto; padding:5px 8px; font-family:inherit; font-size:11px; cursor:${m.usable ? 'pointer' : 'not-allowed'}; opacity:${m.usable ? 1 : 0.4}; background:${on ? 'var(--pip-green)' : 'transparent'}; color:${on ? 'black' : 'var(--pip-dim)'}; border:1px solid ${on ? 'var(--pip-green)' : '#333'};">${escapeHtml(m.label)}</button>`;
+        }).join('');
+
+        const activeMode = availableFireModes(equippedWeaponItem, clip.loaded).find(m => m.id === mode);
+        const iconHtml = equippedWeaponItem.icon
+          ? `<img src="${equippedWeaponItem.icon}" alt="" loading="lazy" decoding="async" style="width:52px; height:52px; object-fit:cover; border:1px solid var(--pip-dim); flex-shrink:0;">`
           : '';
+
         ammoHtml = `
-          <div style="display:flex; align-items:center; justify-content:space-between; font-size:11px; color:#888; margin-bottom:6px;">
-            <span>Ammo: <span style="color:var(--pip-green);">${currentAmmo}/${equippedStats.clip_size}</span>${spareTag}</span>
-            <button class="gm-btn" style="padding:2px 8px; font-size:10px;" onclick="window.reloadWeapon('${currentActor.char_id}', '${equippedWeaponSlot}')">RELOAD</button>
-          </div>
-          ${burstOption}`;
+          <div style="border:1px solid var(--pip-dim); background:rgba(0,20,0,0.3); padding:8px; margin-bottom:8px;">
+            <div style="display:flex; gap:8px; align-items:center;">
+              ${iconHtml}
+              <div style="flex-grow:1; min-width:0;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline; gap:6px; font-size:11px; color:#888;">
+                  <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(equippedWeaponItem.name)}</span>
+                  <span style="white-space:nowrap;"><span style="color:${clip.empty ? '#ff3b30' : 'var(--pip-green)'}; font-weight:bold;">${clip.loaded}</span>/${clip.max}${clip.ammoType ? ` <span style="color:#666;">${escapeHtml(clip.ammoType)}</span>` : ''}</span>
+                </div>
+                <div style="display:flex; gap:2px; margin:5px 0 4px;">${cells}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; color:#666;">
+                  <span>${clip.ammoType ? `${spare} spare in pack` : 'Reloads for free'}</span>
+                  <button class="gm-btn" style="padding:2px 8px; font-size:10px;" ${clip.full ? 'disabled' : ''} onclick="window.reloadWeapon('${currentActor.char_id}', '${equippedWeaponSlot}')">RELOAD</button>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; gap:4px; margin-top:8px;">${modeButtons}</div>
+            <div style="font-size:10px; color:${activeMode && activeMode.usable ? '#666' : '#ff3b30'}; margin-top:5px;">${escapeHtml(activeMode ? (activeMode.usable ? activeMode.blurb : activeMode.reason) : '')}</div>
+          </div>`;
       }
     }
 
@@ -1080,9 +1223,12 @@ export function getCombatView(liveData, userRole, currentUser) {
     // don't carry status effects).
     let bodyPartHtml = '';
     {
+      // Shared across the preview and the wireframe below it: both need
+      // the same per-part hit chance, and the wireframe needs the
+      // target's limb state. Null until a target is actually chosen.
+      let chanceForPart = null;
+      let targetBodyState = null;
       const selectedPart = draft.bodyPart || 'torso';
-      const bodyPartOptions = Object.entries(BODY_PARTS)
-        .map(([key, part]) => `<option value="${key}" ${selectedPart === key ? 'selected' : ''}>${part.label}${part.penalty ? ` (-${part.penalty}%)` : ''}</option>`).join('');
 
       // Live hit% preview — replicates the same effectiveChance math used
       // in resolveAttack() (combat.js resolveHit: max(0, skill - penalty - AC)),
@@ -1116,23 +1262,63 @@ export function getCombatView(liveData, userRole, currentUser) {
         }
         // Same stance-aware AC the attack itself rolls against.
         const targetAC = effectiveTargetAC(target, liveData.characters);
-        if (attackerValue !== null && targetAC !== null) {
-          const part = BODY_PARTS[selectedPart] || BODY_PARTS.torso;
+        // Number.isFinite, not `!== null`: a combatant missing an AC
+        // (or an attack with no hit_percent) used to slip through the
+        // null check and render "NaN%" as a hit chance.
+        if (Number.isFinite(attackerValue) && Number.isFinite(targetAC)) {
           // Job 1: same cover penalty computeAttackResolution() applies —
           // GM-assigned on the target, ranged attacks only.
           const coverLevel = COVER_LEVELS[target.cover || 'none'] || COVER_LEVELS.none;
           const coverPenalty = !isMeleeAttack ? coverLevel.penalty : 0;
-          const chance = Math.max(0, attackerValue - part.penalty - (burstSelected ? BURST_HIT_PENALTY : 0) - coverPenalty - targetAC);
+          // One function for every part, so the number on the wireframe
+          // and the number under it are the same arithmetic resolveAttack
+          // will actually run (combat.js resolveHit).
+          chanceForPart = key => Math.max(0, attackerValue - (BODY_PARTS[key] || BODY_PARTS.torso).penalty - (burstSelected ? BURST_HIT_PENALTY : 0) - coverPenalty - targetAC);
+          const chance = chanceForPart(selectedPart);
           const coverNote = coverPenalty > 0 ? ` <span style="color:orange;">(${coverLevel.label} −${coverPenalty})</span>` : '';
-          previewHtml = `<div style="font-size:11px; color:#888; margin-bottom:6px;">Hit chance vs ${target.name}: <span style="color:var(--pip-green); font-weight:bold;">${chance}%</span>${coverNote}</div>`;
+          previewHtml = `<div style="font-size:11px; color:#888; margin-bottom:6px;">Hit chance vs ${target.name} — <strong style="color:var(--pip-green);">${(BODY_PARTS[selectedPart] || BODY_PARTS.torso).label}</strong>: <span style="color:var(--pip-green); font-weight:bold;">${chance}%</span>${coverNote}</div>`;
         }
+
+        // The target's own limb state, so the GM can see what's already
+        // broken while choosing where to shoot — the whole point of a
+        // targeting overlay. A monster combatant carries limb_damage and
+        // status_effects in the same shape a PC does.
+        targetBodyState = deriveBodyState(
+          target.limb_damage,
+          target.status_effects,
+          combatantLimbResistance(target, liveData.characters)
+        );
       }
+
+      // VATS: click the body, not a dropdown. The wireframe doubles as
+      // the target's condition readout, so an already-crippled arm is
+      // visible at the moment you decide where to aim.
+      const wireframeHtml = targetBodyState
+        ? renderBodyWireframe(targetBodyState, {
+            idPrefix: 'aim',
+            selected: selectedPart,
+            onClickFor: key => `window.setCombatActionField('bodyPart', '${key}')`,
+            labelFor: key => (chanceForPart ? `${chanceForPart(key)}% to hit` : '')
+          })
+        : '';
 
       bodyPartHtml = `
         <label style="font-size:11px; color:#666;">AIMED SHOT (optional — defaults to Torso)</label>
+        ${wireframeHtml ? `
+        <div style="display:flex; gap:12px; align-items:center; margin:4px 0 6px;">
+          <div style="width:96px; height:152px; flex-shrink:0;">${wireframeHtml}</div>
+          <div style="flex-grow:1; min-width:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(84px, 1fr)); gap:4px;">
+            ${Object.entries(BODY_PARTS).map(([key, part]) => {
+              const on = selectedPart === key;
+              const pct = chanceForPart ? `<span style="color:${on ? 'black' : '#888'};">${chanceForPart(key)}%</span>` : '';
+              return `<button type="button" onclick="window.setCombatActionField('bodyPart', '${key}')" title="${escapeHtml(part.label)}${part.penalty ? ` (−${part.penalty}%)` : ''}"
+                style="display:flex; justify-content:space-between; gap:4px; padding:3px 6px; font-size:11px; font-family:inherit; cursor:pointer; text-align:left; background:${on ? 'var(--pip-green)' : 'transparent'}; color:${on ? 'black' : 'var(--pip-dim)'}; border:1px solid ${on ? 'var(--pip-green)' : '#333'};"><span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${part.label}</span>${pct}</button>`;
+            }).join('')}
+          </div>
+        </div>` : `
         <select onchange="window.setCombatActionField('bodyPart', this.value)" style="width:100%; background:black; color:lime; border:1px solid #333; margin-bottom:6px;">
-          ${bodyPartOptions}
-        </select>
+          ${Object.entries(BODY_PARTS).map(([key, part]) => `<option value="${key}" ${selectedPart === key ? 'selected' : ''}>${part.label}${part.penalty ? ` (-${part.penalty}%)` : ''}</option>`).join('')}
+        </select>`}
         ${previewHtml}`;
     }
 
@@ -1921,7 +2107,9 @@ export function getPlayerView(charId, liveData) {
 
       const meterTag = marksIndex !== null ? `<div style="margin-top:2px;">${conditionMeter(marks)}</div>` : '';
 
-      return `<li class="inv-card" style="${style}"><img src="${itemDef.icon}" class="inv-icon"><div class="inv-info"><span class="inv-name" style="cursor:help; border-bottom:1px dotted var(--pip-green);" onmouseover="window.showTooltip('${safeDesc}', event)" onmouseout="window.hideTooltip()">${itemDef.name}</span>${qtyTag}<span class="inv-meta">${itemDef.type.toUpperCase()}</span>${meterTag}</div><div class="inv-actions">${buttons}${giveControl}</div></li>`;
+      const selected = window.selectedInventoryItem === itemId;
+      const selStyle = selected ? 'border-color:var(--pip-green); background:rgba(0,50,0,0.5);' : '';
+      return `<li class="inv-card" style="${style}${selStyle}" onclick="window.selectInventoryItem('${itemId}')"><img src="${itemDef.icon}" class="inv-icon" loading="lazy" decoding="async"><div class="inv-info"><span class="inv-name" style="cursor:help; border-bottom:1px dotted var(--pip-green);" onmouseover="window.showTooltip('${safeDesc}', event)" onmouseout="window.hideTooltip()">${itemDef.name}</span>${qtyTag}<span class="inv-meta">${itemDef.type.toUpperCase()}</span>${meterTag}</div><div class="inv-actions">${buttons}${giveControl}</div></li>`;
     };
 
     inventoryHtml = `<ul class="inventory-list">` + rawInv.filter(i => !i.def || i.def.type !== 'currency').flatMap(i => {
@@ -1941,7 +2129,7 @@ export function getPlayerView(charId, liveData) {
     const itemDef = getItem(itemId);
     if (itemDef) {
       const meterTag = isDurable(itemDef) ? `<div>${conditionMeter(condition.worn[slotKey])}</div>` : '';
-      return `<div class="slot-box occupied" onclick="window.unequipItem('${slotKey}')"><small>${slotName}</small><div style="display:flex; align-items:center; gap:5px;"><img src="${itemDef.icon}" style="width:24px; height:24px; border:1px solid var(--pip-green);"><div><span>${itemDef.name}</span>${meterTag}</div></div></div>`;
+      return `<div class="slot-box occupied" onclick="window.unequipItem('${slotKey}')"><small>${slotName}</small><div style="display:flex; align-items:center; gap:5px;"><img src="${itemDef.icon}" loading="lazy" decoding="async" style="width:24px; height:24px; border:1px solid var(--pip-green);"><div><span>${itemDef.name}</span>${meterTag}</div></div></div>`;
     }
     return `<div class="slot-box empty"><small>${slotName}</small><span style="color:#555;">[EMPTY]</span></div>`;
   };
@@ -2118,7 +2306,12 @@ export function getPlayerView(charId, liveData) {
         <div style="margin-bottom:20px;">${walletHtml || "<small style='color:#555;'>EMPTY</small>"}</div>
 
         <h2>INVENTORY</h2>
-        <div style="overflow-y:auto; flex-grow:1;">${inventoryHtml}</div>
+        <div style="display:flex; gap:12px; flex-grow:1; min-height:0; align-items:flex-start; flex-wrap:wrap;">
+          <div style="overflow-y:auto; flex:2 1 260px; min-width:0; align-self:stretch;">${inventoryHtml}</div>
+          <div style="flex:1 1 200px; min-width:0; border:1px solid var(--pip-dim); background:rgba(0,20,0,0.3); padding:10px; position:sticky; top:0;">
+            ${renderItemDetail(getItem(window.selectedInventoryItem), charData)}
+          </div>
+        </div>
       </div>
 
       <div class="panel">

@@ -23,6 +23,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { allSlots } from './art-slots.mjs';
 import { allLocationShots } from './art-locations.mjs';
@@ -52,7 +53,18 @@ const LIFETIME_GENERATE_CAP = 400; // total paid generations ever; raise deliber
 // competes with the subject. Edit here to restyle everything.
 const GRADE = 'Monsoon Gold grade: blown-out near-white hazy sky light, hot golden key light, cyan-green bounced shadows, heavy humid air.';
 const CLIMATE = 'Equatorial Malaya after 170 years of rain: black-green mould and algae staining from the top down, rust weeping in dark streaks, damp surfaces, red laterite mud. No dust, no sand, no arid cracked earth.';
-const NEGATIVES = 'No text, no lettering, no watermark, no signature, no hands, no people, no modern plastics, no flat screens, no Vault-Tec or other Bethesda marks.';
+// "No text" was blanket, and it fought the item prompts themselves in two
+// whole classes of item. Branded consumables: Jet's prompt asks for
+// "faded red lettering spelling JET", Cap Kilat Cola's for "a label
+// reading Cap Kilat Cola" — a branded bottle without its brand is just a
+// jar, and Fallout's own item art is built on those labels. Written
+// things: a "field diary with terrain sketches and movement notes" or a
+// "log book with hand-drawn water maps" IS writing; ban the writing and
+// the object cannot be drawn at all. So the ban now names the text nobody
+// asked for — captions, watermarks, signatures, stray glyphs floating on
+// an object that isn't a written thing — and lets the subject carry its
+// own.
+const NEGATIVES = 'No captions, no watermark, no signature, and no stray lettering on an object that is not itself a written or labelled thing — a document, book, note, map, poster, sign or a product with a printed label may carry its own writing, and should. No hands, no people, no modern plastics, no flat screens, no Vault-Tec or other Bethesda marks.';
 // Each item carries its own setting in its prompt (a suitable, interesting
 // place that item would actually be found), so the shared style no longer
 // names a surface — it only holds the register, the grade, the climate and
@@ -107,8 +119,22 @@ function loadItems() {
   return items;
 }
 
-const hasArt = item => /^https?:\/\//.test(item.icon || '') && !/placehold\.co/.test(item.icon);
-const fullPrompt = item => `${STYLE} Subject: ${(item.image_prompt || '').replace(LEGACY_TAIL, '').trim()}`;
+// A linked url is either an Imgur link or, on the --local route, a
+// relative `art/<id>.jpg` that ships with the app. Both mean "made" —
+// matching only http:// here is what made the queue keep re-offering
+// locally-ingested art and let a re-ingest overwrite it.
+const isLinked = url => !!url && !/placehold\.co/.test(url) && (/^https?:\/\//.test(url) || /^art\//.test(url));
+const hasArt = item => isLinked(item.icon || '');
+// GM ruling, 25 Sep: armor gets no moss. The shared CLIMATE clause puts
+// "black-green mould and algae staining from the top down" on every
+// object, which is right for a signboard or a fuel drum and wrong for a
+// vest someone is meant to put on — worn kit reads as abandoned scenery
+// the moment it grows a lawn. Armor keeps the wet, rusted, hard-used
+// world; it just isn't overgrown by it.
+const CLIMATE_WORN = 'Equatorial Malaya after 170 years of rain: rust weeping in dark streaks, salt and sweat staining, scuffed and scratched surfaces, damp and recently rained on, red laterite mud worked into the seams. NO moss, NO algae, NO lichen, NO mould, NO green growth of any kind on the object. No dust, no sand, no arid cracked earth.';
+const WORN_TYPES = new Set(['armor', 'accessory']);
+const styleFor = item => (WORN_TYPES.has(item.type) ? STYLE.replace(CLIMATE, CLIMATE_WORN) : STYLE);
+const fullPrompt = item => `${styleFor(item)} Subject: ${(item.image_prompt || '').replace(LEGACY_TAIL, '').trim()}`;
 
 // Edits one field inside the file's json block as a single-line text edit,
 // leaving the GM's formatting everywhere else untouched. Re-parses the block
@@ -187,7 +213,7 @@ function slotTargets() {
       id: slot.id,
       name: slot.label,
       kind: 'slot',
-      hasArt: !!(found && /^https?:\/\//.test(found.value)),
+      hasArt: !!(found && isLinked(found.value)),
       hasPrompt: true,
       prompt: `${slot.style} Subject: ${slot.prompt}`,
       description: slot.prompt,
@@ -251,7 +277,7 @@ function locationTargets() {
       id: shot.id,
       name: `${shot.name} — ${shot.shot}`,
       kind: 'location',
-      hasArt: /^https?:\/\//.test(current || ''),
+      hasArt: isLinked(current || ''),
       hasPrompt: !!shot.prompt,
       prompt: `${locationStyleFor(shot)} Subject: ${shot.prompt}`,
       description: shot.prompt,
@@ -392,15 +418,48 @@ async function imgurAccessToken() {
 // Without Imgur keys, images can still go live: --local copies them into
 // public/art/ and writes a relative url, so they ship with the app on the
 // next deploy instead of depending on a third-party host.
+// Generators hand back 1080-1250px PNGs of 2-3MB each. Those are fine as
+// vault masters but not as something every player downloads, so the copy
+// that ships is capped and, when it has no transparency to lose, written
+// as a JPEG instead — typically 2.8MB down to ~200KB. `sips` is macOS
+// stock; if it isn't there, or anything about it fails, the original is
+// copied through unchanged rather than the ingest breaking.
+// Sized to what the app actually draws. An item icon renders at 24-40px
+// in the inventory and slot boxes, so 512 is already generous headroom on
+// a retina screen; cards and location shots are banners and get more.
+// This matters at volume: 279 items shipped at 1400px would be ~130MB of
+// images in the deploy.
+const LOCAL_MAX_DIM = { item: 512, slot: 1000, location: 1000 };
+function shipCopy(src, destDir, id, kind = 'item') {
+  const srcExt = path.extname(src).toLowerCase() === '.jpeg' ? '.jpg' : path.extname(src).toLowerCase();
+  const plain = () => {
+    const name = `${id}${srcExt}`;
+    fs.copyFileSync(src, path.join(destDir, name));
+    return name;
+  };
+  try {
+    const alpha = execSync(`sips -g hasAlpha ${JSON.stringify(src)}`, { encoding: 'utf8' });
+    const hasAlpha = /hasAlpha:\s*yes/.test(alpha);
+    const ext = hasAlpha ? '.png' : '.jpg';
+    const name = `${id}${ext}`;
+    const out = path.join(destDir, name);
+    const fmt = hasAlpha ? 'png' : 'jpeg';
+    const maxDim = LOCAL_MAX_DIM[kind] || LOCAL_MAX_DIM.item;
+    execSync(`sips -Z ${maxDim} ${JSON.stringify(src)} --out ${JSON.stringify(out)} --setProperty format ${fmt} --setProperty formatOptions 82`, { stdio: 'ignore' });
+    if (!fs.existsSync(out) || fs.statSync(out).size === 0) return plain();
+    return name;
+  } catch {
+    return plain();
+  }
+}
+
 async function ingestLocal(batch) {
   const dir = path.join(ROOT, 'public', 'art');
   fs.mkdirSync(dir, { recursive: true });
   fs.mkdirSync(DONE, { recursive: true });
   const ledger = readLedger();
   for (const { file, item } of batch) {
-    const ext = path.extname(file).toLowerCase() === '.jpeg' ? '.jpg' : path.extname(file).toLowerCase();
-    const name = `${item.id}${ext}`;
-    fs.copyFileSync(file, path.join(dir, name));
+    const name = shipCopy(file, dir, item.id, item.kind);
     item.setUrl(`art/${name}`);
     fs.renameSync(file, path.join(DONE, path.basename(file)));
     ledger.uploaded++;
@@ -415,12 +474,21 @@ async function ingest() {
   const limit = requireLimit();
   const targets = Object.fromEntries(allTargets().map(t => [t.id, t]));
   const files = (fs.existsSync(INBOX) ? fs.readdirSync(INBOX) : []).filter(f => /\.(png|jpe?g|webp)$/i.test(f));
+  // Review is per-image: the GM approves some of a batch and sends the
+  // rest back to the generator. `--ids a,b,c` links exactly those and
+  // leaves everything else sitting in the inbox untouched.
+  const onlyIds = (option('ids') || '').split(',').map(x => x.trim()).filter(Boolean);
   const queue = [];
   for (const f of files) {
     const id = path.basename(f, path.extname(f));
+    if (onlyIds.length && !onlyIds.includes(id)) continue;
     if (!targets[id]) { console.warn(`  skip ${f}: nothing with id "${id}"`); continue; }
     if (targets[id].hasArt) { console.warn(`  skip ${f}: ${targets[id].name} is already linked`); continue; }
     queue.push({ file: path.join(INBOX, f), item: targets[id] });
+  }
+  if (onlyIds.length) {
+    const missing = onlyIds.filter(id => !queue.some(q => q.item.id === id));
+    if (missing.length) console.warn(`  not in the inbox: ${missing.join(', ')}`);
   }
   const batch = queue.slice(0, limit);
   console.log(`Inbox: ${queue.length} ready, uploading ${batch.length}.`);

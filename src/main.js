@@ -45,6 +45,15 @@ if (fontScaleDisplayInit) fontScaleDisplayInit.textContent = Math.round(window.g
 // We must attach these to 'window' so onclick="window.equipItem()" works
 window.equipItem = Controllers.equipItem;
 window.unequipItem = Controllers.unequipItem;
+// Which inventory row the detail pane is showing. Pure view state — it
+// never reaches Firestore, because what one player is looking at is
+// nobody else's business and shouldn't cost a write. Clicking the
+// selected row again closes the pane.
+window.selectedInventoryItem = null;
+window.selectInventoryItem = (itemId) => {
+  window.selectedInventoryItem = window.selectedInventoryItem === itemId ? null : itemId;
+  window.render();
+};
 window.reloadWeapon = Controllers.reloadWeapon;
 window.createAccessCode = Controllers.createAccessCode;
 window.forceReset = Controllers.forceReset;
