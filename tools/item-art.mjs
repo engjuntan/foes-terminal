@@ -26,7 +26,7 @@ import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { allSlots } from './art-slots.mjs';
-import { allLocationShots } from './art-locations.mjs';
+import { allLocationShots, KEPT_INTERIORS } from './art-locations.mjs';
 import crypto from 'crypto';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -249,11 +249,25 @@ const DESERT_CLIMATE = 'Storm-scoured equatorial desert: salt-crusted dunes, sco
 // one that ends "no dust, no sand, no arid cracked earth". The art came
 // back as a lush green city, correctly following a wrong prompt. Name
 // the desert places explicitly rather than inferring them from a path.
+// GM ruling, 26 Sep: an interior people actually use is not mouldy. The
+// shared CLIMATE clause is 170 years of monsoon working on a surface,
+// which is right outdoors and right in a ruin, and wrong inside a manned
+// bunker, a monastery prayer hall or any business that wants custom.
+// Under a roof the damage is USE, not weather: grime, soot, oil, scuffs,
+// patches, repairs. `art-locations.mjs` says which interiors are kept.
+const INTERIOR_KEPT_CLIMATE = 'Equatorial Malaya, 170 years after the war, but INDOORS AND IN DAILY USE: dry and sheltered, swept, lit and lived-in. Wear here comes from use, not weather — scuffed and polished-smooth surfaces, soot and cooking smoke, oil and hand-grease on what gets touched, mismatched repairs, patched panels, salvaged parts pressed into service. Absolutely NO moss, NO algae, NO lichen, NO mould, NO water staining, NO plant growth, NO rain and NO standing water inside. Not derelict and not abandoned: someone maintains this room.';
+
 const DESERT_LOCATIONS = [/chukai/i, /round city/i, /bandar bulat/i];
 const isDesertShot = shot =>
   DESERT_LOCATIONS.some(re => re.test(shot.notePath || '') || re.test(shot.name || ''));
-const locationStyleFor = shot => isDesertShot(shot)
-  ? `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. ${GRADE} ${DESERT_CLIMATE} ${SCENE_NEGATIVES}`
+const sceneStyleWith = climate =>
+  `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. ${GRADE} ${climate} ${SCENE_NEGATIVES}`;
+
+// Upkeep wins over climate: a swept room is swept whether it stands in
+// the monsoon belt or the Chukai Desert.
+const locationStyleFor = shot =>
+  KEPT_INTERIORS.has(shot.id) ? sceneStyleWith(INTERIOR_KEPT_CLIMATE)
+  : isDesertShot(shot) ? sceneStyleWith(DESERT_CLIMATE)
   : LOCATION_STYLE;
 
 // Reads or writes one key in a note's YAML frontmatter, creating the block

@@ -496,6 +496,50 @@ export const LOCATION_SHOTS = [
 ];
 
 // A flat accessor, mirroring tools/art-slots.mjs's allSlots() shape.
+// --- UPKEEP (GM ruling, 26 Sep 2026) -------------------------------
+// The shared climate clause describes 170 years of monsoon doing its
+// work: mould and algae from the top down, rust weeping, damp surfaces.
+// That is right for an exterior and right for a ruin. It is wrong for
+// the inside of a place people actually use — a bunker is kept, monks
+// sweep their own prayer hall, and any business that wants custom
+// cleans its floor. The first pass put moss on all of them.
+//
+// So interiors declare their upkeep. KEPT_INTERIORS are inhabited,
+// staffed or in daily use: they get grime, soot, oil, scuffs, patches
+// and repairs — the wear of use — but no biological growth. Every other
+// interior is abandoned or ruined and keeps the decay clause, because
+// that is the whole point of the shot.
+export const KEPT_INTERIORS = new Set([
+  // lived in
+  'loc_bandar_buaya_interior',
+  'loc_bandawang_baru_interior',
+  // working premises
+  'loc_batu_kapur_interior',
+  'loc_the_scrapyard_interior',
+  'loc_seio_peng_brothers_rnr_interior',
+  'loc_the_lakeside_bar_interior',
+  // gambling houses — takings depend on looking respectable
+  'loc_bandawang_lama_interior',
+  'loc_kulim_interior',
+  'loc_syurga_interior',
+  'loc_the_tiger_palace_interior',
+  'loc_the_free_city_of_bandawang_interior',
+  'loc_north_bandawang_interior',
+  // institutions that maintain themselves
+  'loc_maqil_monastery_interior',
+  'loc_round_city_interior',
+  'loc_federal_cultural_library_interior',
+  'loc_the_education_center_interior',
+  'loc_the_rakan_community_center_interior',
+  // manned posts and bunkers
+  'loc_perdana_bunker_interior',
+  'loc_wira_bunker_interior',
+  'loc_fortress_city_of_penang_interior',
+  'loc_federation_checkpoint_interior',
+  'loc_federation_recruitment_center_interior',
+  'loc_the_bandawang_enforcer_station_b_e_station_interior'
+]);
+
 export function allLocationShots() {
   return LOCATION_SHOTS;
 }
