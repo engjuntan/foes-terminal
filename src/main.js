@@ -80,6 +80,11 @@ window.gmAdjustHP = (amt) => Controllers.gmAdjustHP(window.selectedCharId, amt);
 window.gmSetRadiation = (amt) => Controllers.gmSetRadiation(window.selectedCharId, amt);
 window.gmSetNeed = (needKey, val) => Controllers.gmSetNeed(window.selectedCharId, needKey, val);
 window.gmSetReputation = Controllers.gmSetReputation;
+// Which character the GM's reputation sliders are pointed at. Pure view
+// state — reputation is per character now, but whose sheet the GM happens
+// to have open is nobody else's business and never reaches Firestore.
+window.reputationTargetId = null;
+window.setReputationTarget = (charId) => { window.reputationTargetId = charId; window.render(); };
 window.gmSetKarma = (val) => Controllers.gmSetKarma(window.selectedCharId, val);
 window.gmAddReputationEntity = Controllers.gmAddReputationEntity;
 window.gmRenameReputationEntity = Controllers.gmRenameReputationEntity;

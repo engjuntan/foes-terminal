@@ -98,19 +98,31 @@ export function getReputationTier(value) {
   return tier;
 }
 
-// Reads a single entity's reputation value out of the live doc, tolerating
-// every level of absence (no `reputation` field at all, or the field
-// present but missing this entity).
-export function getReputationValue(liveData, entityId) {
-  const rep = (liveData && liveData.reputation) || {};
-  return typeof rep[entityId] === 'number' ? rep[entityId] : 0;
+// Reputation is PER CHARACTER (GM ruling, 26 Sep). It was party-wide —
+// one `reputation.<entityId>` for everyone — which meant a face-man's
+// careful work with the Rakan Watch and a thug's murder spree landed on
+// the same number, and a player could be Idolized by a faction they had
+// never met. Karma was already per-character; this brings standing in
+// line with it.
+//
+// Stored at `characters.<charId>.reputation.<entityId>`. The old
+// party-wide value is still read as a FALLBACK so existing campaigns
+// don't have every standing silently reset to Neutral on this deploy:
+// a character with no value of their own inherits what the party had,
+// and the first GM write for that character moves them onto their own
+// track for good.
+export function getReputationValue(char, entityId, liveData) {
+  const own = (char && char.reputation) || {};
+  if (typeof own[entityId] === 'number') return own[entityId];
+  const legacy = (liveData && liveData.reputation) || {};
+  return typeof legacy[entityId] === 'number' ? legacy[entityId] : 0;
 }
 
 // What the future shop calls: the tier plus its buy/sell modifiers for one
-// entity, resolved straight from the live doc so callers never have to
-// duplicate the "missing = 0 = Neutral" lookup themselves.
-export function getReputationModifiers(entityId, liveData) {
-  const value = getReputationValue(liveData, entityId);
+// entity and one character, so callers never duplicate the
+// "missing = 0 = Neutral" lookup themselves.
+export function getReputationModifiers(entityId, char, liveData) {
+  const value = getReputationValue(char, entityId, liveData);
   const tier = getReputationTier(value);
   return { value, tier, buy_mod: tier.buy_mod, sell_mod: tier.sell_mod, refuses_trade: tier.buy_mod === null };
 }

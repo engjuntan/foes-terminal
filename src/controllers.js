@@ -878,15 +878,20 @@ export async function gmSetRadiation(targetCharId, amount) {
 }
 
 // --- REPUTATION & KARMA ---
-// Party-wide standing with a faction/town, modelled on Fallout 2 — every
-// player sees the same tier for a given entity. Stored flat at
-// `reputation.<entityId>` (missing = 0 = Neutral, see
-// reputationContent.js's getReputationValue). GM-only write, one
-// updateDoc, same commit-on-release slider convention as gmSetNeed.
-export async function gmSetReputation(entityId, value) {
-  if (!window.liveData || !entityId) return;
+// One character's standing with a faction/town, modelled on Fallout 2.
+// PER CHARACTER since the GM's ruling of 26 Sep — it used to be one
+// party-wide number, so the diplomat and the thug shared a reputation
+// they had earned very differently. Stored at
+// `characters.<charId>.reputation.<entityId>` (missing = inherit the old
+// party value, else 0 = Neutral — see reputationContent.js). GM-only
+// write, one updateDoc, same commit-on-release slider convention as
+// gmSetNeed.
+export async function gmSetReputation(targetCharId, entityId, value) {
+  if (!window.liveData || !entityId || !targetCharId) return;
+  const char = window.liveData.characters[targetCharId];
+  if (!char) return;
   const clamped = Math.max(REPUTATION_MIN, Math.min(REPUTATION_MAX, Math.round(Number(value) || 0)));
-  const before = getReputationValue(window.liveData, entityId);
+  const before = getReputationValue(char, entityId, window.liveData);
   const beforeTier = getReputationTier(before);
   const afterTier = getReputationTier(clamped);
 
@@ -899,18 +904,18 @@ export async function gmSetReputation(entityId, value) {
 
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
-  updatePayload[`reputation.${entityId}`] = clamped;
+  updatePayload[`characters.${targetCharId}.reputation.${entityId}`] = clamped;
   // Only post when the TIER actually changes, not every slider nudge —
   // players see named tiers, never raw numbers, so a message only makes
   // sense when what they'd see has actually moved.
   if (afterTier.id !== beforeTier.id) {
     const currentMessages = window.liveData.messages || [];
     updatePayload.messages = [...currentMessages, {
-      id: `msg_${Date.now()}`, from: 'GM', target: 'all',
+      id: `msg_${Date.now()}`, from: 'GM', target: targetCharId,
       body: `Your standing with ${entityName} is now: ${afterTier.name}.`,
       timestamp: Date.now()
     }];
-    updatePayload.event_log = pushEventLog(window.liveData.event_log, { text: `Standing with ${entityName} shifts to ${afterTier.name}.`, actor: 'GM' });
+    updatePayload.event_log = pushEventLog(window.liveData.event_log, { text: `${char.name}'s standing with ${entityName} shifts to ${afterTier.name}.`, actor: 'GM' });
   }
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
@@ -984,7 +989,13 @@ export async function gmRemoveReputationEntity(entityId) {
   const updated = entities.filter(e => e.id !== entityId);
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = { reputation_entities: updated };
+  // Reputation is per character now, so dropping an entity means clearing
+  // it from every sheet — plus the legacy party-wide key, or a deleted
+  // faction would keep haunting characters through the fallback.
   updatePayload[`reputation.${entityId}`] = deleteField();
+  Object.keys(window.liveData.characters || {}).forEach(cid => {
+    updatePayload[`characters.${cid}.reputation.${entityId}`] = deleteField();
+  });
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 

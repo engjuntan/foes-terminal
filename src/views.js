@@ -551,7 +551,7 @@ export function getReputationView(charId, liveData) {
 
   const entities = normalizeReputationEntities(liveData.reputation_entities);
   const entityCardsHtml = entities.map(entity => {
-    const { tier } = getReputationModifiers(entity.id, liveData);
+    const { tier } = getReputationModifiers(entity.id, char, liveData);
     // Two different pictures, two different jobs: the faction's own card
     // says WHO they are and runs as a wide banner (they're three-figure
     // scenes — a thumbnail turns them to mush), while the tier square
@@ -2809,10 +2809,26 @@ export function renderGMScreen(liveData) {
         </div>`;
     }).join('') || `<div style="color:#555; font-size:12px;">No bestiary entries yet.</div>`;
 
-  // --- REPUTATION (party-wide entity roster + sliders) ---
+  // --- REPUTATION (per character since 26 Sep) ---
+  // The roster is shared — one list of factions everybody is measured
+  // against — but the standing on each slider belongs to ONE character.
+  // Whose, is `window.reputationTargetId`: view state only, never written
+  // to Firestore, defaulting to the first character on the roster.
   const reputationEntities = normalizeReputationEntities(liveData.reputation_entities);
-  const reputationRowsHtml = reputationEntities.map(entity => {
-    const { value, tier } = getReputationModifiers(entity.id, liveData);
+  const repCharIds = Object.keys(chars);
+  if (!window.reputationTargetId || !chars[window.reputationTargetId]) {
+    window.reputationTargetId = repCharIds[0] || null;
+  }
+  const repChar = window.reputationTargetId ? chars[window.reputationTargetId] : null;
+  const reputationWhoHtml = repCharIds.length ? `
+    <label style="font-size:11px; color:var(--pip-dim); display:block;">WHOSE STANDING</label>
+    <div style="font-size:10px; color:#666; margin-bottom:3px;">Reputation is earned per character. These sliders move only this one.</div>
+    <select onchange="window.setReputationTarget(this.value)" style="width:100%; margin-bottom:10px; background:black; color:var(--pip-green); border:1px solid #333; font-family:'VT323';">
+      ${repCharIds.map(id => `<option value="${id}" ${window.reputationTargetId === id ? 'selected' : ''}>${escapeHtml(chars[id].name || id)}</option>`).join('')}
+    </select>` : `<div style="color:#555; font-size:12px; margin-bottom:8px;">No characters yet.</div>`;
+
+  const reputationRowsHtml = !repChar ? '' : reputationEntities.map(entity => {
+    const { value, tier } = getReputationModifiers(entity.id, repChar, liveData);
     return `
       <div style="border:1px solid #222; padding:6px 8px; margin-bottom:8px;">
         <div style="display:flex; gap:4px; margin-bottom:4px;">
@@ -2827,7 +2843,7 @@ export function renderGMScreen(liveData) {
         </div>
         <input type="range" min="${REPUTATION_MIN}" max="${REPUTATION_MAX}" value="${value}" style="width:100%;"
                oninput="this.nextElementSibling.textContent = this.value"
-               onchange="window.gmSetReputation('${entity.id}', Number(this.value))">
+               onchange="window.gmSetReputation('${window.reputationTargetId}', '${entity.id}', Number(this.value))">
         <span style="display:none;">${value}</span>
       </div>`;
   }).join('') || `<div style="color:#555; font-size:12px;">No entities tracked yet.</div>`;
@@ -3052,6 +3068,7 @@ export function renderGMScreen(liveData) {
             <button class="gm-btn" onclick="window.gmAddReputationEntity()">ADD</button>
           </div>
         </div>
+        ${reputationWhoHtml}
         <div style="max-height:400px; overflow-y:auto;">
           ${reputationRowsHtml}
         </div>
