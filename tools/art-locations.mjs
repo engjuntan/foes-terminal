@@ -39,7 +39,7 @@ export const LOCATION_SHOTS = [
     name: 'Bandar Buaya',
     notePath: 'Locations/Bandar Buaya.md',
     shot: 'interior',
-    prompt: "Inside a communal longhouse built from salvaged warehouse steel: rows of hammocks slung between roof trusses, a shared cooking fire under a corrugated vent, jars of murky tonics and bandages stacked on a shelf, damp mould climbing the wall behind them."
+    prompt: "Inside a communal longhouse built from salvaged warehouse steel: rows of hammocks slung between roof trusses, a shared cooking fire under a corrugated vent, jars of murky tonics and bandages stacked on a shelf, cooking soot darkening the wall behind them."
   },
   {
     id: 'loc_batu_kapur_entrance',
