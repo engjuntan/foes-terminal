@@ -2778,9 +2778,17 @@ export function renderGMScreen(liveData) {
       </div>`;
   }).join('');
 
+  // Read as "who this is, and what they type" rather than as raw fields —
+  // the GM reads this list to answer a player asking how to get in.
   const codesHtml = Object.entries(accessCodes).map(([code, data]) => {
-    return `<div><small style="color:var(--pip-gold);">${code}</small>: ${data.role} (${data.linked_char || '-'})</div>`;
-  }).join('');
+    const isGm = data.role === 'gm';
+    const who = isGm ? 'Game Master'
+      : ((chars[data.linked_char] || {}).name || data.linked_char || 'no character yet');
+    return `<div style="display:flex; justify-content:space-between; gap:8px; padding:3px 0; border-bottom:1px dashed #222;">
+      <span style="color:${isGm ? 'orange' : 'var(--pip-green)'}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(who)}</span>
+      <span style="color:var(--pip-gold); font-family:inherit; white-space:nowrap;">types <strong>${escapeHtml(code)}</strong></span>
+    </div>`;
+  }).join('') || `<div style="color:#555; font-size:12px;">Nobody yet.</div>`;
 
   // --- COMBAT SETUP ---
   const combatDraft = window.combatDraft || { monsters: {} };
@@ -3000,15 +3008,27 @@ export function renderGMScreen(liveData) {
       </div>
 
       <div class="panel">
-        <h3>ACCESS CONTROL</h3>
+        <h3>PLAYERS &amp; PASSCODES</h3>
+        <p style="font-size:11px; color:#666; margin-top:-4px;">Each player gets a passcode. They type it at the terminal and land on their own character.</p>
         <div style="margin-bottom:10px; border:1px solid #333; padding:10px; background:rgba(0,0,0,0.5);">
-          <small>GRANT NEW ACCESS</small>
-          <input type="text" id="newCode" placeholder="CODE" style="width:100%; margin-bottom:5px; background:black; color:lime; border:1px solid #333;">
-          <input type="text" id="newCharName" placeholder="CHAR ID (e.g. iron_legs)" style="width:100%; margin-bottom:5px; background:black; color:lime; border:1px solid #333;">
-          <input type="text" id="newDisplayName" placeholder="DISPLAY NAME (e.g. Iron Legs) — optional" style="width:100%; margin-bottom:5px; background:black; color:lime; border:1px solid #333;">
-          <button style="width:100%; cursor:pointer; background:var(--pip-green); color:black; font-weight:bold;" onclick="window.createAccessCode()">AUTHORIZE</button>
+          <label style="font-size:11px; color:var(--pip-dim); display:block;">CHARACTER NAME</label>
+          <div style="font-size:10px; color:#666; margin-bottom:3px;">What everyone at the table sees.</div>
+          <input type="text" id="newDisplayName" placeholder="Iron Legs"
+                 oninput="document.getElementById('newCharName').value = this.value.toLowerCase().trim().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'')"
+                 style="width:100%; margin-bottom:10px; background:black; color:lime; border:1px solid #333;">
+
+          <label style="font-size:11px; color:var(--pip-dim); display:block;">PASSCODE</label>
+          <div style="font-size:10px; color:#666; margin-bottom:3px;">What this player types to log in. Give it to them, not to the table.</div>
+          <input type="text" id="newCode" placeholder="IRON_ACCESS" style="width:100%; margin-bottom:10px; background:black; color:lime; border:1px solid #333;">
+
+          <label style="font-size:11px; color:var(--pip-dim); display:block;">INTERNAL ID</label>
+          <div style="font-size:10px; color:#666; margin-bottom:3px;">Filled in from the name. Only change it if you need to reuse an existing sheet.</div>
+          <input type="text" id="newCharName" placeholder="iron_legs" style="width:100%; margin-bottom:10px; background:black; color:#888; border:1px solid #333;">
+
+          <button style="width:100%; cursor:pointer; background:var(--pip-green); color:black; font-weight:bold;" onclick="window.createAccessCode()">CREATE PLAYER</button>
         </div>
-        <div style="height:200px; overflow-y:auto; border-top:1px solid #333; padding-top:10px;">
+        <div style="font-size:11px; color:var(--pip-dim); border-top:1px solid #333; padding-top:8px;">WHO CAN LOG IN</div>
+        <div style="height:200px; overflow-y:auto; padding-top:6px;">
           ${codesHtml}
         </div>
       </div>

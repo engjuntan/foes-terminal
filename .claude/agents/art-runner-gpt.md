@@ -26,13 +26,22 @@ back.
    `art/queue.md`: each asset's **id**, **file name**, **prompt**, aspect
    ratio and what it's for.
 2. Open the nominated chat. Paste **one** prompt, send it.
-3. **Wait, don't poll.** Polling with `read_page` is what makes this job
-   expensive: every check re-sends the whole conversation, and the wait is
-   the same either way. Send the prompt, then `sleep 150` in Bash, THEN
-   read the page once. If it isn't ready, `sleep 60` and read once more.
-   Only after two misses is anything wrong. Never screenshot — you do not
-   need to see the picture to know it arrived, and a screenshot costs more
-   than everything else in the loop combined.
+3. **Sleep through it in as few calls as possible.** Time is free here;
+   tool calls are not. A `sleep` costs exactly ONE call whether it waits
+   ten seconds or ten minutes, while polling costs one call per check and
+   re-sends the whole conversation each time. The Bash tool caps a single
+   call at 10 minutes, so wait like this:
+
+       sleep 570   # ~9.5 min, one call
+       sleep 570   # again if the image is slow
+       sleep 570   # third only if needed
+
+   ChatGPT has taken up to 30 minutes per image on a bad day. Do all the
+   sleeping FIRST, then `read_page` ONCE. If it still isn't ready, one
+   more `sleep 570` and one more read. Never read the page to "check
+   progress" — you cannot make it faster by looking at it, and each look
+   costs more than the entire wait. Never screenshot.
+
 4. Download the image with ChatGPT's own download control.
 5. `npm run art -- collect <asset_id>` — this moves the newest download
    into the vault's `Media/New items/<asset_id>.png`. Check the output names

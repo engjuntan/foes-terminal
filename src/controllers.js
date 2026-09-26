@@ -402,7 +402,17 @@ export async function createAccessCode() {
   const displayNameInput = document.getElementById('newDisplayName').value.trim();
   const displayName = displayNameInput || charId.toUpperCase(); // fallback to old behavior
 
-  if (!code || !charId) { alert("ENTER CODE AND CHAR ID"); return; }
+  // The form leads with the character's name and fills the id from it, so
+  // say which box is empty in those terms rather than naming the fields.
+  if (!displayNameInput && !charId) { alert("Enter a character name first."); return; }
+  if (!code) { alert("Enter a passcode for this player to log in with."); return; }
+  if (!charId) { alert("Internal ID is empty — type a character name, or fill it in yourself."); return; }
+  const existing = (window.liveData.access_codes || {})[code];
+  if (existing) {
+    const who = existing.role === 'gm' ? 'the Game Master' : (existing.linked_char || 'someone');
+    alert(`The passcode ${code} already belongs to ${who}. Pick a different one.`);
+    return;
+  }
   
   const ref = doc(db, "prisoncampaign", "alpha_team");
   const updatePayload = {};
@@ -426,7 +436,7 @@ export async function createAccessCode() {
     };
   }
   await updateDoc(ref, updatePayload);
-  alert(`ACCESS GRANTED: ${code} linked to ${charId.toUpperCase()}`);
+  alert(`${displayName} can now log in with the passcode ${code}.`);
 }
 
 export async function forceReset() {

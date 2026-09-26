@@ -19,12 +19,18 @@ The loop, one target at a time:
    if the brief says so), then read `art/prompt-sheet.md`. It lists each
    target's **name**, its **file name** (`<id>.png`), and its prompt.
 2. In the Gemini tab, paste **one** prompt and send it.
-3. **Wait, don't poll.** Every `read_page` re-sends the whole conversation,
-   and the image takes the same time either way. Send the prompt, then
-   `sleep 45` in Bash, THEN read the page once. If it isn't ready,
-   `sleep 30` and read once more. Never screenshot — you don't need to see
-   the picture to know it arrived, and it costs more than the rest of the
-   loop combined.
+3. **Sleep through it in as few calls as possible.** Time is free here;
+   tool calls are not. A `sleep` costs exactly ONE call whether it waits
+   ten seconds or ten minutes, while polling costs one call per check and
+   re-sends the whole conversation each time. Gemini usually takes 45-90
+   seconds, so:
+
+       sleep 90    # one call, covers most images
+
+   Then `read_page` ONCE. Not ready? `sleep 60` and read once more. Never
+   read the page to "check progress" — looking at it does not make it
+   faster, and each look costs more than the wait. Never screenshot.
+
 4. Download it with Gemini's own download control.
 5. `npm run art -- collect <id>` — this moves the newest image from the
    GM's Downloads folder into the vault's `Media/New items/<id>.png`. Check the command's
