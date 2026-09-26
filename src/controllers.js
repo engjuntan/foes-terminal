@@ -4,6 +4,7 @@ import { db } from './firebase.js'; // Imports the connection we made in File 1
 import { statusEffectDatabase } from './statusEffects.js';
 import { getItem, itemDatabase } from './items.js';
 import { RACE_RULES, calculateDerivedStats, deriveCharacter, CARRY_OVERAGE_ALLOWANCE } from './formulas.js';
+import { SPECIAL_ORDER as SPECIAL_KEYS } from './goatContent.js';
 import { getMonster } from './bestiary.js';
 import { magazineOnEquip, refundMagazine, usesAmmo, resolveFireMode } from './ammo.js';
 import { instantiateMonster, rollInitiative, rollPercentile, resolveHit, rollDamage, applyDamageReduction, parseArmorDtdr, BODY_PARTS, BURST_HIT_PENALTY, BURST_DAMAGE_ROLLS, buildAttackLogMessage, getCritChance, resolveCrit, rollCritTableEntry, STANCES, COVER_LEVELS, isMonsterAttackMelee, effectiveTargetAC, resolveCombatantSave, combatantLimbResistance, DOWN_RECOVERY_TIER, resolveDownedRecovery, clampReviveHp } from './combat.js';
@@ -724,14 +725,16 @@ export async function openMessage(messageId) {
 // "disrepair" loot — without it defaulting to the item's own start_marks
 // (see condition.js's startMarksForItem). Left blank, it uses that
 // default (pristine unless the item itself is authored pre-worn).
-// Shared core for both grant entry points below — the modal's INVENTORY
-// select (gmGrantItem) and the standalone GRANT ITEMS tab
+// Shared core for both grant entry points below — the GM console's
+// INVENTORY tab (gmGrantItem) and the standalone GRANT ITEMS tab
 // (gmGrantItemToTarget), grouped by category (GM ruling 2026-09-24).
-// Both end up doing exactly the same write, they just source itemId/marks
-// differently.
-async function grantItemCore(targetCharId, itemId, marksRaw) {
+// Both end up doing exactly the same write, they just source
+// itemId/marks/qty differently. `qty` (GM_DASHBOARD_SPEC.md Job 2.1)
+// defaults to 1 for the standalone tab, which has no quantity input.
+async function grantItemCore(targetCharId, itemId, marksRaw, qty = 1) {
   const item = getItem(itemId);
   if (!item) return;
+  qty = Math.max(1, Math.round(Number(qty)) || 1);
   const charRef = doc(db, "prisoncampaign", "alpha_team");
 
   try {
@@ -745,7 +748,7 @@ async function grantItemCore(targetCharId, itemId, marksRaw) {
     // and upgrades transparently even if this character still has the
     // old flat-array shape from before stacking existed.
     const currentInv = targetCharDoc.inventory;
-    const newInv = addToInventory(currentInv, itemId, 1);
+    const newInv = addToInventory(currentInv, itemId, qty);
 
     // WRITE the entire updated map back
     const charPath = `characters.${targetCharId}`;
@@ -755,39 +758,83 @@ async function grantItemCore(targetCharId, itemId, marksRaw) {
     if (isDurable(item)) {
       const condition = normalizeCondition(targetCharDoc);
       const marks = (marksRaw !== '' && marksRaw !== null && marksRaw !== undefined && !isNaN(Number(marksRaw))) ? clampMarks(Number(marksRaw)) : startMarksForItem(item);
+      // One marks entry per copy granted — qty>1 hands over `qty`
+      // separate copies, each starting at the same condition.
+      const newCopies = Array(qty).fill(marks);
       updatePayload[`${charPath}.condition`] = {
-        inv: { ...condition.inv, [itemId]: [...(condition.inv[itemId] || []), marks].sort((a, b) => a - b) },
+        inv: { ...condition.inv, [itemId]: [...(condition.inv[itemId] || []), ...newCopies].sort((a, b) => a - b) },
         worn: condition.worn
       };
     }
 
     updatePayload.event_log = pushEventLog(window.liveData.event_log, {
-      text: `GM grants ${item.name} to ${targetCharDoc.name || targetCharId}.`, actor: 'GM'
+      text: `GM grants ${qty > 1 ? `${qty}x ` : ''}${item.name} to ${targetCharDoc.name || targetCharId}.`, actor: 'GM'
     });
 
     await updateDoc(charRef, updatePayload);
-    alert(`GRANTED ${itemId.toUpperCase()} TO ${targetCharId.toUpperCase()}`);
+    alert(`GRANTED ${qty > 1 ? `${qty}x ` : ''}${itemId.toUpperCase()} TO ${targetCharId.toUpperCase()}`);
   } catch (err) { alert(err.message); }
 }
 
+// GM console INVENTORY tab (GM_DASHBOARD_SPEC.md Job 2.1) — category
+// dropdown repopulates #gmItemSelect, #gmItemQty defaults to 1 when
+// empty/blank. Granted at the item's own default condition (no marks
+// field in the new row — the GM sets condition afterward via the
+// carried-items list if it matters).
 export async function gmGrantItem(targetCharId) {
   const select = document.getElementById('gmItemSelect');
-  const itemId = select.value;
+  const itemId = select && select.value;
   if (!itemId) return;
-  const marksInput = document.getElementById('gmItemMarks');
-  const marksRaw = marksInput ? marksInput.value : '';
-  await grantItemCore(targetCharId, itemId, marksRaw);
+  const qtyInput = document.getElementById('gmItemQty');
+  const qty = qtyInput ? qtyInput.value : 1;
+  await grantItemCore(targetCharId, itemId, '', qty);
 }
 
 // GRANT ITEMS tab (GM ruling 2026-09-24): a character picker up top
-// (window.selectedCharId, same "currently targeted PC" state the modal
+// (window.selectedCharId, same "currently targeted PC" state the console
 // and STATUS tab use) plus one GRANT button per item, grouped by
-// category — no marks input here, granted pristine/at the item's own
-// default (same as leaving the modal's marks field blank).
+// category — no marks/qty input here, granted pristine/at the item's own
+// default, one at a time.
 export async function gmGrantItemToTarget(itemId) {
   const targetCharId = window.selectedCharId;
   if (!targetCharId) { alert("PICK A CHARACTER FIRST"); return; }
   await grantItemCore(targetCharId, itemId, '');
+}
+
+// GM console INVENTORY tab (Job 2.2) — the reverse of a grant, one TAKE
+// button per carried-item row. Removes `qty` (default 1) of an item from
+// the selected character; for a durable item also drops that many
+// condition-marks entries, best-condition copies first (same "no
+// specific-copy picker" default giveItem uses for a multi-item transfer).
+export async function gmTakeItem(targetCharId, itemId, qty) {
+  if (!targetCharId || !window.liveData) return;
+  const char = window.liveData.characters[targetCharId];
+  if (!char) return;
+  const item = getItem(itemId);
+  if (!item) return;
+
+  const owned = getInventoryQuantity(char.inventory, itemId);
+  if (owned <= 0) return;
+  const takeQty = Math.min(owned, Math.max(1, Math.round(Number(qty)) || 1));
+  const newInv = removeFromInventory(char.inventory, itemId, takeQty);
+
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.inventory`] = newInv;
+
+  if (isDurable(item)) {
+    const condition = normalizeCondition(char);
+    const remaining = [...(condition.inv[itemId] || [])].sort((a, b) => a - b).slice(takeQty);
+    const newCondInv = { ...condition.inv };
+    if (remaining.length) newCondInv[itemId] = remaining; else delete newCondInv[itemId];
+    updatePayload[`characters.${targetCharId}.condition`] = { inv: newCondInv, worn: condition.worn };
+  }
+
+  updatePayload.event_log = pushEventLog(window.liveData.event_log, {
+    text: `GM takes ${takeQty > 1 ? `${takeQty}x ` : ''}${item.name} from ${char.name || targetCharId}.`, actor: 'GM'
+  });
+
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // 2. Adjust HP
@@ -1935,6 +1982,39 @@ export async function gmAdjustVaultPoints(targetCharId, amount) {
   updatePayload[`characters.${targetCharId}.vault_points`] = newVP;
   
   await updateDoc(charRef, updatePayload);
+}
+
+// GM console STATS tab (GM_DASHBOARD_SPEC.md Job 1.4) — direct GM
+// override of a raw SPECIAL stat, the sheet value deriveCharacter()
+// starts its math from. Not race-bounded like character creation: this
+// is an out-of-fiction GM correction (same category as gmSetRadiation),
+// so it's clamped to a generous 1-20 rather than the creating race's own
+// min/max, which a GM override may deliberately want to exceed.
+export async function gmSetSpecial(targetCharId, statKey, value) {
+  const char = window.liveData.characters[targetCharId];
+  if (!char || !SPECIAL_KEYS.includes(statKey)) return;
+  const clamped = Math.max(1, Math.min(20, Math.round(Number(value) || 0)));
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.special.${statKey}`] = clamped;
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
+}
+
+// GM console STATS tab — direct override of a skill's spent ranks
+// (char.skill_ranks.<skillKey>, the same field confirmLevelUp writes
+// permanently). Setting it to 0 clears the key outright rather than
+// leaving a "0 ranks" entry (B.2's "never write a zero" convention, same
+// as gmSetLimbDamage).
+export async function gmSetSkillRank(targetCharId, skillKey, value) {
+  const char = window.liveData.characters[targetCharId];
+  if (!char) return;
+  const clamped = Math.max(0, Math.round(Number(value) || 0));
+  const ranks = { ...(char.skill_ranks || {}) };
+  if (clamped > 0) ranks[skillKey] = clamped; else delete ranks[skillKey];
+  const charRef = doc(db, "prisoncampaign", "alpha_team");
+  const updatePayload = {};
+  updatePayload[`characters.${targetCharId}.skill_ranks`] = ranks;
+  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
 
 // 4. Grant Level Up
