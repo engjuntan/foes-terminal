@@ -35,6 +35,7 @@ import { deriveBodyState, renderBodyWireframe } from './wireframe.js';
 import { clipState, heldRounds, availableFireModes, resolveFireMode } from './ammo.js';
 import { STATIONS, canCraft, netWeightDelta, isStationAvailable } from './crafting.js';
 import { recipeDatabase } from './recipes.js';
+import { GRANT_CATEGORY_LABELS, buildGrantCategoryList, defaultGrantCategory, buildCarriedRows } from './gmInventory.js';
 import {
   isDurable, isBroken, normalizeCondition, conditionLabel, scrapYieldFor,
   repairFloor, repairSaveChance, totalRepairCost, genericScrapComponent
@@ -2538,8 +2539,8 @@ function equipLike(charData) {
 
 // --- GM: character picker shared by the GRANT ITEMS and STATUS tabs ---
 // Both tabs act on "whichever character the GM currently has selected" —
-// the same window.selectedCharId the MANAGE modal itself uses, so
-// picking someone here and opening their modal (or vice versa) always
+// the same window.selectedCharId the dashboard's console (Job 1) uses, so
+// picking someone here and clicking a squad card (or vice versa) always
 // agree on who's targeted.
 function renderGMCharPicker(chars, color) {
   const options = Object.entries(chars)
@@ -2555,9 +2556,10 @@ function renderGMCharPicker(chars, color) {
     </div>`;
 }
 
-// --- GM: GRANT ITEMS (its own tab, GM ruling 2026-09-24 — items grouped
-// by category rather than one long select; the MANAGE modal keeps its
-// own single-select grant control unchanged alongside this) ---
+// --- GM: GRANT ITEMS (its own top-level tab, GM ruling 2026-09-24 —
+// items grouped by category rather than one long select; the dashboard
+// console's own INVENTORY tab (GM_DASHBOARD_SPEC.md Job 2) keeps its own
+// category → item → quantity grant row alongside this) ---
 const GRANT_ITEM_CATEGORIES = [
   ['weapon', 'WEAPONS'], ['armor', 'ARMOR'], ['consumable', 'CONSUMABLES'], ['ammo', 'AMMO'],
   ['component', 'COMPONENTS'], ['junk', 'JUNK'], ['accessory', 'ACCESSORIES'], ['currency', 'CURRENCY']
@@ -2620,9 +2622,15 @@ export function getGrantItemsView(liveData) {
     </div>`;
 }
 
-// --- GM: STATUS (its own tab, GM ruling 2026-09-24 — needs, radiation,
-// karma and limb damage moved out of the MANAGE modal, plus TIME CONTROL
-// moved off the Dashboard) ---
+// --- GM: STATUS (its own top-level nav screen, GM ruling 2026-09-24 —
+// needs, radiation, karma and limb damage moved out of the (now-deleted)
+// MANAGE modal, plus TIME CONTROL moved off the Dashboard). NOT the same
+// thing as the dashboard console's own STATUS tab (GM_DASHBOARD_SPEC.md
+// Job 1.4 — per-character status-effect apply/remove only) — Job 1's
+// VITALS tab mirrors this screen's radiation/needs/limb/karma controls
+// for at-a-glance editing without leaving the dashboard, but this screen
+// keeps its own copy rather than folding into it, since PARTY (crafting
+// stations, Job 3) and TIME CONTROL live here and nowhere else. ---
 export function getGMStatusView(liveData) {
   const chars = liveData.characters || {};
   const target = window.selectedCharId;
@@ -2661,7 +2669,7 @@ export function getGMStatusView(liveData) {
       </div>
 
       <h3 style="color:red; border-bottom:1px dashed red;">LIMB DAMAGE</h3>
-      <p style="font-size:10px; color:#666; margin:2px 0 6px;">Direct hit-counter control (STATUS_AND_CRIPPLE_SPEC.md C.3) — sets the raw count only, no auto-cripple. Use the STATUS EFFECTS control in this character's MANAGE modal to actually apply/remove Crippled Arm/Leg.</p>
+      <p style="font-size:10px; color:#666; margin:2px 0 6px;">Direct hit-counter control (STATUS_AND_CRIPPLE_SPEC.md C.3) — sets the raw count only, no auto-cripple. Use the STATUS EFFECTS control in this character's dashboard console (STATUS tab) to actually apply/remove Crippled Arm/Leg.</p>
       <div style="margin-bottom:10px;">
         ${(() => {
           const limbResistance = deriveCharacter(targetChar).limbResistance;
@@ -2748,54 +2756,413 @@ export function getGMStatusView(liveData) {
     </div>`;
 }
 
+
+// --- GM CONSOLE (GM_DASHBOARD_SPEC.md Job 1/2) ---
+// Replaces the old #gm-modal. Clicking a squad card SELECTS a character
+// (window.selectedCharId, set by window.setGMStatusTarget — the same
+// setter the STATUS/GRANT ITEMS tabs' char picker already used, so every
+// screen that reads "who's currently targeted" agrees). The console at
+// right renders whichever of the four tabs window.gmConsoleTab points
+// at — view state only, never written to Firestore, same as
+// window.reputationTargetId.
+
+// 1.3 — one read-only squad card: avatar/name/level/dead-treatment, HP
+// bar, RAW SPECIAL (char.special[k], never deriveCharacter() — the GM
+// wants the sheet, not the modified state), the four survival meters
+// (normalizeNeeds() for hunger/thirst/sleep, raw rads/1000 for the
+// fourth), and status-effect chips. Nothing on it is clickable except
+// the card itself.
+function renderGMSquadCard(id, char) {
+  const hpPercent = Math.max(0, Math.min(100, (char.hp.current / char.hp.max) * 100));
+  const vp = char.vault_points || 0;
+  // Job 5: dead characters stay in the roster forever — never deleted —
+  // but read as unmistakably dead here too.
+  const isDead = !!char.is_dead;
+  const isSelected = window.selectedCharId === id;
+  const special = char.special || {};
+  const needs = normalizeNeeds(char.needs);
+  const rads = char.rads || 0;
+
+  const specialRowHtml = SPECIAL_ORDER.map(k => `
+    <div style="text-align:center; flex:1;">
+      <div style="font-size:9px; color:#666;">${k.toUpperCase()}</div>
+      <div style="font-size:13px; color:var(--pip-green);">${special[k] ?? '-'}</div>
+    </div>`).join('');
+
+  const meter = (label, pct, color) => `
+    <div style="margin-bottom:2px;">
+      <div style="display:flex; justify-content:space-between; font-size:9px; color:#666;"><span>${label}</span></div>
+      <div style="height:4px; background:#221; border:1px solid #333;">
+        <div style="height:100%; width:${Math.max(0, Math.min(100, pct))}%; background:${color};"></div>
+      </div>
+    </div>`;
+
+  const metersHtml = meter('HUNGER', needs.hunger, 'var(--pip-green)')
+    + meter('THIRST', needs.thirst, 'cyan')
+    + meter('SLEEP', needs.sleep, 'violet')
+    + meter('RADS', (rads / 1000) * 100, 'yellow');
+
+  const chipsHtml = (char.status_effects || []).length > 0
+    ? `<div style="display:flex; flex-wrap:wrap; gap:3px; margin-top:4px;">
+        ${char.status_effects.map(fx => `<span style="font-size:10px; border:1px solid orange; color:orange; padding:1px 5px;">${escapeHtml(fx.name)}</span>`).join('')}
+      </div>`
+    : '';
+
+  return `
+    <div class="gm-char-card ${isSelected ? 'selected' : ''}" onclick="window.setGMStatusTarget('${id}')"
+         style="cursor:pointer; align-items:flex-start; ${isDead ? 'opacity:0.5; filter:grayscale(1); border-color:#500;' : ''}">
+      <img src="${char.avatar_url}" class="gm-avatar">
+      <div style="flex-grow:1; min-width:0;">
+        <div style="display:flex; justify-content:space-between;">
+           <strong style="color:${isDead ? '#888' : 'var(--pip-green)'};">${isDead ? '☠ ' : ''}${escapeHtml(char.name)}</strong>
+           <span style="color:var(--pip-gold); font-size:12px;">LVL ${char.level || 1}</span>
+        </div>
+        <div class="hp-bar-container"><div class="hp-fill" style="width:${hpPercent}%; ${isDead ? 'background:#555;' : ''}"></div></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+           <span>${isDead ? 'DECEASED' : `HP: ${char.hp.current}/${char.hp.max}`}</span>
+           <span style="color:cyan;">VP: ${vp}</span>
+        </div>
+        <div style="display:flex; border-top:1px dashed #333; border-bottom:1px dashed #333; padding:3px 0; margin-bottom:4px;">${specialRowHtml}</div>
+        ${metersHtml}
+        ${chipsHtml}
+      </div>
+    </div>`;
+}
+
+// 1.4 VITALS tab — HP/revive, radiation, needs, limb damage, karma. Pulls
+// back everything the old modal had pushed away to the STATUS tab; the
+// modal's own pointer text pointing there is gone along with the modal.
+function renderGMConsoleVitals(targetChar, targetId) {
+  const hpControlsHtml = targetChar.is_dead ? `
+    <div style="border:2px solid red; background:rgba(255,0,0,0.12); padding:8px; margin-bottom:10px; text-align:center;">
+      <strong style="color:red; letter-spacing:2px;">☠ DECEASED</strong>
+      <p style="font-size:11px; color:#ccc; margin:6px 0;">Only the GM can bring a character back — pick the HP to revive at.</p>
+      <div style="display:flex; gap:6px;">
+        <input type="number" id="reviveHpInput" min="1" max="${targetChar.hp.max}" value="1" style="width:60px; background:black; color:lime; border:1px solid #333; font-family:'VT323'; font-size:16px;">
+        <button class="gm-btn" style="border-color:lime; color:lime; flex-grow:1;" onclick="window.gmReviveCharacter(document.getElementById('reviveHpInput').value)">REVIVE</button>
+      </div>
+    </div>` : `
+    <div style="display:flex; gap:10px; margin-bottom:14px;">
+     <button class="gm-btn" onclick="window.gmAdjustHP(-1)">-1 HP</button>
+     <button class="gm-btn" onclick="window.gmAdjustHP(1)">+1 HP</button>
+      <button class="gm-btn" onclick="window.gmAdjustHP(999)">FULL HEAL</button>
+    </div>`;
+
+  const radTier = getRadiationTier(targetChar.rads || 0);
+  const radiationHtml = `
+    <h3 style="color:yellow; border-bottom:1px dashed yellow; margin-top:0;">RADIATION</h3>
+    <div style="font-size:12px; color:#aaa; margin-bottom:6px;">
+      Exact count (only you see this): <span style="color:yellow; font-weight:bold;">${targetChar.rads || 0} rads</span>
+      — <span style="font-style:italic;">${radTier.description}</span>
+    </div>
+    <div style="display:flex; gap:6px; margin-bottom:14px;">
+      <input type="number" id="gmRadInput" min="0" max="1000" placeholder="SET RADS" style="flex-grow:1; background:black; color:yellow; border:1px solid yellow;">
+      <button class="gm-btn" style="border-color:yellow; color:yellow;" onclick="window.gmSetRadiation(Number(document.getElementById('gmRadInput').value))">SET</button>
+    </div>`;
+
+  const needsHtml = `
+    <h3 style="color:var(--pip-green); border-bottom:1px dashed var(--pip-green);">SURVIVAL NEEDS</h3>
+    <div style="margin-bottom:14px;">
+      ${['hunger', 'thirst', 'sleep'].map(key => {
+        const needs = normalizeNeeds(targetChar.needs);
+        const val = needs[key];
+        const tier = getNeedTier(key, val);
+        return `
+        <div style="margin-bottom:8px;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
+            <span>${key.toUpperCase()}</span>
+            <span style="color:var(--pip-green);">${Math.round(val)} — ${tier.label}</span>
+          </div>
+          <input type="range" min="0" max="100" value="${val}" style="width:100%;"
+                 oninput="this.nextElementSibling.textContent = this.value"
+                 onchange="window.gmSetNeed('${key}', Number(this.value))">
+          <span style="display:none;">${Math.round(val)}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  const limbResistance = deriveCharacter(targetChar).limbResistance;
+  const limbDamage = targetChar.limb_damage || {};
+  const limbsHtml = `
+    <h3 style="color:red; border-bottom:1px dashed red;">LIMB DAMAGE</h3>
+    <p style="font-size:10px; color:#666; margin:2px 0 6px;">Direct hit-counter control (STATUS_AND_CRIPPLE_SPEC.md C.3) — sets the raw count only, no auto-cripple. Use the STATUS EFFECTS control (STATUS tab) to actually apply/remove Crippled Arm/Leg.</p>
+    <div style="margin-bottom:14px;">
+      ${LIMB_PART_KEYS.map(partKey => {
+        const bodyPart = BODY_PARTS[partKey];
+        const val = limbDamage[partKey] || 0;
+        return `
+        <div style="margin-bottom:8px;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
+            <span>${bodyPart.label.toUpperCase()}</span>
+            <span style="color:red;">${val} / ${limbResistance}</span>
+          </div>
+          <input type="range" min="0" max="${limbResistance}" value="${val}" style="width:100%;"
+                 oninput="this.nextElementSibling.textContent = this.value"
+                 onchange="window.gmSetLimbDamage('${partKey}', Number(this.value))">
+          <span style="display:none;">${val}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  const karmaVal = getKarmaValue(targetChar);
+  const karmaTier = getKarmaTier(karmaVal);
+  const karmaHtml = `
+    <h3 style="color:var(--pip-gold); border-bottom:1px dashed var(--pip-gold);">KARMA</h3>
+    <div>
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
+        <span>PERSONAL KARMA</span>
+        <span style="color:var(--pip-gold);">${karmaVal} — ${karmaTier.name}</span>
+      </div>
+      <input type="range" min="${KARMA_MIN}" max="${KARMA_MAX}" value="${karmaVal}" style="width:100%;"
+             oninput="this.nextElementSibling.textContent = this.value"
+             onchange="window.gmSetKarma(Number(this.value))">
+      <span style="display:none;">${karmaVal}</span>
+      <p style="font-size:10px; color:#555; margin:4px 0 0;">Only visible to this player and you. Posts a message to them if the tier changes.</p>
+    </div>`;
+
+  return `
+    <h4 style="color:red; border-bottom:1px dashed red; margin-top:0;">HP</h4>
+    ${hpControlsHtml}
+    ${radiationHtml}
+    ${needsHtml}
+    ${limbsHtml}
+    ${karmaHtml}`;
+}
+
+// 2. INVENTORY tab — category -> item -> quantity -> GRANT, plus a
+// TAKE-able readout of what they're already carrying.
+function renderGMConsoleInventory(targetChar, targetId) {
+  const categoryList = buildGrantCategoryList(itemDatabase);
+  window.gmGrantCategory = defaultGrantCategory(categoryList, window.gmGrantCategory);
+  const activeCategory = categoryList.find(c => c.type === window.gmGrantCategory) || categoryList[0];
+
+  const categoryOptionsHtml = categoryList
+    .map(c => `<option value="${c.type}" ${c.type === window.gmGrantCategory ? 'selected' : ''}>${c.label}</option>`)
+    .join('');
+  const itemOptionsHtml = (activeCategory ? activeCategory.items : [])
+    .map(item => `<option value="${item.id}">${escapeHtml(item.name)}</option>`)
+    .join('');
+
+  const grantRowHtml = `
+    <h4 style="color:lime; border-bottom:1px dashed lime; margin-top:0;">GRANT</h4>
+    <div style="display:flex; gap:5px; margin-bottom:10px; flex-wrap:wrap;">
+      <select id="gmGrantCategorySelect" onchange="window.setGMGrantCategory(this.value)" style="background:black; color:lime; border:1px solid lime; font-family:'VT323'; flex:1 1 120px;">
+        ${categoryOptionsHtml}
+      </select>
+      <select id="gmItemSelect" style="background:black; color:lime; border:1px solid lime; font-family:'VT323'; flex:2 1 160px;">
+        ${itemOptionsHtml}
+      </select>
+      <input type="number" id="gmItemQty" min="1" value="1" style="width:55px; background:black; color:lime; border:1px solid lime; font-family:'VT323';">
+      <button class="gm-btn" style="border-color:lime; color:lime;" onclick="window.gmGrantItem()">GRANT</button>
+    </div>`;
+
+  const carriedRows = buildCarriedRows(targetChar.inventory, getItem);
+  let lastType = null;
+  const carriedRowsHtml = carriedRows.length === 0
+    ? `<div style="color:#555; font-size:12px;">Carrying nothing.</div>`
+    : carriedRows.map(({ itemId, qty, item }) => {
+        const headingHtml = item.type !== lastType
+          ? `<h5 style="color:var(--pip-dim); border-bottom:1px dashed var(--pip-dim); margin:10px 0 4px;">${(GRANT_CATEGORY_LABELS.find(([t]) => t === item.type) || [null, item.type.toUpperCase()])[1]}</h5>`
+          : '';
+        lastType = item.type;
+        return `${headingHtml}
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #222; padding:4px 0;">
+          <span style="font-size:13px;">${escapeHtml(item.name)} <span style="color:#666;">x${qty}</span></span>
+          <div style="display:flex; align-items:center; gap:4px;">
+            <input type="number" id="gmTakeQty_${itemId}" min="1" max="${qty}" value="1" style="width:45px; background:black; color:red; border:1px solid #333; font-family:'VT323'; font-size:13px;">
+            <button class="gm-btn" style="border-color:red; color:red; padding:0 8px;" onclick="window.gmTakeItem('${itemId}', document.getElementById('gmTakeQty_${itemId}').value)">TAKE</button>
+          </div>
+        </div>`;
+      }).join('');
+
+  // EQUIPPED GEAR + condition (carried over from the old modal — not one
+  // of the four listed tab contents, but the only place this app lets a
+  // GM unequip something or hand-set a durability mark, so it stays
+  // inside INVENTORY rather than disappearing with the modal).
+  const equippedHtml = ['head', 'body', 'right_hand', 'left_hand'].map(slot => {
+    const equippedId = targetChar.equipment ? targetChar.equipment[slot] : null;
+    const equippedItem = getItem(equippedId);
+    if (!equippedItem) return '';
+    const targetCondition = normalizeCondition(targetChar);
+    const durableTag = isDurable(equippedItem) ? `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
+        ${conditionMeter(targetCondition.worn[slot])}
+        <span>
+          <input type="number" id="gmMarks_${slot}" min="0" max="10" value="${targetCondition.worn[slot] || 0}" style="width:40px; background:black; color:orange; border:1px solid #333; font-family:'VT323';">
+          <button class="gm-btn" style="border-color:orange; color:orange; padding:0 6px;" onclick="window.gmSetItemCondition('${equippedId}', '${slot}', null, document.getElementById('gmMarks_${slot}').value)">SET</button>
+        </span>
+      </div>` : '';
+    return `<div style="border:1px solid #333; padding:3px 8px; margin-bottom:4px; font-size:13px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span>${slot.replace('_', ' ').toUpperCase()}: ${escapeHtml(equippedItem.name)}</span>
+        <button class="gm-btn" style="border-color:lime; color:lime; padding:0 8px;" onclick="window.gmUnequipItem('${slot}')">UNEQUIP</button>
+      </div>
+      ${durableTag}
+    </div>`;
+  }).join('') || `<div style="color:#555; font-size:12px;">Nothing equipped.</div>`;
+
+  const targetCondition = normalizeCondition(targetChar);
+  const unequippedConditionRows = Object.entries(targetCondition.inv).flatMap(([itemId, marksArr]) => {
+    const item = getItem(itemId);
+    return marksArr.map((marks, idx) => ({ item, itemId, marks, idx }));
+  });
+  const unequippedConditionHtml = unequippedConditionRows.length === 0 ? '' : `
+    <h5 style="color:#888; margin:10px 0 4px;">UNEQUIPPED GEAR CONDITION</h5>
+    <div>${unequippedConditionRows.map(({ item, itemId, marks, idx }) => `
+      <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #222; padding:2px 8px; margin-bottom:2px; font-size:12px;">
+        <span>${item ? escapeHtml(item.name) : itemId} — ${conditionMeter(marks)}</span>
+        <span>
+          <input type="number" id="gmMarks_${itemId}_${idx}" min="0" max="10" value="${marks}" style="width:40px; background:black; color:orange; border:1px solid #333; font-family:'VT323';">
+          <button class="gm-btn" style="border-color:orange; color:orange; padding:0 6px;" onclick="window.gmSetItemCondition('${itemId}', null, ${idx}, document.getElementById('gmMarks_${itemId}_${idx}').value)">SET</button>
+        </span>
+      </div>`).join('')}</div>`;
+
+  return `
+    ${grantRowHtml}
+    <h4 style="color:var(--pip-dim); border-bottom:1px dashed var(--pip-dim);">CARRYING</h4>
+    <div>${carriedRowsHtml}</div>
+    <h4 style="color:orange; border-bottom:1px dashed orange; margin-top:14px;">EQUIPPED GEAR</h4>
+    <div>${equippedHtml}</div>
+    ${unequippedConditionHtml}`;
+}
+
+// 3. STATS tab (new — currently nowhere else) — raw SPECIAL, skill ranks,
+// level, and VP (the only reward-currency this app has; there's no
+// separate XP field).
+function renderGMConsoleStats(targetChar, targetId) {
+  const special = targetChar.special || {};
+  const specialHtml = `
+    <h4 style="color:var(--pip-green); border-bottom:1px dashed var(--pip-green); margin-top:0;">SPECIAL</h4>
+    <div style="margin-bottom:14px;">
+      ${SPECIAL_ORDER.map(k => `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:13px;">${k.toUpperCase()}</span>
+          <div style="display:flex; align-items:center; gap:4px;">
+            <input type="number" id="gmSpecial_${k}" min="1" max="20" value="${special[k] ?? 5}" style="width:50px; background:black; color:var(--pip-green); border:1px solid #333; font-family:'VT323'; font-size:14px;">
+            <button class="gm-btn" style="padding:0 8px;" onclick="window.gmSetSpecial('${k}', document.getElementById('gmSpecial_${k}').value)">SET</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+
+  const ranks = targetChar.skill_ranks || {};
+  const skillsHtml = `
+    <h4 style="color:cyan; border-bottom:1px dashed cyan;">SKILLS (ranks spent)</h4>
+    <div style="margin-bottom:14px;">
+      ${Object.entries(SKILL_CATEGORIES).map(([cat, skills]) => `
+        <h5 style="color:#888; margin:8px 0 4px;">${cat}</h5>
+        ${skills.map(skillName => `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span style="font-size:12px;">${skillName.replace(/_/g, ' ').toUpperCase()}</span>
+            <div style="display:flex; align-items:center; gap:4px;">
+              <input type="number" id="gmSkill_${skillName}" min="0" value="${ranks[skillName] || 0}" style="width:50px; background:black; color:cyan; border:1px solid #333; font-family:'VT323'; font-size:14px;">
+              <button class="gm-btn" style="border-color:cyan; color:cyan; padding:0 8px;" onclick="window.gmSetSkillRank('${skillName}', document.getElementById('gmSkill_${skillName}').value)">SET</button>
+            </div>
+          </div>`).join('')}
+      `).join('')}
+    </div>`;
+
+  const levelHtml = `
+    <h4 style="color:var(--pip-gold); border-bottom:1px dashed var(--pip-gold);">LEVEL &amp; REWARDS</h4>
+    <div style="font-size:12px; color:#aaa; margin-bottom:6px;">LEVEL ${targetChar.level || 1} — ${targetChar.skill_points || 0} unspent skill points — <span style="color:cyan;">VP: ${targetChar.vault_points || 0}</span></div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="gm-btn" style="border-color:cyan; color:cyan;" onclick="window.gmAdjustVaultPoints(1)">+1 VP</button>
+      <button class="gm-btn" style="border-color:cyan; color:cyan;" onclick="window.gmAdjustVaultPoints(-1)">-1 VP</button>
+      <button class="gm-btn" style="border-color:gold; color:gold;" onclick="window.gmGrantLevel()">GRANT LEVEL UP</button>
+    </div>`;
+
+  return `${specialHtml}${skillsHtml}${levelHtml}`;
+}
+
+// 4. STATUS tab — apply an effect (library or custom), and the active
+// list WITH remove buttons (job 1.4: distinct from getGMStatusView, the
+// GM's separate top-level STATUS screen — this is per-character status
+// effects only).
+function renderGMConsoleStatus(targetChar, targetId) {
+  const statusEffectOptions = Object.values(statusEffectDatabase)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(fx => `<option value="${fx.id}">${fx.name}</option>`)
+    .join('');
+
+  const activeEffectsHtml = (targetChar.status_effects || []).length > 0
+    ? targetChar.status_effects.map(fx => `
+        <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #333; padding:4px 8px; margin-bottom:4px;">
+          <span>${escapeHtml(fx.name)}</span>
+          <button class="gm-btn" style="border-color:red; color:red; padding:0 6px;" onclick="window.gmRemoveStatusEffect('${fx.id}')">X</button>
+        </div>`).join('')
+    : `<div style="color:#555; font-size:12px;">No active effects.</div>`;
+
+  return `
+    <h4 style="color:orange; border-bottom:1px dashed orange; margin-top:0;">ACTIVE EFFECTS</h4>
+    <div style="margin-bottom:10px;">${activeEffectsHtml}</div>
+    <h4 style="color:orange; border-bottom:1px dashed orange;">APPLY AN EFFECT</h4>
+    <div style="display:flex; gap:5px; margin-bottom:6px;">
+      <select id="statusEffectSelect" style="flex-grow:1; background:black; color:orange; border:1px solid orange; font-family:'VT323';"
+        onchange="document.getElementById('customEffectFields').style.display = this.value === '__custom__' ? 'flex' : 'none';">
+        ${statusEffectOptions}
+        <option value="__custom__">— CUSTOM (type your own) —</option>
+      </select>
+      <button class="gm-btn" style="border-color:orange; color:orange;" onclick="window.gmApplyStatusEffect()">APPLY</button>
+    </div>
+    <div id="customEffectFields" style="display:${statusEffectOptions ? 'none' : 'flex'}; gap:5px; margin-bottom:10px;">
+      <input type="text" id="statusEffectCustomName" placeholder="NAME (e.g. Bleeding)" style="width:40%; background:black; color:orange; border:1px solid #333;">
+      <input type="text" id="statusEffectCustomModifiers" placeholder="MODIFIERS e.g. special_end:-2, skill_sneak:-10" style="flex-grow:1; background:black; color:orange; border:1px solid #333;">
+    </div>`;
+}
+
+const GM_CONSOLE_TABS = [['vitals', 'VITALS'], ['inventory', 'INVENTORY'], ['stats', 'STATS'], ['status', 'STATUS']];
+
+function renderGMConsole(liveData) {
+  const chars = liveData.characters || {};
+  const targetId = window.selectedCharId;
+  const targetChar = targetId ? chars[targetId] : null;
+
+  if (!targetChar) {
+    return `
+      <div class="panel">
+        <h2 style="color:var(--pip-gold); margin-top:0;">CONSOLE</h2>
+        <p style="color:#888;">Pick someone from the squad above.</p>
+      </div>`;
+  }
+
+  window.gmConsoleTab = window.gmConsoleTab || 'vitals';
+  const tabsHtml = GM_CONSOLE_TABS.map(([key, label]) => `
+    <button class="gm-btn" style="${window.gmConsoleTab === key ? 'background:red; color:black;' : ''}" onclick="window.setGMConsoleTab('${key}')">${label}</button>`).join('');
+
+  let bodyHtml;
+  if (window.gmConsoleTab === 'inventory') bodyHtml = renderGMConsoleInventory(targetChar, targetId);
+  else if (window.gmConsoleTab === 'stats') bodyHtml = renderGMConsoleStats(targetChar, targetId);
+  else if (window.gmConsoleTab === 'status') bodyHtml = renderGMConsoleStatus(targetChar, targetId);
+  else bodyHtml = renderGMConsoleVitals(targetChar, targetId);
+
+  return `
+    <div class="panel">
+      <h2 style="color:var(--pip-gold); margin-top:0;">CONSOLE — ${escapeHtml(targetChar.name || targetId).toUpperCase()}</h2>
+      <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:14px; border-bottom:1px solid var(--pip-dim); padding-bottom:10px;">${tabsHtml}</div>
+      <div>${bodyHtml}</div>
+
+      <h4 style="color:cyan; border-bottom:1px dashed cyan; margin-top:20px;">BIOGRAPHY &amp; GM NOTES</h4>
+      <p style="font-size:11px; color:#666; margin:0 0 4px;">Visible only to this player (and you) — not the rest of the party.</p>
+      <label style="font-size:11px; color:#666;">BIOGRAPHY</label>
+      <textarea id="bioTextarea" rows="4" style="width:100%; background:black; color:cyan; border:1px solid #333; font-family:'IBM Plex Mono', monospace; font-size:12px; margin-bottom:8px;">${targetChar.biography || ''}</textarea>
+      <label style="font-size:11px; color:#666;">GM NOTES</label>
+      <textarea id="gmNotesTextarea" rows="4" style="width:100%; background:black; color:cyan; border:1px solid #333; font-family:'IBM Plex Mono', monospace; font-size:12px; margin-bottom:8px;">${targetChar.gm_notes || ''}</textarea>
+      <button class="gm-btn" style="width:100%; border-color:cyan; color:cyan;" onclick="window.gmSaveBiography()">SAVE</button>
+
+      <label style="font-size:11px; color:#666; display:block; margin-top:10px;">PLAYER'S OWN NOTES (read-only)</label>
+      <div style="max-height:100px; overflow-y:auto; width:100%; background:#0a0a0a; color:#999; border:1px solid #333; font-family:'IBM Plex Mono', monospace; font-size:12px; padding:6px; white-space:pre-wrap; box-sizing:border-box;">${escapeHtml(targetChar.player_notes || '') || '<span style="color:#555;">(empty)</span>'}</div>
+
+      <h4 style="color:red; border-bottom:1px dashed red; margin-top:20px;">DANGER ZONE</h4>
+      <button class="gm-btn" style="border-color:red; color:white; background:red; width:100%;" onclick="window.gmFactoryReset()">FACTORY RESET CHARACTER</button>
+    </div>`;
+}
+
 // --- GM SCREEN ---
 export function renderGMScreen(liveData) {
   const chars = liveData.characters || {};
   const accessCodes = liveData.access_codes || {};
 
-  const itemOptions = Object.values(itemDatabase)
-    .sort((a,b) => a.name.localeCompare(b.name))
-    .map(item => `<option value="${item.id}">${item.name} (${item.type})</option>`)
-    .join('');
-
-  const statusEffectOptions = Object.values(statusEffectDatabase)
-    .sort((a,b) => a.name.localeCompare(b.name))
-    .map(fx => `<option value="${fx.id}">${fx.name}</option>`)
-    .join('');
-
-  // Active status effects on the currently-selected GM target, for the modal.
-  const targetChar = window.selectedCharId ? chars[window.selectedCharId] : null;
-  const activeEffectsHtml = targetChar && (targetChar.status_effects || []).length > 0
-    ? targetChar.status_effects.map(fx => `
-        <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #333; padding:4px 8px; margin-bottom:4px;">
-          <span>${fx.name}</span>
-          <button class="gm-btn" style="border-color:red; color:red; padding:0 6px;" onclick="window.gmRemoveStatusEffect('${fx.id}')">X</button>
-        </div>`).join('')
-    : `<div style="color:#555; font-size:12px;">No active effects.</div>`;
-
-  const squadHtml = Object.entries(chars).map(([id, char]) => {
-    const hpPercent = (char.hp.current / char.hp.max) * 100;
-    const vp = char.vault_points || 0;
-    // Job 5: dead characters stay in the roster forever — never deleted —
-    // but read as unmistakably dead here too.
-    const isDead = !!char.is_dead;
-
-    return `
-      <div class="gm-char-card" onclick="window.openGMModal('${id}')" style="cursor:pointer; ${isDead ? 'opacity:0.5; filter:grayscale(1); border-color:#500;' : ''}">
-        <img src="${char.avatar_url}" class="gm-avatar">
-        <div style="flex-grow:1;">
-          <div style="display:flex; justify-content:space-between;">
-             <strong style="color:${isDead ? '#888' : 'var(--pip-green)'};">${isDead ? '☠ ' : ''}${char.name}</strong>
-             <span style="color:var(--pip-gold); font-size:12px;">LVL ${char.level || 1}</span>
-          </div>
-          <div class="hp-bar-container"><div class="hp-fill" style="width:${hpPercent}%; ${isDead ? 'background:#555;' : ''}"></div></div>
-          <div style="display:flex; justify-content:space-between; font-size:12px;">
-             <span>${isDead ? 'DECEASED' : `HP: ${char.hp.current}/${char.hp.max}`}</span>
-             <span style="color:cyan;">VP: ${vp}</span>
-          </div>
-        </div>
-      </div>`;
-  }).join('');
+  const squadHtml = Object.entries(chars).map(([id, char]) => renderGMSquadCard(id, char)).join('')
+    || `<div style="color:#555; font-size:12px;">No characters yet.</div>`;
 
   // Read as "who this is, and what they type" rather than as raw fields —
   // the GM reads this list to answer a player asking how to get in.
@@ -2873,154 +3240,23 @@ export function renderGMScreen(liveData) {
        <button style="width:100%; padding:10px; cursor:pointer; background:red; color:white; font-weight:bold; border:none;" onclick="window.switchTab('COMBAT')">GO TO COMBAT</button>`
     : `<button style="width:100%; padding:10px; cursor:pointer; background:red; color:white; font-weight:bold; border:none;" onclick="window.startCombat()">START COMBAT</button>`;
 
-  // Open/closed state and the title both live in window state (not just
-  // set once via DOM after the fact) so they survive a re-render — every
-  // GM action (grant item, apply status, adjust a slider…) writes to
-  // Firestore, and the onSnapshot listener re-renders the WHOLE gm screen
-  // from scratch afterward, which used to snap this markup back to its
-  // default "hidden" class and wipe out whatever openGMModal had set on
-  // the live DOM node a moment earlier. Baking both into the template
-  // itself means a re-render reproduces the same open/closed state
-  // instead of resetting it.
-  const modalOpen = !!(window.gmModalOpen && targetChar);
-  const modalTitle = targetChar ? ("MANAGING: " + window.selectedCharId.toUpperCase()) : "MANAGING TARGET";
+  const consoleHtml = renderGMConsole(liveData);
 
-  const modalHtml = `
-    <div id="gm-modal" class="modal-overlay ${modalOpen ? '' : 'hidden'}">
-      <div class="panel modal-panel" style="max-width:400px; border:2px solid red; background:#110000;">
-        <div class="modal-header" style="border-bottom:1px solid red; padding-bottom:8px; margin-bottom:10px;">
-          <h2 style="background:none; color:red; margin:0;" id="gm-modal-title">${modalTitle}</h2>
-          <button onclick="window.closeGMModal()" style="background:red; color:white; border:none; cursor:pointer; flex-shrink:0;">[CLOSE]</button>
-        </div>
-        <div class="modal-body">
-        <h4 style="color:red; border-bottom:1px dashed red;">VITALS</h4>
-        ${targetChar && targetChar.is_dead ? `
-        <div style="border:2px solid red; background:rgba(255,0,0,0.12); padding:8px; margin-bottom:10px; text-align:center;">
-          <strong style="color:red; letter-spacing:2px;">☠ DECEASED</strong>
-          <p style="font-size:11px; color:#ccc; margin:6px 0;">Only the GM can bring a character back — pick the HP to revive at.</p>
-          <div style="display:flex; gap:6px;">
-            <input type="number" id="reviveHpInput" min="1" max="${targetChar.hp.max}" value="1" style="width:60px; background:black; color:lime; border:1px solid #333; font-family:'VT323'; font-size:16px;">
-            <button class="gm-btn" style="border-color:lime; color:lime; flex-grow:1;" onclick="window.gmReviveCharacter(document.getElementById('reviveHpInput').value)">REVIVE</button>
-          </div>
-        </div>` : `
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
-         <button class="gm-btn" onclick="window.gmAdjustHP(-1)">-1 HP</button>
-         <button class="gm-btn" onclick="window.gmAdjustHP(1)">+1 HP</button>
-          <button class="gm-btn" onclick="window.gmAdjustHP(999)">FULL HEAL</button>
-        </div>`}
-
-        <p style="font-size:11px; color:#888; border:1px dashed #444; padding:6px;">Radiation, survival needs, limb damage and karma moved to the <span onclick="window.switchTab('STATUS')" style="color:var(--pip-green); text-decoration:underline; cursor:pointer;">STATUS tab</span> (pick this character there).</p>
-
-        <p style="font-size:11px; color:#888; border:1px dashed #444; padding:6px;">Crafting stations moved to the <span onclick="window.switchTab('STATUS')" style="color:var(--pip-green); text-decoration:underline; cursor:pointer;">STATUS tab</span> — they're party-wide now, not granted per character.</p>
-
-        <h4 style="color:cyan; border-bottom:1px dashed cyan;">REWARDS</h4>
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
-          <button class="gm-btn" style="border-color:cyan; color:cyan;" onclick="window.gmAdjustVaultPoints(1)">+1 VP</button>
-          <button class="gm-btn" style="border-color:cyan; color:cyan;" onclick="window.gmAdjustVaultPoints(-1)">-1 VP</button>
-          <button class="gm-btn" style="border-color:gold; color:gold;" onclick="window.gmGrantLevel()">GRANT LEVEL UP</button>
-        </div>
-
-        <h4 style="color:orange; border-bottom:1px dashed orange;">STATUS EFFECTS</h4>
-        <div style="margin-bottom:6px;">${activeEffectsHtml}</div>
-        <div style="display:flex; gap:5px; margin-bottom:6px;">
-          <select id="statusEffectSelect" style="flex-grow:1; background:black; color:orange; border:1px solid orange; font-family:'VT323';"
-            onchange="document.getElementById('customEffectFields').style.display = this.value === '__custom__' ? 'flex' : 'none';">
-            ${statusEffectOptions}
-            <option value="__custom__">— CUSTOM (type your own) —</option>
-          </select>
-          <button class="gm-btn" style="border-color:orange; color:orange;" onclick="window.gmApplyStatusEffect()">APPLY</button>
-        </div>
-        <div id="customEffectFields" style="display:${statusEffectOptions ? 'none' : 'flex'}; gap:5px; margin-bottom:10px;">
-          <input type="text" id="statusEffectCustomName" placeholder="NAME (e.g. Bleeding)" style="width:40%; background:black; color:orange; border:1px solid #333;">
-          <input type="text" id="statusEffectCustomModifiers" placeholder="MODIFIERS e.g. special_end:-2, skill_sneak:-10" style="flex-grow:1; background:black; color:orange; border:1px solid #333;">
-        </div>
-
-        <h4 style="color:lime; border-bottom:1px dashed lime;">INVENTORY</h4>
-        <div style="display:flex; gap:5px; margin-bottom:4px;">
-          <select id="gmItemSelect" style="flex-grow:1; background:black; color:lime; border:1px solid lime; font-family:'VT323';">
-            ${itemOptions}
-          </select>
-          <button class="gm-btn" style="border-color:lime; color:lime;" onclick="window.gmGrantItem()">GRANT</button>
-        </div>
-        <div style="margin-bottom:10px;">
-          <label style="font-size:11px; color:#666;">Starting marks (weapon/armor only, 0-10) — blank uses the item's own default:</label>
-          <input type="number" id="gmItemMarks" min="0" max="10" step="1" placeholder="0" style="width:50px; background:black; color:lime; border:1px solid #333; font-family:'VT323'; margin-left:6px;">
-        </div>
-        <div>
-          ${['head', 'body', 'right_hand', 'left_hand'].map(slot => {
-            const equippedId = targetChar && targetChar.equipment ? targetChar.equipment[slot] : null;
-            const equippedItem = getItem(equippedId);
-            if (!equippedItem) return '';
-            const targetCondition = normalizeCondition(targetChar);
-            const durableTag = isDurable(equippedItem) ? `
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
-                ${conditionMeter(targetCondition.worn[slot])}
-                <span>
-                  <input type="number" id="gmMarks_${slot}" min="0" max="10" value="${targetCondition.worn[slot] || 0}" style="width:40px; background:black; color:orange; border:1px solid #333; font-family:'VT323';">
-                  <button class="gm-btn" style="border-color:orange; color:orange; padding:0 6px;" onclick="window.gmSetItemCondition('${equippedId}', '${slot}', null, document.getElementById('gmMarks_${slot}').value)">SET</button>
-                </span>
-              </div>` : '';
-            return `<div style="border:1px solid #333; padding:3px 8px; margin-bottom:4px; font-size:13px;">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span>${slot.replace('_', ' ').toUpperCase()}: ${equippedItem.name}</span>
-                <button class="gm-btn" style="border-color:lime; color:lime; padding:0 8px;" onclick="window.gmUnequipItem('${slot}')">UNEQUIP</button>
-              </div>
-              ${durableTag}
-            </div>`;
-          }).join('') || `<div style="color:#555; font-size:12px;">Nothing equipped.</div>`}
-        </div>
-        ${(() => {
-          if (!targetChar) return '';
-          const targetCondition = normalizeCondition(targetChar);
-          const rows = Object.entries(targetCondition.inv).flatMap(([itemId, marksArr]) => {
-            const item = getItem(itemId);
-            return marksArr.map((marks, idx) => ({ item, itemId, marks, idx }));
-          });
-          if (rows.length === 0) return '';
-          return `
-            <h5 style="color:#888; margin:10px 0 4px;">UNEQUIPPED GEAR CONDITION</h5>
-            <div>${rows.map(({ item, itemId, marks, idx }) => `
-              <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #222; padding:2px 8px; margin-bottom:2px; font-size:12px;">
-                <span>${item ? item.name : itemId} — ${conditionMeter(marks)}</span>
-                <span>
-                  <input type="number" id="gmMarks_${itemId}_${idx}" min="0" max="10" value="${marks}" style="width:40px; background:black; color:orange; border:1px solid #333; font-family:'VT323';">
-                  <button class="gm-btn" style="border-color:orange; color:orange; padding:0 6px;" onclick="window.gmSetItemCondition('${itemId}', null, ${idx}, document.getElementById('gmMarks_${itemId}_${idx}').value)">SET</button>
-                </span>
-              </div>`).join('')}</div>`;
-        })()}
-
-        <h4 style="color:cyan; border-bottom:1px dashed cyan; margin-top:20px;">BIOGRAPHY &amp; GM NOTES</h4>
-        <p style="font-size:11px; color:#666; margin:0 0 4px;">Visible only to this player (and you) — not the rest of the party.</p>
-        <label style="font-size:11px; color:#666;">BIOGRAPHY</label>
-        <textarea id="bioTextarea" rows="6" style="width:100%; background:black; color:cyan; border:1px solid #333; font-family:'IBM Plex Mono', monospace; font-size:12px; margin-bottom:8px;">${(targetChar && targetChar.biography) || ''}</textarea>
-        <label style="font-size:11px; color:#666;">GM NOTES</label>
-        <textarea id="gmNotesTextarea" rows="6" style="width:100%; background:black; color:cyan; border:1px solid #333; font-family:'IBM Plex Mono', monospace; font-size:12px; margin-bottom:8px;">${(targetChar && targetChar.gm_notes) || ''}</textarea>
-        <button class="gm-btn" style="width:100%; border-color:cyan; color:cyan;" onclick="window.gmSaveBiography()">SAVE</button>
-
-        <label style="font-size:11px; color:#666; display:block; margin-top:10px;">PLAYER'S OWN NOTES (read-only — written by the player, not you)</label>
-        <div style="max-height:120px; overflow-y:auto; width:100%; background:#0a0a0a; color:#999; border:1px solid #333; font-family:'IBM Plex Mono', monospace; font-size:12px; padding:6px; white-space:pre-wrap; box-sizing:border-box;">${escapeHtml((targetChar && targetChar.player_notes) || '') || '<span style="color:#555;">(empty)</span>'}</div>
-
-        <h4 style="color:red; border-bottom:1px dashed red; margin-top:20px;">DANGER ZONE</h4>
-        <button class="gm-btn" style="border-color:red; color:white; background:red; width:100%;" onclick="window.gmFactoryReset()">FACTORY RESET CHARACTER</button>
-        </div>
-      </div>
-    </div>
-  `;
-
+  // The GM runs this on a second monitor — Job 1.2's two-column layout
+  // (squad monitor / console) gets its own row, full width, above the
+  // pre-existing auto-fit grid of Event Log / Players & Passcodes /
+  // Combat / Reputation panels, which stay exactly where they were.
   return `
-    <div class="dashboard-container" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-      ${modalHtml}
-
+    <div class="gm-console-row">
       <div class="panel">
-        <h2 style="color:var(--pip-gold);">>> GAMEMASTER DASHBOARD</h2>
-
-        <p style="font-size:11px; color:#888; border:1px dashed #444; padding:6px; margin-bottom:14px;">Time control moved to the <span onclick="window.switchTab('STATUS')" style="color:var(--pip-green); text-decoration:underline; cursor:pointer;">STATUS tab</span>.</p>
-
-        <h3>SQUAD MONITOR</h3>
-        <p style="font-size:12px; color:#666;">(CLICK CARD TO MANAGE)</p>
+        <h2 style="color:var(--pip-gold); margin-top:0;">SQUAD MONITOR</h2>
+        <p style="font-size:12px; color:#666;">(CLICK CARD TO TARGET)</p>
         <div class="gm-grid">${squadHtml}</div>
       </div>
+      ${consoleHtml}
+    </div>
 
+    <div class="dashboard-container" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
       <div class="panel">
         <h3>EVENT LOG</h3>
         <p style="font-size:11px; color:#666; margin-top:-4px;">Everything — including hidden-check rolls and any GM-only entries no player sees.</p>
@@ -3064,7 +3300,7 @@ export function renderGMScreen(liveData) {
 
       <div class="panel">
         <h3 style="color:var(--pip-gold);">REPUTATION</h3>
-        <p style="font-size:11px; color:#666; margin-top:-4px;">Party-wide standing (-100..100). A player's karma is set per-character in their MANAGE modal instead.</p>
+        <p style="font-size:11px; color:#666; margin-top:-4px;">Party-wide standing (-100..100). A player's karma is set per-character in their console's VITALS tab instead.</p>
         <div style="margin-bottom:10px; border:1px solid #333; padding:8px; background:rgba(0,0,0,0.5);">
           <small>TRACK A NEW ENTITY</small>
           <div style="display:flex; gap:5px; margin-top:5px;">

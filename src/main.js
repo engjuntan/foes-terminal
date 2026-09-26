@@ -14,13 +14,14 @@ window.liveData = null;
 window.currentUser = null;
 window.userRole = null;
 window.currentTab = 'DASHBOARD';
-// Whether the GM's character-management modal (id="gm-modal") is open,
-// and on whom. Every GM action re-renders the whole GM screen from
-// scratch (Firestore write -> onSnapshot -> render()), which used to
-// blow away the modal's "open" state along with everything else in its
-// markup — read by renderGMScreen() so a re-render reproduces the same
-// open/closed state instead of resetting it. See openGMModal/closeGMModal.
-window.gmModalOpen = false;
+// Which of the GM console's four tabs is showing (GM_DASHBOARD_SPEC.md
+// Job 1.4) — VITALS / INVENTORY / STATS / STATUS. View state only, never
+// written to Firestore, same as window.reputationTargetId below.
+window.gmConsoleTab = 'vitals';
+// Which category the GM's INVENTORY-tab grant dropdown is on (Job 2.1) —
+// view state only, defaults lazily inside views.js's renderGMConsoleInventory
+// the first time there's a category list to default against.
+window.gmGrantCategory = null;
 
 // --- TEXT SIZE (per-device preference, not synced — CSS uses fixed px
 // everywhere, so rather than rewrite ~450 lines to rem units, this scales
@@ -78,6 +79,12 @@ window.openMap = Controllers.openMap;
 window.sendMessage = Controllers.sendMessage;
 window.openMessage = Controllers.openMessage;
 window.gmAdjustHP = (amt) => Controllers.gmAdjustHP(window.selectedCharId, amt);
+// Pre-existing REVIVE button (VITALS tab) had no window binding at all —
+// fixed here while wiring the rest of the console's target-scoped
+// controllers, same (window.selectedCharId, ...) pattern as the others.
+window.gmReviveCharacter = (requestedHp) => Controllers.gmReviveCharacter(window.selectedCharId, requestedHp);
+window.setGMConsoleTab = (tab) => { window.gmConsoleTab = tab; window.render(); };
+window.setGMGrantCategory = (category) => { window.gmGrantCategory = category; window.render(); };
 window.gmSetRadiation = (amt) => Controllers.gmSetRadiation(window.selectedCharId, amt);
 window.gmSetNeed = (needKey, val) => Controllers.gmSetNeed(window.selectedCharId, needKey, val);
 window.gmSetReputation = Controllers.gmSetReputation;
@@ -102,6 +109,9 @@ window.scrapItem = Controllers.scrapItem;
 window.repairItem = (itemId, slot, index) => Controllers.repairItem(itemId, slot ? { slot } : { index });
 window.gmSetItemCondition = (itemId, slot, index, marks) => Controllers.gmSetItemCondition(window.selectedCharId, itemId, slot ? { slot } : { index }, marks);
 window.gmToggleStation = Controllers.gmToggleStation;
+window.gmSetSpecial = (statKey, val) => Controllers.gmSetSpecial(window.selectedCharId, statKey, val);
+window.gmSetSkillRank = (skillKey, val) => Controllers.gmSetSkillRank(window.selectedCharId, skillKey, val);
+window.gmTakeItem = (itemId, qty) => Controllers.gmTakeItem(window.selectedCharId, itemId, qty);
 window.useItem = Controllers.useItem;
 window.giveItem = Controllers.giveItem;
 window.gmAdjustVaultPoints = (amt) => Controllers.gmAdjustVaultPoints(window.selectedCharId, amt);
@@ -168,27 +178,6 @@ window.setCureAddictionRoll = Controllers.setCureAddictionRoll;
 window.rollForCureAddiction = Controllers.rollForCureAddiction;
 window.cancelCureAddictionDraft = Controllers.cancelCureAddictionDraft;
 window.resolveCureAddictionDraft = Controllers.resolveCureAddictionDraft;
-
-window.openGMModal = (charId) => {
-  window.selectedCharId = charId; // Store who we are editing globally
-  window.gmModalOpen = true;
-  // Re-render so everything baked into the modal's HTML (title, active
-  // status effects list, etc.) reflects the character just selected, and
-  // the "open" flag above — renderGMScreen() reads both directly, so a
-  // later re-render (e.g. after granting an item) reproduces the same
-  // open modal instead of resetting to closed.
-  window.render();
-};
-
-// Closes the GM modal without navigating away from the GM screen — the
-// only way it should close is this, or Escape (see the keydown listener
-// below). A grant/apply/adjust action must NOT close it: those all just
-// re-render via the normal Firestore round-trip, which leaves
-// window.gmModalOpen untouched.
-window.closeGMModal = () => {
-  window.gmModalOpen = false;
-  window.render();
-};
 
 // --- EXPOSE UI HELPERS ---
 window.showTooltip = (text, evt) => {
@@ -258,9 +247,11 @@ window.switchTab = (tabName) => {
 window.closeWiki = () => { document.getElementById('wiki-overlay').classList.add('hidden'); };
 
 // --- ESCAPE CLOSES WHICHEVER MODAL IS OPEN ---
+// The GM's character-management modal is gone (GM_DASHBOARD_SPEC.md
+// Job 1 — selecting a squad card targets the console instead of opening
+// one), so the only modal left for Escape to close is the wiki overlay.
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
-  if (window.gmModalOpen) { window.closeGMModal(); return; }
   const wikiOverlay = document.getElementById('wiki-overlay');
   if (wikiOverlay && !wikiOverlay.classList.contains('hidden')) window.closeWiki();
 });
