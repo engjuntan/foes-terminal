@@ -186,7 +186,7 @@ export const LOCATION_SHOTS = [
     name: 'The Free City of Bandawang',
     notePath: 'Locations/The Free City of Bandawang.md',
     shot: 'entrance',
-    prompt: "A wide dusk skyline of Bandawang: collapsed pre-war casino towers strung with salvaged neon tubing and hand-painted signboards, rival gang colours layered on every wall, a crowded street market spilling under patchwork tarpaulin roofs toward the old highway, distant kapcai engines echoing off the ruined towers."
+    prompt: "A wide dusk view across Bandawang from a low ridge: the dead hulk of a pre-war cement works standing at the city's centre, silo towers and a collapsed kiln gantry dark against the sky, the town grown up around it on every side. Buildings are shoplots and low blocks of no more than twenty storeys — no skyscrapers — strung with salvaged neon tubing and hand-painted signboards, rival gang colours layered on every wall. A wide retention pond lies below, still and reflecting the neon, with stilted walkways along its edge. Distant kapcai engines echo off the concrete."
   },
   {
     id: 'loc_the_free_city_of_bandawang_interior',
@@ -260,7 +260,7 @@ export const LOCATION_SHOTS = [
     name: 'Bandawang Baru',
     notePath: 'Locations/Bandawang/Bandawang Baru.md',
     shot: 'entrance',
-    prompt: "A street of stilted kampong houses under a patchworked canvas market roof, freshly painted pastel walls, a jury-rigged solar panel wired above a doorway, construction scaffolding and bags of new concrete stacked along the dusty rebuilding street, a hand-lettered welcome sign strung between two posts."
+    prompt: "A street in Bandawang Baru where new and old are fused into single buildings: pre-war timber kampong houses with modern poured-concrete floors added above and beside them, concrete columns rising straight out of carved wooden frames, freshly painted pastel render meeting bare grey slab. A worn cobbled path runs down the middle, swept and patched, edged with drainage stones. Construction scaffolding and stacked bags of cement lean against a wall, a hand-lettered welcome sign strung between two posts."
   },
   {
     id: 'loc_bandawang_baru_interior',
@@ -274,7 +274,7 @@ export const LOCATION_SHOTS = [
     name: 'Bandawang Lama',
     notePath: 'Locations/Bandawang/Bandawang Lama.md',
     shot: 'entrance',
-    prompt: "A row of weathered colonial art-deco shoplots in Bandawang Lama, faded pastel paint peeling under years of radioactive rain, timber bracing propping the cracked facades, rival gang symbols painted over each other again and again along the ground floor, a torn Federation notice pasted crooked beside a doorway."
+    prompt: "A street of post-colonial art-deco shoplots in Bandawang Lama, and unlike the rest of the wasteland it is LOOKED AFTER: stepped deco parapets and curved corner facades repainted in pastel cream and jade, shutters rehung, brass shopfront fittings polished, ornamental plasterwork patched where it had cracked. The road is properly laid asphalt, swept, with kerbstones intact. A Triad house-rules board hangs neatly beside one doorway. Somebody here is deliberately rebuilding a proper society, and it shows."
   },
   {
     id: 'loc_bandawang_lama_interior',
@@ -288,7 +288,7 @@ export const LOCATION_SHOTS = [
     name: 'Federation Checkpoint',
     notePath: 'Locations/Bandawang/Federation Checkpoint.md',
     shot: 'entrance',
-    prompt: "A wooden watchtower and chain-link fence spanning the road, a hand-cranked boom gate lowered across the lane, worn canvas tents lined up beside it where a queue of travellers waits, a restored military truck parked beside the speaker tower, a hand-painted sign listing the day's crossing hours."
+    prompt: "A Federation checkpoint on the road out of Bandawang: a lavender-and-orange painted boom barrier across properly laid, patched asphalt, a sandbagged watchtower cabin beside it, Federation colours hanging limp in the humid air. A long queue of desperate refugees waits along the approach with bundles, cases and children, shuffling forward to be processed one at a time by a single guard at the barrier. Some have plainly been waiting for days."
   },
   {
     id: 'loc_federation_checkpoint_interior',
@@ -330,7 +330,7 @@ export const LOCATION_SHOTS = [
     name: 'North Bandawang',
     notePath: 'Locations/Bandawang/North Bandawang.md',
     shot: 'entrance',
-    prompt: "Rolling grass-grown craters mark old North Bandawang, faded red-and-black Axe Gang graffiti sprayed across scavenged sheet-metal fencing, machinery-parts stalls lining a cratered dirt road, the distant bulk of ProTiga HQ's tower rising above the treeline behind them, a burned-out kapcai frame propped against a fence post."
+    prompt: "The hill country of North Bandawang: low jungle-grown hills rolling back toward the horizon, and cut into the flat valley floor between them the vast pre-war ProTiga vehicle test track — a wide banked oval of cracked asphalt, lane markings still faintly visible, patched and swept where kapcai riders use it. Faded red-and-black Axe Gang paint marks the crash barriers. The bulk of ProTiga HQ's tower rises above the treeline beyond. A retro-futurist car husk with bulbous fifties styling and chrome tail fins sits abandoned at the trackside."
   },
   {
     id: 'loc_north_bandawang_interior',
@@ -428,35 +428,35 @@ export const LOCATION_SHOTS = [
     name: 'The Protectron Yard',
     notePath: 'Locations/Bandawang/The Protectron Yard.md',
     shot: 'entrance',
-    prompt: "A construction site scattered with loose concrete bags, stacked timber and tools, nine boxy pre-war Protectrons mid-task among the half-built outlines of new kampong homes, the unfinished community centre's bare concrete frame rising at the yard's centre, a stack of folded blueprints weighed down against the wind."
+    prompt: "The Protectron Yard: dry hard-packed earth underfoot, the staked-out foundation outlines of half-finished kampong homes laid across the plot, stacked timber and cement bags between them. Seven boxy pre-war Protectrons go about utility tasks among the works. At the yard's centre the new community hall has just been roofed — a concrete building in Minangkabau style with sweeping upswept buffalo-horn gables, their soaring roof built in traditional dark timber over the raw concrete walls below. The roof's centre is deliberately left open to the sky."
   },
   {
     id: 'loc_the_protectron_yard_interior',
     name: 'The Protectron Yard',
     notePath: 'Locations/Bandawang/The Protectron Yard.md',
     shot: 'interior',
-    prompt: "Inside the unfinished community centre's bare concrete shell: exposed rebar reaching up toward an open roof, a Protectron paused mid-task beside a stacked pallet of bricks, loose tarpaulin sheeting flapping over a half-poured floor slab in the humid air, chalked measurements scrawled across an exposed support beam."
+    prompt: "Inside the newly roofed community hall: a cozy but barely furnished room, bright with natural daylight pouring down through the open roof aperture at the centre onto a bare swept concrete floor. A single crafting bench with assorted hand tools stands in one corner; simple worn bedding is laid out in another. A large teak dining table with heavy wooden chairs sits in the middle of the room. The feel is unfinished CONSTRUCTION — clean new concrete, sawdust, the smell of timber — not decay."
   },
   {
     id: 'loc_the_rakan_community_center_entrance',
     name: 'The Rakan Community Center',
     notePath: 'Locations/Bandawang/The Rakan Community Center.md',
     shot: 'entrance',
-    prompt: "A refurbished multi-purpose hall with fresh paint and new concrete steps, community murals of peaceful families covering the outer walls, a simple playground of salvaged pipe swings out front, the building glowing warm against the surrounding district, a hand-painted sign welcoming visitors above the door."
+    prompt: "The Rakan Community Center, nestled among close-packed homes: a repurposed multi-purpose hall lovingly refurbished with fresh paint and new concrete, its outer walls covered in community-made murals of peaceful people and children, bright and hand-painted. A playground of salvaged pipe swings and a climbing frame stands out front on swept paved ground. Warm light spills from the windows. Cared for, well used, and plainly the heart of its neighbourhood."
   },
   {
     id: 'loc_the_rakan_community_center_interior',
     name: 'The Rakan Community Center',
     notePath: 'Locations/Bandawang/The Rakan Community Center.md',
     shot: 'interior',
-    prompt: "Boss Bob's basement office beneath the community centre: old football team pennants and scuffed trophies covering the walls, a battered coach's desk stacked with papers, a bare bulb swinging over a cracked leather chair, the ceiling still marked where a bunker hatch was sealed."
+    prompt: "Inside the Rakan Community Center's main hall: crowded, messy and thoroughly lived in. Children's chalk and paint drawings cover the lower walls beside bright community murals; racks of rifles are mounted high up, deliberately out of a child's reach. An infirmary corner holds cots with sick and injured residents; a shared cafeteria with long trestle tables occupies the far corner; makeshift bedding fills the others. Washing is strung overhead. Warm, busy, safe."
   },
   {
     id: 'loc_the_scrapyard_entrance',
     name: 'The Scrapyard',
     notePath: 'Locations/Bandawang/The Scrapyard.md',
     shot: 'entrance',
-    prompt: "A sprawling open-air scrap bazaar in North Bandawang, stalls of stripped cabling, engine blocks and circuit boards under patched tarpaulin awnings, a perimeter wall layered with scavenger graffiti and a scrawled warning about the gong not ringing for free, a rusted scale hanging beside the entrance for weighing scrap."
+    prompt: "The Scrapyard in North Bandawang: great unsorted mountains of scrap metal heaped across a wide flat yard, engine blocks, bent sheet steel, stripped chassis and cabling piled awaiting sorting, with narrow worked paths of compacted rubble and broken concrete running between them. Stalls of picked-over components shelter under patched awnings at the yard's edge, a rusted weighing scale hanging beside the entrance. Any vehicle wreck in the piles is retro-futurist fifties styling, never a modern car."
   },
   {
     id: 'loc_the_scrapyard_interior',
@@ -466,18 +466,18 @@ export const LOCATION_SHOTS = [
     prompt: "Inside a crowded scrap-stall shed: shelves of sorted components from wiring spools to cracked fusion battery casings, a workbench cluttered with tools beside a hand-scrawled price board, hazy light falling through gaps in the corrugated roof above, a hand-drawn inventory chart tacked above the workbench."
   },
   {
-    id: 'loc_the_tiger_palace_entrance',
-    name: 'The Tiger Palace',
-    notePath: 'Locations/Bandawang/The Tiger Palace.md',
+    id: 'loc_the_tortoise_palace_entrance',
+    name: 'The Tortoise Palace',
+    notePath: 'Locations/Bandawang/The Tortoise Palace.md',
     shot: 'entrance',
-    prompt: "A grand two-floor casino built into a former bus terminal, a Chinese-inspired entrance of repurposed dark timber in faded red and gold, wooden platform stairs leading up between broken neon signage, a suited Protectron butler waiting at the doors, a faded Grand Opening banner still strung above the doors."
+    prompt: "The Tortoise Palace in Bandawang Lama: a grand two-floor casino built into a former bus terminal where Shanghai Bund grandeur meets Malaysian post-colonial art deco — a stepped deco facade in cream and jade with curved corners and vertical fluting, lit by warm salvaged bulbs, dark repurposed timber doors in faded red and gold beneath. Standing at the entrance is an enormous gnarled hardwood log carved into a tortoise, magnificent and weathered smooth by handling, one end of it blackened and charred by fire. The forecourt is laid asphalt, swept clean."
   },
   {
-    id: 'loc_the_tiger_palace_interior',
-    name: 'The Tiger Palace',
-    notePath: 'Locations/Bandawang/The Tiger Palace.md',
+    id: 'loc_the_tortoise_palace_interior',
+    name: 'The Tortoise Palace',
+    notePath: 'Locations/Bandawang/The Tortoise Palace.md',
     shot: 'interior',
-    prompt: "Inside the Tiger Palace's main gaming floor: a fifteen-foot broken and charred wooden dragon coiling overhead, suited dealers at worn card tables, a huge jug of ice water on the lobby counter, faded red-and-gold decor under one of the wasteland's few working air conditioners."
+    prompt: "Inside the Tortoise Palace's main gaming floor: a grand speakeasy in the Shanghai Bund manner rendered in Malaysian Chinese materials — a deco mezzanine balustrade in polished brass and dark timber, fluted columns, etched glass panels, red-and-gold lacquer, a fifteen-foot carved wooden dragon coiling overhead, broken and charred in places but still majestic. Suited dealers work worn card tables, a huge jug of iced water sits on the lobby counter, and one of the wasteland's few working air conditioners hums above. Immaculately kept and warmly lit."
   },
   {
     id: 'loc_seio_peng_brothers_rnr_entrance',
@@ -492,7 +492,35 @@ export const LOCATION_SHOTS = [
     notePath: 'Locations/Bandawang/seio (Peng Brothers RNR).md',
     shot: 'interior',
     prompt: "Inside the garage-diner: travellers seated at mismatched tables over bowls of brahmin rendang, a charging rack of fusion batteries humming behind the counter, worn tools and spare parts hung along the back wall, warm lamp light against the dusk outside."
-  }
+  },
+  {
+    id: 'loc_the_rakan_community_center_office',
+    name: 'The Rakan Community Center',
+    notePath: 'Locations/Bandawang/The Rakan Community Center.md',
+    shot: 'office',
+    prompt: "Boss Bob's office in the basement beneath the Rakan Community Center: it reads as a football coach's room rather than an administrator's. Old team pennants, framed squad photographs and scuffed trophies crowd the walls, a battered timber desk is stacked with residential paperwork for Bandawang Baru, a tactics board leans in the corner, and a bare bulb hangs over a cracked leather chair. Tidy in its own cluttered way, and the only room in the building with no children's drawings on the walls."
+  },
+  {
+    id: 'loc_the_rakan_community_center_bunker',
+    name: 'The Rakan Community Center',
+    notePath: 'Locations/Bandawang/The Rakan Community Center.md',
+    shot: 'bunker',
+    prompt: "The cleared-out private residential bunker beneath the Rakan Community Center: a bare reinforced concrete room stripped of everything it once held, empty anchor bolts and cut conduit stubs marking where bunks and fittings used to be, a heavy pre-war blast door standing open at one end, a single strip light over swept bare floor. Dry, sound and completely empty — cleared deliberately, not looted."
+  },
+  {
+    id: 'loc_the_cement_works_entrance',
+    name: 'The Cement Works',
+    notePath: 'Locations/Bandawang/The Cement Works.md',
+    shot: 'entrance',
+    prompt: "The dead pre-war cement works at the centre of Bandawang: a vast silent industrial hulk of silo towers, a long collapsed rotary kiln lying broken on its cradles, and conveyor gantries sagging between them, all in bleached grey concrete stained with rust runs. The town has grown right up to its fence line on every side without anyone claiming it. A wide asphalt approach road, cracked and patched, runs to chained gates. No smoke, no light, nothing working."
+  },
+  {
+    id: 'loc_the_cement_works_interior',
+    name: 'The Cement Works',
+    notePath: 'Locations/Bandawang/The Cement Works.md',
+    shot: 'interior',
+    prompt: "Inside the dead cement works' main grinding hall: enormous ball mills and drive gearing seized in place under a torn roof, grey dust lying thick and undisturbed over every surface, shafts of hazy daylight falling through holes in the sheeting far above. Empty, cavernous and quiet. Derelict, abandoned and long picked over — nobody works here and nobody lives here."
+  },
 ];
 
 // A flat accessor, mirroring tools/art-slots.mjs's allSlots() shape.
@@ -522,7 +550,7 @@ export const KEPT_INTERIORS = new Set([
   'loc_bandawang_lama_interior',
   'loc_kulim_interior',
   'loc_syurga_interior',
-  'loc_the_tiger_palace_interior',
+  'loc_the_tortoise_palace_interior',
   'loc_the_free_city_of_bandawang_interior',
   'loc_north_bandawang_interior',
   // institutions that maintain themselves
@@ -531,6 +559,8 @@ export const KEPT_INTERIORS = new Set([
   'loc_federal_cultural_library_interior',
   'loc_the_education_center_interior',
   'loc_the_rakan_community_center_interior',
+  'loc_the_rakan_community_center_office',
+  'loc_the_rakan_community_center_bunker',
   // manned posts and bunkers
   'loc_perdana_bunker_interior',
   'loc_wira_bunker_interior',
@@ -538,6 +568,49 @@ export const KEPT_INTERIORS = new Set([
   'loc_federation_checkpoint_interior',
   'loc_federation_recruitment_center_interior',
   'loc_the_bandawang_enforcer_station_b_e_station_interior'
+]);
+
+// --- GROUND (GM ruling, 26 Sep 2026) -------------------------------
+// The first pass gave nearly every exterior a red laterite mud track.
+// People do not keep walking through mud for 170 years — they pave, or
+// they lay stone, or they patch what the pre-war world already left
+// them. So a location standing on pre-war ground, or held by anyone who
+// maintains it, gets a MADE SURFACE: cracked asphalt, patched concrete,
+// worn cobbles or laid brick. Bad condition, yes. Mud, no.
+//
+// This is the exterior half of the same rule as KEPT_INTERIORS: the
+// question is always "does anyone look after this place?"
+export const PAVED_LOCATIONS = new Set([
+  // pre-war towns and infrastructure — the roads were already there
+  'loc_bandawang_baru_entrance',
+  'loc_bandawang_lama_entrance',
+  'loc_north_bandawang_entrance',
+  'loc_the_free_city_of_bandawang_entrance',
+  'loc_kuala_lumpur_baru_entrance',
+  'loc_kulim_entrance',
+  'loc_fortress_city_of_penang_entrance',
+  'loc_the_longest_road_entrance',
+  'loc_the_north_south_railway_entrance',
+  'loc_sekitar_litar_entrance',   // a pre-war test track IS the surface
+  'loc_protiga_hq_entrance',
+  'loc_the_scrapyard_entrance',
+  'loc_federal_cultural_library_entrance',
+  'loc_abave_highlands_entrance',
+  'loc_frim_entrance',
+  // held and maintained by someone with an interest in keeping it usable
+  'loc_federation_checkpoint_entrance',
+  'loc_federation_recruitment_center_entrance',
+  'loc_perdana_bunker_entrance',
+  'loc_wira_bunker_entrance',
+  'loc_the_bandawang_enforcer_station_b_e_station_entrance',
+  'loc_the_rakan_community_center_entrance',
+  'loc_the_education_center_entrance',
+  'loc_kelam_sungai_entrance',
+  'loc_the_tortoise_palace_entrance',
+  'loc_the_cement_works_entrance',
+  'loc_syurga_entrance',
+  'loc_seio_peng_brothers_rnr_entrance',
+  'loc_the_lakeside_bar_entrance'
 ]);
 
 export function allLocationShots() {

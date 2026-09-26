@@ -39,3 +39,6 @@ reference/
 
 # Agent worktrees
 .claude/worktrees/
+
+# Firebase deploy cache — rewritten on every deploy, no value in history
+.firebase/

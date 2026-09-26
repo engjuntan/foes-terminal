@@ -103,6 +103,10 @@ player-facing and uses this convention.
   runs the sync, reviews, and commits.
 - Item icons: `npm run art` (`tools/item-art.mjs`, guide in
   `tools/ITEM_ART.md`). Plain script, no Claude tokens; hard-capped runs.
+- **Art rules live in `ART_DIRECTION.md`** — weathering, interiors vs
+  ruins, paved ground, retro-futurist props, when text is allowed. Read it
+  before writing an image prompt or changing a style constant; each rule
+  records the bad batch that produced it.
 - Lore and aesthetic checks come from the `lore-keeper` agent (DIRECTION
   before writing, REVIEW after); it writes to `reviews/` and changes
   nothing else.

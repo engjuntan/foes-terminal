@@ -26,7 +26,7 @@ import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { allSlots } from './art-slots.mjs';
-import { allLocationShots, KEPT_INTERIORS } from './art-locations.mjs';
+import { allLocationShots, KEPT_INTERIORS, PAVED_LOCATIONS } from './art-locations.mjs';
 import crypto from 'crypto';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -52,7 +52,12 @@ const LIFETIME_GENERATE_CAP = 400; // total paid generations ever; raise deliber
 // 1080x1080 square, and a plain post-apocalyptic ground that never
 // competes with the subject. Edit here to restyle everything.
 const GRADE = 'Monsoon Gold grade: blown-out near-white hazy sky light, hot golden key light, cyan-green bounced shadows, heavy humid air.';
-const CLIMATE = 'Equatorial Malaya after 170 years of rain: black-green mould and algae staining from the top down, rust weeping in dark streaks, damp surfaces, red laterite mud. No dust, no sand, no arid cracked earth.';
+// Toned down on the GM's note (26 Sep): the first pass read as one
+// uniform green smear, because "mould and algae from the top down" was
+// applied at full strength to every surface in every shot. Weathering
+// now collects where water actually sits — the shaded side, the drip
+// line, the foot of a wall — leaving the rest of the frame legible.
+const CLIMATE = 'Equatorial Malaya after 170 years of rain: rust weeping in dark streaks, sun-bleached and water-darkened surfaces, red laterite staining. Weathering is SELECTIVE, not total — algae and moss gather only where water actually sits, in shade, along drip lines and at the foot of walls, never as an even coat over everything. Most surfaces are simply old, faded and repaired. No dust, no sand, no arid cracked earth.';
 // "No text" was blanket, and it fought the item prompts themselves in two
 // whole classes of item. Branded consumables: Jet's prompt asks for
 // "faded red lettering spelling JET", Cap Kilat Cola's for "a label
@@ -64,7 +69,7 @@ const CLIMATE = 'Equatorial Malaya after 170 years of rain: black-green mould an
 // asked for — captions, watermarks, signatures, stray glyphs floating on
 // an object that isn't a written thing — and lets the subject carry its
 // own.
-const NEGATIVES = 'No captions, no watermark, no signature, and no stray lettering on an object that is not itself a written or labelled thing — a document, book, note, map, poster, sign or a product with a printed label may carry its own writing, and should. No hands, no people, no modern plastics, no flat screens, no Vault-Tec or other Bethesda marks.';
+const NEGATIVES = 'No captions, no watermark, no signature, and no stray lettering on an object that is not itself a written or labelled thing — a document, book, note, map, poster, sign or a product with a printed label may carry its own writing, and should. No hands, no people, no modern plastics, no flat screens, no Vault-Tec or other Bethesda marks. Vehicles, appliances and machinery are RETRO-FUTURIST in the Fallout manner: bulbous 1950s American styling, chrome, tail fins, atomic curves, never anything resembling a modern car or modern electronics. Corrugated metal sheet appears sparingly, as patches and lean-tos, never as the main material of a building.';
 // Each item carries its own setting in its prompt (a suitable, interesting
 // place that item would actually be found), so the shared style no longer
 // names a surface — it only holds the register, the grade, the climate and
@@ -260,15 +265,22 @@ const INTERIOR_KEPT_CLIMATE = 'Equatorial Malaya, 170 years after the war, but I
 const DESERT_LOCATIONS = [/chukai/i, /round city/i, /bandar bulat/i];
 const isDesertShot = shot =>
   DESERT_LOCATIONS.some(re => re.test(shot.notePath || '') || re.test(shot.name || ''));
+// Appended to a paved location's style. Deliberately specific about the
+// alternative, because "a road" alone still came back as a mud track.
+const PAVED_GROUND = 'THE GROUND IS A MADE SURFACE, NOT MUD: cracked and patched asphalt, worn concrete, laid cobbles or brick, with weeds through the joints, potholes crudely filled and kerbs still visible under the dirt. People have walked and driven here for generations and have kept a usable surface. No deep mud, no churned earth track, no unpaved laterite road.';
+
 const sceneStyleWith = climate =>
   `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. ${GRADE} ${climate} ${SCENE_NEGATIVES}`;
 
 // Upkeep wins over climate: a swept room is swept whether it stands in
 // the monsoon belt or the Chukai Desert.
-const locationStyleFor = shot =>
-  KEPT_INTERIORS.has(shot.id) ? sceneStyleWith(INTERIOR_KEPT_CLIMATE)
-  : isDesertShot(shot) ? sceneStyleWith(DESERT_CLIMATE)
-  : LOCATION_STYLE;
+const locationStyleFor = shot => {
+  const base =
+    KEPT_INTERIORS.has(shot.id) ? sceneStyleWith(INTERIOR_KEPT_CLIMATE)
+    : isDesertShot(shot) ? sceneStyleWith(DESERT_CLIMATE)
+    : LOCATION_STYLE;
+  return PAVED_LOCATIONS.has(shot.id) ? `${base} ${PAVED_GROUND}` : base;
+};
 
 // Reads or writes one key in a note's YAML frontmatter, creating the block
 // when the note has none. Leaves the body untouched either way.
@@ -302,6 +314,7 @@ function locationTargets() {
       id: shot.id,
       name: `${shot.name} — ${shot.shot}`,
       kind: 'location',
+      notePath: shot.notePath,   // lets `queue --match` aim at a district
       hasArt: isLinked(current || ''),
       hasPrompt: !!shot.prompt,
       prompt: `${locationStyleFor(shot)} Subject: ${shot.prompt}`,
@@ -372,7 +385,19 @@ function readSkipList() {
 // everything else uses.
 function queue() {
   const limit = option('limit') ? requireLimit() : Infinity;
-  const pending = pendingTargets().slice(0, limit);
+  // `--match <text>` narrows the queue to assets whose id contains it, so
+  // a batch can be aimed at one place: `--only locations --match bandawang`
+  // gives you the city's shots and nothing else. The GM works location by
+  // location, not in whatever order the list happens to be in.
+  const match = (option('match') || '').toLowerCase();
+  let pool = pendingTargets();
+  // Match the note's path as well as the id: most of Bandawang's places
+  // are named for themselves (the Tortoise Palace, the Scrapyard) and only
+  // the folder `Locations/Bandawang/` says where they are.
+  if (match) pool = pool.filter(t =>
+    t.id.toLowerCase().includes(match) || (t.notePath || '').toLowerCase().includes(match));
+  const pending = pool.slice(0, limit);
+  if (match && pending.length === 0) fail(`nothing pending matches "${match}".`);
   const useFor = t => t.kind === 'item' ? 'Item icon, shown in inventory and equipped slots'
     : t.kind === 'location' ? 'Location art, shown on the location note'
     : 'Card art, shown on the reputation/SPECIAL card';
@@ -478,19 +503,26 @@ function shipCopy(src, destDir, id, kind = 'item') {
   }
 }
 
+// Location shots live in their own folder (GM's request, 26 Sep): there
+// are 68 of them at banner size next to ~280 small item icons, and
+// mixing the two made public/art impossible to skim.
+const SHIP_SUBDIR = { location: 'locations' };
+
 async function ingestLocal(batch) {
-  const dir = path.join(ROOT, 'public', 'art');
-  fs.mkdirSync(dir, { recursive: true });
+  fs.mkdirSync(path.join(ROOT, 'public', 'art'), { recursive: true });
   fs.mkdirSync(DONE, { recursive: true });
   const ledger = readLedger();
   for (const { file, item } of batch) {
+    const sub = SHIP_SUBDIR[item.kind] || '';
+    const dir = path.join(ROOT, 'public', 'art', sub);
+    fs.mkdirSync(dir, { recursive: true });
     const name = shipCopy(file, dir, item.id, item.kind);
-    item.setUrl(`art/${name}`);
+    item.setUrl(`art/${sub ? sub + '/' : ''}${name}`);
     fs.renameSync(file, path.join(DONE, path.basename(file)));
     ledger.uploaded++;
     ledger.history.push({ at: new Date().toISOString(), action: 'local', id: item.id, url: `art/${name}` });
     writeLedger(ledger);
-    console.log(`  ✓ ${item.name} → public/art/${name}`);
+    console.log(`  ✓ ${item.name} → public/art/${sub ? sub + '/' : ''}${name}`);
   }
   console.log('\nDone. These ship with the app — commit public/art and deploy. Item icons also need `node sync-obsidian.js --once`.');
 }
@@ -679,7 +711,73 @@ function setPrompts() {
   console.log(`${DRY ? '[dry run] would write' : 'Wrote'} ${written} prompts; skipped ${skipped}.`);
 }
 
-const commands = { status, sheet, ingest, generate, link, collect, skip, queue, 'set-prompts': setPrompts };
+
+// ---------- collect-batch ----------
+// The cheap handoff. Driving a browser costs ~19 tool calls per image;
+// this costs two commands for a whole batch. The GM hands `art/queue.md`
+// to ChatGPT, it generates every prompt IN ORDER, the GM downloads the
+// results into one folder, and this maps them onto the queue by download
+// time — the order they arrived is the order they were asked for.
+//
+// Always dry-runs first. Order is an assumption, and an assumption that
+// silently mis-files 20 images is worse than one that asks.
+function collectBatch() {
+  const positional = args.slice(1).find(a => !a.startsWith('--'));
+  const dir = positional || path.join(process.env.HOME || '', 'Downloads', 'foes-art');
+  if (!fs.existsSync(dir)) fail(`no such folder: ${dir}\n  Make it, and have the generator's images saved there in queue order.`);
+
+  const queuePath = path.join(ROOT, 'art', 'queue.json');
+  if (!fs.existsSync(queuePath)) fail('no art/queue.json — run `queue` first so there is an order to map onto.');
+  const queued = JSON.parse(fs.readFileSync(queuePath, 'utf8'));
+  const ids = (queued.assets || queued).map(a => a.asset_id || a.id);
+
+  const files = fs.readdirSync(dir)
+    .filter(f => /\.(png|jpe?g|webp)$/i.test(f))
+    .map(f => ({ f, at: fs.statSync(path.join(dir, f)).mtimeMs }))
+    .sort((a, b) => a.at - b.at);
+
+  if (!files.length) fail(`no images in ${dir}.`);
+
+  const targets = Object.fromEntries(allTargets().map(t => [t.id, t]));
+  const pairs = files.map((file, i) => ({ file, id: ids[i] }));
+  const extra = Math.max(0, files.length - ids.length);
+
+  console.log(`\n${files.length} image(s) in ${dir}, ${ids.length} asset(s) in the queue.\n`);
+  console.log('Oldest download maps to the first queued asset:\n');
+  for (const { file, id } of pairs) {
+    if (!id) { console.log(`  ${file.f.padEnd(42)} → (no queued asset — will be left alone)`); continue; }
+    const t = targets[id];
+    console.log(`  ${file.f.padEnd(42)} → ${id}${t ? '' : '   [!! unknown id]'}`);
+  }
+  if (extra) console.log(`\n  ${extra} extra file(s) beyond the queue; they stay put.`);
+  if (files.length < ids.length) console.log(`\n  ${ids.length - files.length} queued asset(s) have no image yet.`);
+
+  if (DRY) { console.log('\n[dry run] nothing moved. Re-run without --dry-run to file them.\n'); return; }
+
+  fs.mkdirSync(INBOX, { recursive: true });
+  let filed = 0;
+  for (const { file, id } of pairs) {
+    if (!id || !targets[id]) continue;
+    const src = path.join(dir, file.f);
+    const ext = path.extname(file.f).toLowerCase() === '.jpeg' ? '.jpg' : path.extname(file.f).toLowerCase();
+    // Same square guard collect uses — a wide image is wrong whichever
+    // route it came in by.
+    try {
+      const out = execSync(`sips -g pixelWidth -g pixelHeight ${JSON.stringify(src)}`, { encoding: 'utf8' });
+      const w = Number((out.match(/pixelWidth:\s*(\d+)/) || [])[1]);
+      const h = Number((out.match(/pixelHeight:\s*(\d+)/) || [])[1]);
+      if (w && h && Math.abs(w - h) / Math.max(w, h) > 0.02) {
+        console.log(`  skipped ${file.f}: ${w}x${h}, not square — regenerate "${id}" at 1:1.`);
+        continue;
+      }
+    } catch { /* sips unavailable: let it through */ }
+    fs.renameSync(src, path.join(INBOX, `${id}${ext}`));
+    filed++;
+  }
+  console.log(`\nFiled ${filed} image(s) into the vault's Media/New items/. Review them, then ingest.\n`);
+}
+
+const commands = { status, sheet, ingest, generate, link, collect, 'collect-batch': collectBatch, skip, queue, 'set-prompts': setPrompts };
 if (!commands[command]) { console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(0, 9).join('\n')); process.exit(command ? 1 : 0); }
 fs.mkdirSync(INBOX, { recursive: true });
 await commands[command]();

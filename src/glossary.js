@@ -913,6 +913,20 @@ export const glossaryDatabase = {
       "Bandawang"
     ]
   },
+  the_cement_works: {
+    "id": "the_cement_works",
+    "name": "The Cement Works",
+    "aliases": [
+      "the Works",
+      "Kilang Simen"
+    ],
+    "strict_aliases": [],
+    "summary": "The Cement Works is the dead heart of The Free City of Bandawang — a vast pre-war cement plant whose silo towers and collapsed rotary kiln still stand at the centre of the city, with all three districts grown up around its fence line.",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
   the_education_center: {
     "id": "the_education_center",
     "name": "The Education Center",
@@ -974,12 +988,12 @@ export const glossaryDatabase = {
       "Bandawang"
     ]
   },
-  the_tiger_palace: {
-    "id": "the_tiger_palace",
-    "name": "The Tiger Palace",
+  the_tortoise_palace: {
+    "id": "the_tortoise_palace",
+    "name": "The Tortoise Palace",
     "aliases": [],
     "strict_aliases": [],
-    "summary": "The Tiger Palace is the largest casino for hundreds of kilometres around, built into the shell of what was once a large bus terminal in Bandawang Lama.",
+    "summary": "The Tortoise Palace is the largest casino for hundreds of kilometres around, built into the shell of what was once a large bus terminal in Bandawang Lama.",
     "category_path": [
       "Locations",
       "Bandawang"
