@@ -22,6 +22,7 @@ import { getRecipe } from './recipes.js';
 import { STATIONS, canCraft, netWeightDelta, isStationAvailable } from './crafting.js';
 import { planListGrant, describeNoOpGrant } from './grants.js';
 import { pushEventLog } from './eventLog.js';
+import { buildCheckLogLines, checkLogVisibility } from './checkLog.js';
 import {
   REPUTATION_MIN, REPUTATION_MAX, KARMA_MIN, KARMA_MAX,
   getReputationTier, getReputationValue, getKarmaTier, getKarmaValue,
@@ -3745,9 +3746,14 @@ export async function resolvePlayerCheck() {
     at: Date.now()
   };
 
+  // Same event-log gap as resolveGmCheck — a player's own check is never
+  // hidden, so this always logs 'all' (checkLogVisibility(entry) with
+  // entry.hidden === false), same audience as everything else here.
+  const eventLog = pushEventLog(window.liveData.event_log, { text: buildCheckLogLines(entry)[0], actor: char.name, visibility: checkLogVisibility(entry) });
+
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   try {
-    await updateDoc(charRef, { checks: [...current, entry], last_resolution });
+    await updateDoc(charRef, { checks: [...current, entry], last_resolution, event_log: eventLog });
     window.playerCheckDraft = null;
     window.render();
   } catch (err) { alert("ERROR: " + err.message); }
@@ -3868,6 +3874,18 @@ export async function resolveGmCheck() {
   if (draft.reveal) {
     updatePayload.messages = [...currentMessages, { id: `msg_${Date.now()}`, from: 'GM', target: 'all', body: buildCheckRevealMessage(entry), timestamp: Date.now() }];
   }
+
+  // A resolved check used to leave no trace in the event log (bug fixed
+  // 2026-09-27) — one line per result, so a party check's independent
+  // pass/fails each get their own entry rather than one joint line.
+  // Hidden (unrevealed) checks log 'gm'-only, same as the check itself
+  // never reaching a player; that's the whole point of hiding it.
+  let eventLog = window.liveData.event_log;
+  const visibility = checkLogVisibility(entry);
+  buildCheckLogLines(entry).forEach(text => {
+    eventLog = pushEventLog(eventLog, { text, actor: 'GM', visibility });
+  });
+  updatePayload.event_log = eventLog;
 
   // GM reroll (SCOPE_DECISIONS.md "Next systems" ruling, 2026-09-21) —
   // 'single' and 'custom' scope only. 'party' rolls N characters against

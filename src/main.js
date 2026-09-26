@@ -6,6 +6,7 @@ import * as Controllers from './controllers.js'; // All Actions
 import { formatGameTime } from './needs.js';
 import { captureScrollPositions, restoreScrollPositions } from './scrollUtil.js';
 import { shouldAnimateInitiative } from './combat.js';
+import { buildCheckAnnouncement } from './checkLog.js';
 import './style.css';
 
 // --- GLOBAL STATE ---
@@ -430,6 +431,7 @@ window.render = function() {
 
   maybeAnnounceTurn();
   maybeAnnounceWeaponSwap();
+  maybeAnnounceCheck();
   maybeAnimateInitiative();
 }
 
@@ -486,6 +488,26 @@ function maybeAnnounceWeaponSwap() {
   showBigAnnouncement(result.success ? 'WEAPON SWAP SUCCESS!' : 'WEAPON SWAP FAILED!', []);
 }
 
+// Job 4: a resolved check announces the same way combat does — every
+// client watches the same `checks[]` array and reacts independently the
+// first time it sees a given entry's id, so this fires once per check
+// and not on every re-render (same key-comparison pattern as the two
+// watchers above). A hidden (unrevealed) check is GM-only: a big
+// "CHECK FAILED" on a player's screen would give away a roll the GM
+// chose to hide, so a non-GM viewer bails out having still recorded the
+// id, and never sees it even after a later reveal.
+window.lastAnnouncedCheckId = null;
+function maybeAnnounceCheck() {
+  const checks = (window.liveData && window.liveData.checks) || [];
+  const entry = checks[checks.length - 1];
+  if (!entry) return;
+  if (window.lastAnnouncedCheckId === entry.id) return;
+  window.lastAnnouncedCheckId = entry.id;
+  if (entry.hidden && window.userRole !== 'gm') return;
+  const { headline, sublines } = buildCheckAnnouncement(entry);
+  showBigAnnouncement(headline, sublines);
+}
+
 function showBigAnnouncement(headline, sublines, actionButton) {
   let el = document.getElementById('turn-announcement');
   if (!el) {
@@ -499,8 +521,15 @@ function showBigAnnouncement(headline, sublines, actionButton) {
     document.body.appendChild(el);
   }
 
+  // A subline is a plain string (every existing caller — turn events,
+  // weapon-swap results — reads red, unchanged) or a { text, color }
+  // object (job 4: a passed check shouldn't be coloured like a failure).
   const sublinesHtml = (sublines || [])
-    .map(line => `<div style="font-size:16px; color:#ff5555; text-align:center;">${line}</div>`)
+    .map(line => {
+      const text = typeof line === 'string' ? line : line.text;
+      const color = typeof line === 'string' ? '#ff5555' : (line.color || '#ff5555');
+      return `<div style="font-size:16px; color:${color}; text-align:center;">${text}</div>`;
+    })
     .join('');
 
   const actionHtml = actionButton ? `
