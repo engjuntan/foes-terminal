@@ -100,8 +100,7 @@ window.scrapItem = Controllers.scrapItem;
 // somehow both are (never expected in practice).
 window.repairItem = (itemId, slot, index) => Controllers.repairItem(itemId, slot ? { slot } : { index });
 window.gmSetItemCondition = (itemId, slot, index, marks) => Controllers.gmSetItemCondition(window.selectedCharId, itemId, slot ? { slot } : { index }, marks);
-window.gmGrantStation = Controllers.gmGrantStation;
-window.gmRevokeStation = Controllers.gmRevokeStation;
+window.gmToggleStation = Controllers.gmToggleStation;
 window.useItem = Controllers.useItem;
 window.giveItem = Controllers.giveItem;
 window.gmAdjustVaultPoints = (amt) => Controllers.gmAdjustVaultPoints(window.selectedCharId, amt);

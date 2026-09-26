@@ -6,9 +6,11 @@ import { getItem } from './items.js';
 import { normalizeInventory, getInventoryQuantity } from './inventory.js';
 
 // Four stations, hardcoded rather than synced content — there will never
-// be many of these, and the GM's own flavour label (where the party found
-// it) lives per-character in characters.<id>.stations, not here. This
-// object just defines what a station id MEANS.
+// be many of these. Availability itself is party-wide (liveData.stations,
+// GM ruling 2026-09-27 — a workbench in the safehouse isn't one PC's to
+// own), with old per-character grants (characters.<id>.stations) honoured
+// as a fallback until the GM flips the party toggle. This object just
+// defines what a station id MEANS.
 export const STATIONS = {
   field_kit: {
     id: 'field_kit', name: 'Field Kit', always: true,
@@ -46,17 +48,33 @@ export function meetsSkillFloor(recipe, derivedSkills) {
   return ((derivedSkills || {})[req.key] || 0) >= req.min;
 }
 
-// field_kit is always available — every other station requires the GM
-// to have granted it on charStations (characters.<id>.stations).
-export function hasStation(recipe, charStations) {
+// The one gate every read site (crafting, scrapping, the Workshop
+// display) must go through — a station on in one place and off in
+// another is exactly the bug this exists to prevent. field_kit is always
+// on. Otherwise the party-wide toggle wins once the GM has set it either
+// way (`false` counts — a deliberately-off station must not fall through
+// to the old per-character grant). Only when the party has never touched
+// this station's toggle does a character's old grant still count, so a
+// bench a party already had doesn't vanish the moment this ships.
+export function isStationAvailable(stationId, liveData, char) {
+  if (STATIONS[stationId]?.always) return true;
+  const party = (liveData && liveData.stations) || {};
+  if (typeof party[stationId] === 'boolean') return party[stationId];
+  return !!(char && char.stations && char.stations[stationId]);
+}
+
+// field_kit is always available — every other station is read through
+// isStationAvailable() (party-wide toggle, falling back to the old
+// per-character grant).
+export function hasStation(recipe, liveData, char) {
   if (!recipe.station || recipe.station === 'field_kit') return true;
-  return !!(charStations && charStations[recipe.station]);
+  return isStationAvailable(recipe.station, liveData, char);
 }
 
 // Returns every reason crafting is currently blocked, not just the
 // first — the Workshop shows a player everything standing in their way
 // at once rather than one error at a time across repeated clicks.
-export function canCraft(recipe, char, derivedSkills) {
+export function canCraft(recipe, char, derivedSkills, liveData) {
   const reasons = [];
   const missing = getMissingInputs(recipe, char && char.inventory);
   Object.entries(missing).forEach(([id, qty]) => {
@@ -67,7 +85,7 @@ export function canCraft(recipe, char, derivedSkills) {
     const req = recipe.skill;
     reasons.push(`Requires ${req.key.replace(/_/g, ' ')} ${req.min} (you have ${(derivedSkills || {})[req.key] || 0})`);
   }
-  if (!hasStation(recipe, char && char.stations)) {
+  if (!hasStation(recipe, liveData, char)) {
     const station = STATIONS[recipe.station];
     reasons.push(`Requires ${station ? station.name : recipe.station} — not available here`);
   }

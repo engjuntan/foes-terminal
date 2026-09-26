@@ -33,7 +33,7 @@ import {
 } from './reputationContent.js';
 import { deriveBodyState, renderBodyWireframe } from './wireframe.js';
 import { clipState, heldRounds, availableFireModes, resolveFireMode } from './ammo.js';
-import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
+import { STATIONS, canCraft, netWeightDelta, isStationAvailable } from './crafting.js';
 import { recipeDatabase } from './recipes.js';
 import {
   isDurable, isBroken, normalizeCondition, conditionLabel, scrapYieldFor,
@@ -2342,7 +2342,6 @@ export function getWorkshopView(charId, liveData) {
   const charData = liveData.characters[charId];
   if (!charData) return `<h1>&gt; ERROR: IDENTITY NOT FOUND</h1>`;
   const inventory = normalizeInventory(charData.inventory);
-  const stations = charData.stations || {};
 
   const derived = deriveCharacter(charData);
   const condition = normalizeCondition(charData);
@@ -2363,11 +2362,13 @@ export function getWorkshopView(charId, liveData) {
       </div>`;
   }).join('') : `<div style="color:#555; font-size:12px;">No components authored yet.</div>`;
 
-  // STATIONS — field_kit always available; everything else read off
-  // characters.<id>.stations, which only the GM's gmGrantStation writes to.
+  // STATIONS — party-wide (liveData.stations), field_kit always
+  // available; every read goes through isStationAvailable(), which also
+  // honours an old per-character grant until the GM's party toggle has
+  // been set at all.
   const stationsHtml = Object.values(STATIONS).map(s => {
-    const available = s.always || !!stations[s.id];
-    const label = s.always ? 'always' : (stations[s.id] || '[not found]');
+    const available = isStationAvailable(s.id, liveData, charData);
+    const label = s.always ? 'always' : (available ? 'available' : '[not found]');
     return `
       <div style="display:flex; justify-content:space-between; padding:3px 0; ${available ? '' : 'opacity:0.4;'}">
         <span>${available ? '<span style="color:var(--pip-green);">●</span>' : '<span style="color:#555;">○</span>'} ${renderWikiLink(s.name, s.description)}</span>
@@ -2395,7 +2396,7 @@ export function getWorkshopView(charId, liveData) {
   const recipesHtml = Object.keys(byCategory).length === 0
     ? `<div style="color:#555; font-size:12px;">No recipes known — your GM will teach you some as the story unfolds.</div>`
     : Object.entries(byCategory).map(([cat, list]) => {
-        const scored = list.map(r => ({ r, result: canCraft(r, charData, derived.skills) }))
+        const scored = list.map(r => ({ r, result: canCraft(r, charData, derived.skills, liveData) }))
           .sort((a, b) => (a.result.ok === b.result.ok) ? 0 : (a.result.ok ? -1 : 1));
         const rowsHtml = scored.map(({ r, result }) => {
           const outputItem = getItem(r.produces && r.produces.item);
@@ -2477,7 +2478,7 @@ export function getWorkshopView(charId, liveData) {
     ? `<div style="color:#555; font-size:12px;">No weapons or armor to repair.</div>`
     : repairRows.sort((a, b) => b.marks - a.marks).map(({ item, itemId, marks, slot, index }) => {
         const benchStationId = item.type === 'weapon' ? 'weapons_bench' : 'armour_bench';
-        const atBench = !!stations[benchStationId];
+        const atBench = isStationAvailable(benchStationId, liveData, charData);
         const floor = repairFloor(repairSkill, atBench);
         const marksToRepair = Math.max(0, marks - floor);
         const cost = totalRepairCost(item, marksToRepair);
@@ -2702,9 +2703,27 @@ export function getGMStatusView(liveData) {
       </div>
     </div>`;
 
+  // PARTY — crafting stations, party-wide (GM ruling 2026-09-27: a
+  // workbench in the safehouse isn't one PC's to own). field_kit is
+  // never shown here — it's always on for everyone, nothing to toggle.
+  const partyStations = (liveData.stations || {});
+  const partyStationsHtml = Object.values(STATIONS).filter(s => !s.always).map(s => {
+    const on = partyStations[s.id] === true;
+    return `
+      <label style="display:flex; align-items:center; gap:6px; padding:3px 0; cursor:pointer;">
+        <input type="checkbox" ${on ? 'checked' : ''} onchange="window.gmToggleStation('${s.id}', this.checked)">
+        <span>${s.name}</span>
+      </label>`;
+  }).join('');
+
   return `
     <div class="dashboard-container">
       ${renderGMCharPicker(chars, 'var(--pip-green)')}
+      <div class="panel">
+        <h3 style="color:var(--pip-green); margin-top:0;">CRAFTING STATIONS</h3>
+        <p style="font-size:11px; color:#888; margin-top:-4px;">Available to everyone. The field kit is always on.</p>
+        ${partyStationsHtml}
+      </div>
       <div class="panel">
         <h3 style="color:var(--pip-green); margin-top:0;">TIME CONTROL</h3>
         <div style="display:flex; gap:4px; margin-bottom:8px;">
@@ -2892,22 +2911,7 @@ export function renderGMScreen(liveData) {
 
         <p style="font-size:11px; color:#888; border:1px dashed #444; padding:6px;">Radiation, survival needs, limb damage and karma moved to the <span onclick="window.switchTab('STATUS')" style="color:var(--pip-green); text-decoration:underline; cursor:pointer;">STATUS tab</span> (pick this character there).</p>
 
-        <h4 style="color:var(--pip-green); border-bottom:1px dashed var(--pip-green);">CRAFTING STATIONS</h4>
-        <div style="margin-bottom:10px;">
-          ${Object.values(STATIONS).filter(s => !s.always).map(s => {
-            const granted = targetChar && targetChar.stations && targetChar.stations[s.id];
-            return granted ? `
-              <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 0;">
-                <span><span style="color:var(--pip-green);">●</span> ${s.name} <span style="color:#888; font-size:11px;">— ${granted}</span></span>
-                <button class="gm-btn" style="border-color:red; color:red; padding:0 6px;" onclick="window.gmRevokeStation('${s.id}', window.selectedCharId)">REVOKE</button>
-              </div>` : `
-              <div style="display:flex; gap:6px; align-items:center; padding:3px 0;">
-                <span style="flex-grow:1;"><span style="color:#555;">○</span> ${s.name}</span>
-                <input type="text" id="stationLabel_${s.id}" placeholder="location" style="width:90px; background:black; color:var(--pip-green); border:1px solid var(--pip-dim); font-size:11px; padding:2px 4px;">
-                <button class="gm-btn" style="padding:0 6px;" onclick="window.gmGrantStation('${s.id}', window.selectedCharId, document.getElementById('stationLabel_${s.id}').value)">GRANT</button>
-              </div>`;
-          }).join('')}
-        </div>
+        <p style="font-size:11px; color:#888; border:1px dashed #444; padding:6px;">Crafting stations moved to the <span onclick="window.switchTab('STATUS')" style="color:var(--pip-green); text-decoration:underline; cursor:pointer;">STATUS tab</span> — they're party-wide now, not granted per character.</p>
 
         <h4 style="color:cyan; border-bottom:1px dashed cyan;">REWARDS</h4>
         <div style="display:flex; gap:10px; margin-bottom:10px;">

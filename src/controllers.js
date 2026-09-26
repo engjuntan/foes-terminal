@@ -19,7 +19,7 @@ import {
   splitCuredAddictionsByTime, CHEM_ADDICTION_MEDICINE_TIER
 } from './chems.js';
 import { getRecipe } from './recipes.js';
-import { STATIONS, canCraft, netWeightDelta } from './crafting.js';
+import { STATIONS, canCraft, netWeightDelta, isStationAvailable } from './crafting.js';
 import { planListGrant, describeNoOpGrant } from './grants.js';
 import { pushEventLog } from './eventLog.js';
 import {
@@ -671,35 +671,15 @@ export async function gmGrantRecipe(recipeId, target) {
 }
 
 // --- CRAFTING STATIONS ---
-// Same grant pattern as gmGrantMap above, but writes a map key rather
-// than pushing to an array — characters.<id>.stations is { [stationId]:
-// locationLabel }, so the Workshop can show "where you found it" rather
-// than just a checkmark. field_kit needs no grant; STATIONS.field_kit is
-// always available (see crafting.js's hasStation()).
-export async function gmGrantStation(stationId, target, locationLabel) {
-  if (!STATIONS[stationId]) return;
-  const characters = window.liveData.characters || {};
-  const targets = target === 'all' ? Object.keys(characters).filter(id => characters[id].is_finalized) : [target];
-  const updatePayload = {};
-  targets.forEach(charId => {
-    updatePayload[`characters.${charId}.stations.${stationId}`] = locationLabel || STATIONS[stationId].name;
-  });
-  if (Object.keys(updatePayload).length === 0) return;
-  const charRef = doc(db, "prisoncampaign", "alpha_team");
-  try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
-}
-
-// The party leaving a settlement is exactly when a granted bench should
-// go away again — deleteField() rather than writing null, so hasStation()'s
-// truthy check keeps working without needing to special-case an empty string.
-export async function gmRevokeStation(stationId, target) {
-  const characters = window.liveData.characters || {};
-  const targets = target === 'all' ? Object.keys(characters).filter(id => characters[id].is_finalized) : [target];
-  const updatePayload = {};
-  targets.forEach(charId => {
-    updatePayload[`characters.${charId}.stations.${stationId}`] = deleteField();
-  });
-  if (Object.keys(updatePayload).length === 0) return;
+// GM ruling 2026-09-27: a workbench in the safehouse is not one PC's to
+// own — stations are party-wide, one boolean flip rather than a grant
+// with a location label. `false` is written and read as a real value
+// (not deleteField()), so the GM can turn a station back off after
+// turning it on — see isStationAvailable() in crafting.js, which honours
+// an old per-character grant only until this toggle has been set at all.
+export async function gmToggleStation(stationId, enabled) {
+  if (!STATIONS[stationId] || STATIONS[stationId].always) return;
+  const updatePayload = { [`stations.${stationId}`]: !!enabled };
   const charRef = doc(db, "prisoncampaign", "alpha_team");
   try { await updateDoc(charRef, updatePayload); } catch (err) { alert("ERROR: " + err.message); }
 }
@@ -1636,7 +1616,7 @@ export async function craftItem(recipeId) {
   if (!outputItem) { alert("THIS RECIPE'S OUTPUT ITEM IS MISSING — TELL YOUR GM"); return; }
 
   const derived = deriveCharacter(char);
-  const { ok, reasons } = canCraft(recipe, char, derived.skills);
+  const { ok, reasons } = canCraft(recipe, char, derived.skills, window.liveData);
   if (!ok) { alert(reasons.join('\n')); return; }
 
   // Crafting usually consumes more mass than it produces (scrap metal is
@@ -1770,7 +1750,7 @@ export async function repairItem(itemId, copyRef) {
   const derived = deriveCharacter(char);
   const repairSkill = derived.skills.repair || 0;
   const benchStationId = item.type === 'weapon' ? 'weapons_bench' : 'armour_bench';
-  const atBench = !!(char.stations && char.stations[benchStationId]);
+  const atBench = isStationAvailable(benchStationId, window.liveData, char);
   const floor = repairFloor(repairSkill, atBench);
 
   if (currentMarks <= floor) {
