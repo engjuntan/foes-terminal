@@ -62,11 +62,17 @@ Two columns on a wide screen, stacking to one below **1100px**:
 │  (cards, read-only)     │  [VITALS][INVENTORY]         │
 │                         │  [STATS][STATUS]             │
 │                         │                              │
-│ PARTY                   │  …the selected tab…          │
-│  crafting toggles       │                              │
-│  time control           │                              │
+│                         │  …the selected tab…          │
+│                         │                              │
 └─────────────────────────┴──────────────────────────────┘
 ```
+
+**Correction to an earlier draft of this spec.** The mock above once had a
+PARTY panel in the left column holding crafting toggles and time control.
+That was written without checking where TIME CONTROL actually lives — it
+is in `getGMStatusView` (the GM's STATUS tab), not `renderGMScreen`. Job 3
+put the crafting toggles beside it there, which is correct. **Leave both
+where they are.** The left column here is the squad monitor alone.
 
 Use CSS grid with `grid-template-columns: minmax(320px, 420px) 1fr` and a
 `@media (max-width: 1100px)` single-column fallback. No `max-width` cap on
