@@ -10,6 +10,30 @@ each one so nobody re-opens a settled question.
 
 ---
 
+## Reject list — read this first
+
+An image that does any of these is **wrong** and gets regenerated, no
+matter how good it looks otherwise. Each one is here because it actually
+happened.
+
+| Reject | Why |
+|---|---|
+| **Moss, algae or water damage inside an occupied building** | A bunker is kept. Monks sweep their prayer hall. A business that wants custom cleans its floor. |
+| **A mud track where people live or work** | Nobody walks through mud for 170 years. They pave, lay stone, or patch what the pre-war world left. |
+| **Moss on armour or worn gear** | A vest reads as abandoned scenery the moment it grows a lawn. |
+| **An even green coat over the whole frame** | Weathering gathers where water sits — shade, drip lines, the foot of a wall. Not everywhere at once. |
+| **Corrugated metal as a building's main material** | It became shorthand for "poor" and made every settlement look identical. Patches and lean-tos only. |
+| **A modern-looking car, or modern electronics** | Vehicles and machines are retro-futurist: bulbous fifties styling, chrome, tail fins, atomic curves. |
+| **A caption, watermark or signature** | Text belongs on things that are written or labelled, never floating over the image. |
+| **A template placeholder rendered literally** | One betting board came back reading `FIGHT 1: (Name) vs (Name)`. |
+| **A non-square image** | Everything is 1:1. Gemini silently returns 1408×768 when a subject sounds landscape. `collect` refuses these. |
+| **European faces or European armour silhouettes** | This is Malaya. Faces and dress are Malaysian — Malay, Chinese, Indian. |
+| **A skyscraper in Bandawang** | Nothing there is over twenty storeys. It is shoplots and low blocks. |
+| **Desert in a monsoon location, or jungle in the Chukai** | The climate clause is per-location and is not a suggestion. |
+| **Bethesda or Vault-Tec marks** | Including ones that bleed in from a contaminated generator thread. |
+
+---
+
 ## The shared formula
 
 Every prompt is `register + grade + climate + negatives + subject`. The
@@ -150,6 +174,80 @@ tropical. `DESERT_LOCATIONS` matches on name as well as note path.
 > its note is `Locations/Round City.md`, so it was handed the monsoon
 > clause ending "no dust, no sand, no arid cracked earth". The generator
 > obeyed and produced a lush green city. Fixed 26 Sep.
+
+---
+
+## Faction and place look
+
+The identity notes behind the prompts. A prompt that contradicts one of
+these is the thing to fix, not the image.
+
+### Federation of Malaya
+**Lavender and orange throughout. Never white or cream.** Retro-futurist
+1950s silhouettes — high orange stand collars, brass buttons, wide brown
+leather belts, peaked caps. Soldiers wear sun-faded lavender field
+jackets and WW1-pattern steel helmets painted lavender.
+
+**Flag and logo (GM ruling, 26 Sep — not yet applied to prompts).** The
+Federated Malay States flag, with a **yellow fifteen-pointed star**
+replacing the tiger in the white centre circle — fifteen points for a
+unified pre-war Malaya including Singapore. The white and red bands
+become **lavender and orange**. The logo alone is that yellow star on
+white.
+
+Ghouls in the Public Citizenship Initiative wear long frayed **bright
+orange** mechanic's jumpsuits.
+
+### The Protectorate
+**Dark navy blue. Never khaki or cream.** Naval formal tailoring with a
+light steampunk flair: quilted high-collared tunics and long coats,
+open-necked shirts, navy shoulder boards, brass buttons, black gloves,
+tall boots, and a leather bandolier of mechanic's tools. **No headgear of
+any kind.** Personnel are typically Asian.
+
+**Armour direction (GM ruling, 26 Sep — not yet applied).** Retro-futurist
+**WW1**, not power armour. Think a futurist reading of 1916 infantry
+plate, not a Fallout T-45.
+
+### The Caliphate
+Arid Chukai sandstone, never jungle, never Balinese or Hindu temple
+architecture. Pahlawan wear **salvaged modern body armour over
+traditional Malay dress** — plate carrier, composite shoulder and shin
+plates, webbing — over unbleached linen robes, samping sash, tengkolok.
+Sand and ochre with turquoise accents.
+
+### The Chukai Desert
+**Pending rewrite.** It is an **emerald sea**: the GM's direction is a
+night scene, a vast desert scattered with tiny **trinitite** shards
+twinkling green — glass fused by the bomb that made the place. A high
+angle with a **Richat-like ring structure** as the reference point.
+**Refineries, not oil derrick pumps. No highway signs.**
+
+### Bandawang
+Inland, never coastal. Its water is a broad pre-war **retention pond**.
+The dead **cement works** stands at the centre as neutral ground. Nothing
+over twenty storeys.
+
+- **Bandawang Baru** — new and old fused into single buildings: modern
+  poured concrete added onto and beside pre-war timber kampong houses,
+  concrete columns rising out of carved wooden frames.
+- **Bandawang Lama** — post-colonial **art deco** shoplots, and
+  deliberately **maintained**: repainted, shutters rehung, plasterwork
+  patched, roads properly laid and swept. Sam Lim is rebuilding a proper
+  society and the district shows it.
+- **North Bandawang** — hill country, with the flat pre-war ProTiga
+  vehicle test track cut into the valley floor between the hills.
+- **The Tortoise Palace** (formerly Tiger Palace) — Shanghai Bund
+  grandeur in Malaysian post-colonial deco, immaculately kept. An
+  enormous gnarled hardwood log carved into a tortoise stands at the
+  entrance, one end burnt.
+
+### The Axe Gang
+**Rock kapak, not punk.** Long loose hair past the shoulders, headbands
+and knotted bandanas — **no mohawks, no shaved heads**. Sleeveless denim
+and leather over bare chests, tight jeans, studded belts. Oil-black and
+factory safety-yellow. Their "axes" are **electric guitars**; a wall of
+axes in ProTiga's vault means guitars, not hatchets.
 
 ---
 
