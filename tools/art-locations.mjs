@@ -242,14 +242,14 @@ export const LOCATION_SHOTS = [
     name: 'Chukai Desert',
     notePath: 'Locations/🏜️Chukai Desert.md',
     shot: 'entrance',
-    prompt: "A vast salt-crusted dune basin stretching to the horizon, skeletal pre-war oil derricks leaning at broken angles against a bleached sky, fused glassy trinitite glinting across scorched blackened ground, a lone sand-scoured highway marker leaning half-buried at the desert's edge."
+    prompt: "A night view over the Chukai Desert from high ground: a vast dark basin under moonlight, its floor glittering green from horizon to horizon with countless tiny shards of trinitite glass fused by the bomb — an emerald sea. A great concentric ring of rock ridges, ridge inside ridge, reads as an enormous circle across the desert floor below, the one landmark here. Salt-crusted dunes and scorched soil between the ridges. NO oil derrick pumps, NO highway signs, no lettering of any kind. Cold moonlight, not golden daylight."
   },
   {
     id: 'loc_chukai_desert_interior',
     name: 'Chukai Desert',
     notePath: 'Locations/🏜️Chukai Desert.md',
     shot: 'interior',
-    prompt: "Inside a collapsed refinery structure at the desert's heart: twisted fused pipework and a caved-in roof letting in hard white light, the floor a sheet of black glassy trinitite, an old brass instrument case left half-open on a fallen catwalk."
+    prompt: "Inside a collapsed pre-war petroleum REFINERY at the desert's heart, at night: twisted fused pipework, cracked distillation columns and a caved-in roof open to a moonlit sky, sand drifted deep across the floor. Scattered across that sand, tiny shards of trinitite glass catch the moonlight and glitter faint green. Derelict, abandoned, picked over. It is a refinery, NOT a derrick or a pumpjack. No highway signs, no lettering."
   },
 
   // ---------------------------------------------------------------
