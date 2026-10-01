@@ -107,6 +107,12 @@ player-facing and uses this convention.
   ruins, paved ground, retro-futurist props, when text is allowed. Read it
   before writing an image prompt or changing a style constant; each rule
   records the bad batch that produced it.
+- **Amend an existing artifact rather than publishing a new one.** When
+  the GM names a document ("the roadmap", "the parking lot"), update
+  that artifact in place — `Artifact` with `action: "read"` and a
+  `path` fetches its published file to disk, so there is no need to
+  re-emit the HTML. A second artifact covering the same ground splits
+  the record.
 - Lore and aesthetic checks come from the `lore-keeper` agent (DIRECTION
   before writing, REVIEW after); it writes to `reviews/` and changes
   nothing else.

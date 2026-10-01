@@ -26,6 +26,10 @@ The loop, one target at a time:
    seconds, so:
 
        sleep 90    # one call, covers most images
+                   # Pass timeout=120000+ on the Bash call for anything
+                   # over ~115s; the tool default is 120000 ms and a
+                   # longer bare sleep is killed, which reads as the
+                   # sandbox blocking sleep. It is not. Max is 600000.
 
    Then `read_page` ONCE. Not ready? `sleep 60` and read once more. Never
    read the page to "check progress" — looking at it does not make it

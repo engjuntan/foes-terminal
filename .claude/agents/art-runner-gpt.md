@@ -33,6 +33,10 @@ back.
    call at 10 minutes, so wait like this:
 
        sleep 570   # ~9.5 min, one call
+                   # PASS timeout=590000 ON THE BASH CALL. The tool
+                   # defaults to a 120000 ms timeout, so a bare
+                   # `sleep 570` is killed at 2 minutes and looks like
+                   # the sandbox blocking sleep. It is not. Max is 600000.
        sleep 570   # again if the image is slow
        sleep 570   # third only if needed
 

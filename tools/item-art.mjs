@@ -378,6 +378,7 @@ function status() {
   report('Items:', targets.filter(t => t.kind === 'item'));
   report('Content slots:', targets.filter(t => t.kind === 'slot'));
   report('Location shots:', targets.filter(t => t.kind === 'location'));
+  report('NPC portraits:', targets.filter(t => t.kind === 'person'));
   const inInbox = fs.existsSync(INBOX) ? fs.readdirSync(INBOX).filter(f => !f.startsWith('.')).length : 0;
   const ledger = readLedger();
   const skipped = readSkipList().length;
