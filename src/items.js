@@ -2650,7 +2650,7 @@ export const itemDatabase = {
     "id": "bobby_pin",
     "name": "Bobby Pin",
     "type": "junk",
-    "icon": "",
+    "icon": "art/bobby_pin.jpg",
     "image_prompt": "A single metal bobby pin bent open into a straightened U-shape, one flattened prong ridged and the other smooth, the finish dulled and lightly rusted, a small kink where it has been reshaped for prying locks, on a heap of scrap in a Bandawang junkyard corner.",
     "description": "Lockpicking resource — mainline staple item, functions almost as its own currency in most Fallout games. Not much to it once you look closely: just bent scrap.",
     "scrap_yield": {
