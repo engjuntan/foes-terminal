@@ -27,6 +27,15 @@ export const peopleDatabase = {
       "People"
     ]
   },
+  big_ben: {
+    "id": "big_ben",
+    "name": "Big Ben",
+    "type": "person",
+    "body": "Big Ben is the Gergasi who stands at the gate of Syurga dressed as a clock tower.\n\nIshtar wanted a Big Ben for the Proper English Casino and could not build one, so she hired the largest thing in Bandawang and put a costume on him. The costume is homemade, enormous, and bad: a plywood-and-scrap-tin spire roped to his head, a long coat hand-painted to look like stonework, a cardboard clock face hanging crooked on his chest with its hands permanently bent. It does not look like Big Ben. It looks like a very large person wearing a poor costume of Big Ben, which is exactly what it is.\n\nHe does not mind. Big Ben takes the job seriously in the way that matters — he turns up, he stands where he is told, and he is unfailingly gentle with the children who come to stare at him. He answers to \"Ben\". Nobody has told him the tower he is dressed as burned down with the rest of London, and nobody is going to.\n\nFaction: Syurga — employed, not owned.\n\nBackground: Like every Gergasi on the Peninsula, how he got here is nobody's idea of settled history. He was in Bandawang before Syurga broke ground, doing heavy lifting at the Scrapyard for food, and Ishtar's recruiter found him there. He took the costume job because it pays in tinned meat and nobody at the gate asks him to hit anyone.",
+    "category_path": [
+      "People"
+    ]
+  },
   cheryl_chia: {
     "id": "cheryl_chia",
     "name": "Cheryl Chia",

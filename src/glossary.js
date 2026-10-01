@@ -1210,6 +1210,18 @@ export const glossaryDatabase = {
       "People"
     ]
   },
+  big_ben: {
+    "id": "big_ben",
+    "name": "Big Ben",
+    "aliases": [
+      "Ben"
+    ],
+    "strict_aliases": [],
+    "summary": "Big Ben is the Gergasi who stands at the gate of Syurga dressed as a clock tower.",
+    "category_path": [
+      "People"
+    ]
+  },
   cheryl_chia: {
     "id": "cheryl_chia",
     "name": "Cheryl Chia",

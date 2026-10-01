@@ -324,7 +324,48 @@ function locationTargets() {
   });
 }
 
-function allTargets() { return [...itemTargets(), ...slotTargets(), ...locationTargets()]; }
+
+// People/ notes carry their own portrait prompt in frontmatter, unlike
+// locations (whose prompts live in art-locations.mjs). NPCs are written
+// in the vault, so the prompt belongs with the character — add
+// `image_prompt:` to a People note and it joins the queue; the url is
+// written back to `image:`. A note without an image_prompt is simply not
+// a target, so the other 33 People notes are unaffected until the GM
+// wants a portrait for one.
+//
+// Portraits are scene photographs of a person, so they take the card
+// register rather than the object plate — and they override the shared
+// "no people" negative, which exists to keep bystanders out of item
+// shots and would otherwise forbid the entire subject.
+const PORTRAIT_STYLE = `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. A single full-length figure is the subject, sharply lit and filling most of the frame, caught mid-moment rather than posed for a portrait. The setting is simple and thrown well out of focus behind them. ${GRADE} ${CLIMATE.replace('No dust, no sand, no arid cracked earth.', '')} No captions, no watermark, no signature, no modern plastics, no flat screens, no Vault-Tec or other Bethesda marks.`;
+
+function peopleTargets() {
+  const dir = path.join(VAULT, 'People');
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir)
+    .filter(f => f.endsWith('.md'))
+    .map(f => {
+      const file = path.join(dir, f);
+      const text = fs.readFileSync(file, 'utf8');
+      const prompt = frontmatterValue(text, 'image_prompt');
+      if (!prompt) return null;
+      const name = path.basename(f, '.md');
+      return {
+        id: `person_${name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')}`,
+        name,
+        kind: 'person',
+        notePath: `People/${f}`,
+        hasArt: isLinked(frontmatterValue(text, 'image') || ''),
+        hasPrompt: true,
+        prompt: `${PORTRAIT_STYLE} Subject: ${prompt}`,
+        description: prompt,
+        setUrl: url => setFrontmatterValue(file, 'image', url)
+      };
+    })
+    .filter(Boolean);
+}
+
+function allTargets() { return [...itemTargets(), ...slotTargets(), ...locationTargets(), ...peopleTargets()]; }
 
 // ---------- commands ----------
 function status() {
@@ -479,7 +520,7 @@ async function imgurAccessToken() {
 // a retina screen; cards and location shots are banners and get more.
 // This matters at volume: 279 items shipped at 1400px would be ~130MB of
 // images in the deploy.
-const LOCAL_MAX_DIM = { item: 512, slot: 1000, location: 1000 };
+const LOCAL_MAX_DIM = { item: 512, slot: 1000, location: 1000, person: 1000 };
 function shipCopy(src, destDir, id, kind = 'item') {
   const srcExt = path.extname(src).toLowerCase() === '.jpeg' ? '.jpg' : path.extname(src).toLowerCase();
   const plain = () => {
@@ -506,7 +547,7 @@ function shipCopy(src, destDir, id, kind = 'item') {
 // Location shots live in their own folder (GM's request, 26 Sep): there
 // are 68 of them at banner size next to ~280 small item icons, and
 // mixing the two made public/art impossible to skim.
-const SHIP_SUBDIR = { location: 'locations' };
+const SHIP_SUBDIR = { location: 'locations', person: 'people' };
 
 async function ingestLocal(batch) {
   fs.mkdirSync(path.join(ROOT, 'public', 'art'), { recursive: true });
