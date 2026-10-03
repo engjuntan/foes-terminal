@@ -3303,7 +3303,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "big_guns",
-    "icon": "",
+    "icon": "art/light_machine_gun.jpg",
     "image_prompt": "A RETRO-FUTURIST belt-fed light machine gun in the Fallout manner: bulbous 1950s industrial styling, a heavy ribbed cooling shroud over the barrel, rounded pressed-steel housings, a wooden shoulder stock and a wooden forward grip, brass and chrome fittings. NOT a modern military machine gun, NOT an M60 or FN MAG, no polymer and no picatinny rail. A hundred and seventy years old and badly used: matte-green paint worn through to bare pitted steel across every edge, deep rust blooming in the shadowed recesses, a bent folding bipod, a dangling half-empty belt of tarnished brass rounds, a crack in the stock bound with wire. Balanced across the gunwale of a wooden sampan on brown river water.",
     "description": "Big Guns tier sustained-fire weapon. Burst-capable.",
     "stats": {
@@ -3616,7 +3616,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "big_guns",
-    "icon": "",
+    "icon": "art/grenade_launcher.jpg",
     "image_prompt": "A break-action grenade launcher with a short stubby barrel and a wide flip-up sight, worn matte-black finish scratched to grey steel, a single fat shell loaded in the open breech, a cracked rubber shoulder pad on the stock, lying in the flooded silt of a collapsed shophouse stairwell.",
     "description": "Rare tier launcher weapon, area damage at range.",
     "stats": {
@@ -3637,7 +3637,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "throwing",
-    "icon": "",
+    "icon": "art/incendiary_grenade.jpg",
     "image_prompt": "A hand grenade with a scorched matte-red shell, fins of dried fire-gel residue crusted around the seams, a bent pull-pin dangling from the safety lever, a faded flame-warning label peeling on one side, on the tailgate of a wrecked pickup truck swallowed by ferns.",
     "description": "Thrown fire explosive, self-contained, damage-over-time.",
     "stats": {
@@ -3656,7 +3656,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "throwing",
-    "icon": "",
+    "icon": "art/land_mine.jpg",
     "image_prompt": "A flat disc-shaped land mine with a corroded olive-drab casing, a pressure plate dented and rust-streaked across the top, a faded painted skull-and-crossbones warning barely visible through the grime, leaning in the doorway of a corrugated-zinc guard post.",
     "description": "Placed explosive, triggered rather than thrown.",
     "stats": {
@@ -3675,7 +3675,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "throwing",
-    "icon": "",
+    "icon": "art/molotov_cocktail.jpg",
     "image_prompt": "A glass bottle stuffed with a soot-stained rag wick, dried petrol residue crusting the neck, a peeling label from some long-gone kopitiam soft drink still faintly legible beneath the grime, on a folded sarong laid over a motorbike seat.",
     "description": "Scrap tier thrown fire weapon, improvised, self-contained.",
     "stats": {
@@ -3694,7 +3694,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "throwing",
-    "icon": "",
+    "icon": "art/plasma_grenade.jpg",
     "image_prompt": "A round hand grenade with a segmented glass shell glowing faint green at its seams, dented metal banding around the equator, a scorched pull-pin dangling loose, faint plasma residue crusted near the fuse housing, balanced on a stack of wooden crates behind a night market stall.",
     "description": "Rare thrown energy explosive, self-contained.",
     "stats": {
@@ -3714,7 +3714,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
-    "image_prompt": "A long tube-shaped rocket launcher with a flared muzzle and a folding shoulder stock, dull olive paint scratched through to bare steel, a cracked optical sight mounted on top, its length needing both arms to shoulder and aim, balanced across the gunwale of a wooden sampan on brown river water.",
+    "image_prompt": "A RETRO-FUTURIST shoulder-fired rocket launcher in the Fallout manner: a fat riveted steel tube with a wide bell-mouth blast cone, a bulbous 1950s receiver housing, a rounded wooden shoulder pad and a wooden carrying handle along the top, brass fittings and a small round brass-rimmed gauge. NOT an RPG-7, NOT a modern anti-tank launcher, no modern optic, no polymer, no pistol grip. A squat cylindrical rocket is loaded nose-out at the front. A hundred and seventy years old and hard used: dull olive paint scratched through to bare pitted steel, rust blooming along every weld and rivet line, a cracked glass sighting ring bound back on with wire. Balanced across the gunwale of a wooden sampan on brown river water.",
     "description": "Rare Big Guns tier launcher, single-target high explosive damage.",
     "stats": {
       "clip_size": 1,
@@ -3734,7 +3734,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "energy_weapons",
-    "icon": "",
+    "icon": "art/fractured_laser_rifle.jpg",
     "description": "A genuine pre-War Laser Rifle, badly aged — cracked housing and a chipped focusing lens leave it recognizably special but mechanically weak. Disrepair, not pristine.",
     "image_prompt": "A cracked and weathered pre-war laser rifle, chipped crystal focusing lens, exposed wiring, faded lavender paint markings, damaged but recognizable high-tech weapon, laid across a mechanic's workbench beside a half-stripped kapcai engine.",
     "condition": "disrepair",
@@ -3777,7 +3777,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/kapak.jpg",
     "description": "Wow an actual axe axe. Don't tell the axe gang.",
     "image_prompt": "A homemade felling axe: a heavy wedge of scrap steel ground to an edge and bound with wire to a hardwood haft worn smooth by use, hammer marks across the head, damp black-green staining in the grain.",
     "stats": {
@@ -3815,7 +3815,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/baseball_bat.jpg",
     "image_prompt": "A wooden baseball bat scarred with dents and deep gouges, the once-glossy varnish worn to bare grain along the grip, a faded brand stamp near the handle, dark stains streaking the barrel, set on a crumbling brick ledge beside an overgrown roadside shrine.",
     "description": "Normal tier blunt weapon. Tier 1 (Normal).",
     "stats": {
@@ -3834,7 +3834,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/bowie_knife.jpg",
     "image_prompt": "A heavy bowie knife with a broad clip-point blade pitted with rust spots, a worn leather-wrapped handle, a brass hilt guard tarnished green, the edge still keeping a rough working sharpness, laid on the deck boards of a half-sunk river ferry.",
     "description": "Normal tier bladed weapon, heavier than the standard Combat Knife. Tier 1 (Normal).",
     "stats": {
@@ -3853,7 +3853,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "unarmed",
-    "icon": "",
+    "icon": "art/boxing_gloves.jpg",
     "image_prompt": "A pair of padded boxing gloves, cracked red leather peeling at the seams, foam stuffing poking through a split knuckle, the laces frayed and knotted, a faded gym stamp barely visible on the cuff, propped beside a rain barrel on a flooded kampung five-foot-way.",
     "description": "Normal tier unarmed weapon. Intentionally low tier; padded gloves deal less damage by design — the manual's own number, kept as-is.",
     "stats": {
@@ -3872,7 +3872,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "unarmed",
-    "icon": "",
+    "icon": "art/brass_knuckles.jpg",
     "image_prompt": "A set of brass knuckles worn smooth and dull with handling, the finger holes lined with grime, one edge nicked and bent slightly out of shape, faint scratches where an engraved maker's mark has worn away, resting on a sandbagged checkpoint wall at a Bandawang Enforcers post.",
     "description": "Scrap tier unarmed weapon, common and concealable. Tier 0/1 border — the manual's exact number fit well, kept as-is.",
     "stats": {
@@ -3891,7 +3891,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/chinese_officers_sword.jpg",
     "image_prompt": "A pre-war military officer's sword with a slightly curved steel blade dulled and speckled with rust, a wrapped cord grip faded and frayed, a brass hilt tarnished dark, faint engraved characters worn shallow along the spine, propped against a motorbike's kickstand on a muddy track.",
     "description": "Rare/Signature tier bladed weapon, pre-war military relic. Tier 3 (Rare/Signature).",
     "stats": {
@@ -3910,7 +3910,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/cleaver.jpg",
     "image_prompt": "A plain steel meat cleaver with a wide rectangular blade nicked along the edge, a worn wooden handle darkened with grease and age, faint rust freckling the flat of the blade near the spine, laid on a straw mat inside a bamboo-scaffolded watch tower.",
     "description": "Generic Normal tier bladed weapon — smaller than the custom Axe Gang Cleaver signature item. Tier 1 (Normal).",
     "stats": {
@@ -3929,7 +3929,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/combat_knife.jpg",
     "image_prompt": "A military-issue combat knife with a matte-black coated blade worn silver along the edge, a ridged rubber grip cracked with age, a small fuller groove running the spine, faded unit markings stamped near the guard, across a cluttered workbench in a gunsmith's shed.",
     "description": "Normal tier bladed weapon, military-issue design. Tier 1 (Normal). Stats assigned via 7-10 round combat framework (target avg ~6-10).",
     "stats": {
@@ -3948,7 +3948,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": false,
     "skill": "unarmed",
-    "icon": "",
+    "icon": "art/deathclaw_gauntlet.jpg",
     "image_prompt": "A heavy leather gauntlet studded with three curved deathclaw talons lashed on with sinew and wire, the claws yellowed and chipped at the tips, dried dark stains crusted into the leather straps, on a riverside jetty plank, fishing nets drying nearby.",
     "description": "Unique/Quest-leaning unarmed weapon, made from a deathclaw's actual claws. Tier 4 (Unique/Quest) — slightly above the Tier 3 ceiling, appropriate for its rarity.",
     "stats": {
@@ -3967,7 +3967,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/fire_axe.jpg",
     "image_prompt": "A fire axe with a wide flat blade balanced by a spike on the reverse head, chipped red paint worn to bare rusted steel, a wooden handle scarred and darkened, a faded fire-service number painted near the eye, on a moss-slick storm drain ledge beside a roadside verge.",
     "description": "Normal tier bladed/blunt hybrid weapon. Tier 1 (Normal).",
     "stats": {
@@ -3986,7 +3986,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/golf_club.jpg",
     "image_prompt": "A bent golf club with a scuffed metal head and a torn rubber grip unraveling down the shaft, the steel shaft dented mid-length, a faded club-face brand stamp worn nearly smooth, on a banana-leaf mat beside a smouldering charcoal brazier.",
     "description": "Scrap tier improvised blunt weapon. Tier 0 (Scrap).",
     "stats": {
@@ -4005,7 +4005,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/katana.jpg",
     "image_prompt": "An imported katana with a slightly curved steel blade showing a faint hamon line beneath a film of surface rust, a frayed cord-wrapped hilt, a worn brass guard, the scabbard long since lost, half-buried in wet leaf litter at the edge of a jungle trail.",
     "description": "Rare/Signature tier bladed weapon, imported relic. Tier 3 (Rare/Signature) — scaled down from the manual's Claymore-tier numbers to fit the 7-10 round target.",
     "stats": {
@@ -4024,7 +4024,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/keris.jpg",
     "image_prompt": "A wavy-bladed Malay keris with a pattern-welded pamor finish dulled by age, a carved wooden hilt worn smooth by handling, a plain sarung sheath scuffed at the tip, the blade's waves still sharp-edged, propped against a chain-link fence post overgrown with vines.",
     "description": "From the manual — a real Malaysian ceremonial dagger, already statted. Smithed tier. Special Move: Lithe Thrust — -20% Hit Chance, ignores DT and DR, inflicts 2d4 bleed damage until the wound is closed. Takes 1 turn to prepare.",
     "stats": {
@@ -4044,7 +4044,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/machete.jpg",
     "image_prompt": "A plain steel machete with a long straight blade dulled and speckled with rust spots, a worn wooden handle bound with a strip of frayed cord, faint nicks along the cutting edge from heavy use, on the cracked terrazzo floor of an abandoned civic hall.",
     "description": "Normal tier bladed weapon. Note: overlaps thematically with the existing custom Parang item — both fill a similar niche, kept separate since Parang is the Malaysian-flavor version and this is the generic Fallout-derived import. Tier 1 (Normal).",
     "stats": {
@@ -4063,7 +4063,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/nightstick.jpg",
     "image_prompt": "A Federation-issue nightstick, black bakelite worn matte-grey along the grip, a looped wrist strap frayed and graying, faint scuff marks and a chipped painted unit number near the base, resting across a canoe paddle propped on a jungle riverbank.",
     "description": "Normal tier blunt weapon, Federation crowd-control issue. Tier 1 (Normal). Stats assigned via 7-10 round combat framework.",
     "stats": {
@@ -4082,7 +4082,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/pool_cue.jpg",
     "image_prompt": "A cracked pool cue with blue chalk residue smudged into the worn wooden shaft, the tip's leather cap peeling and spotted with mildew, a faded felt-and-brass joint gone green at the seam, splintering visible along one broken edge, on a folding table inside a patched canvas market tent.",
     "description": "Scrap tier improvised blunt weapon. Tier 0 (Scrap). Stats assigned via 7-10 round combat framework (target avg ~4-6).",
     "stats": {
