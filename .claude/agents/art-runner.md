@@ -20,20 +20,22 @@ The loop, one target at a time:
    target's **name**, its **file name** (`<id>.png`), and its prompt.
 2. In the Gemini tab, paste **one** prompt and send it.
 3. **Sleep through it in as few calls as possible.** Time is free here;
-   tool calls are not. A `sleep` costs exactly ONE call whether it waits
-   ten seconds or ten minutes, while polling costs one call per check and
-   re-sends the whole conversation each time. Gemini usually takes 45-90
-   seconds, so:
+   tool calls are not. Polling costs one call per check and re-sends the
+   whole conversation each time, so one wait beats twenty looks.
 
-       sleep 90    # one call, covers most images
-                   # Pass timeout=120000+ on the Bash call for anything
-                   # over ~115s; the tool default is 120000 ms and a
-                   # longer bare sleep is killed, which reads as the
-                   # sandbox blocking sleep. It is not. Max is 600000.
+   **A foreground `sleep` is blocked in this harness.** That is real, not
+   a misdiagnosis — an earlier version of this file claimed otherwise and
+   was wrong. Background it instead:
 
-   Then `read_page` ONCE. Not ready? `sleep 60` and read once more. Never
-   read the page to "check progress" — looking at it does not make it
-   faster, and each look costs more than the wait. Never screenshot.
+       Bash(command="sleep 90", run_in_background=true)
+
+   A backgrounded command returns at once and the harness wakes you when
+   it exits, so the whole wait costs ONE call and no polling. Gemini
+   usually takes 45-90 seconds.
+
+   Then `read_page` ONCE. Not ready? One more backgrounded sleep and one
+   more read. Never read the page to "check progress" — looking does not
+   make it faster, and each look costs more than the wait.
 
 4. Download it with Gemini's own download control.
 5. `npm run art -- collect <id>` — this moves the newest image from the

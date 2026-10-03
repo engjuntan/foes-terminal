@@ -27,24 +27,23 @@ back.
    ratio and what it's for.
 2. Open the nominated chat. Paste **one** prompt, send it.
 3. **Sleep through it in as few calls as possible.** Time is free here;
-   tool calls are not. A `sleep` costs exactly ONE call whether it waits
-   ten seconds or ten minutes, while polling costs one call per check and
-   re-sends the whole conversation each time. The Bash tool caps a single
-   call at 10 minutes, so wait like this:
+   tool calls are not. Polling costs one call per check and re-sends the
+   whole conversation each time, so one wait beats twenty looks.
 
-       sleep 570   # ~9.5 min, one call
-                   # PASS timeout=590000 ON THE BASH CALL. The tool
-                   # defaults to a 120000 ms timeout, so a bare
-                   # `sleep 570` is killed at 2 minutes and looks like
-                   # the sandbox blocking sleep. It is not. Max is 600000.
-       sleep 570   # again if the image is slow
-       sleep 570   # third only if needed
+   **A foreground `sleep` is blocked in this harness.** That is real, not
+   a misdiagnosis — an earlier version of this file claimed otherwise and
+   was wrong. Background it instead:
 
-   ChatGPT has taken up to 30 minutes per image on a bad day. Do all the
-   sleeping FIRST, then `read_page` ONCE. If it still isn't ready, one
-   more `sleep 570` and one more read. Never read the page to "check
-   progress" — you cannot make it faster by looking at it, and each look
-   costs more than the entire wait. Never screenshot.
+       Bash(command="sleep 180", run_in_background=true)
+
+   A backgrounded command returns at once and the harness wakes you when
+   it exits, so the whole wait costs ONE call and no polling. Pick the
+   delay from how long the image actually takes: ChatGPT is usually 1-2
+   minutes and has taken 30 on a bad day.
+
+   Then `read_page` ONCE. Not ready? One more backgrounded sleep and one
+   more read. Never read the page to "check progress" — looking does not
+   make it faster, and each look costs more than the entire wait.
 
 4. Download the image with ChatGPT's own download control.
 5. `npm run art -- collect <asset_id>` — this moves the newest download

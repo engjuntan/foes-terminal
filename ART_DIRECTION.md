@@ -280,3 +280,16 @@ Gemini and ~31,000 on ChatGPT, almost all of it polling. Runners sleep
 through the full expected generation time and look once. The API path
 (`npm run art -- generate`) is about $0.03 an image with no browser at
 all.
+
+**How a runner waits.** A foreground `sleep` really is blocked in this
+harness. A backgrounded one is not, and the harness wakes the agent when
+it exits, so the whole wait costs one call:
+
+    Bash(command="sleep 180", run_in_background=true)
+
+> Why: a runner reported "the sandbox blocks a foreground sleep" and I
+> recorded it as a misdiagnosis, blaming the Bash tool's 120000 ms
+> timeout default instead. The runner was right and I was wrong. Both
+> agent definitions carried the wrong instruction for two runs; the
+> runs survived because the agents ignored it and backgrounded the
+> sleep themselves. Corrected 3 Oct.
