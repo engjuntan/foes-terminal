@@ -24,6 +24,7 @@ happened.
 | **An even green coat over the whole frame** | Weathering gathers where water sits — shade, drip lines, the foot of a wall. Not everywhere at once. |
 | **Corrugated metal as a building's main material** | It became shorthand for "poor" and made every settlement look identical. Patches and lean-tos only. |
 | **A modern-looking car, or modern electronics** | Vehicles and machines are retro-futurist: bulbous fifties styling, chrome, tail fins, atomic curves. |
+| **Faction colour painted on a weapon** | A gun is its own materials: steel reads as steel, wood as wood. No lavender stripes, no livery. |
 | **A caption, watermark or signature** | Text belongs on things that are written or labelled, never floating over the image. |
 | **A template placeholder rendered literally** | One betting board came back reading `FIGHT 1: (Name) vs (Name)`. |
 | **A non-square image** | Everything is 1:1. Gemini silently returns 1408×768 when a subject sounds landscape. `collect` refuses these. |
@@ -125,6 +126,46 @@ kerbs still visible under the dirt. Bad condition, yes. Mud, no.
 
 This is the exterior half of the interiors rule. The question is always
 the same: *does anyone look after this place?*
+
+---
+
+## Weapons
+
+**A real-world gun is not a defect.** Conventional firearms may look like
+real weapons — a 1911, an AK pattern, a Garand, a Winchester pump. Real
+weapons have always existed in Fallout alongside its invented ones, and
+this setting is no different. Do not reroll a gun for resembling a real
+one.
+
+> GM ruling, 3 Oct, after a runner flagged eleven conventional firearms
+> as "real modern weapons". They ship as they are. The retro-futurist
+> rule below is about vehicles, appliances and machinery, and it does not
+> reach down to every rifle.
+
+**But the image must depict the item.** Two in that batch were rejected,
+and neither was about style: the Homemade Rifle came back a military
+bolt-action when its own note calls it a zip gun of scrap pipe and tape,
+and the Anti-Materiel Rifle came back the size of a hunting rifle. That
+is the test — not "is this gun too real", but "is this the thing the note
+describes".
+
+**The fix that works is naming the wrong answer.** "A belt-fed light
+machine gun" gave an FN MAG; "a long tube with a flared muzzle and a
+folding stock" gave an RPG-7; "a crude rifle cobbled from scrap" gave a
+Lee-Enfield anyway, because the word *rifle* outweighed everything around
+it. Each was fixed by writing NOT an M60, NOT an RPG-7, NOT a Mosin into
+the prompt. Asking harder for the right answer does not work; ruling out
+the wrong one does.
+
+**Weapons wear their own colours.** Steel is steel or blued or
+parkerised, wood is wood, brass is brass, and a weapon with wooden
+furniture is a mixture of the two. No faction livery: the Federation's
+lavender belongs on uniforms and barriers, not painted down the stock of
+a rifle anyone might pick up.
+
+> GM ruling, 3 Oct. Two weapons came back with a lavender stripe because
+> their prompts asked for one. The stripe wording is gone from the
+> Riot Shotgun, the Assault Rifle and the Fractured Laser Rifle.
 
 ---
 

@@ -3734,9 +3734,9 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "energy_weapons",
-    "icon": "art/fractured_laser_rifle.jpg",
+    "icon": "",
     "description": "A genuine pre-War Laser Rifle, badly aged — cracked housing and a chipped focusing lens leave it recognizably special but mechanically weak. Disrepair, not pristine.",
-    "image_prompt": "A cracked and weathered pre-war laser rifle, chipped crystal focusing lens, exposed wiring, faded lavender paint markings, damaged but recognizable high-tech weapon, laid across a mechanic's workbench beside a half-stripped kapcai engine.",
+    "image_prompt": "A cracked and weathered pre-war laser rifle, chipped crystal focusing lens, exposed wiring, bare scratched steel and tarnished brass housings, NO PAINTED FACTION COLOUR OF ANY KIND, damaged but recognizable high-tech weapon, laid across a mechanic's workbench beside a half-stripped kapcai engine.",
     "condition": "disrepair",
     "stats": {
       "clip_size": 10,
@@ -4477,7 +4477,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/anti_materiel_rifle.jpg",
     "image_prompt": "An ENORMOUS anti-materiel rifle, a two-man weapon that fires rounds the length of a hand. NOT a hunting rifle and NOT an ordinary sniper rifle — the scale is the whole point. A barrel as thick as a wrist with a huge slotted muzzle brake at the end, a deep boxy receiver, a heavy steel bipod with broad feet, a thick recoil pad. Scale it against the floor tiles: the rifle spans several of them. Worn matte-black finish scratched to bare steel, rust in the pitting, a battered tube scope clamped on with mismatched rings. Lying on the cracked terrazzo floor of an abandoned civic hall.",
     "description": "Top-of-Normal-tier rifle, highest single-shot damage in the class. Tier 4 (Unique-leaning) — runs slightly above the Tier 3 ceiling by design, the single hardest-hitting standard rifle in the game.",
     "stats": {
@@ -4498,8 +4498,8 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "art/assault_rifle.jpg",
-    "image_prompt": "A faction-issue automatic rifle with a ribbed handguard and a curved magazine, worn olive-drab finish chipped to bare metal along the receiver, a scratched optical sight mounted on top, a faded lavender stripe painted near the stock, set on a crumbling brick ledge beside an overgrown roadside shrine.",
+    "icon": "",
+    "image_prompt": "An automatic rifle with a ribbed handguard and a curved magazine, the steel left in its own dark grey parkerised finish worn to bright bare metal along the edges, a wooden handguard and stock aged to a dull honey brown, a scratched optical sight mounted on top, NO PAINTED FACTION COLOUR OF ANY KIND, set on a crumbling brick ledge beside an overgrown roadside shrine.",
     "description": "Normal tier automatic rifle. Burst-fire capable — see the campaign's burst mechanic (single roll, AC/DR debuff). Tier 2 (Faction-Issued).",
     "stats": {
       "clip_size": 5,
@@ -4564,7 +4564,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/homemade_rifle.jpg",
     "image_prompt": "A ZIP GUN: a homemade rifle with NO manufactured parts at all. NOT a military bolt-action, NOT a Lee-Enfield, NOT a Mosin or a Kar98, NOT a hunting rifle — nothing about it was ever made in a factory. A length of rusted steel water pipe serves as the barrel, lashed with wire and black tape onto a plank of salvaged timber hacked roughly into the shape of a stock, the saw marks still on it. A crude bolt handle bent out of scrap rod, a nail for a firing pin, a sight made of a bent strip of tin. Mismatched screws, a hose clamp, and a rubber band holding one part on. Bare metal pitted orange with rust. Laid on a folded sarong over a motorbike seat.",
     "description": "Scrap tier — the rifle-length sibling to the Homemade Pistol. Improvised, no real ammo standard, no mod system. Tier 0 (Scrap). Stats assigned via 7-10 round combat framework.",
     "stats": {
@@ -4818,8 +4818,8 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "art/riot_shotgun.jpg",
-    "image_prompt": "A Federation crowd-control shotgun with a short barrel and a folding wire stock, worn matte-black finish scratched along the receiver, a painted lavender stripe near the pump, a sling loop riveted to the side, propped against a stilt-house post on a rain-slick kampung porch.",
+    "icon": "",
+    "image_prompt": "A Federation crowd-control shotgun with a short barrel and a folding wire stock, blued steel receiver and barrel worn through to bright bare metal along every edge, NO PAINTED FACTION COLOUR OF ANY KIND, a sling loop riveted to the side, propped against a stilt-house post on a rain-slick kampung porch.",
     "description": "Faction-Issued leaning Normal tier shotgun, Federation crowd-control standard. Tier 2 (Faction-Issued).",
     "stats": {
       "clip_size": 12,

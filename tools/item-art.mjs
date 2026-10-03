@@ -240,12 +240,28 @@ function slotTargets() {
 // Locations keep the item negatives except "no hands, no people" — a
 // market or a checkpoint reads wrong with nobody in it, and the prompts
 // themselves say when figures belong.
-const SCENE_NEGATIVES = NEGATIVES.replace(' no hands, no people,', '');
+// NOTE: the casing here has to match NEGATIVES exactly. It read
+// `' no hands, no people,'` (lowercase, leading space) and NEGATIVES says
+// `'No hands, no people, no modern plastics'`, so the replace never fired
+// and every location shot ever made carried "no people" while its own
+// subject asked for a refugee queue, guards or a classroom of children.
+// The generator obeyed the subject anyway, which is why nobody caught it.
+// Asserted below so it cannot silently stop matching again.
+const SCENE_NEGATIVES = NEGATIVES.replace('No hands, no people, no modern plastics', 'No modern plastics');
+if (SCENE_NEGATIVES === NEGATIVES || /no people/i.test(SCENE_NEGATIVES)) {
+  throw new Error('SCENE_NEGATIVES still bans people — the replace in item-art.mjs stopped matching NEGATIVES.');
+}
 const LOCATION_STYLE = `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. ${GRADE} ${CLIMATE} ${SCENE_NEGATIVES}`;
 // The Chukai Desert is the GM's deliberate exception to the wet-climate rule
 // — a sacred desert in canon — so those shots swap the monsoon clauses for
 // their own rather than being forced to contradict the note.
 const DESERT_CLIMATE = 'Storm-scoured equatorial desert: salt-crusted dunes, scorched soil, wind-polished concrete, bleached debris, heat haze. Dry, not tropical.';
+// Desert shots take their own grade. Monsoon Gold ends "heavy humid air"
+// and leads with a hot golden key, which fought DESERT_CLIMATE's "dry, not
+// tropical" in the same breath — and fought the Chukai subjects harder
+// still, since those are night scenes asking for cold moonlight. This
+// stays silent about time of day so the subject sets it.
+const DESERT_GRADE = 'Hard dry grade: high contrast, bleached highlights, deep clean shadow, fine dust hanging in the air, no humidity and no haze of moisture. The subject sets the time of day and the colour of the light; follow it exactly.';
 // The Chukai Desert is the GM's deliberate exception to the wet-climate
 // rule, and so is everything standing in it. This used to match on the
 // note's PATH containing "Chukai", which quietly missed Round City —
@@ -269,15 +285,15 @@ const isDesertShot = shot =>
 // alternative, because "a road" alone still came back as a mud track.
 const PAVED_GROUND = 'THE GROUND IS A MADE SURFACE, NOT MUD: cracked and patched asphalt, worn concrete, laid cobbles or brick, with weeds through the joints, potholes crudely filled and kerbs still visible under the dirt. People have walked and driven here for generations and have kept a usable surface. No deep mud, no churned earth track, no unpaved laterite road.';
 
-const sceneStyleWith = climate =>
-  `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. ${GRADE} ${climate} ${SCENE_NEGATIVES}`;
+const sceneStyleWith = (climate, grade = GRADE) =>
+  `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. ${grade} ${climate} ${SCENE_NEGATIVES}`;
 
 // Upkeep wins over climate: a swept room is swept whether it stands in
 // the monsoon belt or the Chukai Desert.
 const locationStyleFor = shot => {
   const base =
     KEPT_INTERIORS.has(shot.id) ? sceneStyleWith(INTERIOR_KEPT_CLIMATE)
-    : isDesertShot(shot) ? sceneStyleWith(DESERT_CLIMATE)
+    : isDesertShot(shot) ? sceneStyleWith(DESERT_CLIMATE, DESERT_GRADE)
     : LOCATION_STYLE;
   return PAVED_LOCATIONS.has(shot.id) ? `${base} ${PAVED_GROUND}` : base;
 };
