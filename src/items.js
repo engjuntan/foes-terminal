@@ -2664,7 +2664,7 @@ export const itemDatabase = {
     "id": "circuit_board_fragment",
     "name": "Circuit Board Fragment",
     "type": "junk",
-    "icon": "",
+    "icon": "art/circuit_board_fragment.jpg",
     "image_prompt": "A broken fragment of a green circuit board, snapped copper traces and a few desoldered component pads, one corner scorched black, edges jagged where it was pried loose, abandoned in the long grass of a jungle verge.",
     "description": "Robotics/science crafting component, sourced from North Bandawang factory equipment.",
     "scrap_yield": {
@@ -2678,7 +2678,7 @@ export const itemDatabase = {
     "id": "copper_wire_spool",
     "name": "Copper Wire Spool",
     "type": "junk",
-    "icon": "",
+    "icon": "art/copper_wire_spool.jpg",
     "image_prompt": "A small wooden spool wound with tarnished copper wire, several strands unraveling loose, the wood cracked and stained, a faded factory tag tied to the spindle, washed up on a muddy riverbank.",
     "description": "Electronics crafting component, sourced from North Bandawang factory wiring.",
     "scrap_yield": {
@@ -2693,7 +2693,7 @@ export const itemDatabase = {
     "id": "duct_tape",
     "name": "Duct Tape",
     "type": "junk",
-    "icon": "",
+    "icon": "art/duct_tape.jpg",
     "image_prompt": "A half-used roll of grey duct tape, the outer layer peeling and curled at the edge, adhesive residue crusted along the torn strip, the cardboard core slightly crushed, on the tailgate of a wrecked pickup truck swallowed by ferns.",
     "description": "Universal crafting binder — mainline staple.",
     "scrap_yield": {
@@ -2707,7 +2707,7 @@ export const itemDatabase = {
     "id": "protiga_factory_scrap",
     "name": "ProTiga Factory Scrap",
     "type": "junk",
-    "icon": "",
+    "icon": "art/protiga_factory_scrap.jpg",
     "image_prompt": "A jagged chunk of stamped sheet metal factory scrap, edges sheared and curled, partial painted lettering illegible with rust across a rust-streaked surface, on the cracked floor of an overgrown ruin.",
     "description": "Core local salvage pool — the ProTiga factory site is the obvious crafting-component source for North Bandawang.",
     "scrap_yield": {
@@ -2721,7 +2721,7 @@ export const itemDatabase = {
     "id": "rusted_pipe_segment",
     "name": "Rusted Pipe Segment",
     "type": "junk",
-    "icon": "",
+    "icon": "art/rusted_pipe_segment.jpg",
     "image_prompt": "A short length of corroded metal pipe, threaded ends chewed by rust, flaking orange scale along the body, a dented section near the middle from old impact, on a riverside jetty plank, fishing nets drying nearby.",
     "description": "Dual-purpose: crafting component or reflavored into the Water Pipe Cudgel weapon, from Bandawang Lama.",
     "scrap_yield": {
@@ -2735,7 +2735,7 @@ export const itemDatabase = {
     "id": "dinar",
     "name": "Caliphate Dinar",
     "type": "currency",
-    "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
+    "icon": "art/dinar.jpg",
     "image_prompt": "A trinitite-glazed ceramic token stamped with the Caliphate's rising-sun quarter-circle device, its glassy surface faintly iridescent, edges chipped, a worn line of Jawi calligraphy circling the rim, in an open cash tin on a market stall counter.",
     "description": "A trinitite-infused library token, granting temporary access to the Grand Library. Often treated as spiritual relics or symbols of honor ",
     "weight": 0,
@@ -2746,7 +2746,7 @@ export const itemDatabase = {
     "id": "pd",
     "name": "Protectorate Dollar",
     "type": "currency",
-    "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
+    "icon": "art/pd.jpg",
     "image_prompt": "A crisp rectangular banknote printed in green ink, a portrait of a Protectorate official at its centre, an engraved guilloché border and a woven metallic security thread, corners slightly worn, tucked into a worn leather coin pouch on a wooden table.",
     "description": "A tightly controlled currency distributed by the Protectorate.",
     "weight": 0,
@@ -2757,7 +2757,7 @@ export const itemDatabase = {
     "id": "rmr",
     "name": "Reformed Malayan Ringgit",
     "type": "currency",
-    "icon": "[https://placehold.co/50x50/gold/black?text=$](https://placehold.co/50x50/gold/black?text=$)",
+    "icon": "art/rmr.jpg",
     "image_prompt": "A worn paper banknote overstamped in red ink atop the original pre-war Malaysian ringgit printing, creased and soft from handling, a serial number faded along one edge, on a trader's counter beside a set of brass scales.",
     "description": "Also called RMR, it is the most common currency in the Wastes. It consists of salvaged pre-war Malayan Ringgit that have been stamped and marked for day to day use.",
     "weight": 0,
@@ -2768,7 +2768,7 @@ export const itemDatabase = {
     "id": "broken_ceiling_fan_blade",
     "name": "Broken Ceiling Fan Blade",
     "type": "junk",
-    "icon": "",
+    "icon": "art/broken_ceiling_fan_blade.jpg",
     "image_prompt": "A single snapped ceiling fan blade, curved aluminum scarred with scratches and a bent tip, mounting screws still lodged in the base, paint chipped to bare metal along the edge, half-buried in mud beside a roadside storm drain.",
     "description": "A snapped-off blade from a household ceiling fan — common indoor scavenge across Bandawang.",
     "scrap_yield": {
@@ -2782,7 +2782,7 @@ export const itemDatabase = {
     "id": "broken_pressure_cooker",
     "name": "Broken Pressure Cooker",
     "type": "junk",
-    "icon": "",
+    "icon": "art/broken_pressure_cooker.jpg",
     "image_prompt": "A dented aluminum pressure cooker with a cracked gauge and a missing handle, the lid seal perished and peeling, soot staining the underside, a faded enamel floral pattern on the body, half-buried in wet leaf litter at the edge of a jungle trail.",
     "description": "A dented kitchen pressure cooker — a kampung kitchen staple before the bombs.",
     "scrap_yield": {
@@ -2797,7 +2797,7 @@ export const itemDatabase = {
     "id": "broken_radio_set",
     "name": "Broken Radio Set",
     "type": "junk",
-    "icon": "",
+    "icon": "art/broken_radio_set.jpg",
     "image_prompt": "A household radio set with a cracked wooden-veneer casing, dial glass shattered, exposed tubes and wiring visible through a broken panel, a tuning knob missing, in the flooded silt of a collapsed stairwell.",
     "description": "A household radio set, casing cracked, innards mostly intact.",
     "scrap_yield": {
@@ -2812,7 +2812,7 @@ export const itemDatabase = {
     "id": "broken_streetlamp_fixture",
     "name": "Broken Streetlamp Fixture",
     "type": "junk",
-    "icon": "",
+    "icon": "art/broken_streetlamp_fixture.jpg",
     "image_prompt": "A fallen streetlamp head, its metal casing dented and rust-streaked, the bulb socket empty and corroded, a cracked glass lens hanging loose on bent brackets, propped against a rusted fence post in tall grass.",
     "description": "A fallen streetlamp head, casing dented, bulb long gone.",
     "scrap_yield": {
@@ -2841,7 +2841,7 @@ export const itemDatabase = {
     "id": "cracked_motorbike_mirror",
     "name": "Cracked Motorbike Mirror",
     "type": "junk",
-    "icon": "",
+    "icon": "art/cracked_motorbike_mirror.jpg",
     "image_prompt": "A snapped-off motorbike wing mirror on its mounting arm, the glass spiderwebbed with cracks, chrome housing pitted with rust, a strip of faded reflective tape along the edge, on the cracked floor of an overgrown ruin.",
     "description": "A snapped-off wing mirror, still on its mounting arm.",
     "scrap_yield": {
@@ -2856,7 +2856,7 @@ export const itemDatabase = {
     "id": "cracked_motorcycle_helmet",
     "name": "Cracked Motorcycle Helmet",
     "type": "junk",
-    "icon": "",
+    "icon": "art/cracked_motorcycle_helmet.jpg",
     "image_prompt": "An open-face motorcycle helmet with a shattered grey fiberglass shell cracked clean through, foam padding and a frayed nylon chin strap still buckled on, a faded kapcai dealer sticker peeling near the visor line, on the tailgate of a wrecked pickup truck swallowed by ferns.",
     "description": "A shattered helmet shell, padding and strap still attached.",
     "scrap_yield": {
@@ -2871,7 +2871,7 @@ export const itemDatabase = {
     "id": "cracked_rain_barrel",
     "name": "Cracked Rain Barrel",
     "type": "junk",
-    "icon": "",
+    "icon": "art/cracked_rain_barrel.jpg",
     "image_prompt": "A tall blue plastic rain-collection barrel split down one side, sun-bleached to a chalky white along the crack, streaked with algae and mineral crust, a molded Bahasa Malaysia capacity marking worn illegible near the rim, propped against a rusted fence post in tall grass.",
     "description": "A plastic rain-collection barrel, split down one side.",
     "scrap_yield": {
@@ -2885,7 +2885,7 @@ export const itemDatabase = {
     "id": "dead_car_battery",
     "name": "Dead Car Battery",
     "type": "junk",
-    "icon": "",
+    "icon": "art/dead_car_battery.jpg",
     "image_prompt": "A rectangular lead-acid car battery encased in cracked black bakelite, corroded green-white crust crusted around the terminals, one post snapped off, the brand label long peeled away, acid stains crusting down one side, in the flooded silt of a collapsed stairwell.",
     "description": "A spent lead-acid battery, pulled from a wreck long since stripped of everything else.",
     "scrap_yield": {
@@ -2900,7 +2900,7 @@ export const itemDatabase = {
     "id": "dried_fish_bones",
     "name": "Dried Fish Bones",
     "type": "junk",
-    "icon": "",
+    "icon": "art/dried_fish_bones.jpg",
     "image_prompt": "A small heap of dried salted fish bones and papery skin, ikan masin remains bleached pale grey-white, curling and brittle, a few grains of coarse salt still clinging to the spine, on a riverside jetty plank, fishing nets drying nearby.",
     "description": "The remains of a salted-fish meal — ikan masin's leftovers, everywhere along the coast.",
     "scrap_yield": {
@@ -2914,7 +2914,7 @@ export const itemDatabase = {
     "id": "empty_kerosene_tin",
     "name": "Empty Kerosene Tin",
     "type": "junk",
-    "icon": "",
+    "icon": "art/empty_kerosene_tin.jpg",
     "image_prompt": "A rectangular tin kerosene container with a narrow pour spout, dented sides blooming with orange-brown rust through worn red paint, a faded Malay-script minyak tanah label painted across one face, propped against a chain-link fence post overgrown with vines.",
     "description": "A rusted kerosene tin, the kind kampung households kept for the stove.",
     "scrap_yield": {
@@ -2929,7 +2929,7 @@ export const itemDatabase = {
     "id": "federation_ration_tin",
     "name": "Federation Ration Tin",
     "type": "junk",
-    "icon": "",
+    "icon": "art/federation_ration_tin.jpg",
     "image_prompt": "A dented steel ration tin, olive-drab paint chipped to bare metal, a painted lavender stripe and lot number faded on the lid, pull-ring long snapped off, rust freckling the seams, half-buried in wet leaf litter at the edge of a jungle trail.",
     "description": "A discarded Federation-issue ration tin. Common wherever Federation patrols have passed through.",
     "scrap_yield": {
@@ -2943,7 +2943,7 @@ export const itemDatabase = {
     "id": "jammed_sewing_machine",
     "name": "Jammed Sewing Machine",
     "type": "junk",
-    "icon": "",
+    "icon": "art/jammed_sewing_machine.jpg",
     "image_prompt": "A cast-iron treadle sewing machine on its wooden base, black lacquer flaking to rust across the arm, spoked flywheel seized solid, gold scrollwork worn thin, bobbin thread still strung through a bent needle, half-buried in mud beside a roadside storm drain.",
     "description": "An old treadle sewing machine, mechanism mostly intact under the rust.",
     "scrap_yield": {
@@ -2958,7 +2958,7 @@ export const itemDatabase = {
     "id": "moth_eaten_prayer_mat",
     "name": "Moth-Eaten Prayer Mat",
     "type": "junk",
-    "icon": "",
+    "icon": "art/moth_eaten_prayer_mat.jpg",
     "image_prompt": "A woven prayer mat riddled with moth holes, once-green pile faded to dull khaki, fringed edges frayed and unraveling, a geometric mihrab pattern still visible through the wear and grime, abandoned in the long grass of a jungle verge.",
     "description": "A woven prayer mat, faded and holed through but still real fabric.",
     "scrap_yield": {
