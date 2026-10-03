@@ -130,7 +130,7 @@ export const peopleDatabase = {
     "id": "janson_peng",
     "name": "Janson Peng",
     "type": "person",
-    "body": "Janson Peng is tiny but ferocious. He's the brother of Orange Peng.\n\nFaction: Peng Brothers\n\nBackground: The Peng brothers are truly something special. Janson is even more so: where Orange is a gentle giant, Janson is a fierce firebrand who never backs away from a fight. He constantly gets Orange into trouble.\n\nDescription: A short, squat man about 5 ft tall who wears colourful glasses. A contortionist, he's skilled at getting into places that are hard to fit.\n\nImportance: He's one of the people who can be recruited for the heist, but he'll insist on bringing his brother along.",
+    "body": "Janson Peng is tiny but ferocious. He's the brother of Orange Peng.\n\nFaction: Peng Brothers\n\nBackground: The Peng brothers are truly something special. Janson is even more so: where Orange is a gentle giant, Janson is a fierce firebrand who never backs away from a fight. He constantly gets Orange into trouble.\n\nDescription: A short, squat Chinese man about 5 ft tall who wears colourful glasses. A contortionist, he's skilled at getting into places that are hard to fit. He works the family's rest stop at seio.\n\nImportance: He's one of the people who can be recruited for the heist, but he'll insist on bringing his brother along.",
     "category_path": [
       "People"
     ]
@@ -139,7 +139,7 @@ export const peopleDatabase = {
     "id": "jas_kaur",
     "name": "Jas Kaur",
     "type": "person",
-    "body": "Jas Kaur is one of PosLaju's riders on the Bandawang run.\n\nFaction: PosLaju\n\nDescription: A jovial Sikh woman with a yellow turban. A little chubby with a big belly, she's dressed in a simple, loose, faded red kurta that falls just below her waist, over faded, dirty yellow loose trousers.\n\nImportance: Jas handles Bandawang's post — nearly every letter and parcel that comes into or leaves the city passes through her saddlebags, including the mail that carries the codes to the ProTiga security system. A crew that wants those codes can get them from her, one way or another.",
+    "body": "Jas Kaur is one of PosLaju's riders on the Bandawang run.\n\nFaction: PosLaju\n\nDescription: A jovial Sikh man with a yellow turban. A little chubby with a big belly, he's dressed in a simple, loose, faded red kurta that falls just below his waist, over faded, dirty yellow loose trousers.\n\nImportance: Jas handles Bandawang's post — nearly every letter and parcel that comes into or leaves the city passes through his saddlebags, including the mail that carries the codes to the ProTiga security system. A crew that wants those codes can get them from him, one way or another.",
     "category_path": [
       "People"
     ]
@@ -175,7 +175,7 @@ export const peopleDatabase = {
     "id": "najwa",
     "name": "Najwa",
     "type": "person",
-    "body": "Najwa is Bob's daughter and the light of his life — even through her sickness and weakness, she brightens any room she's in.\n\nFaction: Rakan Watch\n\nBackground: Najwa is Bob's daughter, adopted from the Kancil Orphanage. Bob was initially never much of a family man, but after an incident, and learning the truth behind the Kancils, he felt compelled to act.\n\nDescription: A thin, sickly and weak Malay girl. Her eyes are large and full of curiosity and kindness, but her complexion is very pale. She generally wears a light-blue baju kurung with a floral pattern that's been adapted into a scrub.\n\nImportance: Najwa is one of the most important people to Ketua Bob, and making her happy is the most important quest for getting into Bob's good books.",
+    "body": "Najwa is Bob's daughter and the light of his life — even through her sickness and weakness, she brightens any room she's in.\n\nFaction: Rakan Watch\n\nBackground: Najwa is Bob's daughter, adopted from the Kancil Orphanage. Bob was initially never much of a family man, but after an incident, and learning the truth behind the Kancils, he felt compelled to act.\n\nDescription: A thin, sickly and weak Malay girl of ten. Her eyes are large and full of curiosity and kindness, but her complexion is very pale. She generally wears a light-blue baju kurung with a floral pattern that's been adapted into a scrub.\n\nImportance: Najwa is one of the most important people to Ketua Bob, and making her happy is the most important quest for getting into Bob's good books.",
     "category_path": [
       "People"
     ]
