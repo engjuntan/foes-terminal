@@ -28,7 +28,7 @@ happened.
 | **A caption, watermark or signature** | Text belongs on things that are written or labelled, never floating over the image. |
 | **A template placeholder rendered literally** | One betting board came back reading `FIGHT 1: (Name) vs (Name)`. |
 | **A non-square image** | Everything is 1:1. Gemini silently returns 1408×768 when a subject sounds landscape. `collect` refuses these. |
-| **European faces or European armour silhouettes** | This is Malaya. Faces and dress are Malaysian — Malay, Chinese, Indian. |
+| **European faces or European armour silhouettes** | This is Malaya. Faces and dress are Malaysian — Malay, Chinese, Indian, unless a character's own note says otherwise. |
 | **A skyscraper in Bandawang** | Nothing there is over twenty storeys. It is shoplots and low blocks. |
 | **Desert in a monsoon location, or jungle in the Chukai** | The climate clause is per-location and is not a suggestion. |
 | **Bethesda or Vault-Tec marks** | Including ones that bleed in from a contaminated generator thread. This bans marks the generator *imports*, not the GM's own deliberate Fallout references — Big Ben is a Fallout 4 super mutant on purpose, and seio is what is left of a Poseidon Oil sign. When a vault note names one, it is canon. |
@@ -126,6 +126,35 @@ kerbs still visible under the dirt. Bad condition, yes. Mud, no.
 
 This is the exterior half of the interiors rule. The question is always
 the same: *does anyone look after this place?*
+
+---
+
+## Faces
+
+**Where a prompt does not say who someone is, the generator picks — and
+it picks European.** This cost three assets before the pattern was
+obvious: the Protectorate faction card ("three Protectorate personnel"),
+Orange Peng (a note with no ethnicity, whose brother is Chinese), and the
+do-gooder karma card ("a stranger crouched at a roadside"). Each was a
+different file and each failed the same way.
+
+So the clause lives in the shared styles, not in prompts.
+`FACTION_STYLE` and `CARD_STYLE` both say every person named by a subject
+is Malaysian — Malay, Chinese or Indian — and `CARD_STYLE` names the trap
+outright, because "a stranger", "a stallholder" and "a guard" are exactly
+the phrasings that leave the door open.
+
+**A character's own note overrides this.** Gardener Steve is described as
+a skinny white guy and his portrait is correct. The rule fills silence;
+it does not overwrite what the GM has written.
+
+**A ghoul is not a face.** Portraits whose description mentions a ghoul
+get `GHOUL_CLAUSE` appended automatically — no nose, no hair, cracked
+leather skin split to the tissue, lipless mouth, and an explicit "not a
+scarred man, not a burn victim, not a weathered human". The GM writes
+"a ghoul" and stops, because a GM knows what a ghoul is; the generator
+drew Farmer Nick Peng and Guru Besar Raj as healthy farmers and teachers
+until the clause existed.
 
 ---
 

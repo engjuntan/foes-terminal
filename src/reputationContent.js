@@ -176,7 +176,7 @@ export const KARMA_TIERS = [
     min: 20,
     max: 59,
     description: "You've helped more than you've hurt, and it shows — small kindnesses people remember and mention to their friends.",
-    image_url: ""
+    image_url: "art/karma_do_gooder.jpg"
   },
   {
     id: "nobody",
