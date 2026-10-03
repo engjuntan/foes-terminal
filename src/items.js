@@ -2827,7 +2827,7 @@ export const itemDatabase = {
     "id": "cracked_lcd_panel",
     "name": "Cracked LCD Panel",
     "type": "junk",
-    "icon": "",
+    "icon": "art/cracked_lcd_panel.jpg",
     "image_prompt": "A large cracked glass-fronted display board from a pre-war shopfront, spiderweb fractures across a grid of small glass indicator windows, a bent bakelite-and-metal bezel, frayed cloth-sheathed wiring trailing from one edge, a faded shopfront brand plate in the corner, tangled in vines at the edge of a scrapyard.",
     "description": "A shattered display panel, scavenged from a pre-War shopfront or office.",
     "scrap_yield": {
@@ -2973,7 +2973,7 @@ export const itemDatabase = {
     "name": "Rubber Sandal Strap",
     "type": "junk",
     "icon": "",
-    "image_prompt": "A single snapped rubber sandal strap, moulded dark brown and cracked with age, the Y-shaped thong torn free of its post, a sole fragment still attached, gritty with dried mud, tangled in vines at the edge of a scrapyard.",
+    "image_prompt": "A snapped flip-flop strap: SOFT FLEXIBLE RUBBER, not metal and not wood. A limp Y-shaped thong of matte dark-brown moulded rubber, floppy and bending under its own weight, perished and crazed with fine age cracks, the stem torn out of its hole with a ragged tear, still joined to a chunk of thin foam-rubber sandal sole. Gritty with dried mud. Lying flat on bare swept concrete, nothing else in frame.",
     "description": "A snapped rubber sandal strap — the most common footwear in the pre-War Peninsula, still lying everywhere.",
     "scrap_yield": {
       "clothing_scrap": 1,
@@ -2987,7 +2987,7 @@ export const itemDatabase = {
     "id": "rusted_kapcai_carburettor",
     "name": "Rusted Kapcai Carburettor",
     "type": "junk",
-    "icon": "",
+    "icon": "art/rusted_kapcai_carburettor.jpg",
     "image_prompt": "A small motorcycle carburettor stripped off a wrecked kapcai, aluminium body pitted and rusted orange-brown, float bowl cracked, throttle cable snapped short, dried fuel residue crusted around the intake, on a heap of scrap in a Bandawang junkyard corner.",
     "description": "Scavenged straight off a wrecked kapcai — Bandawang's old commuter bike of choice.",
     "scrap_yield": {
@@ -3001,7 +3001,7 @@ export const itemDatabase = {
     "id": "rusty_bicycle_chain",
     "name": "Rusty Bicycle Chain",
     "type": "junk",
-    "icon": "",
+    "icon": "art/rusty_bicycle_chain.jpg",
     "image_prompt": "A corroded bicycle chain coiled in a loose loop, links fused orange-brown with rust, a few stiff or missing links, dried chain oil turned to black grime in the grooves, washed up on a muddy riverbank.",
     "description": "A corroded bicycle chain, common enough scrap wherever there used to be a bike rack.",
     "scrap_yield": {
@@ -3016,7 +3016,7 @@ export const itemDatabase = {
     "id": "shredded_tarpaulin",
     "name": "Shredded Tarpaulin",
     "type": "junk",
-    "icon": "",
+    "icon": "art/shredded_tarpaulin.jpg",
     "image_prompt": "A torn sheet of blue plastic tarpaulin, shredded edges fraying into ribbons, sun-bleached patches gone pale and brittle, a faded warung stall's hand-painted name still legible across one corner, set on a market stall counter beside stacked enamel bowls.",
     "description": "Blue plastic tarp, the kind every stall and stockroom in Bandawang used to have rolls of.",
     "scrap_yield": {
@@ -3030,7 +3030,7 @@ export const itemDatabase = {
     "id": "spoiled_coconut_husk_sack",
     "name": "Spoiled Coconut Husk Sack",
     "type": "junk",
-    "icon": "",
+    "icon": "art/spoiled_coconut_husk_sack.jpg",
     "image_prompt": "A burlap sack stuffed with coarse coconut husk fibre, the weave stained dark and mildewed, one corner split and spilling brown fibre, a faded plantation number painted on the fabric, in the flooded silt of a collapsed stairwell.",
     "description": "A burlap sack of coconut husk fibre — old plantation waste, still tough as rope.",
     "scrap_yield": {
@@ -3044,7 +3044,7 @@ export const itemDatabase = {
     "id": "spool_of_fishing_line",
     "name": "Spool of Fishing Line",
     "type": "junk",
-    "icon": "",
+    "icon": "art/spool_of_fishing_line.jpg",
     "image_prompt": "A small wooden spool wound with tangled nylon fishing line, the line yellowed and brittle, salt crust caked around the edges, a faded brand label peeling off the hub, on a rusted oil drum in a scrapyard clearing.",
     "description": "Nylon fishing line off a broken reel — common salvage near Bandawang's waterfront.",
     "scrap_yield": {
@@ -3059,7 +3059,7 @@ export const itemDatabase = {
     "id": "tangled_barbed_wire_coil",
     "name": "Tangled Barbed Wire Coil",
     "type": "junk",
-    "icon": "",
+    "icon": "art/tangled_barbed_wire_coil.jpg",
     "image_prompt": "A tangled coil of barbed wire pulled from a perimeter fence, thick rust flaking off in scales, several barbs snapped or bent flat, the coil roughly the size of a car tyre, on a market stall tray beside loose hardware.",
     "description": "A rusted coil of barbed wire, pulled off an old perimeter fence.",
     "scrap_yield": {
@@ -3073,7 +3073,7 @@ export const itemDatabase = {
     "id": "ishtar_device",
     "name": "The Ishtar Device",
     "type": "junk",
-    "icon": "",
+    "icon": "art/ishtar_device.jpg",
     "image_prompt": "A palm-sized bakelite device with a small speaker grille and a single blinking status light, moulded casing scuffed and yellowed with age, a peeling sticker printed with a roaring animal crossed out in red, a hand-written price tag tied on with string, tangled in vines at the edge of a scrapyard.",
     "description": "A boxy unit that supposedly emits an ultrasonic screech to scare off dangerous creatures. Reads like a scam — but anyone with real Science knowledge can tell the internals are genuine pre-War hardware, even if nobody can say whether it ever worked.",
     "scrap_yield": {
@@ -3087,7 +3087,7 @@ export const itemDatabase = {
     "id": "torn_umbrella_frame",
     "name": "Torn Umbrella Frame",
     "type": "junk",
-    "icon": "",
+    "icon": "art/torn_umbrella_frame.jpg",
     "image_prompt": "A collapsed umbrella reduced to its bent metal ribs, black fabric torn away in ragged strips clinging to a few spokes, the central shaft dented and the folding hinge seized with rust, on a heap of scrap in a Bandawang junkyard corner.",
     "description": "A collapsed umbrella's metal ribs — useless as shelter, useful as scrap.",
     "scrap_yield": {
@@ -3102,7 +3102,7 @@ export const itemDatabase = {
     "id": "warung_signboard",
     "name": "Warung Signboard",
     "type": "junk",
-    "icon": "",
+    "icon": "art/warung_signboard.jpg",
     "image_prompt": "A rectangular tin signboard from a roadside warung, enamel paint chipped down to rusted metal, faded Jawi and Rumi lettering advertising nasi lemak and kopi, one corner bent from being pried off its nails, on the cracked floor of an overgrown ruin.",
     "description": "A roadside stall's old tin signboard — every Bandawang street had a dozen of these once.",
     "scrap_yield": {
@@ -3117,7 +3117,7 @@ export const itemDatabase = {
     "id": "withered_herb_bundle",
     "name": "Withered Herb Bundle",
     "type": "junk",
-    "icon": "",
+    "icon": "art/withered_herb_bundle.jpg",
     "image_prompt": "A small bundle of dried kitchen herbs tied with string, brittle pandan and serai stalks curled and browned, leaves crumbling to brittle flakes, a faded twine loop for hanging still knotted at the top, on the floor of a scrapyard shed.",
     "description": "A bundle of dried kitchen herbs, found hanging in an abandoned stall.",
     "scrap_yield": {
