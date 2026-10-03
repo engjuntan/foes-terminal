@@ -202,7 +202,7 @@ export const peopleDatabase = {
     "id": "orange_peng",
     "name": "Orange Peng",
     "type": "person",
-    "body": "Orange Peng is simple. His name, for one, is Orange. He's the brother of Janson Peng.\n\nFaction: Peng Brothers\n\nBackground: The Peng brothers are something special. Orange grew up a simpleton despite his large appearance, and can be summed up as a gentle giant.\n\nDescription: A large, hulking man, 6.5 ft tall and chubby rather than muscular, though there's real heft underneath. He's usually dressed in a shirtless, dirtied yellow coverall, and has a handsome face with a childlike, innocent sense of wonder.\n\nImportance: If his brother is hired for the heist, Orange will join too — and he'll insist on bringing Commie Bot.",
+    "body": "Orange Peng is simple. His name, for one, is Orange. He's the brother of Janson Peng.\n\nFaction: Peng Brothers\n\nBackground: The Peng brothers are something special. Orange grew up a simpleton despite his large appearance, and can be summed up as a gentle giant.\n\nDescription: A large, hulking Chinese man, 6.5 ft tall and chubby rather than muscular, though there's real heft underneath. He's usually dressed in a shirtless, dirtied yellow coverall, and has a handsome face with a childlike, innocent sense of wonder.\n\nImportance: If his brother is hired for the heist, Orange will join too — and he'll insist on bringing Commie Bot.",
     "category_path": [
       "People"
     ]

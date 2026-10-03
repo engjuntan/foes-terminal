@@ -569,7 +569,7 @@ export const itemDatabase = {
     "type": "armor",
     "slot": "body",
     "size": "medium",
-    "icon": "",
+    "icon": "art/protectorate_heavy_trooper_armor.jpg",
     "image_prompt": "RETRO-FUTURIST WW1 TRENCH ARMOUR, not power armour and NOT European knight's plate: no breastplate with a raised ridge, no pauldrons, no fluted medieval shapes, nothing that belongs on a suit of armour in a castle. Think a 1916 infantryman's body plate as a 1950s designer would redraw it — a flat slab-fronted steel cuirass of riveted horizontal lapped bands worn over a quilted navy canvas coat, a deep squared brow-plate helmet with a hanging mail-and-leather face curtain, broad segmented shoulder yokes, heavy articulated gauntlets, thick leather and canvas straps with brass buckles. Deep Protectorate navy-blue enamel scratched and scorched down to bare steel, polished brass trim across the chest, rivets everywhere. Set on a chair at a checkpoint sandbag wall.",
     "description": "From the manual — top tier of the faction-armor progression. Grants LR+2, imposes -20 to Sneak and Steal while worn.",
     "stats": {
@@ -930,7 +930,7 @@ export const itemDatabase = {
     "type": "armor",
     "slot": "body",
     "size": "medium",
-    "icon": "",
+    "icon": "art/ucl_vanguard_armor.jpg",
     "image_prompt": "Heavy armour built in SOUTHEAST ASIAN shapes, NOT European: no knight's breastplate, no pauldrons, no fluted or gothic plate, nothing from a European armoury. Its lines come from Nusantara war dress — overlapping lamellar scales of cut and hammered scrap steel laced together with leather cord, a long tapered torso plate shaped like a baju besi, a high standing collar, shoulder pieces that hang in layered rectangular plates rather than rounded cups, a wide woven sash belt over the hips. Deep scratches and scorch marks, riveted and re-laced repairs throughout, a faded red-and-blue stripe painted across the chest. Set across a bamboo rack on a kampung porch.",
     "description": "From the manual — top UCL faction armor tier.",
     "stats": {
