@@ -199,6 +199,12 @@ Ghouls in the Public Citizenship Initiative wear long frayed **bright
 orange** mechanic's jumpsuits.
 
 ### The Protectorate
+**Personnel are Malaysian.** The 25 Sep card got the navy, the tools and
+the bare heads right and still came back with three European faces — the
+naval tailoring and the steampunk flair pull the generator to Europe on
+their own. `FACTION_STYLE` now says every face is Malay, Chinese or
+Indian and names this faction and the Caliphate as the two that drift.
+
 **Dark navy blue. Never khaki or cream.** Naval formal tailoring with a
 light steampunk flair: quilted high-collared tunics and long coats,
 open-necked shirts, navy shoulder boards, brass buttons, black gloves,
