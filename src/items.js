@@ -2828,7 +2828,7 @@ export const itemDatabase = {
     "name": "Cracked LCD Panel",
     "type": "junk",
     "icon": "art/cracked_lcd_panel.jpg",
-    "image_prompt": "A large cracked glass-fronted display board from a pre-war shopfront, spiderweb fractures across a grid of small glass indicator windows, a bent bakelite-and-metal bezel, frayed cloth-sheathed wiring trailing from one edge, a faded shopfront brand plate in the corner, tangled in vines at the edge of a scrapyard.",
+    "image_prompt": "A dead flat-panel LCD screen prised out of a pre-war machine. ONE unbroken sheet of grey-black glass — NOT a grid of coloured panes, NOT leaded or stained glass, NO window frame. A spiderweb of fine fractures radiates from a single impact point, and the liquid crystal has bled out of it in a dark purple-black bloom. A bent bakelite-and-metal bezel around the edge, a ribbon cable hanging frayed from one side, a faded brand plate in the corner, tangled in vines at the edge of a scrapyard.",
     "description": "A shattered display panel, scavenged from a pre-War shopfront or office.",
     "scrap_yield": {
       "scrap_electronics": 2
@@ -2972,7 +2972,7 @@ export const itemDatabase = {
     "id": "rubber_sandal_strap",
     "name": "Rubber Sandal Strap",
     "type": "junk",
-    "icon": "",
+    "icon": "art/rubber_sandal_strap.jpg",
     "image_prompt": "A snapped flip-flop strap: SOFT FLEXIBLE RUBBER, not metal and not wood. A limp Y-shaped thong of matte dark-brown moulded rubber, floppy and bending under its own weight, perished and crazed with fine age cracks, the stem torn out of its hole with a ragged tear, still joined to a chunk of thin foam-rubber sandal sole. Gritty with dried mud. Lying flat on bare swept concrete, nothing else in frame.",
     "description": "A snapped rubber sandal strap — the most common footwear in the pre-War Peninsula, still lying everywhere.",
     "scrap_yield": {
@@ -3135,7 +3135,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/triad_straight_razor.jpg",
     "image_prompt": "A folding straight razor with a polished steel blade kept honed sharp despite its age, a dark lacquered wood handle worn smooth, a small engraved character near the hinge, worn soft from handling, set on a crumbling brick ledge beside an overgrown roadside shrine.",
     "description": "Quiet, close-range blade favored by the Tan/Choo subfamilies of the 1414 Triad for discreet business.",
     "stats": {
@@ -3154,7 +3154,7 @@ export const itemDatabase = {
     "size": "oversized",
     "two_handed": true,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/angkasa_wrench.jpg",
     "description": "An industrial pipe wrench scaled for factory machinery, repurposed as a two-handed bludgeon. Heavy, slow, and it ends fights.",
     "image_prompt": "A massive industrial pipe wrench, chipped red paint over rusted steel, factory brand markings, held two-handed, oversized wasteland weapon, laid on the deck boards of a half-sunk river ferry.",
     "stats": {
@@ -3173,7 +3173,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/bent_rebar_spear.jpg",
     "description": "A long length of rebar ground to a point, with several scrap hand holds welded along one end that serve as grips and as counterweight.",
     "image_prompt": "A long single length of ridged rusted rebar ground to a point at one end, with several short scrap-steel hand holds crudely welded along the other end as grips and counterweight, weld spatter and black-brown rust streaks.",
     "stats": {
