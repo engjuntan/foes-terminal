@@ -3713,7 +3713,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "big_guns",
-    "icon": "",
+    "icon": "art/rocket_launcher.jpg",
     "image_prompt": "A RETRO-FUTURIST shoulder-fired rocket launcher in the Fallout manner: a fat riveted steel tube with a wide bell-mouth blast cone, a bulbous 1950s receiver housing, a rounded wooden shoulder pad and a wooden carrying handle along the top, brass fittings and a small round brass-rimmed gauge. NOT an RPG-7, NOT a modern anti-tank launcher, no modern optic, no polymer, no pistol grip. A squat cylindrical rocket is loaded nose-out at the front. A hundred and seventy years old and hard used: dull olive paint scratched through to bare pitted steel, rust blooming along every weld and rivet line, a cracked glass sighting ring bound back on with wire. Balanced across the gunwale of a wooden sampan on brown river water.",
     "description": "Rare Big Guns tier launcher, single-target high explosive damage.",
     "stats": {
@@ -4101,7 +4101,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "unarmed",
-    "icon": "",
+    "icon": "art/power_fist.jpg",
     "image_prompt": "A powered gauntlet bristling with small pneumatic pistons along the knuckles, dull steel plating scorched and dented, exposed wiring trailing from a cracked power cell strapped to the forearm, servo housing caked in grime, laid on a rattan mat inside a bamboo lookout shack.",
     "description": "Rare/Signature tier unarmed weapon, powered gauntlet. Tier 3 (Rare/Signature). Heavily scaled down from the manual's 4d4+20+MD, which ran far too hot for the 7-10 round target.",
     "stats": {
@@ -4120,7 +4120,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/ripper.jpg",
     "image_prompt": "A vibro-blade weapon with a serrated chainsaw-style edge housed along a stubby steel bar, a small motor housing rattling loose at the grip, chipped orange safety paint, chain links caked with old rust and grime, resting on a sandbagged checkpoint wall at a Bandawang Enforcers post.",
     "description": "Rare/Signature tier bladed weapon, powered vibro-blade. Tier 3 (Rare/Signature). Scaled down from the manual's Chain Weapons numbers, which ran hot across the whole family.",
     "stats": {
@@ -4139,7 +4139,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/shishkebab.jpg",
     "image_prompt": "An improvised fire sword built from a car leaf-spring blade welded to a fuel canister and hose running along the hilt, scorched black soot streaking the edge, a small igniter valve set into the guard, balanced on a stack of wooden crates behind a night market stall.",
     "description": "Rare/Signature tier bladed weapon, improvised fire sword, uses Flamer Fuel. Tier 3 (Rare/Signature). Not in the manual — fresh numbers built to fit the 7-10 round target.",
     "stats": {
@@ -4159,7 +4159,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/shovel.jpg",
     "image_prompt": "A flat-bladed shovel with a dented and rust-pitted steel head, a wooden shaft worn smooth and split near the collar, dried mud caked along the blade's edge from heavy digging use, laid in wet roadside grass with rain still beading on it.",
     "description": "Scrap tier improvised blunt weapon, dual-purpose tool. Tier 0 (Scrap). Stats assigned via 7-10 round combat framework.",
     "stats": {
@@ -4178,7 +4178,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/sledgehammer.jpg",
     "image_prompt": "A heavy sledgehammer with a broad flat steel head chipped and pitted with rust, a long wooden handle worn smooth and cracked near the grip, the head's mass and shaft length needing both hands to swing, across a fallen concrete beam in a bombed-out shophouse.",
     "description": "Normal tier heavy blunt weapon. Tier 2 (Faction-Issued). Scaled down significantly from the manual's flat bonus, which ran far too hot for the 7-10 round target.",
     "stats": {
@@ -4197,7 +4197,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/super_sledge.jpg",
     "image_prompt": "A reinforced motorized sledgehammer with a bulky steel head wrapped in scorched metal plating, small exposed pistons along the haft, a thick rubber-wrapped grip worn and split, its bulk and weight demanding both hands, on a moss-slick storm drain ledge beside a roadside verge.",
     "description": "Rare/Signature tier heavy blunt weapon, reinforced/motorized variant of the Sledgehammer. Tier 3 (Rare/Signature). Heavily scaled down from the manual's 6d4+20+MD, which would have one-shot even a level-10 character.",
     "stats": {
@@ -4216,7 +4216,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/switchblade.jpg",
     "image_prompt": "A small switchblade with a slim steel blade folded into a scratched aluminium housing, a worn thumb-stud release, faint corrosion pitting along the spine, the handle scales cracked and yellowed with age, laid on the deck boards of a half-sunk river ferry.",
     "description": "Normal tier concealable bladed weapon. Tier 1 (Normal), light/concealable. Stats assigned via 7-10 round combat framework.",
     "stats": {
@@ -4235,7 +4235,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/tire_iron.jpg",
     "image_prompt": "A straight steel tire iron with a flattened pry end and a lug-wrench socket at the other, dull grey metal pitted with rust spots, a faded factory stamp worn shallow near the middle, propped against a chain-link fence post overgrown with vines.",
     "description": "Normal tier blunt weapon, ProTiga factory-tool origin. Tier 1 (Normal). Stats assigned via 7-10 round combat framework.",
     "stats": {
@@ -4254,7 +4254,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/nail_board.jpg",
     "description": "A plank of wood studded with bent nails — the archetypal wasteland weapon.",
     "image_prompt": "A wooden plank bristling with rusty bent nails driven through it, wrapped cloth handle, dried blood stains, wasteland scavenge aesthetic, on a workshop bench beside scattered tools.",
     "stats": {
@@ -4273,7 +4273,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/parang.jpg",
     "image_prompt": "A real Malay jungle blade with a broad slightly curved steel edge honed from daily use, a plain worn wooden handle darkened with sweat and oil, a simple leather sheath scuffed along the seams, propped beside a rain barrel on a flooded kampung five-foot-way.",
     "description": "A real Malay jungle blade, functioning as the setting's everyday tool-turned-survival-weapon.",
     "stats": {
@@ -4292,7 +4292,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/223_pistol.jpg",
     "image_prompt": "A rifle-caliber conversion pistol with a long thick barrel and an oversized cylinder cut for rifle rounds, worn blued steel scratched to bare metal, a checkered grip panel cracked down the middle, propped against a motorbike's kickstand on a muddy track.",
     "description": "High-end Normal-tier pistol, rifle-caliber conversion. Tier 2 (Faction-Issued), top of the pistol bracket.",
     "stats": {
@@ -4313,7 +4313,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/32_revolver.jpg",
     "image_prompt": "A small .32 revolver with a short thin barrel, worn blued finish gone silver-grey at the edges, a plain wooden grip scratched and darkened, the cylinder release stiff with dried grime, laid across a mechanic's workbench beside a half-stripped kapcai engine.",
     "description": "Normal tier revolver — light caliber, common starter sidearm. Tier 1 (Normal), low end.",
     "stats": {
@@ -4334,7 +4334,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/44_revolver.jpg",
     "image_prompt": "A heavy .44 revolver with a thick barrel and a wide-bored cylinder, worn nickel plating flaking to reveal steel beneath, a checkered wooden grip chipped at one corner, faint holster wear along the frame, lying in the flooded silt of a collapsed shophouse stairwell.",
     "description": "Normal tier heavy revolver, higher stopping power than the .32. Tier 1 (Normal), high end.",
     "stats": {
@@ -4355,7 +4355,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/10mm_pistol.jpg",
     "image_prompt": "A pre-war factory-made 10mm pistol with a boxy slide and squared trigger guard, worn matte-black finish rubbed to bare metal at the edges, a faded serial number stamped along the frame near the grip, set on a market stall counter beside stacked enamel bowls.",
     "description": "Standard-issue pre-war sidearm, Normal tier — a real factory firearm, not a scrap improvisation. Tier 1 (Normal). Ranged weapons don't get an MD bonus (no ST scaling per the manual).",
     "stats": {
@@ -4376,7 +4376,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/14mm_pistol.jpg",
     "image_prompt": "An oversized-caliber pistol with a thick wide barrel and a bulky slide, worn parkerized finish scratched through to bright steel, a scuffed grip panel loose at one screw, its heft visibly larger than a standard sidearm, half-buried in wet leaf litter at the edge of a jungle trail.",
     "description": "Rare oversized pistol caliber, sits at the top of the Normal-tier pistol bracket. Tier 2 (Faction-Issued).",
     "stats": {
@@ -4397,7 +4397,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/9mm_pistol.jpg",
     "image_prompt": "A compact 9mm pistol with a slim slide and a short barrel, worn matte finish scratched along the edges, a cracked bakelite grip panel, a faded factory proof mark stamped near the muzzle, balanced across the gunwale of a wooden sampan on brown river water.",
     "description": "Normal tier factory sidearm, easily concealed. Tier 1 (Normal), low end.",
     "stats": {
@@ -4418,7 +4418,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": false,
     "skill": "TBA",
-    "icon": "",
+    "icon": "art/pneumatic_nail_driver.jpg",
     "image_prompt": "A repurposed pneumatic nail gun converted into a weapon, its steel housing scorched and dented, a coiled rubber air hose trailing from the grip, a stamped serial plate riveted to the side, on the tailgate of a wrecked pickup truck swallowed by ferns.",
     "description": "Repurposed ProTiga factory tool-turned-weapon, North Bandawang.",
     "stats": {
@@ -4458,7 +4458,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/rebar_nail_club.jpg",
     "image_prompt": "A length of rebar hammered flat at one end and studded with bent nails driven through the shaft, rust bleeding down the metal, a strip of cloth wound around the grip end, sourced from ProTiga stock, laid on a rattan mat inside a bamboo lookout shack.",
     "description": "Salvage bludgeon, sourced from ProTiga factory rebar stock. North Bandawang / neutral.",
     "stats": {
@@ -4478,7 +4478,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "image_prompt": "A massive long-barreled rifle with a thick bull barrel and a bipod folded beneath the stock, worn matte-black finish scratched to bare steel, a scoped sight mounted along the top rail, its length and weight needing both arms to level, on the cracked terrazzo floor of an abandoned civic hall.",
+    "image_prompt": "An ENORMOUS anti-materiel rifle, a two-man weapon that fires rounds the length of a hand. NOT a hunting rifle and NOT an ordinary sniper rifle — the scale is the whole point. A barrel as thick as a wrist with a huge slotted muzzle brake at the end, a deep boxy receiver, a heavy steel bipod with broad feet, a thick recoil pad. Scale it against the floor tiles: the rifle spans several of them. Worn matte-black finish scratched to bare steel, rust in the pitting, a battered tube scope clamped on with mismatched rings. Lying on the cracked terrazzo floor of an abandoned civic hall.",
     "description": "Top-of-Normal-tier rifle, highest single-shot damage in the class. Tier 4 (Unique-leaning) — runs slightly above the Tier 3 ceiling by design, the single hardest-hitting standard rifle in the game.",
     "stats": {
       "clip_size": 8,
@@ -4498,7 +4498,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/assault_rifle.jpg",
     "image_prompt": "A faction-issue automatic rifle with a ribbed handguard and a curved magazine, worn olive-drab finish chipped to bare metal along the receiver, a scratched optical sight mounted on top, a faded lavender stripe painted near the stock, set on a crumbling brick ledge beside an overgrown roadside shrine.",
     "description": "Normal tier automatic rifle. Burst-fire capable — see the campaign's burst mechanic (single roll, AC/DR debuff). Tier 2 (Faction-Issued).",
     "stats": {
@@ -4521,7 +4521,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/battle_rifle.jpg",
     "image_prompt": "A hard-hitting semi-automatic rifle with a long wooden stock and a heavy steel receiver, worn varnish cracked and faded, a scratched iron sight mounted along the barrel, a straight box magazine seated beneath, set on a temple courtyard step half in shade.",
     "description": "Rare/Signature-leaning Normal tier rifle, harder-hitting than the Assault or Combat Rifle. Tier 3 (Rare/Signature).",
     "stats": {
@@ -4543,7 +4543,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/combat_rifle.jpg",
     "image_prompt": "A faction-standard semi-automatic rifle with a ribbed bakelite handguard and a straight magazine, worn matte-green finish scuffed to bare metal, a scratched optical sight mounted on the rail, a faded serial stamp near the receiver, resting across a canoe paddle propped on a jungle riverbank.",
     "description": "Normal tier semi-automatic rifle, faction-standard issue. Tier 2 (Faction-Issued).",
     "stats": {
@@ -4565,7 +4565,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "",
-    "image_prompt": "A crude rifle cobbled from scrap pipe and salvaged wood, bound together with wire, tape and rivets, bare metal pitted with rust, a makeshift sight welded on from bent scrap, the stock roughly carved and unfinished, on a folded sarong laid over a motorbike seat.",
+    "image_prompt": "A ZIP GUN: a homemade rifle with NO manufactured parts at all. NOT a military bolt-action, NOT a Lee-Enfield, NOT a Mosin or a Kar98, NOT a hunting rifle — nothing about it was ever made in a factory. A length of rusted steel water pipe serves as the barrel, lashed with wire and black tape onto a plank of salvaged timber hacked roughly into the shape of a stock, the saw marks still on it. A crude bolt handle bent out of scrap rod, a nail for a firing pin, a sight made of a bent strip of tin. Mismatched screws, a hose clamp, and a rubber band holding one part on. Bare metal pitted orange with rust. Laid on a folded sarong over a motorbike seat.",
     "description": "Scrap tier — the rifle-length sibling to the Homemade Pistol. Improvised, no real ammo standard, no mod system. Tier 0 (Scrap). Stats assigned via 7-10 round combat framework.",
     "stats": {
       "clip_size": 1,
@@ -4585,7 +4585,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/hunting_rifle.jpg",
     "image_prompt": "A bolt-action hunting rifle with a long slim barrel and a wooden stock worn smooth with handling, faded varnish cracked along the grip, a scratched iron sight, a small brass shell casing lodged in the open bolt, across a cluttered workbench in a gunsmith's shed.",
     "description": "Normal tier bolt-action rifle, common pre-war hunting/utility weapon. Tier 1 (Normal).",
     "stats": {
@@ -4606,7 +4606,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/marksman_carbine.jpg",
     "image_prompt": "A lightweight carbine with a shortened barrel and a simple wooden stock, worn matte finish scratched along the receiver, a plain iron sight, a faded factory proof mark stamped near the trigger guard, on a rusted oil drum in a scrapyard clearing.",
     "description": "Lower-end Normal tier carbine, common early rifle option. Tier 1 (Normal).",
     "stats": {
@@ -4627,7 +4627,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/sniper_rifle.jpg",
     "image_prompt": "A long-range rifle with a heavy bull barrel and a scoped sight mounted along the top rail, worn matte-black finish scratched to bare steel, a bipod folded beneath the stock, a faded unit marking near the grip, propped against a stilt-house post on a rain-slick kampung porch.",
     "description": "Rare/Signature-leaning Normal tier rifle, long range and high single-shot damage. Tier 3 (Rare/Signature).",
     "stats": {
@@ -4648,7 +4648,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/varmint_rifle.jpg",
     "image_prompt": "A light, worn bolt-action rifle with a slim barrel and a scuffed wooden stock, faded varnish chipped along the grip, a simple iron sight, a small magazine tube running beneath the barrel, common and unremarkable, on a banana-leaf mat beside a smouldering charcoal brazier.",
     "description": "Bottom-of-Normal-tier rifle, weak but common and cheap to feed. Tier 0/1 border, weakest rifle.",
     "stats": {
@@ -4669,7 +4669,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/10mm_smg.jpg",
     "image_prompt": "A compact automatic SMG with a stubby barrel and a curved magazine jutting forward of the trigger guard, worn matte-black finish scratched to bare metal, a folding wire stock, a faded serial stamp near the ejection port, leaning in the doorway of a corrugated-zinc guard post.",
     "description": "Normal tier automatic SMG. Burst-fire capable. Tier 1 (Normal), per-round damage — burst mode applies the AC/DR debuff convention.",
     "stats": {
@@ -4692,7 +4692,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/tommy_gun.jpg",
     "image_prompt": "A pre-war automatic Tommy Gun with a distinctive drum magazine and finned barrel, worn blued steel scratched and pitted with age, a wooden foregrip darkened with handling, a faded manufacturer stamp along the receiver, on a riverside jetty plank, fishing nets drying nearby.",
     "description": "Normal tier automatic SMG, pre-war antique still in circulation. Burst-fire capable. Tier 2 (Faction-Issued), per-round damage.",
     "stats": {
@@ -4715,7 +4715,7 @@ export const itemDatabase = {
     "size": "oversized",
     "two_handed": true,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/salvaged_rebar_greatsword.jpg",
     "description": "A crude but effective greatsword welded together from flattened rebar lengths. The best pure damage a bench can currently produce.",
     "image_prompt": "A large improvised greatsword forged from flattened rebar segments welded together, rough weld seams visible, wrapped leather grip, oversized wasteland weapon, across a bunk in a cramped stilt-house sleeping loft.",
     "stats": {
@@ -4734,7 +4734,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/combat_shotgun.jpg",
     "image_prompt": "A faction-standard combat shotgun with a ribbed pump handguard and a short barrel, worn matte-green finish scuffed to bare metal, a sling loop riveted to the stock, a faded serial stamp near the receiver, on a folding table inside a patched canvas market tent.",
     "description": "Normal tier shotgun, faction-standard close-range weapon. Tier 2 (Faction-Issued).",
     "stats": {
@@ -4755,7 +4755,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/double_barrel_shotgun.jpg",
     "image_prompt": "A break-action double-barrel shotgun with twin side-by-side barrels, worn blued steel scratched and freckled with rust, a scarred wooden stock, a simple hinge action stiff with grime, a faded proof mark near the breech, across a fallen concrete beam in a bombed-out shophouse.",
     "description": "Normal tier shotgun, simple break-action design. Tier 1/2 border.",
     "stats": {
@@ -4776,7 +4776,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/lever_action_shotgun.jpg",
     "image_prompt": "A tube-fed lever-action shotgun with a long barrel and a worn wooden stock, blued steel scratched to bare metal along the receiver, a stiff lever loop worn smooth, a faded brand stamp near the chamber, laid on a rattan mat inside a bamboo lookout shack.",
     "description": "Normal tier shotgun, tube-fed lever mechanism. Tier 1 (Normal).",
     "stats": {
@@ -4797,7 +4797,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/pump_action_shotgun.jpg",
     "image_prompt": "A common pump-action shotgun with a ribbed foregrip and a short barrel, worn matte finish scuffed to bare metal, a scarred bakelite stock, a faded serial number stamped near the receiver, the most ordinary shotgun around, propped against a chain-link fence post overgrown with vines.",
     "description": "Normal tier shotgun, the most common variant in circulation. Tier 1 (Normal), most common variant.",
     "stats": {
@@ -4818,7 +4818,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/riot_shotgun.jpg",
     "image_prompt": "A Federation crowd-control shotgun with a short barrel and a folding wire stock, worn matte-black finish scratched along the receiver, a painted lavender stripe near the pump, a sling loop riveted to the side, propped against a stilt-house post on a rain-slick kampung porch.",
     "description": "Faction-Issued leaning Normal tier shotgun, Federation crowd-control standard. Tier 2 (Faction-Issued).",
     "stats": {
@@ -4839,7 +4839,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/sawed_off_shotgun.jpg",
     "image_prompt": "A shortened shotgun with both barrels hacksawed down to stubs, worn blued steel scratched and pitted, a sawn-off wooden stock cut roughly to a pistol grip, a faded proof mark near the breech, laid in wet roadside grass with rain still beading on it.",
     "description": "Concealable Normal tier shotgun, very short range, high close-quarters damage. Tier 1 (Normal), very short range.",
     "stats": {
@@ -4860,7 +4860,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/axe_gang_axe_melee.jpg",
     "description": "The choice weapon of the Axe Gang. Spits tunes and splits heads in equal measure. The melee variant.",
     "image_prompt": "A salvaged electric guitar rebuilt as a melee weapon: the body reinforced with welded steel plate and studded with spikes along both edges, strings still strung over a scarred pickguard, hand-painted band lettering worn away by use, black-brown rust streaking the plate.",
     "stats": {
@@ -4879,7 +4879,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/axe_gang_axe_ranged.jpg",
     "description": "The choice weapon of the Axe Gang. Spits tunes and splits heads in equal measure. The ranged variant.",
     "image_prompt": "A salvaged double-necked electric guitar rebuilt as a firearm: a scavenged gun barrel running the length of each neck, a handle protruding perpendicular from the body as a grip with the trigger set into it, strings still strung across a scorched pickguard, welded steel bracing and rust weeping from every seam.",
     "stats": {
@@ -4900,7 +4900,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": false,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/water_pipe_cudgel.jpg",
     "image_prompt": "A length of salvaged metal water pipe repurposed as a cudgel, one end wrapped in frayed cloth for a grip, dented and streaked with rust, a corroded threaded joint still fused at the base, laid across a mechanic's workbench beside a half-stripped kapcai engine.",
     "description": "Salvaged plumbing, Bandawang Lama. Thematically tied to water-rights disputes.",
     "stats": {
