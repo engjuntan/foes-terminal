@@ -3192,7 +3192,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "big_guns",
-    "icon": "",
+    "icon": "art/50_cal_machine_gun.jpg",
     "image_prompt": "A belt-fed .50 calibre machine gun with a heavy finned barrel, matte-black finish worn silver at the edges, an ammo belt hanging half-fed from the receiver, its bulk long and heavy enough to need a sling and both hands, across a fallen concrete beam in a bombed-out shophouse.",
     "description": "Big Guns tier heavy weapon, highest per-round damage in the class. Burst-capable.",
     "stats": {
@@ -3215,7 +3215,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "big_guns",
-    "icon": "",
+    "icon": "art/fat_man.jpg",
     "image_prompt": "A squat mini-nuke launcher with a spherical drum magazine loaded atop a short thick barrel, a stubby targeting scope, chipped mustard-yellow paint over dented steel, a faded radiation trefoil painted on the side, bulky enough to brace against the shoulder with both arms, propped beside a rain barrel on a flooded kampung five-foot-way.",
     "description": "Unique/Quest-leaning Big Guns tier weapon — mini-nuke launcher, extremely rare ordinance. Tier 4 (Unique) — deliberately exceeds the standard tier ceiling given its rarity and narrative weight, but bounded rather than an automatic kill against high-DR targets.",
     "stats": {
@@ -3236,7 +3236,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "big_guns",
-    "icon": "",
+    "icon": "art/flamer.jpg",
     "image_prompt": "A nozzle gun linked by a scorched rubber hose to a dented fuel tank meant for a shoulder harness, soot blackening the barrel, faded painted warning letters peeling off the tank's flank, bulky and heavy across both arms, balanced on a stack of wooden crates behind a night market stall.",
     "description": "Big Guns tier fuel-based weapon, short range, area denial. Tier 2. Short range, area denial with lingering fire field.",
     "stats": {
@@ -3257,7 +3257,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "big_guns",
-    "icon": "",
+    "icon": "art/gatling_gun.jpg",
     "image_prompt": "A rotary multi-barrel gatling gun with six thick steel barrels bundled around a central spindle, pitted with rust and old scorch marks, a hand-crank housing bolted to one side, its bulk heavy enough to need bracing with both arms, laid on a rattan mat inside a bamboo lookout shack.",
     "description": "Big Guns tier heavy ballistic weapon, alternative to the Minigun. Burst/sustained-fire capable. Tier 2, per-bullet damage.",
     "stats": {
@@ -3280,7 +3280,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "big_guns",
-    "icon": "",
+    "icon": "art/gatling_laser.jpg",
     "image_prompt": "A rotary multi-barrel energy weapon with six slender crystal-tipped barrels bundled around a humming central core, chipped blue focusing lenses, scorched vents along the housing, cabling trailing to a bulky battery pack too heavy to fire one-handed, resting across a canoe paddle propped on a jungle riverbank.",
     "description": "Big Guns tier heavy energy weapon. Burst/sustained-fire capable. Tier 2, per-bullet damage.",
     "stats": {
@@ -3304,7 +3304,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "",
-    "image_prompt": "A belt-fed light machine gun with a long finned barrel and a folding bipod, worn matte-green paint chipped to bare steel, a dangling half-empty ammo belt, its length and weight needing both hands to level, balanced across the gunwale of a wooden sampan on brown river water.",
+    "image_prompt": "A RETRO-FUTURIST belt-fed light machine gun in the Fallout manner: bulbous 1950s industrial styling, a heavy ribbed cooling shroud over the barrel, rounded pressed-steel housings, a wooden shoulder stock and a wooden forward grip, brass and chrome fittings. NOT a modern military machine gun, NOT an M60 or FN MAG, no polymer and no picatinny rail. A hundred and seventy years old and badly used: matte-green paint worn through to bare pitted steel across every edge, deep rust blooming in the shadowed recesses, a bent folding bipod, a dangling half-empty belt of tarnished brass rounds, a crack in the stock bound with wire. Balanced across the gunwale of a wooden sampan on brown river water.",
     "description": "Big Guns tier sustained-fire weapon. Burst-capable.",
     "stats": {
       "clip_size": 100,
@@ -3326,7 +3326,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "big_guns",
-    "icon": "",
+    "icon": "art/minigun.jpg",
     "image_prompt": "A multi-barrel rotary minigun with six thick barrels bundled around a central spindle, worn matte-black finish scratched to bare steel, an ammo belt trailing from a side feed, a motor housing bolted beneath, heavy enough to need both arms, on a folding table inside a patched canvas market tent.",
     "description": "Big Guns tier heavy automatic weapon, high ammo consumption. Burst/sustained-fire capable. Tier 2, per-bullet damage kept modest since sustained fire + the burst AC/DR debuff carries this weapon's real power.",
     "stats": {
@@ -3349,7 +3349,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "big_guns",
-    "icon": "",
+    "icon": "art/missile_launcher.jpg",
     "image_prompt": "A tube-shaped missile launcher slung over one shoulder, dull olive paint scratched and dented along the length, a cracked sighting scope mounted on top, a painted warning arrow pointing toward the muzzle, long enough to need both arms to aim, on a folded sarong laid over a motorbike seat.",
     "description": "Rare Big Guns tier weapon, single-target high explosive damage.",
     "stats": {
@@ -3370,7 +3370,7 @@ export const itemDatabase = {
     "size": "oversized",
     "two_handed": true,
     "skill": "melee_weapons",
-    "icon": "",
+    "icon": "art/corroded_minigun_barrel_club.jpg",
     "description": "A rotary minigun barrel cluster, seized solid with rust and repurposed as the heaviest melee weapon around.",
     "image_prompt": "A rusted rotary minigun barrel cluster repurposed as a heavy improvised club, six fused barrels, welded handle grip, oversized wasteland weapon, resting across a canoe paddle propped on a jungle riverbank.",
     "stats": {
@@ -3389,7 +3389,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/cracked_pvc_pipe_gun.jpg",
     "description": "A single-shot improvised firearm built from PVC piping and a nail-strike mechanism.",
     "image_prompt": "A crude single-shot pipe gun made from white PVC pipe, rubber bands and a nail firing pin, duct tape wrapped grip, across a fallen concrete beam in a bombed-out shophouse.",
     "stats": {
@@ -3410,7 +3410,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "energy_weapons",
-    "icon": "",
+    "icon": "art/gauss_pistol.jpg",
     "image_prompt": "A compact electromagnetic pistol with an exposed coil barrel wound in copper wire, brushed steel casing scorched at the muzzle, a small crystal capacitor glowing faintly blue-green through a cracked housing panel, propped beside a rain barrel on a flooded kampung five-foot-way.",
     "description": "Rare tier electromagnetic sidearm.",
     "stats": {
@@ -3431,7 +3431,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "energy_weapons",
-    "icon": "",
+    "icon": "art/gauss_rifle.jpg",
     "image_prompt": "An electromagnetic rifle with a long coil-wrapped barrel and an exposed capacitor bank along the stock, brushed steel dulled with handling, a faint blue-green glow leaking from a cracked casing seam near the trigger guard, laid on a rattan mat inside a bamboo lookout shack.",
     "description": "Rare/Signature tier electromagnetic rifle, distinct ammo type from laser/plasma.",
     "stats": {
@@ -3452,7 +3452,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "energy_weapons",
-    "icon": "",
+    "icon": "art/laser_pistol.jpg",
     "image_prompt": "A compact energy pistol with a stubby crystal-focusing barrel, worn chrome housing scratched down to grey metal, a small charge indicator dial cracked on the grip, faded Federation-issue serial numbers stamped along the frame, on a folding table inside a patched canvas market tent.",
     "description": "Normal-to-Faction-Issued tier energy sidearm, real pre-war tech, rarer than ballistic pistols.",
     "stats": {
@@ -3473,7 +3473,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "energy_weapons",
-    "icon": "",
+    "icon": "art/laser_rifle.jpg",
     "image_prompt": "A long-barreled energy rifle with a crystal focusing lens set into a boxy receiver, faded Federation olive-drab paint chipped along the stock, a small battery gauge cracked on the side, wear polishing the grip to bare metal, set on a crumbling brick ledge beside an overgrown roadside shrine.",
     "description": "Faction-Issued tier energy rifle, standard Federation-grade tech.",
     "stats": {
@@ -3494,7 +3494,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "energy_weapons",
-    "icon": "",
+    "icon": "art/plasma_caster.jpg",
     "image_prompt": "A heavy plasma weapon with a bulbous glass containment chamber bolted to a thick steel barrel, faint green plasma residue crusted around the muzzle, cabling looping to a bulky backpack power cell, its weight demanding both arms to raise, on a folded sarong laid over a motorbike seat.",
     "description": "Top-tier Rare/Signature energy weapon, heaviest plasma option before Unique tier.",
     "stats": {
@@ -3515,7 +3515,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "energy_weapons",
-    "icon": "",
+    "icon": "art/plasma_pistol.jpg",
     "image_prompt": "A stubby plasma pistol with a small glass containment bulb glowing faint green at its core, scorched steel casing pitted around the muzzle, a cracked charge dial set into the worn grip, balanced across the gunwale of a wooden sampan on brown river water.",
     "description": "Rare/Signature tier energy sidearm, higher damage than laser equivalents.",
     "stats": {
@@ -3536,7 +3536,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "energy_weapons",
-    "icon": "",
+    "icon": "art/plasma_rifle.jpg",
     "image_prompt": "A long plasma rifle with a glass containment chamber running along the barrel, faint green residue crusted at the muzzle, scorched steel housing worn to bare metal at the grip, a cracked charge gauge set near the trigger, laid on the deck boards of a half-sunk river ferry.",
     "description": "Rare/Signature tier energy rifle, top of the energy weapon bracket short of Unique.",
     "stats": {
@@ -3557,7 +3557,7 @@ export const itemDatabase = {
     "size": "large",
     "two_handed": true,
     "skill": "energy_weapons",
-    "icon": "",
+    "icon": "art/tesla_cannon.jpg",
     "image_prompt": "A boxy energy cannon ringed with exposed copper coils and small arcing prongs at the muzzle, scorched black housing pitted with old arc burns, cabling trailing to a humming backpack cell, heavy enough to need both arms to brace, propped against a motorbike's kickstand on a muddy track.",
     "description": "Rare/Signature tier energy weapon, arc-damage across multiple targets.",
     "stats": {
@@ -3578,7 +3578,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "throwing",
-    "icon": "",
+    "icon": "art/dynamite.jpg",
     "image_prompt": "A bundle of three waxy paper-wrapped dynamite sticks bound with twine, a short fuse coiled and taped at one end, the paper stained and curling with age, a faded demolition warning label barely legible, balanced on a stack of wooden crates behind a night market stall.",
     "description": "Thrown/placed explosive, pre-war construction demolition stock.",
     "stats": {
@@ -3597,7 +3597,7 @@ export const itemDatabase = {
     "size": "small",
     "two_handed": false,
     "skill": "throwing",
-    "icon": "",
+    "icon": "art/frag_grenade.jpg",
     "image_prompt": "A hand-sized fragmentation grenade with a ribbed cast-iron shell, dull olive paint chipped to rust at the seams, a pull-ring pin dangling from a bent safety lever, faded painted lot numbers along one side, across a bunk in a cramped stilt-house sleeping loft.",
     "description": "Standard thrown explosive, self-contained — no separate ammo type needed.",
     "stats": {
