@@ -484,7 +484,12 @@ export const LOCATION_SHOTS = [
     name: 'seio (Peng Brothers RNR)',
     notePath: 'Locations/Bandawang/seio (Peng Brothers RNR).md',
     shot: 'entrance',
-    prompt: "A hollow pre-war petrol station beside the Longest Road, faded Poseidon Oil lettering still visible above the forecourt, a large windmill turning atop the roof, old fuel nozzles replaced with fusion-battery charging terminals under a patched awning, a hand-painted menu board propped beside the garage door."
+    // The whole point of this place is its name. The note says "seio" is
+    // what is LEFT of POSEIDON OIL on the fascia, so the sign has to be
+    // mostly gone. The first attempt rendered POSEIDON OIL intact and
+    // clean, which reads as a working petrol station and loses the joke
+    // entirely. Spell out which letters survive.
+    prompt: "A hollow pre-war petrol station beside the Longest Road. THE SIGN IS THE SUBJECT: a long fascia above the forecourt that once read POSEIDON OIL in tall letters, now mostly stripped away — only four letters still stand, S E I and a lone O further along, so the board reads SEI O with wide dark gaps and bare rusted mounting bolts where the rest fell off. The ghosts of the missing letters remain as cleaner unfaded patches in the paint. A large windmill turning atop the roof, old fuel nozzles replaced with fusion-battery charging terminals under a patched awning, a hand-painted menu board propped beside the garage door."
   },
   {
     id: 'loc_seio_peng_brothers_rnr_interior',

@@ -3734,7 +3734,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "energy_weapons",
-    "icon": "",
+    "icon": "art/fractured_laser_rifle.jpg",
     "description": "A genuine pre-War Laser Rifle, badly aged — cracked housing and a chipped focusing lens leave it recognizably special but mechanically weak. Disrepair, not pristine.",
     "image_prompt": "A cracked and weathered pre-war laser rifle, chipped crystal focusing lens, exposed wiring, bare scratched steel and tarnished brass housings, NO PAINTED FACTION COLOUR OF ANY KIND, damaged but recognizable high-tech weapon, laid across a mechanic's workbench beside a half-stripped kapcai engine.",
     "condition": "disrepair",
@@ -4498,7 +4498,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/assault_rifle.jpg",
     "image_prompt": "An automatic rifle with a ribbed handguard and a curved magazine, the steel left in its own dark grey parkerised finish worn to bright bare metal along the edges, a wooden handguard and stock aged to a dull honey brown, a scratched optical sight mounted on top, NO PAINTED FACTION COLOUR OF ANY KIND, set on a crumbling brick ledge beside an overgrown roadside shrine.",
     "description": "Normal tier automatic rifle. Burst-fire capable — see the campaign's burst mechanic (single roll, AC/DR debuff). Tier 2 (Faction-Issued).",
     "stats": {
@@ -4818,7 +4818,7 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "small_guns",
-    "icon": "",
+    "icon": "art/riot_shotgun.jpg",
     "image_prompt": "A Federation crowd-control shotgun with a short barrel and a folding wire stock, blued steel receiver and barrel worn through to bright bare metal along every edge, NO PAINTED FACTION COLOUR OF ANY KIND, a sling loop riveted to the side, propped against a stilt-house post on a rain-slick kampung porch.",
     "description": "Faction-Issued leaning Normal tier shotgun, Federation crowd-control standard. Tier 2 (Faction-Issued).",
     "stats": {

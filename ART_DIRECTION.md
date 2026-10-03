@@ -31,7 +31,7 @@ happened.
 | **European faces or European armour silhouettes** | This is Malaya. Faces and dress are Malaysian — Malay, Chinese, Indian. |
 | **A skyscraper in Bandawang** | Nothing there is over twenty storeys. It is shoplots and low blocks. |
 | **Desert in a monsoon location, or jungle in the Chukai** | The climate clause is per-location and is not a suggestion. |
-| **Bethesda or Vault-Tec marks** | Including ones that bleed in from a contaminated generator thread. |
+| **Bethesda or Vault-Tec marks** | Including ones that bleed in from a contaminated generator thread. This bans marks the generator *imports*, not the GM's own deliberate Fallout references — Big Ben is a Fallout 4 super mutant on purpose, and seio is what is left of a Poseidon Oil sign. When a vault note names one, it is canon. |
 
 ---
 
