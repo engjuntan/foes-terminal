@@ -355,6 +355,16 @@ function locationTargets() {
 // shots and would otherwise forbid the entire subject.
 const PORTRAIT_STYLE = `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. A single full-length figure is the subject, sharply lit and filling most of the frame, caught mid-moment rather than posed for a portrait. The setting is simple and thrown well out of focus behind them. ${GRADE} ${CLIMATE.replace('No dust, no sand, no arid cracked earth.', '')} No captions, no watermark, no signature, no modern plastics, no flat screens, no Vault-Tec or other Bethesda marks.`;
 
+// The GM's descriptions say "a ghoul" and stop there, because a GM knows
+// what a ghoul is. The generator does not: Colonel Rizal and Daz came out
+// properly ghoulified because their descriptions carry other hints, while
+// Farmer Nick Peng ("a tanned ghoul, if there can even be such a thing")
+// and Guru Besar Raj ("a ghoul dressed in a short-sleeve shirt") both came
+// back as healthy weathered men. Nick's parenthetical joke read as hedging
+// and "tanned" pulled it to a suntan. Appended whenever the subject says
+// ghoul, so the GM never has to describe one again.
+const GHOUL_CLAUSE = 'THIS CHARACTER IS A GHOUL, in the Fallout sense, and the ghoulification is the first thing you should see: skin like cracked sun-dried leather in mottled grey, brown and raw pink, split open in places to the tissue beneath; NO NOSE at all, only the bare nasal opening in the skull; no hair anywhere, no eyebrows, no eyelashes; lipless mouth drawn back from the teeth; milky or sunken eyes. Not a scarred man, not a burn victim, not a weathered or sun-darkened human — a ghoul. Whatever the description says about his colouring applies to ghoul skin, never to a healthy tan. He wears his clothes normally and holds himself like the person described: the body is ruined, the man is not.';
+
 function peopleTargets() {
   const dir = path.join(VAULT, 'People');
   if (!fs.existsSync(dir)) return [];
@@ -373,7 +383,7 @@ function peopleTargets() {
         notePath: `People/${f}`,
         hasArt: isLinked(frontmatterValue(text, 'image') || ''),
         hasPrompt: true,
-        prompt: `${PORTRAIT_STYLE} Subject: ${prompt}`,
+        prompt: `${PORTRAIT_STYLE}${/ghoul/i.test(prompt) ? ` ${GHOUL_CLAUSE}` : ''} Subject: ${prompt}`,
         description: prompt,
         setUrl: url => setFrontmatterValue(file, 'image', url)
       };
@@ -414,16 +424,22 @@ function sheet() {
 }
 
 // What still needs an image: no art yet, has a prompt, and isn't already
+// The plural the GM types, mapped to the singular `kind` a target carries.
+// This was `only.replace(/s$/, '')`, which turns "people" into "peopl" — so
+// `--only people` was rejected and portraits could only be reached through
+// `--match person_`. Spell the mapping out rather than deriving it.
+const ONLY_KINDS = { items: 'item', slots: 'slot', locations: 'location', people: 'person' };
+
 // sitting in the inbox waiting to be ingested. `--only items|slots` narrows it.
 function pendingTargets() {
   const only = option('only');
-  if (only && !['items', 'slots', 'locations'].includes(only)) fail(`--only takes "items", "slots" or "locations".`);
+  if (only && !ONLY_KINDS[only]) fail(`--only takes ${Object.keys(ONLY_KINDS).map(k => `"${k}"`).join(', ')}.`);
   const skipped = readSkipList();
   // --group narrows slots to one family (faction, karma, rep, special),
   // which is how a single set gets handed to another tool on its own.
   const group = option('group');
   return allTargets()
-    .filter(t => !only || t.kind === only.replace(/s$/, ''))
+    .filter(t => !only || t.kind === ONLY_KINDS[only])
     .filter(t => !group || t.id.startsWith(`${group}_`))
     .filter(t => !t.hasArt && t.hasPrompt && !inboxFileFor(t.id) && !skipped.includes(t.id));
 }
