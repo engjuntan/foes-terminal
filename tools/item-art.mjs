@@ -396,10 +396,22 @@ function allTargets() { return [...itemTargets(), ...slotTargets(), ...locationT
 // ---------- commands ----------
 function status() {
   const targets = allTargets();
+  // "to go" used to be (total - linked), which counted skipped assets and
+  // assets with no prompt as outstanding work. It disagreed with `queue`
+  // every time — status said one item and thirteen cards remained when the
+  // queue held none and seven, and a runner was briefed on the wrong
+  // numbers twice. Count what `queue` would actually hand out.
+  const skipped = readSkipList();
   const report = (label, list) => {
     const linked = list.filter(t => t.hasArt).length;
     const noPrompt = list.filter(t => !t.hasArt && !t.hasPrompt).length;
-    console.log(`${label.padEnd(18)}${String(linked).padStart(4)} done, ${String(list.length - linked).padStart(4)} to go${noPrompt ? `  (${noPrompt} still need a prompt)` : ''}`);
+    const held = list.filter(t => !t.hasArt && skipped.includes(t.id)).length;
+    const togo = list.filter(t => !t.hasArt && t.hasPrompt && !skipped.includes(t.id)).length;
+    const notes = [
+      noPrompt ? `${noPrompt} need a prompt` : '',
+      held ? `${held} skipped` : ''
+    ].filter(Boolean).join(', ');
+    console.log(`${label.padEnd(18)}${String(linked).padStart(4)} done, ${String(togo).padStart(4)} to go${notes ? `  (${notes})` : ''}`);
   };
   report('Items:', targets.filter(t => t.kind === 'item'));
   report('Content slots:', targets.filter(t => t.kind === 'slot'));
@@ -407,8 +419,7 @@ function status() {
   report('NPC portraits:', targets.filter(t => t.kind === 'person'));
   const inInbox = fs.existsSync(INBOX) ? fs.readdirSync(INBOX).filter(f => !f.startsWith('.')).length : 0;
   const ledger = readLedger();
-  const skipped = readSkipList().length;
-  if (skipped) console.log(`Skipped (made elsewhere): ${skipped}`);
+  if (skipped.length) console.log(`Skipped (made elsewhere): ${skipped.length}`);
   console.log(`Waiting for review:        ${inInbox}  (${path.relative(VAULT, MEDIA)} in the vault)`);
   console.log(`Paid generations so far: ${ledger.generated} / ${LIFETIME_GENERATE_CAP} lifetime cap`);
 }

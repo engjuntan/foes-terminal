@@ -138,8 +138,8 @@ export const DEFAULT_REPUTATION_ENTITIES = [
   { id: "axe_gang", name: "Axe Gang" , image_url: "art/faction_axe_gang.jpg" },
   { id: "bandawang_enforcers", name: "Bandawang Enforcers" , image_url: "art/faction_bandawang_enforcers.jpg" },
   { id: "the_federation", name: "The Federation" , image_url: "art/faction_the_federation.jpg" },
-  { id: "the_protectorate", name: "The Protectorate" , image_url: "" },
-  { id: "the_caliphate", name: "The Caliphate" , image_url: "" }
+  { id: "the_protectorate", name: "The Protectorate" , image_url: "art/faction_the_protectorate.jpg" },
+  { id: "the_caliphate", name: "The Caliphate" , image_url: "art/faction_the_caliphate.jpg" }
 ];
 
 export function normalizeReputationEntities(raw) {
@@ -168,7 +168,7 @@ export const KARMA_TIERS = [
     min: 60,
     max: 100,
     description: "Strangers tell stories about you around the fire. Whatever you did, it mattered enough to become legend.",
-    image_url: ""
+    image_url: "art/karma_guardian_angel.jpg"
   },
   {
     id: "do_gooder",
@@ -184,7 +184,7 @@ export const KARMA_TIERS = [
     min: -19,
     max: 19,
     description: "You haven't done enough of anything for the wasteland to have an opinion of you yet.",
-    image_url: ""
+    image_url: "art/karma_nobody.jpg"
   },
   {
     id: "troublemaker",
@@ -192,7 +192,7 @@ export const KARMA_TIERS = [
     min: -59,
     max: -20,
     description: "You cut corners and people get hurt for it. That's earned you a reputation nobody's proud of.",
-    image_url: ""
+    image_url: "art/karma_troublemaker.jpg"
   },
   {
     id: "menace",
@@ -200,7 +200,7 @@ export const KARMA_TIERS = [
     min: -100,
     max: -60,
     description: "Your name gets spat out like a curse. You've hurt too many people for anyone to believe it wasn't on purpose.",
-    image_url: ""
+    image_url: "art/karma_menace.jpg"
   }
 ];
 
