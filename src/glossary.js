@@ -423,6 +423,21 @@ export const glossaryDatabase = {
       "The Federation"
     ]
   },
+  keturunan: {
+    "id": "keturunan",
+    "name": "Keturunan",
+    "aliases": [
+      "Keturunans",
+      "the bloodlines",
+      "Keturunan system"
+    ],
+    "strict_aliases": [],
+    "summary": "Keturunan are the Federation's hereditary knowledge-bloodlines — the",
+    "category_path": [
+      "02_Factions",
+      "The Federation"
+    ]
+  },
   keturunans: {
     "id": "keturunans",
     "name": "Keturunans",
@@ -1208,6 +1223,18 @@ export const glossaryDatabase = {
     ],
     "strict_aliases": [],
     "summary": "Big Ben is the Gergasi who stands at the gate of Syurga dressed as a clock tower.",
+    "category_path": [
+      "People"
+    ]
+  },
+  chang: {
+    "id": "chang",
+    "name": "Chang",
+    "aliases": [
+      "Investigator Chang"
+    ],
+    "strict_aliases": [],
+    "summary": "Chang is the lead investigator of the Wataniah and the man who",
     "category_path": [
       "People"
     ]

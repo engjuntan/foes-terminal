@@ -36,6 +36,15 @@ export const peopleDatabase = {
       "People"
     ]
   },
+  chang: {
+    "id": "chang",
+    "name": "Chang",
+    "type": "person",
+    "body": "Chang is the lead investigator of the Wataniah and the man who\nactually runs it — a hot-tempered, permanently disgruntled ghoul who has\nread too many pre-war westerns and taken all of them personally.\n\nFaction: Wataniah\n\nBackground: Chang has been investigating on the Peninsula longer\nthan most of his colleagues have been alive, which is the problem. He\nremembers how the Wataniah was supposed to work. He has watched it\nbecome a filing system with a budget, staffed by green recruits who\nrotate out before they learn anything and administrators who would\nrather a case stayed open than closed badly. He has stopped expecting\nbetter and has not stopped complaining about it.\n\nThe cowboy business is genuine and slightly embarrassing. Somewhere in\nthe Cultural Library's holdings is a run of pre-war westerns, and Chang\ngot hold of them young. He talks like a marshal, dresses like one where\nhe can get away with it, and holds a private conviction that a case is\nsomething a man rides out and settles. He is aware this is ridiculous.\nIt has not changed anything.\n\nDescription: A ghoul in a battered wide-brimmed hat and a duster\ngone the colour of the road, with a tin star pinned crooked and a\nrevolver he has drawn perhaps four times. Loud, abrasive, profane, and\nbetter at the job than anyone who has only met him once would guess.\n\nImportance: Chang is the Wataniah's institutional memory and the\nreason any of its cases get closed. For players he is the official\nchannel — the one person in the system who will actually look at\nevidence, if they can survive the lecture that comes with handing it\nover. He despises being handled and responds to being levelled with.",
+    "category_path": [
+      "People"
+    ]
+  },
   cheryl_chia: {
     "id": "cheryl_chia",
     "name": "Cheryl Chia",
@@ -166,7 +175,7 @@ export const peopleDatabase = {
     "id": "mother_senja",
     "name": "Mother Senja",
     "type": "person",
-    "body": "Mother Senja is the stern caretaker of the Bandawang branch of the Kancil Orphanage.\n\nFaction: Kancil Orphanage\n\nBackground: The Kancil Orphanage is a mysterious organisation that operates across the Peninsula. Mother Senja herself was once a Kancil, growing up together with Mother Sejora, who leads the Orphanage elsewhere on the Peninsula.\n\nDescription: A thin, wiry Indian woman wearing a perpetual scowl. She's combined a saree with a nurse's outfit — a curious amalgamation of traditional and practical fashion.\n\nImportance: Mother Senja is Mother Sejora's good friend, and firmly believes that the Kancils are, ultimately, good and just in an unkind world.",
+    "body": "Mother Senja is the stern caretaker of the Bandawang branch of the Kancil Orphanage.\n\nFaction: Kancil Orphanage\n\nBackground: The Kancil Orphanage is a mysterious organisation that operates across the Peninsula. Mother Senja herself was once a Kancil, growing up alongside Mother Sejora, who ran the cafeteria at the Kelam Sungai prison and protected the children put to work in it. Sejora is dead. Senja came out to Bandawang afterwards and took the branch here, and does the same work above ground that her friend did below it.\n\nDescription: A thin, wiry Indian woman wearing a perpetual scowl. She's combined a saree with a nurse's outfit — a curious amalgamation of traditional and practical fashion.\n\nImportance: Mother Senja firmly believes that the Kancils are, ultimately, good and just in an unkind world — a conviction she holds harder since Sejora died, because the alternative is that her friend died for nothing.",
     "category_path": [
       "People"
     ]
