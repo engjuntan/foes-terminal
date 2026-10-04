@@ -25,6 +25,66 @@ export const itemDatabase = {
     "weight": 2,
     "value": 60
   },
+  ammo_22: {
+    "id": "ammo_22",
+    "name": ".22",
+    "type": "ammo",
+    "icon": "",
+    "image_prompt": "A small tin of .22 rimfire cartridges, the lid prised off and set beside it, a peeling paper label reading 'PELURU .22', dozens of tiny dull-brass rounds heaped loose inside and a few spilled onto the surface, on a banana-leaf mat beside a smouldering charcoal brazier.",
+    "description": "Ammunition for the Varmint Rifle.",
+    "ammo_type": ".22",
+    "stackable": true,
+    "weight": 0.005,
+    "value": "TBA"
+  },
+  ammo_32: {
+    "id": "ammo_32",
+    "name": ".32",
+    "type": "ammo",
+    "icon": "",
+    "image_prompt": "A worn cardboard box of .32 revolver cartridges, the flap torn away, a faded floral-bordered label reading 'PELURU .32', stubby tarnished rounds standing in a cracked inner tray with three missing, on a market stall counter beside stacked enamel bowls.",
+    "description": "Ammunition for the .32 Revolver.",
+    "ammo_type": ".32",
+    "stackable": true,
+    "weight": 0.01,
+    "value": "TBA"
+  },
+  ammo_44: {
+    "id": "ammo_44",
+    "name": ".44",
+    "type": "ammo",
+    "icon": "",
+    "image_prompt": "Six fat .44 Magnum cartridges standing upright in a split leather belt loop, deep brass casings tarnished green at the rim, blunt lead noses scarred, one casing crushed out of shape, on a wooden counter under a hanging kerosene lamp.",
+    "description": "Ammunition for the .44 Revolver.",
+    "ammo_type": ".44",
+    "stackable": true,
+    "weight": 0.022,
+    "value": "TBA"
+  },
+  ammo_45: {
+    "id": "ammo_45",
+    "name": ".45",
+    "type": "ammo",
+    "icon": "",
+    "image_prompt": "A stripped cloth bandolier of .45 cartridges laid out flat, squat brass rounds pushed into frayed loops with several gaps, a stencilled olive-drab tin behind reading 'PELURU .45' in faded block letters, on a mechanic's workbench beside a half-stripped kapcai engine.",
+    "description": "Ammunition for the Combat Rifle and the Tommy Gun.",
+    "ammo_type": ".45",
+    "stackable": true,
+    "weight": 0.02,
+    "value": "TBA"
+  },
+  ammo_50: {
+    "id": "ammo_50",
+    "name": ".50",
+    "type": "ammo",
+    "icon": "",
+    "image_prompt": "Four enormous .50 calibre cartridges lying on a folded oiled rag, each as long as a hand, heavy green-tarnished brass with steel-grey armour-piercing tips, one linked into a short length of rusted belt, on the cracked terrazzo floor of an abandoned civic hall.",
+    "description": "Ammunition for the .50 cal Machine Gun and the Anti-Materiel Rifle.",
+    "ammo_type": ".50",
+    "stackable": true,
+    "weight": 0.11,
+    "value": "TBA"
+  },
   ammo_10mm: {
     "id": "ammo_10mm",
     "name": "10mm",

@@ -40,16 +40,6 @@ export const glossaryDatabase = {
       "01_World Details"
     ]
   },
-  foes_timeline: {
-    "id": "foes_timeline",
-    "name": "FOES Timeline",
-    "aliases": [],
-    "strict_aliases": [],
-    "summary": "Superseded — see 🕛 Timeline of Major Events",
-    "category_path": [
-      "01_World Details"
-    ]
-  },
   helicopters: {
     "id": "helicopters",
     "name": "Helicopters",
