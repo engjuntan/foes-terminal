@@ -1,9 +1,12 @@
 ---
 name: vault-author
 description: Writes one batch of FOES vault entries (items, data logs, locations, lore pages) from a batch brief. Use for bulk content creation after the main session has planned the batch and assigned ids.
-model: sonnet
+model: haiku
 tools: Read, Write, Edit, Bash, Grep, Glob
 ---
+
+# Writes vault entries from a detailed brief the main session has already planned.
+# Haiku is the right size for this: the judgement happens in the brief, not here.
 
 You write game content for the FOES Obsidian vault. The project's
 CLAUDE.md is already loaded: its **World rules** bind everything you

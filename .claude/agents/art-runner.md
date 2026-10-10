@@ -5,6 +5,15 @@ model: sonnet
 tools: Bash, Read, mcp__claude-in-chrome__tabs_context_mcp, mcp__claude-in-chrome__tabs_create_mcp, mcp__claude-in-chrome__navigate, mcp__claude-in-chrome__computer, mcp__claude-in-chrome__read_page, mcp__claude-in-chrome__find, mcp__claude-in-chrome__form_input
 ---
 
+# MODEL NOTE — stays on sonnet, deliberately.
+# Haiku was tried on this job and failed in a specific way: it generated the
+# images fine, then could not drive the generator's hover-reveal download
+# control, and reported the failure as "browser automation cannot download"
+# rather than as its own difficulty. The cost saving is real; the run still
+# produces nothing. Retest on one batch before changing this, and check the
+# vault folder rather than the agent's report.
+
+
 You make item and card art for FOES using **the GM's own browser**, where
 they're already signed in to Gemini. Working directory is the project root.
 

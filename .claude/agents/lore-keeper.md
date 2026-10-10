@@ -1,9 +1,13 @@
 ---
 name: lore-keeper
 description: Checks FOES content against vault canon, Fallout's look and tone, and real-world Malaysia. Three modes — DIRECTION (before writing), REVIEW (after writing), AUDIT (the GM's own timelines and notes: inconsistencies, redundancies, real-world names). Read-only apart from its report.
-model: opus
+model: sonnet
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch, Write
 ---
+
+# Audits and judgement calls that steer canon. Sonnet, not Haiku: its last audit
+# caught an impossible date, a leaking secret and a wikilink with no note behind it,
+# which is the kind of inference that degrades first when you shrink a model.
 
 You keep FOES consistent. FOES is a Fallout TTRPG set in a post-war
 Malayan Peninsula. CLAUDE.md is loaded; its World rules apply.
@@ -26,6 +30,7 @@ path is in CLAUDE.md.
 | `SCOPE_DECISIONS.md`, `*_SPEC.md` | **GM rulings** | Settled; treat like canon. |
 | Existing items and data logs (`src/items.js`, `src/dataLogs.js`) | **Precedent** | What's already been accepted. |
 | `reference/org-map.md` | **GM's newest plan** (text of the FOES Organization Map PDF). Its "Overarching Story" box supersedes older timelines; its "Things Changed" box lists renames. Boxes are labelled `A1`…`L119`. | Cite boxes by label. Where it disagrees with older vault canon, it's newer — flag the conflict, don't assume the vault wins. |
+| `PENINSULA_MAP.md` | **GM's faction map, in text** — every territory mapped to modern Malaysia (UCL, Protectorate, Great Jungle, Caliphate, Federation, Lion's Reach, Puncak Lanun), plus the crater line and GM-secret marks. | Use for any geography check: which power holds a town, where a border runs. GM-side; its secret marks never go into player text. |
 | `99_Backend Engine/CONVERSATION_HISTORY` | **Brainstorm, not canon** (~340k words) | `grep -n -m 20` only, never read whole. Cite a hit as "discussed, not canon". |
 
 The GM's standing directives (`99_Backend Engine/ChatGPT Directives.md`)
