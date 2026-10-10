@@ -299,6 +299,22 @@ export const itemDatabase = {
     "weight": 1.8,
     "value": "TBA"
   },
+  axe_gang_leather_jacket: {
+    "id": "axe_gang_leather_jacket",
+    "name": "Axe Gang Leather Jacket",
+    "type": "armor",
+    "slot": "body",
+    "size": "medium",
+    "icon": "",
+    "image_prompt": "A sleeveless black leather jacket cut off at the shoulders and hanging open, the oil-black leather scuffed and sweat-stained at the collar, studded belt loops along the hem, the back panel painted over in factory safety-yellow with the paint scraped and chipped away in places, blank cloth band patches sewn in rows down the front and a few hand-painted yellow letters across the back smeared past reading, draped over a plank bench in a garage.",
+    "description": "A sleeveless black leather jacket cut off at the shoulders and worn open, its hem set with studded belt loops. The back is painted in factory safety-yellow, salvaged paint from a pre-war car plant, so the Axe Gang can be spotted across a street before anyone has to speak. Light armor with a Charisma flavour, and it is worn gear, not a costume.",
+    "stats": {
+      "ac": 8,
+      "dt_dr_normal": "1/15"
+    },
+    "weight": 2.5,
+    "value": 30
+  },
   clothes: {
     "id": "clothes",
     "name": "Clothes",
@@ -3886,25 +3902,6 @@ export const itemDatabase = {
     "weight": 0.9,
     "value": 80
   },
-  bowie_knife: {
-    "id": "bowie_knife",
-    "name": "Bowie Knife",
-    "type": "weapon",
-    "slot": "hand",
-    "size": "small",
-    "two_handed": false,
-    "skill": "melee_weapons",
-    "icon": "art/bowie_knife.jpg",
-    "image_prompt": "A heavy bowie knife with a broad clip-point blade pitted with rust spots, a worn leather-wrapped handle, a brass hilt guard tarnished green, the edge still keeping a rough working sharpness, laid on the deck boards of a half-sunk river ferry.",
-    "description": "Normal tier bladed weapon, heavier than the standard Combat Knife. Tier 1 (Normal).",
-    "stats": {
-      "dmg": "1d8+2+MD",
-      "dmgType": "normal",
-      "range": 1
-    },
-    "weight": 0.4,
-    "value": 100
-  },
   boxing_gloves: {
     "id": "boxing_gloves",
     "name": "Boxing Gloves",
@@ -4095,6 +4092,25 @@ export const itemDatabase = {
     },
     "weight": 0.5,
     "value": "TBA"
+  },
+  khukri: {
+    "id": "khukri",
+    "name": "Khukri",
+    "type": "weapon",
+    "slot": "hand",
+    "size": "small",
+    "two_handed": false,
+    "skill": "melee_weapons",
+    "icon": "",
+    "image_prompt": "A Nepali-pattern khukri with a heavy forward-curving blade, broad near the tip, its steel dark and oiled with a freshly honed edge, a small notch cut into the inner curve just above the guard, the grip of cracked dark wood bound with brass wire, and a worn leather-and-wood scabbard lying beside it with the stitching gone grey at the mouth, resting on an oiled workbench in a hardware shop on the Peninsula.",
+    "description": "A Nepali-pattern blade with a heavy forward-curving edge, broad near the tip, and a small notch cut at the base where the blade meets the guard. Carried on the Peninsula by descendants of Gurkha regiments, and kept sharper than it looks. Tier 1 (Normal).",
+    "stats": {
+      "dmg": "1d8+2+MD",
+      "dmgType": "normal",
+      "range": 1
+    },
+    "weight": 0.4,
+    "value": 100
   },
   machete: {
     "id": "machete",

@@ -30,6 +30,18 @@ export const glossaryDatabase = {
       "01_World Details"
     ]
   },
+  cap_kilat: {
+    "id": "cap_kilat",
+    "name": "Cap Kilat",
+    "aliases": [
+      "Lightning Brand"
+    ],
+    "strict_aliases": [],
+    "summary": "Cap Kilat is a pre-war Malayan drinks and condensed-milk company whose lightning-bolt label is still the most recognised pre-war mark on the Peninsula.",
+    "category_path": [
+      "01_World Details"
+    ]
+  },
   economies_of_the_peninsula: {
     "id": "economies_of_the_peninsula",
     "name": "Economies of the Peninsula",
@@ -973,6 +985,19 @@ export const glossaryDatabase = {
       "Bandawang"
     ]
   },
+  the_driving_school: {
+    "id": "the_driving_school",
+    "name": "The Driving School",
+    "aliases": [
+      "Sekolah Memandu"
+    ],
+    "strict_aliases": [],
+    "summary": "The Driving School is a pre-war driving school on the edge of Bandawang Lama, the kind every family drove past on the way to the market: a cracked practice circuit, a hill-start ramp that tilts the wrong way, a row of traffic cones gone the colour of stewed tea, and a faded ey…",
+    "category_path": [
+      "Locations",
+      "Bandawang"
+    ]
+  },
   the_education_center: {
     "id": "the_education_center",
     "name": "The Education Center",
@@ -1340,6 +1365,16 @@ export const glossaryDatabase = {
     "aliases": [],
     "strict_aliases": [],
     "summary": "Daz is a cranky ghoul who holds court in the corner of the Lakeside Bar.",
+    "category_path": [
+      "People"
+    ]
+  },
+  elora: {
+    "id": "elora",
+    "name": "Elora",
+    "aliases": [],
+    "strict_aliases": [],
+    "summary": "Elora is a teacher at The Education Center who keeps her nerves behind a pencil.",
     "category_path": [
       "People"
     ]

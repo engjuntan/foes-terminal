@@ -81,6 +81,15 @@ export const peopleDatabase = {
       "People"
     ]
   },
+  elora: {
+    "id": "elora",
+    "name": "Elora",
+    "type": "person",
+    "body": "Elora is a teacher at The Education Center who keeps her nerves behind a pencil.\n\nFaction: The Education Center\n\nBackground: Elora teaches at the Education Center, the joint Tan and Rakan Watch school on the hill above Bandawang Lama that opens its doors to anyone who walks up the path. She has the patience the job asks for, and the stubbornness it needs when a parent refuses to send a child in.\n\nDescription: A tudung-wearing young woman of medium build, with kindness in her eyes and a confident way of standing in front of a class. Her baju kurung is an old one, faded to sky blue and frayed at the hem and cuffs, and she has never been able to justify buying a new one. When she is thinking, or nervous, she bites a pencil, and the pencil shows it.\n\nImportance: Elora is the teacher the children trust most at the Education Center. Janson Peng finds reasons to be on the school steps when the bell goes, and he has never managed to explain what he came for. Elora has noticed. She is the only person who can get him to stop mid-sentence, and she does it with one look over the top of her pencil.",
+    "category_path": [
+      "People"
+    ]
+  },
   faiz: {
     "id": "faiz",
     "name": "Faiz",
