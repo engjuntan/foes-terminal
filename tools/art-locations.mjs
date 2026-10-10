@@ -18,7 +18,7 @@ export const LOCATION_SHOTS = [
     name: 'Abave Highlands',
     notePath: 'Locations/Abave Highlands.md',
     shot: 'entrance',
-    prompt: "A cracked mountain access road climbs past a broken pre-war theme-park archway and a dead casino marquee, chrome lettering half fallen, jungle vines pulling the signage down; further up the slope, round rammed-earth monastery buildings sit where casino terraces used to be."
+    prompt: "A cluster of enormous pre-war resort hotels standing on a cold misty mountain ridge, reached by a switchback road. ASIAN-MODERN CIVIC ARCHITECTURE, not alpine and not European: broad sweeping concrete roof planes with upswept gable ends drawn from minangkabau roofs, deep shaded colonnades, repeating concrete sunshade screens across the facades, a vast tiled forecourt and ceremonial steps, in the manner of a 1970s Malaysian stadium or a state majlis bandaraya building blown up to resort scale. Towers of guest rooms behind, windows dark, neon signage long dead on the roofline. Cloud sits in the valley below the terrace."
   },
   {
     id: 'loc_abave_highlands_interior',
@@ -238,18 +238,14 @@ export const LOCATION_SHOTS = [
     prompt: "A munitions workshop deep in Wira Bunker: rows of reloading benches and chemical vats under bare bulb light, half-assembled weapon frames on a workbench, a fusion generator humming behind a mesh cage at the far end of the hall, spent shell casings swept into a corner pile."
   },
   {
+    // GM ruling: the Chukai Desert has NO interior shot. Everything the
+    // vault says about it is that it is a desert, so an interior read as a
+    // different place entirely. Do not re-add one.
     id: 'loc_chukai_desert_entrance',
     name: 'Chukai Desert',
-    notePath: 'Locations/🏜️Chukai Desert.md',
+    notePath: 'Locations/Chukai Desert.md',
     shot: 'entrance',
-    prompt: "A night view over the Chukai Desert from high ground: a vast dark basin under moonlight, its floor glittering green from horizon to horizon with countless tiny shards of trinitite glass fused by the bomb — an emerald sea. A great concentric ring of rock ridges, ridge inside ridge, reads as an enormous circle across the desert floor below, the one landmark here. Salt-crusted dunes and scorched soil between the ridges. NO oil derrick pumps, NO highway signs, no lettering of any kind. Cold moonlight, not golden daylight."
-  },
-  {
-    id: 'loc_chukai_desert_interior',
-    name: 'Chukai Desert',
-    notePath: 'Locations/🏜️Chukai Desert.md',
-    shot: 'interior',
-    prompt: "Inside a collapsed pre-war petroleum REFINERY at the desert's heart, at night: twisted fused pipework, cracked distillation columns and a caved-in roof open to a moonlit sky, sand drifted deep across the floor. Scattered across that sand, tiny shards of trinitite glass catch the moonlight and glitter faint green. Derelict, abandoned, picked over. It is a refinery, NOT a derrick or a pumpjack. No highway signs, no lettering."
+    prompt: "A vast open desert of rolling sand dunes under a huge sky, seen from ground level at the edge of the sand. The dunes run to the horizon in long wind-carved ridges. Scattered across the sand everywhere, catching the light, are TINY FRAGMENTS OF GREEN TRINITITE GLASS \u2014 thousands of small glittering green shards half-buried in the surface, concentrated in the hollows between dunes. No ring structure, no crater, no hills, no oil derricks, no highway signs, no buildings. Just sand, sky and green glass."
   },
 
   // ---------------------------------------------------------------
@@ -274,7 +270,7 @@ export const LOCATION_SHOTS = [
     name: 'Bandawang Lama',
     notePath: 'Locations/Bandawang/Bandawang Lama.md',
     shot: 'entrance',
-    prompt: "A street of post-colonial art-deco shoplots in Bandawang Lama, and unlike the rest of the wasteland it is LOOKED AFTER: stepped deco parapets and curved corner facades repainted in pastel cream and jade, shutters rehung, brass shopfront fittings polished, ornamental plasterwork patched where it had cracked. The road is properly laid asphalt, swept, with kerbstones intact. A Triad house-rules board hangs neatly beside one doorway. Somebody here is deliberately rebuilding a proper society, and it shows."
+    prompt: "A street of pre-war shophouses in Bandawang Lama, drawn with the VARIETY OF PENANG'S OLD TOWN rather than one repeated facade: each building different from its neighbour \u2014 one Straits eclectic with elaborate stucco garlands and a curved pediment, one plain art deco with stepped parapets and horizontal banding, one early shophouse with timber louvred shutters and carved brackets, one with glazed green ceramic air vents and Peranakan tilework along the base. Different heights, different parapet lines, different paint \u2014 jade, ochre, dusty pink, cream \u2014 a continuous five-foot-way colonnade running the length of them. Deliberately MAINTAINED: repainted, shutters rehung, plasterwork patched, the road properly laid and swept."
   },
   {
     id: 'loc_bandawang_lama_interior',
@@ -288,7 +284,7 @@ export const LOCATION_SHOTS = [
     name: 'Federation Checkpoint',
     notePath: 'Locations/Bandawang/Federation Checkpoint.md',
     shot: 'entrance',
-    prompt: "A Federation checkpoint on the road out of Bandawang: a lavender-and-orange painted boom barrier across properly laid, patched asphalt, a sandbagged watchtower cabin beside it, Federation colours hanging limp in the humid air. A long queue of desperate refugees waits along the approach with bundles, cases and children, shuffling forward to be processed one at a time by a single guard at the barrier. Some have plainly been waiting for days."
+    prompt: "A Federation road checkpoint on a cracked asphalt highway: a lavender-and-orange painted boom barrier, a sandbagged timber guard post, lavender pennants. JUST A FEW PEOPLE \u2014 one Federation soldier checking papers, and a SMALL handful of travellers waiting, four or five at most, not a crowd and not a queue stretching away. Quiet, routine, under-staffed. Jungle and low hills beyond."
   },
   {
     id: 'loc_federation_checkpoint_interior',
@@ -365,7 +361,7 @@ export const LOCATION_SHOTS = [
     name: 'Sekitar Litar',
     notePath: 'Locations/Bandawang/Sekitar Litar.md',
     shot: 'interior',
-    prompt: "Inside the bombed-out grandstand's ground-floor lobby: a betting counter scrawled with the day's odds in chalk, torn kapcai-race posters curling off the walls, mismatched stools around a cash table, sunlight cutting through a hole in the collapsed ceiling above, a rack of race flags propped against the broken counter."
+    prompt: "An underground VIP gambling room beneath the Sekitar Litar circuit, built to impress: a GRAND low-ceilinged salon with fluted columns, a coffered ceiling, heavy chandeliers, deep carpet, dark panelled walls and gilded mirrors. Green baize tables with brass fittings, leather armchairs, a long mirrored bar. Pre-war luxury, now imperfectly kept \u2014 carpet worn through on the walking lines, a cracked mirror panel, mismatched replacement bulbs, a water stain in one ceiling coffer, cigarette burns on a table rail. Still unmistakably the grandest room anyone here has seen."
   },
   {
     id: 'loc_syurga_entrance',
@@ -442,14 +438,14 @@ export const LOCATION_SHOTS = [
     name: 'The Rakan Community Center',
     notePath: 'Locations/Bandawang/The Rakan Community Center.md',
     shot: 'entrance',
-    prompt: "The Rakan Community Center, nestled among close-packed homes: a repurposed multi-purpose hall lovingly refurbished with fresh paint and new concrete, its outer walls covered in community-made murals of peaceful people and children, bright and hand-painted. A playground of salvaged pipe swings and a climbing frame stands out front on swept paved ground. Warm light spills from the windows. Cared for, well used, and plainly the heart of its neighbourhood."
+    prompt: "A TWO-STOREY Malaysian community multipurpose hall \u2014 a dewan serbaguna \u2014 in Bandawang Baru: a long rectangular concrete building on two floors with a deep covered walkway along the ground floor, a louvred upper storey with a run of windows, a broad pitched roof, and an external concrete staircase up one end. EVERY WALL IS PAINTED WITH MURALS, bright community-made scenes of kampong life running the full height of both storeys. A swept forecourt with a hand-painted signboard, a swing frame and climbing bars, potted plants in old tins."
   },
   {
     id: 'loc_the_rakan_community_center_interior',
     name: 'The Rakan Community Center',
     notePath: 'Locations/Bandawang/The Rakan Community Center.md',
     shot: 'interior',
-    prompt: "Inside the Rakan Community Center's main hall: crowded, messy and thoroughly lived in. Children's chalk and paint drawings cover the lower walls beside bright community murals; racks of rifles are mounted high up, deliberately out of a child's reach. An infirmary corner holds cots with sick and injured residents; a shared cafeteria with long trestle tables occupies the far corner; makeshift bedding fills the others. Washing is strung overhead. Warm, busy, safe."
+    prompt: "Inside the Rakan community hall, a single long double-height room showing TWO LIVES AT ONCE in one frame. At one end, small children kneel on the floor DRAWING DIRECTLY ON THE WALL in chalk and paint, their work climbing up beside older murals. At the other end, a TRIAGE STATION: a row of iron cots with clean sheets, a folding screen, a trestle of bandages and bottles, a woman tending someone sitting on a cot edge. Between them the ordinary hall \u2014 laundry on lines strung overhead, long tables where people eat and sort, mural-painted walls throughout. Dry, swept, well lit, lived in. No moss, no water staining."
   },
   {
     id: 'loc_the_scrapyard_entrance',
@@ -477,7 +473,7 @@ export const LOCATION_SHOTS = [
     name: 'The Tortoise Palace',
     notePath: 'Locations/Bandawang/The Tortoise Palace.md',
     shot: 'interior',
-    prompt: "Inside the Tortoise Palace's main gaming floor: a grand speakeasy in the Shanghai Bund manner rendered in Malaysian Chinese materials — a deco mezzanine balustrade in polished brass and dark timber, fluted columns, etched glass panels, red-and-gold lacquer, a fifteen-foot carved wooden dragon coiling overhead, broken and charred in places but still majestic. Suited dealers work worn card tables, a huge jug of iced water sits on the lobby counter, and one of the wasteland's few working air conditioners hums above. Immaculately kept and warmly lit."
+    prompt: "The grand gaming floor of the Tortoise Palace: Shanghai Bund opulence rendered in Malaysian post-colonial art deco, immaculately kept. Chandeliers, a sweeping balustraded mezzanine, green baize tables, brass and dark lacquered wood, patrons in cheongsam and tailored suits. THE MOTIF IS THE TORTOISE THROUGHOUT AND THERE IS NO DRAGON ANYWHERE: a huge carved stone tortoise on a plinth dominating the floor, smaller bronze tortoises on newel posts and side tables, tortoise-shell geometry worked into the deco screens and the floor inlay. No dragon, no serpent, no lion."
   },
   {
     id: 'loc_seio_peng_brothers_rnr_entrance',
@@ -489,7 +485,7 @@ export const LOCATION_SHOTS = [
     // mostly gone. The first attempt rendered POSEIDON OIL intact and
     // clean, which reads as a working petrol station and loses the joke
     // entirely. Spell out which letters survive.
-    prompt: "A hollow pre-war petrol station beside the Longest Road. THE SIGN IS THE SUBJECT: a long fascia above the forecourt that once read POSEIDON OIL in tall letters, now mostly stripped away — only four letters still stand, S E I and a lone O further along, so the board reads SEI O with wide dark gaps and bare rusted mounting bolts where the rest fell off. The ghosts of the missing letters remain as cleaner unfaded patches in the paint. A large windmill turning atop the roof, old fuel nozzles replaced with fusion-battery charging terminals under a patched awning, a hand-painted menu board propped beside the garage door."
+    prompt: "A hollow pre-war petrol station on the Longest Road, run as a DIVE BAR and rest stop. THE SIGN IS THE SUBJECT: a long fascia that once read POSEIDON OIL in tall letters, now mostly stripped away \u2014 only four letters still stand, S E I and a lone O further along, so the board reads SEI O with wide dark gaps and bare rusted mounting bolts where the rest fell off, the ghosts of the missing letters showing as cleaner unfaded patches. Grubby and well-used: oil-stained forecourt, mismatched plastic stools and crates for seating, a hand-painted menu board, strings of bare bulbs, crushed cans and bottle crates stacked by the door, a windmill turning on the roof. Retro-futurist fusion-battery charging terminals stand where the fuel pumps were, scorched and taped. Lived-in and a bit rough, not tidy."
   },
   {
     id: 'loc_seio_peng_brothers_rnr_interior',
@@ -510,7 +506,7 @@ export const LOCATION_SHOTS = [
     name: 'The Rakan Community Center',
     notePath: 'Locations/Bandawang/The Rakan Community Center.md',
     shot: 'bunker',
-    prompt: "The cleared-out private residential bunker beneath the Rakan Community Center: a bare reinforced concrete room stripped of everything it once held, empty anchor bolts and cut conduit stubs marking where bunks and fittings used to be, a heavy pre-war blast door standing open at one end, a single strip light over swept bare floor. Dry, sound and completely empty — cleared deliberately, not looted."
+    prompt: "A pre-war concrete bunker beneath the Rakan community hall, now LIVED IN rather than empty. Bedrolls and folded blankets along one wall, a line of hooks with clothes, crates used as furniture, a kettle on a hotplate, a strip light overhead and a kerosene lamp as backup. CHILDREN'S DRAWINGS IN CHALK AND CRAYON COVER THE LOWER CONCRETE WALLS all the way round at child height \u2014 houses, animals, stick families. The heavy blast door stands open to a stair. Dry, warm, swept, somebody's home. No moss, no standing water."
   },
   {
     id: 'loc_the_cement_works_entrance',
