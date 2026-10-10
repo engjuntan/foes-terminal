@@ -2457,7 +2457,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
-    "description": "A stray gone wrong — feral, fast, and hunting in a pack. Once somebody's kampung dog, now just teeth and hunger.",
+    "description": "A stray gone wrong — feral, fast, and hunting in a pack. Once somebody's kampong dog, now just teeth and hunger.",
     "notes": "Has 1 attack and 1 move. Hunts in packs; will flee if left alone and badly hurt.",
     "stats": {
       "hp": 26,

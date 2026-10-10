@@ -25,6 +25,8 @@ into `src/*.js` by the sync script.
 - **GM's campaign plan:** `reference/org-map.md` — text of the FOES
   Organization Map PDF (gitignored; regenerate from the PDF). Newest
   source for story, NPCs, locations and to-dos.
+- **Territories:** `PENINSULA_MAP.md` — the GM's faction map as text,
+  mapped to modern Malaysia. Check geography against it.
 - **Design records:** `SCOPE_DECISIONS.md` (rulings log), `*_SPEC.md`
   (one per system), `CHANGELOG.md`.
 

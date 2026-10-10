@@ -179,7 +179,7 @@ export const LOCATION_SHOTS = [
     name: 'Round City',
     notePath: 'Locations/Round City.md',
     shot: 'interior',
-    prompt: "Inside the Grand Library Mosque: tessellated stone arches supporting a white-and-turquoise dome overhead, a salvaged oil-derrick mast antenna threaded up through the ceiling, calligraphic manuscript shelves lining a subterranean archive hall, its arched alcoves lit by rows of scattered oil lamps."
+    prompt: "Inside the Grand Library Mosque: tessellated stone arches supporting a white-and-turquoise dome overhead, a salvaged refinery flare-stack lattice threaded up through the ceiling, calligraphic manuscript shelves lining a subterranean archive hall, its arched alcoves lit by rows of electric lamps in old oil-lamp housings."
   },
   {
     id: 'loc_the_free_city_of_bandawang_entrance',

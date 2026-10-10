@@ -17,7 +17,7 @@ export const itemDatabase = {
     "type": "accessory",
     "slot": "back",
     "icon": "art/sturdy_backpack.jpg",
-    "image_prompt": "A canvas-and-aluminum frame backpack, faded olive fabric patched with mismatched cloth squares, buckled straps worn shiny, an external steel frame dented at one corner, a faded ration number painted on the flap, propped against a stilt-house post on a rain-slick kampung porch.",
+    "image_prompt": "A canvas-and-aluminum frame backpack, faded olive fabric patched with mismatched cloth squares, buckled straps worn shiny, an external steel frame dented at one corner, a faded ration number painted on the flap, propped against a stilt-house post on a rain-slick kampong porch.",
     "description": "A frame backpack — the standard answer to 'why can you carry all that.' Equip it to expand your carry capacity.",
     "stats": {
       "carry_bonus": 20
@@ -90,7 +90,7 @@ export const itemDatabase = {
     "name": "10mm",
     "type": "ammo",
     "icon": "art/ammo_10mm.jpg",
-    "image_prompt": "A small torn cardboard box of 10mm brass cartridges, lid taped shut, a faded Malay supply label reading 'PELURU 10MM' painted on the side, a few loose rounds tarnished green at the rims, in a woven rattan basket on a kampung porch.",
+    "image_prompt": "A small torn cardboard box of 10mm brass cartridges, lid taped shut, a faded Malay supply label reading 'PELURU 10MM' painted on the side, a few loose rounds tarnished green at the rims, in a woven rattan basket on a kampong porch.",
     "description": "Ammunition for 10mm Pistol and 10mm SMG.",
     "ammo_type": "10mm",
     "stackable": true,
@@ -220,8 +220,8 @@ export const itemDatabase = {
     "id": "microfusion_cell",
     "name": "Microfusion Cell",
     "type": "ammo",
-    "icon": "art/microfusion_cell.jpg",
-    "image_prompt": "A squat cylindrical microfusion cell, its metal casing scorched at one end, a small viewport showing a faint green glow, a worn hazard sticker peeling from the side, on a moss-slick storm drain ledge beside a roadside verge.",
+    "icon": "",
+    "image_prompt": "A squat cylindrical microfusion cell, its metal casing scorched at one end, a small viewport showing a faint green glow, a worn hazard sticker peeling from the side, on a dry concrete ledge beside a roadside verge.",
     "description": "Microfusion cell — ammunition for plasma-class energy weapons (Plasma Pistol/Rifle, Plasma Caster).",
     "ammo_type": "microfusion_cell",
     "stackable": true,
@@ -232,7 +232,7 @@ export const itemDatabase = {
     "id": "mini_nuke",
     "name": "Mini Nuke",
     "type": "ammo",
-    "icon": "art/mini_nuke.jpg",
+    "icon": "",
     "image_prompt": "A squat, bulbous mini-nuke warhead the size of a large drum, a fat rounded nose tapering to four tail fins, dull olive casing dented and streaked with rust, a faded radiation trefoil painted on its nose, across a cluttered workbench in a gunsmith's shed.",
     "description": "Extremely rare ordinance for the Fat Man.",
     "ammo_type": "mini_nuke",
@@ -380,7 +380,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "art/ghoul_wrap.jpg",
-    "image_prompt": "Layered strips of yellowed cloth bandage wound into a wrap, edges frayed and stained brown, a few loose pins holding the outer layer, a faded laundry-mark stitched into one strip, set across a bamboo rack on a kampung porch.",
+    "image_prompt": "Layered strips of yellowed cloth bandage wound into a wrap, edges frayed and stained brown, a few loose pins holding the outer layer, a faded laundry-mark stitched into one strip, set across a bamboo rack on a kampong porch.",
     "description": "Bandage wrappings covering exposed flesh — cosmetic/social race-flavor item, no mechanical DR intended.",
     "stats": {
       "dt": 0,
@@ -420,8 +420,8 @@ export const itemDatabase = {
     "type": "armor",
     "slot": "body",
     "size": "medium",
-    "icon": "art/malayan_frontliner_armor.jpg",
-    "image_prompt": "A bulky riveted armor vest of layered grey plating over a padded jacket, scratched and dented across the chest, a faded lavender stripe painted on the shoulder, straps cinched with worn buckles, on a workbench in a cramped shophouse tailor's shop.",
+    "icon": "",
+    "image_prompt": "WELL MAINTAINED AND ROBUST — kit someone still relies on: plates straight, straps sound, buckles working, cleaned and oiled. Honest rust and scuffing only. A bulky riveted armor vest of layered grey plating over a padded jacket, scratched and dented across the chest, a faded lavender stripe painted on the shoulder, straps cinched with worn buckles, on a workbench in a cramped shophouse tailor's shop.",
     "description": "From the manual — imposes -40 to Sneak, Steal, and Engineering while worn.",
     "stats": {
       "ac": 20,
@@ -473,7 +473,7 @@ export const itemDatabase = {
     "type": "armor",
     "slot": "body",
     "size": "medium",
-    "icon": "art/malayan_officers_uniform.jpg",
+    "icon": "",
     "image_prompt": "A pressed olive uniform jacket with brass buttons, one missing and replaced with a mismatched button, a faded rank bar on the shoulder, a small tear stitched closed near the collar, on a barracks footlocker lid.",
     "description": "From the manual.",
     "stats": {
@@ -943,7 +943,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "art/ucl_officers_uniform.jpg",
-    "image_prompt": "A tailored dark uniform jacket with a red-and-blue collar tab, brass buttons tarnished, cuffs frayed, a small tear near the shoulder mended with contrasting thread, propped against a stilt-house post on a rain-slick kampung porch.",
+    "image_prompt": "A tailored dark uniform jacket with a red-and-blue collar tab, brass buttons tarnished, cuffs frayed, a small tear near the shoulder mended with contrasting thread, propped against a stilt-house post on a rain-slick kampong porch.",
     "description": "From the manual.",
     "stats": {
       "ac": 2,
@@ -991,7 +991,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "art/ucl_vanguard_armor.jpg",
-    "image_prompt": "Heavy armour built in SOUTHEAST ASIAN shapes, NOT European: no knight's breastplate, no pauldrons, no fluted or gothic plate, nothing from a European armoury. Its lines come from Nusantara war dress — overlapping lamellar scales of cut and hammered scrap steel laced together with leather cord, a long tapered torso plate shaped like a baju besi, a high standing collar, shoulder pieces that hang in layered rectangular plates rather than rounded cups, a wide woven sash belt over the hips. Deep scratches and scorch marks, riveted and re-laced repairs throughout, a faded red-and-blue stripe painted across the chest. Set across a bamboo rack on a kampung porch.",
+    "image_prompt": "Heavy armour built in SOUTHEAST ASIAN shapes, NOT European: no knight's breastplate, no pauldrons, no fluted or gothic plate, nothing from a European armoury. Its lines come from Nusantara war dress — overlapping lamellar scales of cut and hammered scrap steel laced together with leather cord, a long tapered torso plate shaped like a baju besi, a high standing collar, shoulder pieces that hang in layered rectangular plates rather than rounded cups, a wide woven sash belt over the hips. Deep scratches and scorch marks, riveted and re-laced repairs throughout, a faded red-and-blue stripe painted across the chest. Set across a bamboo rack on a kampong porch.",
     "description": "From the manual — top UCL faction armor tier.",
     "stats": {
       "ac": 20,
@@ -1015,7 +1015,7 @@ export const itemDatabase = {
     "slot": "body",
     "size": "medium",
     "icon": "art/water_wardens_slicker.jpg",
-    "image_prompt": "A long rubberized rain slicker in faded Federation lavender, cracked at the folds, a hood with a torn drawstring, a small hand-painted orange water-drop shape on the chest, damp stains and creeping black mould along the hem, propped against a stilt-house post on a rain-slick kampung porch.",
+    "image_prompt": "A long rubberized rain slicker in faded Federation lavender, cracked at the folds, a hood with a torn drawstring, a small hand-painted orange water-drop shape on the chest, damp stains and creeping black mould along the hem, propped against a stilt-house post on a rain-slick kampong porch.",
     "description": "Worn by those who guard/control Federation water distribution. Mapped to the manual's UCL Officers Uniform tier: light, breathable rainwear rather than combat armor.",
     "stats": {
       "ac": 2,
@@ -1066,7 +1066,7 @@ export const itemDatabase = {
     "name": "Scrap Electronics",
     "type": "component",
     "icon": "art/scrap_electronics.jpg",
-    "image_prompt": "A small tangle of salvaged electronics — coiled wiring, a cracked circuit board, and a couple of corroded battery cells — bundled together with a rubber band, solder points tarnished green, in a woven rattan basket on a kampung porch.",
+    "image_prompt": "A small tangle of salvaged electronics — coiled wiring, a cracked circuit board, and a couple of corroded battery cells — bundled together with a rubber band, solder points tarnished green, in a woven rattan basket on a kampong porch.",
     "description": "Wiring, boards, cells — generic electronics crafting.",
     "stackable": true,
     "weight": 0.2,
@@ -1199,7 +1199,7 @@ export const itemDatabase = {
     "name": "Can of Food",
     "type": "consumable",
     "icon": "art/can_of_food.jpg",
-    "image_prompt": "A dented tin can of preserved food, the paper label torn and faded showing a painted vegetable illustration, a rusted pull-ring lid, a thin smear of grease around the rim, on a kitchen shelf in a kampung house, tins and jars beside it.",
+    "image_prompt": "A dented tin can of preserved food, the paper label torn and faded showing a painted vegetable illustration, a rusted pull-ring lid, a thin smear of grease around the rim, on a kitchen shelf in a kampong house, tins and jars beside it.",
     "description": "From the manual — the original baseline food item.",
     "effect": "Restores 30 Hunger",
     "stats": {
@@ -1260,9 +1260,9 @@ export const itemDatabase = {
     "id": "cicak_on_a_stick",
     "name": "Cicak on a Stick",
     "type": "consumable",
-    "icon": "art/cicak_on_a_stick.jpg",
+    "icon": "",
     "description": "A grilled house lizard on a skewer — street food born of necessity. There is always another cicak.",
-    "image_prompt": "A small grilled lizard skewered on a bamboo stick, charred and salted, street-food style presentation, on a five-foot-way shophouse step, rain dripping from the eaves.",
+    "image_prompt": "A small grilled lizard skewered on a bamboo stick, charred and salted, street-food style. Resting on a tin plate ON A WOODEN TABLE at a roadside warung — never on the ground. Condiment tins and a chipped enamel mug soft in the background.",
     "effect": "Restores 20 Hunger",
     "stats": {
       "hunger": 20
@@ -1466,8 +1466,8 @@ export const itemDatabase = {
     "id": "med_kit",
     "name": "Med-Kit",
     "type": "consumable",
-    "icon": "art/med_kit.jpg",
-    "image_prompt": "A compact metal med-kit box with a hinged lid, faded red cross painted on top, scratched and dented corners, a small latch bent slightly out of shape, on a kampung house shelf beside a kerosene lamp.",
+    "icon": "",
+    "image_prompt": "A compact metal med-kit box with a hinged lid, faded red cross painted on top, scratched and dented corners, a small latch bent slightly out of shape, on a kampong house shelf beside a kerosene lamp.",
     "description": "From the manual: acts as a successful Medicine skill use. Heals 1d10 HP over 1d10 minutes. Single use.",
     "effect": "Heals 1d10 HP over 1d10 minutes",
     "stats": {
@@ -1619,7 +1619,7 @@ export const itemDatabase = {
     "name": "Purified Water",
     "type": "consumable",
     "icon": "art/purified_water.jpg",
-    "image_prompt": "A dented metal canteen with a screw cap on a frayed strap, condensation beading on the clean-looking water inside, a faded water-authority stamp on the side, on a kitchen shelf in a kampung house, tins and jars beside it.",
+    "image_prompt": "A dented metal canteen with a screw cap on a frayed strap, condensation beading on the clean-looking water inside, a faded water-authority stamp on the side, on a kitchen shelf in a kampong house, tins and jars beside it.",
     "description": "Direct mechanical link to the hunger/thirst system. Federation-controlled — narrative lever for the water-scarcity arc.",
     "effect": "Heals 1d4 HP, restores 30 Thirst",
     "stats": {
@@ -1906,9 +1906,9 @@ export const itemDatabase = {
     "id": "bayang_senyap",
     "name": "Bayang Senyap",
     "type": "consumable",
-    "icon": "art/bayang_senyap.jpg",
+    "icon": "",
     "description": "Skill book — pre-War spy serial, unexpectedly instructive.",
-    "image_prompt": "A pulp spy novel with a shadowed figure on the cover, cheap paper yellowed, on a workshop bench beside scattered tools.",
+    "image_prompt": "A cheap pulp magazine in the MAD magazine manner: garish colour, a crowded cartoon cover drawn with comic exaggeration, a bug-eyed would-be sneak thief tiptoeing in an absurdly over-elaborate disguise while every single person behind him watches him, deadpan. Loud hand-lettered Malay cover text and a price corner flash. Yellowed cheap paper, dog-eared corners, a coffee ring. Funny first, stealth-themed second. On a workshop bench beside scattered tools.",
     "effect": "Permanently grants +5 Sneak skill",
     "stats": {
       "skill_sneak": 5,
@@ -1988,7 +1988,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "art/hidup_di_alam_liar.jpg",
     "description": "Skill book — pre-War outdoors magazine, now read very differently.",
-    "image_prompt": "A pre-war outdoor recreation magazine, jungle photograph cover, heavily thumbed, on a kampung house shelf beside a kerosene lamp.",
+    "image_prompt": "A pre-war outdoor recreation magazine, jungle photograph cover, heavily thumbed, on a kampong house shelf beside a kerosene lamp.",
     "effect": "Permanently grants +5 Survival skill",
     "stats": {
       "skill_survival": 5,
@@ -2419,7 +2419,7 @@ export const itemDatabase = {
     "name": "Stolen Keturunan Manual",
     "type": "consumable",
     "icon": "art/stolen_keturunan_manual.jpg",
-    "image_prompt": "A leather-bound manual with a cracked spine, the cover embossed with a faded decorative border, torn pages sticking out unevenly, a smudged ink stamp marking it as stolen property, on a kampung house shelf beside a kerosene lamp.",
+    "image_prompt": "A leather-bound manual with a cracked spine, the cover embossed with a faded decorative border, torn pages sticking out unevenly, a smudged ink stamp marking it as stolen property, on a kampong house shelf beside a kerosene lamp.",
     "description": "Skill book — ties to the knowledge-scarcity theme. One-time use, permanent small skill bonus on read. No target skill was specified in the original flavor text; guessed Speech (a lineage/heritage document trading on social standing) rather than leaving it unresolved — worth confirming or retargeting.",
     "effect": "Permanently grants +5 Speech skill",
     "stats": {
@@ -2596,7 +2596,7 @@ export const itemDatabase = {
     "type": "consumable",
     "icon": "art/understanding_gut_instincts.jpg",
     "description": "Skill book — a study of intuition and threat perception.",
-    "image_prompt": "A sober academic-looking paperback on intuition, plain typographic cover, on a kampung house shelf beside a kerosene lamp.",
+    "image_prompt": "A sober academic-looking paperback on intuition, plain typographic cover, on a kampong house shelf beside a kerosene lamp.",
     "effect": "Permanently grants +5 Instinct skill",
     "stats": {
       "skill_instinct": 5,
@@ -2642,7 +2642,7 @@ export const itemDatabase = {
     "name": "Stimpak",
     "type": "consumable",
     "icon": "art/stimpak.jpg",
-    "image_prompt": "A chunky handheld medical injector with a translucent barrel of red serum, a broad ridged thumb-plunger cap, a worn red cross painted on the casing, a capped needle at the tip, scuffed metal-and-plastic housing, on a kitchen shelf in a kampung house, tins and jars beside it.",
+    "image_prompt": "A chunky handheld medical injector with a translucent barrel of red serum, a broad ridged thumb-plunger cap, a worn red cross painted on the casing, a capped needle at the tip, scuffed metal-and-plastic housing, on a kitchen shelf in a kampong house, tins and jars beside it.",
     "description": "Standard pre-war combat medical syringe — mainline 'Stimpak.' Baseline healing item; can_use_stimpaks flag already exists in RACE_RULES (Robots cannot use).",
     "effect": "Heals 1d10+10 HP",
     "stats": {
@@ -2795,8 +2795,8 @@ export const itemDatabase = {
     "id": "dinar",
     "name": "Caliphate Dinar",
     "type": "currency",
-    "icon": "art/dinar.jpg",
-    "image_prompt": "A trinitite-glazed ceramic token stamped with the Caliphate's rising-sun quarter-circle device, its glassy surface faintly iridescent, edges chipped, a worn line of Jawi calligraphy circling the rim, in an open cash tin on a market stall counter.",
+    "icon": "",
+    "image_prompt": "A single pre-war Caliphate dinar coin in close detail. Struck in pale worn gold, its whole face and rim covered in INTERLOCKING ISLAMIC GEOMETRIC PATTERN — eight-point stars, tessellated strapwork, a banded geometric border running right around the edge. At the exact centre, set into the metal, a tiny shard of green TRINITITE glass catching the light. No portrait, no face, no animal anywhere on it. Lying on dark cloth.",
     "description": "A trinitite-infused library token, granting temporary access to the Grand Library. Often treated as spiritual relics or symbols of honor ",
     "weight": 0,
     "value": 1,
@@ -2806,8 +2806,8 @@ export const itemDatabase = {
     "id": "pd",
     "name": "Protectorate Dollar",
     "type": "currency",
-    "icon": "art/pd.jpg",
-    "image_prompt": "A crisp rectangular banknote printed in green ink, a portrait of a Protectorate official at its centre, an engraved guilloché border and a woven metallic security thread, corners slightly worn, tucked into a worn leather coin pouch on a wooden table.",
+    "icon": "",
+    "image_prompt": "A Protectorate Dollar coin designed by engineers who could not leave anything simple. NO FACE, NO PORTRAIT. Instead: concentric machined rings, a fine engine-turned guilloche field, raised index marks around the rim like a dial, tiny stamped tolerance figures, two small rivet-like bosses, and a milled edge. The Protectorate's own emblem struck at the centre. Dark tarnished brass and steel, honestly worn. It reads as an instrument part that happens to be money. On a wooden table.",
     "description": "A tightly controlled currency distributed by the Protectorate.",
     "weight": 0,
     "value": 1,
@@ -2844,7 +2844,7 @@ export const itemDatabase = {
     "type": "junk",
     "icon": "art/broken_pressure_cooker.jpg",
     "image_prompt": "A dented aluminum pressure cooker with a cracked gauge and a missing handle, the lid seal perished and peeling, soot staining the underside, a faded enamel floral pattern on the body, half-buried in wet leaf litter at the edge of a jungle trail.",
-    "description": "A dented kitchen pressure cooker — a kampung kitchen staple before the bombs.",
+    "description": "A dented kitchen pressure cooker — a kampong kitchen staple before the bombs.",
     "scrap_yield": {
       "scrap_metal": 2,
       "chemicals": 1
@@ -2976,7 +2976,7 @@ export const itemDatabase = {
     "type": "junk",
     "icon": "art/empty_kerosene_tin.jpg",
     "image_prompt": "A rectangular tin kerosene container with a narrow pour spout, dented sides blooming with orange-brown rust through worn red paint, a faded Malay-script minyak tanah label painted across one face, propped against a chain-link fence post overgrown with vines.",
-    "description": "A rusted kerosene tin, the kind kampung households kept for the stove.",
+    "description": "A rusted kerosene tin, the kind kampong households kept for the stove.",
     "scrap_yield": {
       "scrap_metal": 2,
       "chemicals": 1
@@ -3276,7 +3276,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "big_guns",
     "icon": "art/fat_man.jpg",
-    "image_prompt": "A squat mini-nuke launcher with a spherical drum magazine loaded atop a short thick barrel, a stubby targeting scope, chipped mustard-yellow paint over dented steel, a faded radiation trefoil painted on the side, bulky enough to brace against the shoulder with both arms, propped beside a rain barrel on a flooded kampung five-foot-way.",
+    "image_prompt": "A squat mini-nuke launcher with a spherical drum magazine loaded atop a short thick barrel, a stubby targeting scope, chipped mustard-yellow paint over dented steel, a faded radiation trefoil painted on the side, bulky enough to brace against the shoulder with both arms, propped beside a rain barrel on a flooded kampong five-foot-way.",
     "description": "Unique/Quest-leaning Big Guns tier weapon — mini-nuke launcher, extremely rare ordinance. Tier 4 (Unique) — deliberately exceeds the standard tier ceiling given its rarity and narrative weight, but bounded rather than an automatic kill against high-DR targets.",
     "stats": {
       "clip_size": 1,
@@ -3311,14 +3311,14 @@ export const itemDatabase = {
   },
   gatling_gun: {
     "id": "gatling_gun",
-    "name": "Gatling Gun",
+    "name": "Hand-Cranked Gatling Gun",
     "type": "weapon",
     "slot": "hand",
     "size": "large",
     "two_handed": true,
     "skill": "big_guns",
-    "icon": "art/gatling_gun.jpg",
-    "image_prompt": "A rotary multi-barrel gatling gun with six thick steel barrels bundled around a central spindle, pitted with rust and old scorch marks, a hand-crank housing bolted to one side, its bulk heavy enough to need bracing with both arms, laid on a rattan mat inside a bamboo lookout shack.",
+    "icon": "",
+    "image_prompt": "A HAND-CRANKED gatling gun: six thick steel barrels bundled around a central spindle, a prominent side-mounted crank handle a man turns by hand, a brass-and-steel receiver housing. Not motorised and not a minigun — the crank is the point. Pitted with rust and old scorch marks, heavy enough to need bracing with both arms. Laid on a rattan mat inside a bamboo lookout shack.",
     "description": "Big Guns tier heavy ballistic weapon, alternative to the Minigun. Burst/sustained-fire capable. Tier 2, per-bullet damage.",
     "stats": {
       "clip_size": 100,
@@ -3430,9 +3430,9 @@ export const itemDatabase = {
     "size": "oversized",
     "two_handed": true,
     "skill": "melee_weapons",
-    "icon": "art/corroded_minigun_barrel_club.jpg",
+    "icon": "",
     "description": "A rotary minigun barrel cluster, seized solid with rust and repurposed as the heaviest melee weapon around.",
-    "image_prompt": "A rusted rotary minigun barrel cluster repurposed as a heavy improvised club, six fused barrels, welded handle grip, oversized wasteland weapon, resting across a canoe paddle propped on a jungle riverbank.",
+    "image_prompt": "A length of minigun barrel cluster hacked out of a wrecked rotary gun and used as a club. The cut is CRUDE — the barrels were sawn and torn through at an angle, ends ragged and flared where the metal gave way, several of them bent and splayed out of true rather than parallel. Three or four barrels, not a neat six. Deep orange rust across every surface, a grip of wound wire and tape at the sawn end. Salvaged by someone with no proper tools. Resting across a canoe paddle propped on a jungle riverbank.",
     "stats": {
       "dmg": "2d6+4",
       "dmgType": "normal",
@@ -3471,7 +3471,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "energy_weapons",
     "icon": "art/gauss_pistol.jpg",
-    "image_prompt": "A compact electromagnetic pistol with an exposed coil barrel wound in copper wire, brushed steel casing scorched at the muzzle, a small crystal capacitor glowing faintly blue-green through a cracked housing panel, propped beside a rain barrel on a flooded kampung five-foot-way.",
+    "image_prompt": "A compact electromagnetic pistol with an exposed coil barrel wound in copper wire, brushed steel casing scorched at the muzzle, a small crystal capacitor glowing faintly blue-green through a cracked housing panel, propped beside a rain barrel on a flooded kampong five-foot-way.",
     "description": "Rare tier electromagnetic sidearm.",
     "stats": {
       "clip_size": 12,
@@ -3914,7 +3914,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "unarmed",
     "icon": "art/boxing_gloves.jpg",
-    "image_prompt": "A pair of padded boxing gloves, cracked red leather peeling at the seams, foam stuffing poking through a split knuckle, the laces frayed and knotted, a faded gym stamp barely visible on the cuff, propped beside a rain barrel on a flooded kampung five-foot-way.",
+    "image_prompt": "A pair of padded boxing gloves, cracked red leather peeling at the seams, foam stuffing poking through a split knuckle, the laces frayed and knotted, a faded gym stamp barely visible on the cuff, propped beside a rain barrel on a flooded kampong five-foot-way.",
     "description": "Normal tier unarmed weapon. Intentionally low tier; padded gloves deal less damage by design — the manual's own number, kept as-is.",
     "stats": {
       "dmg": "1d2+MD",
@@ -4065,8 +4065,8 @@ export const itemDatabase = {
     "size": "medium",
     "two_handed": true,
     "skill": "melee_weapons",
-    "icon": "art/katana.jpg",
-    "image_prompt": "An imported katana with a slightly curved steel blade showing a faint hamon line beneath a film of surface rust, a frayed cord-wrapped hilt, a worn brass guard, the scabbard long since lost, half-buried in wet leaf litter at the edge of a jungle trail.",
+    "icon": "",
+    "image_prompt": "An imported katana kept in excellent condition by someone who knows its worth. The blade is clean and bright with a clear hamon line and NO rust whatsoever, the cord-wrapped hilt tight and unfrayed, the brass guard polished, the lacquered scabbard intact beside it. MOUNTED ON A WOODEN RACK ON THE WALL of a kampong house, above a doorway, carved timber and woven panels around it. Cared for, not scavenged.",
     "description": "Rare/Signature tier bladed weapon, imported relic. Tier 3 (Rare/Signature) — scaled down from the manual's Claymore-tier numbers to fit the 7-10 round target.",
     "stats": {
       "dmg": "2d8+6+MD",
@@ -4334,7 +4334,7 @@ export const itemDatabase = {
     "two_handed": false,
     "skill": "melee_weapons",
     "icon": "art/parang.jpg",
-    "image_prompt": "A real Malay jungle blade with a broad slightly curved steel edge honed from daily use, a plain worn wooden handle darkened with sweat and oil, a simple leather sheath scuffed along the seams, propped beside a rain barrel on a flooded kampung five-foot-way.",
+    "image_prompt": "A real Malay jungle blade with a broad slightly curved steel edge honed from daily use, a plain worn wooden handle darkened with sweat and oil, a simple leather sheath scuffed along the seams, propped beside a rain barrel on a flooded kampong five-foot-way.",
     "description": "A real Malay jungle blade, functioning as the setting's everyday tool-turned-survival-weapon.",
     "stats": {
       "dmg": "TBA",
@@ -4688,7 +4688,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "art/sniper_rifle.jpg",
-    "image_prompt": "A long-range rifle with a heavy bull barrel and a scoped sight mounted along the top rail, worn matte-black finish scratched to bare steel, a bipod folded beneath the stock, a faded unit marking near the grip, propped against a stilt-house post on a rain-slick kampung porch.",
+    "image_prompt": "A long-range rifle with a heavy bull barrel and a scoped sight mounted along the top rail, worn matte-black finish scratched to bare steel, a bipod folded beneath the stock, a faded unit marking near the grip, propped against a stilt-house post on a rain-slick kampong porch.",
     "description": "Rare/Signature-leaning Normal tier rifle, long range and high single-shot damage. Tier 3 (Rare/Signature).",
     "stats": {
       "clip_size": 5,
@@ -4879,7 +4879,7 @@ export const itemDatabase = {
     "two_handed": true,
     "skill": "small_guns",
     "icon": "art/riot_shotgun.jpg",
-    "image_prompt": "A Federation crowd-control shotgun with a short barrel and a folding wire stock, blued steel receiver and barrel worn through to bright bare metal along every edge, NO PAINTED FACTION COLOUR OF ANY KIND, a sling loop riveted to the side, propped against a stilt-house post on a rain-slick kampung porch.",
+    "image_prompt": "A Federation crowd-control shotgun with a short barrel and a folding wire stock, blued steel receiver and barrel worn through to bright bare metal along every edge, NO PAINTED FACTION COLOUR OF ANY KIND, a sling loop riveted to the side, propped against a stilt-house post on a rain-slick kampong porch.",
     "description": "Faction-Issued leaning Normal tier shotgun, Federation crowd-control standard. Tier 2 (Faction-Issued).",
     "stats": {
       "clip_size": 12,

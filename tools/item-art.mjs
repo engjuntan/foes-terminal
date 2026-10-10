@@ -137,7 +137,12 @@ const hasArt = item => isLinked(item.icon || '');
 // the moment it grows a lawn. Armor keeps the wet, rusted, hard-used
 // world; it just isn't overgrown by it.
 const CLIMATE_WORN = 'Equatorial Malaya after 170 years of rain: rust weeping in dark streaks, salt and sweat staining, scuffed and scratched surfaces, damp and recently rained on, red laterite mud worked into the seams. NO moss, NO algae, NO lichen, NO mould, NO green growth of any kind on the object. No dust, no sand, no arid cracked earth.';
-const WORN_TYPES = new Set(['armor', 'accessory']);
+// Moss belongs on scavenged scenery, not on things people carry and use.
+// This was armor+accessory only, so a mini-nuke, a microfusion cell and a
+// med-kit still got the full monsoon clause and came back green. GM: 'the
+// material is metal/cloth, it shouldn't have the mossy greens, the rust is
+// fine'. Junk keeps it — junk IS scenery.
+const WORN_TYPES = new Set(['armor', 'accessory', 'ammo', 'consumable', 'component', 'currency']);
 const styleFor = item => (WORN_TYPES.has(item.type) ? STYLE.replace(CLIMATE, CLIMATE_WORN) : STYLE);
 const fullPrompt = item => `${styleFor(item)} Subject: ${(item.image_prompt || '').replace(LEGACY_TAIL, '').trim()}`;
 

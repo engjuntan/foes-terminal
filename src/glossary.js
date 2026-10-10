@@ -85,12 +85,38 @@ export const glossaryDatabase = {
       "01_World Details"
     ]
   },
+  pendekar: {
+    "id": "pendekar",
+    "name": "Pendekar",
+    "aliases": [
+      "Pendekars"
+    ],
+    "strict_aliases": [],
+    "summary": "Pendekar is the general term on the Peninsula for the wanderers of the Peninsula Wastes: scavengers, couriers, hired guns and anyone else who lives out of a pack and sleeps wherever the roof is still on.",
+    "category_path": [
+      "01_World Details"
+    ]
+  },
+  peninsula_wastes: {
+    "id": "peninsula_wastes",
+    "name": "Peninsula Wastes",
+    "aliases": [
+      "the Wastes",
+      "Peninsular Wastes",
+      "The Peninsular Wastes"
+    ],
+    "strict_aliases": [],
+    "summary": "The Peninsula Wastes is the post-war name for the Malay Peninsula, the irradiated, overgrown country that runs from the Thai border down to the Straits of Johor.",
+    "category_path": [
+      "01_World Details"
+    ]
+  },
   protiga: {
     "id": "protiga",
     "name": "ProTiga",
     "aliases": [],
     "strict_aliases": [],
-    "summary": "ProTiga was one of the largest pre-war megacorporations on the Peninsula, formed through the merger of Petrogas, ProCars Automotive, and Tenaga Nasional.",
+    "summary": "ProTiga was one of the largest pre-war megacorporations on the Peninsula, formed through the merger of Petrogas, ProCars Automotive, and Tenaga.",
     "category_path": [
       "01_World Details"
     ]
@@ -115,6 +141,18 @@ export const glossaryDatabase = {
       "01_World Details"
     ]
   },
+  sungai_construction: {
+    "id": "sungai_construction",
+    "name": "Sungai Construction",
+    "aliases": [
+      "Sungai Construction Berhad"
+    ],
+    "strict_aliases": [],
+    "summary": "Sungai Construction was a pre-war Malayan construction and property company that built new townships on worked-out tin-mining land, selling the dream of a modern home with a lake view, the lake being the old mine pool.",
+    "category_path": [
+      "01_World Details"
+    ]
+  },
   the_sepuluh_ribu_cipher: {
     "id": "the_sepuluh_ribu_cipher",
     "name": "The Sepuluh Ribu Cipher",
@@ -130,7 +168,7 @@ export const glossaryDatabase = {
     "name": "Timeline of Major Events",
     "aliases": [],
     "strict_aliases": [],
-    "summary": "2000s - 2020s - China aggressively attempts to wrest control of the South China Sea.",
+    "summary": "The Timeline of Major Events follows the Peninsula from the last decades before the Great War to 2247, the year the campaign begins.",
     "category_path": [
       "01_World Details"
     ]
@@ -339,9 +377,12 @@ export const glossaryDatabase = {
   pahlawan: {
     "id": "pahlawan",
     "name": "Pahlawan",
-    "aliases": [],
+    "aliases": [
+      "Pahlawans",
+      "Pencari"
+    ],
     "strict_aliases": [],
-    "summary": "The Pahlawan are spiritual pilgrims of the Caliphate who undertake a personal _Hajj_ in accordance with The Path.",
+    "summary": "Pahlawan are the Caliphate's elite militia, not an army: pilgrims on a personal _Hajj_ who defend its towns from the Great Jungle.",
     "category_path": [
       "02_Factions",
       "The Caliphate"
@@ -356,7 +397,7 @@ export const glossaryDatabase = {
       "Caliphate"
     ],
     "strict_aliases": [],
-    "summary": "The Caliphate is the blanket name for the autonomous region of the 🏜️Chukai Desert where towns and villages are united but not necessarily governed under a new, evolved version of a pre-war religion known simply as The Path.",
+    "summary": "The Caliphate is the blanket name for the autonomous region of the Chukai Desert where towns and villages are united but not necessarily governed under a new, evolved version of a pre-war religion known simply as The Path.",
     "category_path": [
       "02_Factions",
       "The Caliphate"
@@ -417,7 +458,7 @@ export const glossaryDatabase = {
     "name": "Federation–Protectorate Labor Exchange",
     "aliases": [],
     "strict_aliases": [],
-    "summary": "A labor exchange program proposed by the Federation for peace between them.",
+    "summary": "A labor exchange program, proposed by the Federation and signed in 2230, for peace between them.",
     "category_path": [
       "02_Factions",
       "The Federation"
@@ -456,7 +497,7 @@ export const glossaryDatabase = {
     "strict_aliases": [
       "Kosongs"
     ],
-    "summary": "The Kosongs are a caste of Protectorate made lobotomized laborers, created as part of the Federation–Protectorate Labor Exchange deal.",
+    "summary": "The Kosongs are a caste of Protectorate made lobotomized laborers, first made after the Great Ghoul Massacre and exported under the 2230 Federation–Protectorate Labor Exchange deal.",
     "category_path": [
       "02_Factions",
       "The Federation"
@@ -874,7 +915,7 @@ export const glossaryDatabase = {
     "name": "ProTiga HQ",
     "aliases": [],
     "strict_aliases": [],
-    "summary": "ProTiga HQ is a dominating bomb-proof, quake-proof tower in North Bandawang, relatively short at twenty floors but built to outlast the apocalypse — its bulletproof windows have survived two centuries, dusty and pockmarked with bullet holes, some smashed in on the lower floors…",
+    "summary": "ProTiga HQ is a dominating bomb-proof, quake-proof tower in North Bandawang, relatively short at twenty floors but built to outlast the apocalypse — its bulletproof windows have survived nearly two centuries, dusty and pockmarked with bullet holes, some smashed in on the lower…",
     "category_path": [
       "Locations",
       "Bandawang"
@@ -962,7 +1003,7 @@ export const glossaryDatabase = {
     "name": "The Protectron Yard",
     "aliases": [],
     "strict_aliases": [],
-    "summary": "The Protectron Yard is a construction site in Bandawang Baru where nine Construction Protectrons are raising a new neighbourhood: a row of homes and a large community centre at its heart.",
+    "summary": "The Protectron Yard is a construction site in Bandawang Baru where seven rusting pre-war Protectrons are still building the housing estate their developer, Sungai Construction, abandoned in 2077: a row of homes with a large community centre at its heart.",
     "category_path": [
       "Locations",
       "Bandawang"
@@ -1029,6 +1070,18 @@ export const glossaryDatabase = {
       "Locations"
     ]
   },
+  chukai_desert: {
+    "id": "chukai_desert",
+    "name": "Chukai Desert",
+    "aliases": [
+      "Chukai"
+    ],
+    "strict_aliases": [],
+    "summary": "The Chukai Desert is a vast, irradiated expanse along the East Coast of the Peninsula.",
+    "category_path": [
+      "Locations"
+    ]
+  },
   frim: {
     "id": "frim",
     "name": "FRIM",
@@ -1067,6 +1120,18 @@ export const glossaryDatabase = {
     "aliases": [],
     "strict_aliases": [],
     "summary": "The Great Jungle is an anomaly.",
+    "category_path": [
+      "Locations"
+    ]
+  },
+  ivory_tower: {
+    "id": "ivory_tower",
+    "name": "Ivory Tower",
+    "aliases": [
+      "the Red Light"
+    ],
+    "strict_aliases": [],
+    "summary": "The Ivory Tower is the seat of the Protectorate: a pre-war tower of cream concrete, more than sixty storeys of it, standing over the Fortress City of Penang, where the Grand Architect and the Directorate rule and the Divisions keep their offices and laboratories.",
     "category_path": [
       "Locations"
     ]
@@ -1111,7 +1176,7 @@ export const glossaryDatabase = {
       "Perdana"
     ],
     "strict_aliases": [],
-    "summary": "The Perdana Bunker is the primary residential and administrative heart of the 01_Federation of Malaya, located beneath the ruins of the pre-war transportation hub KL Sentral.",
+    "summary": "The Perdana Bunker is the primary residential and administrative heart of the 01_Federation of Malaya, located beneath the ruins of the old central station of Kuala Lumpur.",
     "category_path": [
       "Locations"
     ]
@@ -1123,7 +1188,19 @@ export const glossaryDatabase = {
       "Bandar Bulat"
     ],
     "strict_aliases": [],
-    "summary": "Built in the deep wound of a long-forgotten nuclear crater, the Round City is the spiritual and intellectual center of the Caliphate located in the 🏜️Chukai Desert.",
+    "summary": "Built in the deep scar of a lesser nuclear crater at the desert's edge, long since half-filled with sand, the Round City is the spiritual and intellectual center of the Caliphate located in the Chukai Desert.",
+    "category_path": [
+      "Locations"
+    ]
+  },
+  the_crater_line: {
+    "id": "the_crater_line",
+    "name": "The Crater Line",
+    "aliases": [
+      "Crater Line"
+    ],
+    "strict_aliases": [],
+    "summary": "The Crater Line is a band of old shell craters across the mainland south and east of the Fortress City of Penang, marking the furthest reach of the Protectorate's guns as far as anyone can tell.",
     "category_path": [
       "Locations"
     ]
@@ -1169,18 +1246,6 @@ export const glossaryDatabase = {
     ],
     "strict_aliases": [],
     "summary": "The Wira Bunker is the primary industrial and military installation of the 01_Federation of Malaya, located beneath the ruins of the pre-war industrial hub of Shah Alam.",
-    "category_path": [
-      "Locations"
-    ]
-  },
-  chukai_desert: {
-    "id": "chukai_desert",
-    "name": "Chukai Desert",
-    "aliases": [
-      "Chukai"
-    ],
-    "strict_aliases": [],
-    "summary": "The Chukai Desert is a vast, irradiated expanse along the East Coast of the Peninsula.",
     "category_path": [
       "Locations"
     ]

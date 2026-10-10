@@ -1040,3 +1040,130 @@ it, for players and GM.
 
 **Recipes are unlockable.** The GM grants recipes like data logs; the
 Workshop only offers what a character has been taught.
+
+## The Chukai Desert, the Emerald Sea and the Caliphate — GM rulings (2026-10-06)
+
+- **The Emerald Sea is a desert, not water.** It is the Chukai's own name
+  after dark: the trinitite plain glittering green under the moon. No note
+  gives it a shore, tides or a body of water.
+- **No oil derricks** in the Chukai or the Round City. Refineries, tank
+  farms, flare stacks and chemical works stay. (Also the real-world
+  answer: Terengganu's oil is all offshore.) The Round City's mast antenna
+  comes from a refinery flare stack; the "On the Salt" log opens on stacks.
+- **The Library Token and the Caliphate Dinar are one item**: a
+  trinitite-infused pre-war library card, the Grand Library's key, issued
+  and controlled by the Stewards. The late-return death penalty stays.
+- **Proposed by the lore-keeper and applied, pending GM objection:** several
+  warheads hit the coast. The largest left the Ring (empty, holy, the
+  navigation mark); a lesser strike at the desert's edge opened the buried
+  shelter that is the Grand Library, and the Round City stands in that
+  smaller, half-filled crater. The Library came first and the walls were
+  built because of it. Reading is open to anyone; a Dinar lends a Library
+  copy, opens the terminals and the deeper stacks. "Heaven" replaces "God"
+  in the Chukai note (The Path is agnostic). The Library's own water plant
+  still runs (GM callout only).
+- **Still open:** whether the Ring and the city's crater are two features
+  (applied) or one; what the Library was before the war; whether Faiz's
+  errand is for a Caliphate presence in the East or the West Coast (the
+  Faiz note and this log say East, the Caliphate note and org map say West).
+
+## The consolidated timeline — GM rulings (2026-10-06)
+
+- **One Great Ghoul Massacre, 2130–2132, before the Federation exists.** The
+  Sepuluh Ribu are the original defenders of KLB until the Chosen emerge in
+  2150; the Massacre has already broken them, and the war they then fight
+  against the Chosen is the one they cannot win, ended by Tunku Adnan Rafa's
+  truce (2150–2157). The Protectorate's centralisation stays 2115 (the
+  Protectorate faction note said 2130 and was changed).
+- **The Northern Conflict document is the future-future timeline.** Its
+  2196 invasion, 2198 "defensive victory", the Gajah war, the explorers and
+  the spy incident are NOT in the canon timeline. Its 2245/2248/2250 dates
+  stay deprecated; the Kingdom of Malaya appears only in a GM callout.
+- **New Federation Blues is set in 2247**, the weeks after the Kelam Sungai
+  explosion, alongside the main campaign's opening. The Ghoul King's rise
+  in the Sword and Prime Minister notes is now rumour, or in a GM callout.
+- **The Chosen emerge in 2150; the Federation is constituted in 2157** with
+  Tunku Adnan Rafa as first Prime Minister (terms from the GM's v1 draft).
+  Perdana Bunker is under the old central station of KL; Harapan alone is
+  under Putrajaya, sealed.
+- **Triad and Rakan Watch (ages checked):** the triad is forced out of
+  Abave in the 2190s (Sam Lim, b. ~2182, is a boy; his father leads the
+  retreat). The Rakan Watch is formed by Boss Bob's father; Bob (b. ~2202)
+  takes over in the 2220s. Ketua Bob's note now says the Watch "would not
+  have held together" without him, not "formed".
+- **Defaults applied:** PCI launched 2232; Wataniah reformed around 2200;
+  Jeb Rafa is Tunku Adnan's great-grandson; Baru Setar and Qal'at as-Petani
+  in the one 2230 entry; Gergasi undated in player text; "Razak Hashim"
+  becomes Razwan; Daz's defeat is "decades ago".
+- **The Caliphate in the timeline** follows the Chukai ruling above: Syed
+  finds the buried shelter in the 2160s; the Caliphate forms as a defensive
+  union in the 2200s; the Grand Library Mosque is finished in the 2220s.
+
+## The Pahlawan, the Wastes and the map — GM rulings (2026-10-06, later)
+
+- **Pahlawan character (GM's own statements, now in the note):** the
+  Caliphate is unaggressive and likes helping people; its Pahlawan are
+  quick defenders against the Great Jungle's monsters. They are not an
+  army but dogmatic ideologues who, through the journey, become upstanding
+  members of the town or village they came from. The Caliphate is a
+  disparate confederacy of towns that refuses a standing army for fear of
+  warlords; the Pahlawan are its elite militia. Very loyal to their
+  kampong. Skilled infiltrators, usually in civilian clothes: if you can
+  recognise one, they wanted to be seen. War gear is individual.
+- **The House of Syed sends Pahlawan, but only blesses them**: a blessing
+  on the journey, not an order.
+- **Names, not ranks:** a new Pahlawan is a **Pencari**; only the
+  experienced, or those who come home with missions done, are called
+  **Pahlawan**; veterans are **Otai**. None carries command.
+- **The Peninsula Wastes** is the post-war name for Malaysia (as Fallout 3
+  has the Capital Wastes). Those who wander it are **Pendekar**. Both are
+  glossary entries in `01_World Details`.
+- **House spelling is "kampong"** (both spellings are real; this is the
+  house one). Swept vault-wide, transcripts excepted.
+- **The Caliphate** began as nomadic desert dwellers and coalesced into
+  today's Confederation. Its towns are small-town Malaysian life, never
+  generic desert townsfolk.
+- **Every Pahlawan carries a keris** — the one constant across individual
+  kits. No religious imagery on their gear (no prayer beads, no talismans).
+- **The Visual Standard Bible is older than the GM's current direction.**
+  Where they disagree, what the GM says now wins; flag the clash. Its
+  Pahlawan brief (§7.4, §9.6) was rewritten to the individual look.
+- **The Path needs a sensitivity relook** (a theological evolution of
+  Islam that cannot be called Islam). Parked on the Future Ideas board.
+- **The faction map** is transcribed in `PENINSULA_MAP.md`, mapped to
+  modern Malaysia. The crater line runs along the edges of the
+  Protectorate's territory, around Kulim.
+
+## The Prewar series and twelve data logs — GM rulings (2026-10-06)
+
+- **Prewar Data Logs is its own folder** (`Found Texts/Prewar Data Logs/`).
+  All pre-war logs live there, including the new ones. Abave Journal 1
+  stays with its five-part series. The terminal builds its folder tree from
+  the vault folders, so the group appears after a sync with no code change.
+- **Bomb time: Fallout's.** The first strikes reach Malaya at about 9:47 PM
+  on Saturday 23 October 2077. Abave Journal 1 was changed to match (the
+  flash comes at the baccarat tables after dinner, not at breakfast).
+- **Sungai Construction** is a pre-war construction and property company
+  (a Sunway analogue; the name is the GM's choice). It built the three
+  bunkers jointly with ProTiga, and its unfinished Bandawang estate, Taman
+  Seri Bandawang, is today's Protectron Yard.
+- **Protectron Yard:** seven rusted RobCo Protectrons the Rakan Watch calls
+  "the useless machines", named in Malay after the seven dwarfs (Doktor,
+  Bengkeng, Ceria, Mengantuk, Pemalu, Bersin, Dungu). The eighth, the
+  Foreman, is a player character and appears only in a GM callout.
+- **ProTiga's merger** (2056) is Petrogas, ProCars Automotive and Tenaga
+  ("Tenaga", never "Tenaga Nasional"). The American rival is Poseidon
+  Energy; its forecourt brand is Poseidon Oil.
+- **New locations:** the Ivory Tower (the Protectorate's seat, with its lone
+  red light and geodesic dome at the base) and the Crater Line (the shell
+  craters marking where the Protectorate's guns stopped in 2132).
+- **The UCL as a trade phenomenon (proposal, not yet ruled):** the UCL's
+  "Huìlì Traders" sell cheaper goods that exist, and the old merchant
+  houses lose their customers. Wording rules: name the institution and the
+  trade, never the ethnicity; Chinese Malayan towkays are the sympathetic
+  losers; jokes hit subsidies, quotas and slogans, never people.
+- **Cheryl Chia** signs as "School of Infrastructure, Directorate of
+  Infrastructure". The vault has five Divisions; "Schools" exist only in
+  brainstorm notes, so the Division name stays beside the School.
+- **Secrets moved into GM callouts:** the Kancil Orphanage's child-labour
+  secret and the Fallen Gong's missile-silo-lid secret were in player text.

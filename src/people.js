@@ -31,7 +31,7 @@ export const peopleDatabase = {
     "id": "big_ben",
     "name": "Big Ben",
     "type": "person",
-    "body": "Big Ben is the Gergasi who stands at the gate of Syurga dressed as a clock tower.\n\nIshtar wanted a Big Ben for the Proper English Casino and could not build one, so she hired the largest thing in Bandawang and put a costume on him. The costume is homemade, enormous, and bad: a plywood-and-scrap-tin spire roped to his head, a long coat hand-painted to look like stonework, a cardboard clock face hanging crooked on his chest with its hands permanently bent. It does not look like Big Ben. It looks like a very large person wearing a poor costume of Big Ben, which is exactly what it is.\n\nHe does not mind. Big Ben takes the job seriously in the way that matters — he turns up, he stands where he is told, and he is unfailingly gentle with the children who come to stare at him. He answers to \"Ben\". Nobody has told him the tower he is dressed as burned down with the rest of London, and nobody is going to.\n\nFaction: Syurga — employed, not owned.\n\nBackground: Like every Gergasi on the Peninsula, how he got here is nobody's idea of settled history. He was in Bandawang before Syurga broke ground, doing heavy lifting at the Scrapyard for food, and Ishtar's recruiter found him there. He took the costume job because it pays in tinned meat and nobody at the gate asks him to hit anyone.",
+    "body": "Big Ben is the Gergasi who stands at the gate of Syurga dressed as a clock tower.\n\nIshtar wanted a Big Ben for the Proper English Casino and could not build one, so he hired the largest thing in Bandawang and put a costume on him. The costume is homemade, enormous, and bad: a plywood-and-scrap-tin spire roped to his head, a long coat hand-painted to look like stonework, a cardboard clock face hanging crooked on his chest with its hands permanently bent. It does not look like Big Ben. It looks like a very large person wearing a poor costume of Big Ben, which is exactly what it is.\n\nHe does not mind. Big Ben takes the job seriously in the way that matters — he turns up, he stands where he is told, and he is unfailingly gentle with the children who come to stare at him. He answers to \"Ben\". Nobody has told him the tower he is dressed as burned down with the rest of London, and nobody is going to.\n\nFaction: Syurga — employed, not owned.\n\nHis best friend is Orange Peng; the two sit together in class at The Education Center.\n\nBackground: Like every Gergasi on the Peninsula, how he got here is nobody's idea of settled history. He was in Bandawang before Syurga broke ground, doing heavy lifting at the Scrapyard for food, and Ishtar's recruiter found him there. He took the costume job because it pays in tinned meat and nobody at the gate asks him to hit anyone.",
     "category_path": [
       "People"
     ]
@@ -49,7 +49,7 @@ export const peopleDatabase = {
     "id": "cheryl_chia",
     "name": "Cheryl Chia",
     "type": "person",
-    "body": "Cheryl Chia is a cute and curious Protectorate scientist travelling the Peninsula.\n\nFaction: The Protectorate\n\nBackground: A young Protectorate citizen going out into the world to explore, with a solid engineering background. She wants to study the Kapcai, and how to make it better.\n\nDescription: A small, petite Chinese girl wearing a dirty T-shirt and mechanic's coveralls, her hair tied back in a messy bun.",
+    "body": "Cheryl Chia is a cute and curious Protectorate scientist travelling the Peninsula.\n\nFaction: The Protectorate\n\nBackground: A young Protectorate citizen going out into the world to explore, with a solid engineering background. She wants to study the Kapcai, and how to make it better. She has found a second subject she was not sent to study: the Caliphate's Pahlawan. She has very little patience for people and an unlimited amount for questions.\n\nDescription: A small, petite Chinese girl wearing a dirty T-shirt and mechanic's coveralls, her hair tied back in a messy bun.",
     "category_path": [
       "People"
     ]
@@ -76,7 +76,7 @@ export const peopleDatabase = {
     "id": "daz",
     "name": "Daz",
     "type": "person",
-    "body": "Daz is a cranky ghoul who holds court in the corner of the Lakeside Bar.\n\nFaction: Sepuluh Ribu\n\nBackground: Daz leads the Bandawang cell of the Sepuluh Ribu, and has long been embarrassed by their defeat at Federation hands years ago.\n\nDescription: A scowling ghoul in a halo brace, holding his neck upright. He wears a bomber jacket over a bulletproof vest with no shirt, and camo cargo pants. He twirls a 10mm pistol in his free hand, with a kopiah on his head.\n\nImportance: He's the main point of contact for reaching the Sepuluh Ribu, and can also be recruited.",
+    "body": "Daz is a cranky ghoul who holds court in the corner of the Lakeside Bar.\n\nFaction: Sepuluh Ribu\n\nBackground: Daz leads the Bandawang cell of the Sepuluh Ribu, and has long been embarrassed by their defeat at Federation hands, decades ago.\n\nDescription: A scowling ghoul in a halo brace, holding his neck upright. He wears a bomber jacket over a bulletproof vest with no shirt, and camo cargo pants. He twirls a 10mm pistol in his free hand, with a kopiah on his head.\n\nImportance: He's the main point of contact for reaching the Sepuluh Ribu, and can also be recruited.",
     "category_path": [
       "People"
     ]
@@ -121,7 +121,7 @@ export const peopleDatabase = {
     "id": "guru_besar_raj",
     "name": "Guru Besar Raj",
     "type": "person",
-    "body": "Guru Besar Raj is the headmaster of Bandawang's Education Center, and a Rakan Watch representative.\n\nFaction: Rakan Watch\n\nDescription: A ghoul dressed in a short-sleeve shirt and jeans. He carries a ruler with him at all times.",
+    "body": "Guru Besar Raj is the headmaster of Bandawang's Education Center, and a Rakan Watch representative. He keeps a remarks column on every pupil, and reads it more often than he admits.\n\nFaction: Rakan Watch\n\nDescription: A ghoul dressed in a short-sleeve shirt and jeans. He carries a ruler with him at all times.",
     "category_path": [
       "People"
     ]
@@ -157,7 +157,7 @@ export const peopleDatabase = {
     "id": "ketua_bob",
     "name": "Ketua Bob",
     "type": "person",
-    "body": "Ketua Bob is the Ketua (chief) of the Bandawang Rakan Watch — a big, loud yet kind-hearted father figure among Bandawang's civilians.\n\nFaction: Rakan Watch\n\nBackground: Back when the 1414 Triad was on the move and descending into Bandawang, the civilians — sick of the gangsterism and warfare — banded together to build their own society, naming it after Rakan, a pre-War distributor of kitchen supplies.\n\nDescription: A big, loud and abrasive father figure among the Rakans. He's always dressed in a reversed cap, wearing a faded Harimau Malaya football jersey.\n\nImportance: The Rakan Watch would not have formed without Bob. As an outspoken and loud man, he has the charisma to rally the Rakans toward making Bandawang a respectable city — though his lack of ambition, and his wish to keep his family safe, leave some wondering how long he'll stay in charge.",
+    "body": "Ketua Bob is the Ketua (chief) of the Bandawang Rakan Watch — a big, loud yet kind-hearted father figure among Bandawang's civilians.\n\nFaction: Rakan Watch\n\nBackground: Back when the 1414 Triad was on the move and descending into Bandawang, the civilians — sick of the gangsterism and warfare — banded together to build their own society, naming it after Rakan, a pre-War distributor of kitchen supplies.\n\nDescription: A big, loud and abrasive father figure among the Rakans. He's always dressed in a reversed cap, wearing a faded Harimau Malaya football jersey.\n\nImportance: The Rakan Watch was formed by Bob's father, and would not have held together without Bob. As an outspoken and loud man, he has the charisma to rally the Rakans toward making Bandawang a respectable city — though his lack of ambition, and his wish to keep his family safe, leave some wondering how long he'll stay in charge.",
     "category_path": [
       "People"
     ]
@@ -211,7 +211,7 @@ export const peopleDatabase = {
     "id": "orange_peng",
     "name": "Orange Peng",
     "type": "person",
-    "body": "Orange Peng is simple. His name, for one, is Orange. He's the brother of Janson Peng.\n\nFaction: Peng Brothers\n\nBackground: The Peng brothers are something special. Orange grew up a simpleton despite his large appearance, and can be summed up as a gentle giant.\n\nDescription: A large, hulking Chinese man, 6.5 ft tall and chubby rather than muscular, though there's real heft underneath. He's usually dressed in a shirtless, dirtied yellow coverall, and has a handsome face with a childlike, innocent sense of wonder.\n\nImportance: If his brother is hired for the heist, Orange will join too — and he'll insist on bringing Commie Bot.",
+    "body": "Orange Peng is simple. His name, for one, is Orange. He's the brother of Janson Peng.\n\nFaction: Peng Brothers\n\nHis best friend is Ben, and the two attend The Education Center together.\n\nBackground: The Peng brothers are something special. Orange grew up a simpleton despite his large appearance, and can be summed up as a gentle giant.\n\nDescription: A large, hulking Chinese man, 6.5 ft tall and chubby rather than muscular, though there's real heft underneath. He's usually dressed in a shirtless, dirtied yellow coverall, and has a handsome face with a childlike, innocent sense of wonder.\n\nImportance: If his brother is hired for the heist, Orange will join too — and he'll insist on bringing Commie Bot.",
     "category_path": [
       "People"
     ]
