@@ -129,6 +129,33 @@ the same: *does anyone look after this place?*
 
 ---
 
+## A positive subject does not clean up the world
+
+When a prompt asks for kindness, warmth or decency, the generator will
+quietly make everything else nice too: fresh paint, clean clothes, good
+light, everybody beaming. The result reads as a charity brochure and
+stops being this setting at all.
+
+**The setting does not soften for the subject.** The hall is still
+patched and water-stained, the shirts are still faded and mended, the
+concrete is still cracked, and nobody is clean. A kind act is worth
+drawing *because* the world around it is hard — remove the hardness and
+you remove the reason the picture is interesting.
+
+**Watch the recipient's face.** The Rakan Watch card came back with the
+ghoul beaming and arm-in-arm with the volunteers, which says he is used
+to this. He is not. Someone being helped for the first time in years is
+startled, wary, and does not know what to do with it. Write the reaction
+you want or the generator will write gratitude as friendship.
+
+> Why: the GM's note on the second Rakan Watch card — "now looks too
+> positive and clean… the ghoul isn't smiling and holding hands with
+> them but rather is more surprised and grateful to be helped". The
+> first version of that card failed for being cold; the second failed
+> for being warm. 12 Oct.
+
+---
+
 ## Faces
 
 **Where a prompt does not say who someone is, the generator picks — and
