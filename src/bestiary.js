@@ -6,6 +6,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Robot",
     "icon": "",
+    "image_prompt": "A squat automated gun turret of riveted steel on a bulbous 1950s housing, with a glass sensor eye, a pair of stubby cannon barrels, a rounded laser emitter and a short flame nozzle, its chrome trim pitted and scorched at the muzzles. Plain and unmarked, not a sleek modern turret. Bolted to a concrete bunker roof beside a steel gate.",
     "description": "An automated turret usually indicate fortified positions and can usually be found at places of value such as an army bases, reactors or VIP residences. Can be hacked in melee range or disabled elsewhere like a computer terminal.",
     "notes": "Can attack once in a cone fire. Must adjust view, if adjusting and attacking halve damage. Reload takes 1 turn.",
     "stats": {
@@ -102,6 +103,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "A plump kampung chicken, red-brown with black-flecked feathers, three separate heads on three necks rising from one body, each with its own bright eye, bare red wattle and sharp yellow beak. Ordinary chicken size, wing feathers ragged and sun-faded. Standing on a cracked concrete step of a kampung yard.",
     "description": "A three-headed chicken, ordinary-sized and ordinary-tempered until something sets it off — though farmers swear the ones left to feed long enough grow as big as a kerbau. The ones that end up fried still have all three heads on the plate.",
     "notes": "Has 3 attacks (one peck per head) and 1 move.",
     "stats": {
@@ -182,6 +184,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "A pig-tailed macaque, lean and grey-furred, with a bare pink-tan face, a short curled tail like a pig's tail, long canines bared in a snarl, and a bundle of stolen food clutched to its chest. Mangy patches on the shoulders, scarred ears. Perched on the sagging ridge of a palm-thatch roof.",
     "description": "A mutated beruk — lean, grey-furred and permanently furious. They travel in troops, take what they want, bite anyone slow about handing it over, and throw what they have been saving at anyone who argues.",
     "notes": "Can attack and move. Never alone: troops of three or more, and an Ibu Beruk is usually close by.",
     "stats": {
@@ -271,6 +274,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Robot",
     "icon": "",
+    "image_prompt": "A Fallout Protectron, not a humanoid android: a squat barrel-bodied robot on two stubby legs, a domed head with a single wide glowing visor band, segmented arms ending in tool claws, one arm swapped for a pneumatic nail and spike driver. Faded pre-War construction paint chipped to bare steel and rusted at the joints. Standing on a half-built concrete slab among rebar stubs.",
     "description": "A pre-War construction-site Protectron, still cycling through its work order decades after the site closed. Its nail and spike driver was never meant to be a weapon, but it swings it like one at anything that trips its motion sensor.",
     "notes": "Electrical/EMP weakness: -50 energy resistance, and an EMP effect disables it for a round. Drops ammo_nails when destroyed.",
     "stats": {
@@ -335,6 +339,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Human",
     "icon": "",
+    "image_prompt": "A Malay Federation commando in a sun-faded lavender field jacket with a high orange stand collar, brass buttons and a wide brown leather belt, a steel helmet painted lavender, a rifle held across the chest. Lean and fast, with a hard, watchful face and scuffed boots. Standing at a bullet-pocked concrete checkpoint barrier.",
     "description": "An elite Federation shock trooper, fast and lethal, sent in where regular conscripts would only break against the line.",
     "notes": "Boss immunity: One Shot One Kill instead deals 20 true damage. Relentless: may take a second full attack this turn, at -30 hit. Suggested package (BALANCE_PROPOSAL §6.5): Relentless (second attack at -30) + boss, roughly 63% win rate for a level-7 party against two Commandos.",
     "stats": {
@@ -399,6 +404,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Human",
     "icon": "",
+    "image_prompt": "A Chinese Federation frontliner in heavy plate: a lavender-painted riveted steel breastplate and shoulder guards over a lavender field jacket with an orange collar, a lavender steel helmet, and a light machine gun with a box magazine, its steel blued and worn. Not an FN MAG, not a modern squad gun. Standing behind a steel gate checkpoint.",
     "description": "A Federation Frontliner in heavy armour — the bunker state's answer to a real firefight, rarely deployed but devastating when it is.",
     "notes": "Has 1 attack and 1 move. Deployed only when the Federation commits to a fight for real.",
     "stats": {
@@ -463,6 +469,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Human",
     "icon": "",
+    "image_prompt": "An Indian Federation conscript in a sun-faded lavender field jacket with an orange collar and brass buttons, a lavender-painted WW1-pattern steel helmet a size too big, and an old bolt-action hunting rifle with a worn wooden stock and frayed sling. Not a military service rifle. Thin and earnest, standing by a lamppost on a cracked tarmac road.",
     "description": "A Federation of Malaya conscript, drilled well but supplied poorly — the bunker state's citizen army, sent out in whatever's left in the armoury.",
     "notes": "Has 1 attack and 1 move. Poorly equipped next to Protectorate regulars; noticeably weaker against energy weapons.",
     "stats": {
@@ -527,6 +534,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Ghoul",
     "icon": "",
+    "image_prompt": "A Fallout ghoul: skin like cracked sun-dried leather in mottled grey and raw pink, split open in places to the flesh, no nose, no hair, lipless mouth drawn back from the teeth, long clawed fingers, rotted rags hanging from its hips. Hunched and hungry. Not a scarred man, not a burn victim, not a weathered human. Standing at the mouth of a concrete storm drain.",
     "description": "A ghoul who lost the fight for their own mind. No citizenship, no 'uncle' or 'auntie' — just hunger and claws, shambling in packs toward anything that moves.",
     "notes": "Has 1 attack and 1 move. Rad immune. Weak to fire (-15 DR).",
     "stats": {
@@ -591,6 +599,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "A giant ant roughly the size of a large dog, with a glossy black-brown exoskeleton, a segmented abdomen, bent antennae and wide curved mandibles held open, saliva glinting. Nicked and scuffed carapace, pale scratches across the shell from old fights. Standing on a cracked pavement beside a rotting timber door frame.",
     "description": "Giant ants are overgrown insects. They usually travel in packs and are usually indicative that there is a huge colony somewhere nearby. Usually such creatures are merely cleared but never do people set foot into a found colony.",
     "notes": "Has 1 attack and 1 move. May not move and attack. Weak to fire (-25 DR).",
     "stats": {
@@ -655,6 +664,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "A giant centipede longer than a man is tall, with a dark brown-black segmented body, a pale yellow underside, dozens of short jointed legs, a pair of curved venom claws at the head and long antennae whipping. Shell cracked and gritty with drain grime, one leg missing. Rising out of a storm-drain grate on a concrete pavement.",
     "description": "A monsoon-drain horror, longer than a man is tall, that comes up through the grates after heavy rain. Its bite doesn't kill outright — it just makes sure you can't run.",
     "notes": "Has 1 attack and 1 move. Poison: on a hit the target makes an EN check or takes 1d4 damage a turn for 2 turns. Weak to fire (-25 DR).",
     "stats": {
@@ -719,6 +729,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "A giant mutated rat the size of a small dog, with scruffy grey-brown fur and bald scar patches, long yellow incisors bared, a bare pink tail dragging behind, torn ears, stiff wide whiskers and a raw wound on one shoulder. Standing on a cracked pavement beside a heap of torn woven sacks.",
     "description": "A giant mutated rat. One of the most common vermins in the wastes, aside from perhaps the Lipas-Lipas. Worrying enough to be dealt with but not enough of a threat to warrant an armed response, often times a neighborhood would gather strong adults or bounty hunters to exterminate nests nearby.",
     "notes": "Has 1 attack and 1 move.",
     "stats": {
@@ -791,6 +802,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "A kampong mongrel grown huge, tan and brindle, with a thick-muscled chest and neck, a broad skull, a jaw wide enough to take an arm off, yellow fangs bared, a scarred muzzle and cropped ears. Sinew bulges under the coat and the legs are heavy and straight. Standing on a cracked concrete yard in front of a kampong house.",
     "description": "A Vicious Dog that kept eating and kept mutating, until its jaw could take an arm off. Radiation thickened its muscle before it thickened its skull.",
     "notes": "Has 1 attack and 1 move. Larger, radiation-thickened cousin of the Vicious Dog; shrugs off small arms fire.",
     "stats": {
@@ -855,6 +867,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "A pig-tailed macaque matriarch, large and heavy across the shoulders, grey-furred with a bare pink-tan face, a short curled tail and long canines. Her mouth is wide open in a shriek, shoulder fur bristling, one arm raised with long hooked claws. Standing on the broken top of a shophouse wall.",
     "description": "The matriarch of a troop of mutated beruk. Grey-furred and heavy across the shoulders, she is far faster than her size suggests and fiercely protective of the troop. She screams once before she comes.",
     "notes": "Can attack and move. Never found alone — a troop of Beruk is always nearby, and they join in once she engages.",
     "stats": {
@@ -961,6 +974,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Human/Ghoul/Mutant",
     "icon": "",
+    "image_prompt": "An Indian labourer in faded work clothes: a sweat-darkened singlet, patched trousers and boots with broken laces. Gaunt and tired, with a heavy sledgehammer resting on one shoulder, its wooden handle cracked and bound with wire. Standing beside a half-demolished shophouse wall.",
     "description": "A labourer, worn down by hard manual work. Hungry and tired. May carry a sledgehammer. Won't fight unless their foreman orders it, and stops once the foreman is down. Killing a labourer costs the PC -10 Karma.",
     "notes": "Has 1 attack and 1 move. Not interested in fighting, unless forced.",
     "stats": {
@@ -1025,6 +1039,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "A small mutated pangolin with overlapping armoured scales in olive-brown and bone-grey, a long tapering tail, a narrow snout with a long sticky tongue half out, and heavy curved claws on the forelegs. Scarred plates along the back. Standing on a cracked concrete path under a rain tree.",
     "description": "A mutated small pangolin. The Panguling hunts insects and are generally nocturnal. They cannot see but can smell and hear well enough to see their prey. Their tongues excrete a paralyzing poison and they have evolved a strong rolling attack which has been known to leave impacts on concrete.",
     "notes": "Has 1 attack and 1 move. May take an action to curl up and gain +5 AC.",
     "stats": {
@@ -1113,6 +1128,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Robot",
     "icon": "",
+    "image_prompt": "A Fallout-style liberator robot: a waist-high body of riveted steel on a heavy wheeled base, exposed vacuum tubing, a bulbous glass-domed head with a laser lens, a loudspeaker horn bolted to the chest, a claw arm and a second arm with a small emitter. Refurbished, with new rivets among old panels and rust streaks at the seams. Standing beside a kopitiam table.",
     "description": "A curious oddity you found. It has been modified to spew UCL propaganda, yet seemingly has a mind of its own. It has been refurbished. May be upgraded with specific parts.",
     "notes": "Can attack and move. NOTE: this description text is identical to 'Monyet Sakai' in the source manual — likely a copy-paste artifact worth checking against the real page.",
     "stats": {
@@ -1193,6 +1209,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Robot",
     "icon": "",
+    "image_prompt": "A small, cheap Fallout-style liberator robot: a knee-high tin body of pressed steel panels, a flat bulbous dome head with one glass eye lens, a stubby laser arm and a claw arm, exposed tubing and mismatched paint. Dented and crude, not sleek. Standing on a cracked pavement beside a bus stop bench.",
     "description": "A small, cheap and ineffective robot. This was once manufactured in large quantities as disruption based machines to distract enemy backlines. Usually where one is found there are more around.",
     "notes": "Can attack and move. Increase stats by 1 per Mk (i.e. Mk2 = these stats +1, Mk3 = +2, etc. — only the Mk1 block is given in the manual). NOTE: description text is identical to 'Ibu Sakai' in the source manual — likely a copy-paste artifact worth checking against the real page.",
     "stats": {
@@ -1265,6 +1282,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Human",
     "icon": "",
+    "image_prompt": "A Chinese mercenary in mismatched surplus combat gear: a dark tactical vest over a black shirt with sleeves rolled, a belt of spare magazines, a stubby assault rifle with a taped grip held low. Shaved head, calm and hard eyes, professional and unhurried. Standing beside a shuttered petrol station forecourt.",
     "description": "A gun-for-hire working the Peninsula's contracts — professional, well-drilled, and entirely for sale to whichever faction is paying this week.",
     "notes": "Has 1 attack and 1 move. Fights professionally: will disengage if the contract isn't worth dying for.",
     "stats": {
@@ -1329,6 +1347,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Human",
     "icon": "",
+    "image_prompt": "A Malay Caliphate pahlawan in salvaged modern body armour, a black plate carrier with composite shoulder and shin plates and webbing, worn over unbleached linen robes with a samping sash at the waist and a tengkolok headcloth in ochre with turquoise edging. Holding a long wavy-bladed kris in both hands. Standing on sun-baked sandstone steps.",
     "description": "A Caliphate warrior-pilgrim on their sanctioned Hajj, sent out under the House of Syed with a mission beyond survival. What they carry as a weapon they've mastered completely — faith and discipline make them a match for anything the wasteland puts in front of them.",
     "notes": "Boss immunity: One Shot One Kill instead deals 20 true damage. Relentless: may take a second full attack this turn, at -30 hit. Optional Last Stand: the first lethal hit leaves it at 1 HP instead. Suggested package (BALANCE_PROPOSAL §6.5): Relentless (second attack at -30) + boss, roughly 56% win rate for a level-7 party against two.",
     "stats": {
@@ -1393,6 +1412,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "A full-grown mutated pangolin, broad and heavy, its overlapping scales thick as roof tiles in olive-brown and bone-grey, with scars across the plates. A long tapering tail, a narrow snout with a long sticky tongue, claws planted low for a rolling charge. Standing beside a fallen durian tree on a cracked concrete path.",
     "description": "A mutated pangolin, full grown — this is the 'Tenggiling Besar' the old-timers talk about. The Panguling exists to hunt insects and are generally nocturnal. They cannot see but can smell and hear well enough to see their prey. Their tongues excrete a paralyzing poison and they have evolved a strong rolling attack which has been known to leave impacts on concrete.",
     "notes": "Has 1 attack and 1 move. May take a small action to curl up and gain +5 AC. This is the bigger, tougher Panguling — see Lesser Panguling for the smaller kind.",
     "stats": {
@@ -1481,6 +1501,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Human",
     "icon": "",
+    "image_prompt": "A Chinese Protectorate infantryman in a dark navy quilted tunic with a high collar, navy shoulder boards and brass buttons, a leather bandolier of mechanic's tools, black gloves and a riveted steel breastplate. Bare-headed. Holding a battle rifle across the body with a stick grenade clipped to the belt. Standing behind a concrete block barricade across a cracked road.",
     "description": "Standard Protectorate Infantry. Usually citizens called to arms to serve, but given acceptable levels of gear to survive. Equipped with Infantry armor and a standard battle rifle with a grenade for suppressive tactics. Protectorate doctrine is about forming defensive lines and penetrating enemy formations with shock troops or mortar fire.",
     "notes": "Will form a defensive perimeter and make a killzone. Will suppress and throw grenades.",
     "stats": {
@@ -1577,6 +1598,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Human",
     "icon": "",
+    "image_prompt": "A Protectorate trooper sealed inside a full suit of POWER ARMOUR in the Fallout manner: a huge enclosing shell of riveted steel plate, bulbous rounded pauldrons, thick segmented limbs, a sealed HELMET with a narrow horizontal visor slit and small round lamps either side, exhaust stacks at the shoulders. The head is NOT bare — the suit is closed. Deep Protectorate navy paint worn through to bare steel at every edge and knee, brass-rimmed joints, hydraulic lines exposed at the elbows. Standing heavily, holding a Fallout plasma rifle with its bulbous green cell. On a cracked quayside.",
     "description": "A Protectorate trooper sealed inside a battered suit of power armour — rare on the Peninsula, and terrifying when the Protectorate actually fields one.",
     "notes": "Boss immunity: One Shot One Kill instead deals 20 true damage. EMP-vulnerable (§7): energy resistance -50, and an EMP effect can drop its shield for a round. Suggested package (BALANCE_PROPOSAL §6.5): Plated Hide +4 DT (ignored by Head/Eyes aimed shots) + boss, or Energy Shield 8 + Self-Destruct (4d10+20 explosive to 2 PCs on death, AG check halves it; crippling both arms first disarms it) — roughly 55-66% win rate for a level-7 party against two.",
     "stats": {
@@ -1641,6 +1663,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Ghoul",
     "icon": "",
+    "image_prompt": "A Fallout ghoul in raider rags: skin like cracked sun-dried leather in mottled grey and raw pink, split open in places, no nose, no hair, lipless mouth drawn back from the teeth. A torn singlet, frayed belt and a rusted parang with a tape-wrapped grip held low. Not a scarred man, not a weathered human. Standing in a broken concrete carpark.",
     "description": "A raider who turned ghoul and never slowed down. No 'uncle' or 'auntie' citizenship for this one — still running with the pack, still armed the same as any other raider.",
     "notes": "Fights like a standard Raider — armed with whatever it's scrounged. Rad and poison resistant (ghoul racial): RR 80, PR 30.",
     "stats": {
@@ -1705,6 +1728,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Robot",
     "icon": "",
+    "image_prompt": "A Fallout Protectron taken by raiders: a squat barrel-bodied robot on two stubby legs, a domed head with a single wide glowing visor band, segmented arms with one tool claw swapped for a welded laser emitter. Chassis crudely repainted in blotchy red and black enamel, plain and unmarked, dented and scraped. Not a humanoid android. Standing beside a patched tarpaulin lean-to.",
     "description": "A RobCo Protectron some raider crew got walking again, chassis repainted with gang colours and its manners left in whatever junkyard they found it in. Patrols raider camps until something crosses its sensor.",
     "notes": "Self-destructs when both arms are crippled. Electrical/EMP weakness: -50 energy resistance, and an EMP effect disables it for a round.",
     "stats": {
@@ -1769,6 +1793,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Human/Ghoul/Mutant",
     "icon": "",
+    "image_prompt": "A Malay raider veteran in scavenged plate: patched steel sheets wired over a stained sleeveless shirt at the chest, shoulders and shins, a dented steel helmet, scarred forearms and hard stubble. Holding a combat shotgun low at the hip, its stock wrapped in tape. Standing on the cracked deck of an overpass.",
     "description": "A raider who's survived long enough for it to matter — scavenged plate over real firepower, instead of whatever the newest recruit could scrounge.",
     "notes": "Has 1 attack and 1 move. Tougher and better-equipped than a standard Raider; leads small raider bands.",
     "stats": {
@@ -1833,6 +1858,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Human/Ghoul/Mutant",
     "icon": "",
+    "image_prompt": "An Indian raider in a torn T-shirt and a scavenged leather jacket with one sleeve ripped away, a submachine gun on a frayed sling, a rusted machete in the other hand and a pistol tucked in the belt. Bruised knuckles, wary eyes. Standing on a cracked street corner beside a fallen shutter.",
     "description": "The strong prey on the weak as they say, and those that do are considered raiders. Often desperate, raiders roam in tight-knit packs, and tend to break easily when the odds turn against them. Often will equip anything they can find or scrounge.",
     "notes": "Standard raider scum. Will flee if friends are dead.",
     "stats": {
@@ -1937,6 +1963,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Human",
     "icon": "",
+    "image_prompt": "A Chinese Rakan Watch enforcer in a homemade mint-green municipal windbreaker, reinforced with scrap steel plates across the chest and shoulders. Carrying a pump-action shotgun with a taped forestock, shells on a bandolier, a radio clipped at the hip. Standing at a road junction in front of a shophouse.",
     "description": "A senior Rakan Watch enforcer — better armoured, better armed, and called in when a patrol of Members isn't enough.",
     "notes": "Has 1 attack and 1 move. Backs up Rakan Watch Members when trouble escalates past what a patrol can handle.",
     "stats": {
@@ -2001,6 +2028,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Human",
     "icon": "",
+    "image_prompt": "An Indian Rakan Watch member in a faded homemade mint-green windbreaker zipped to the chin, a steel 9mm pistol in a holster at the hip, a handheld radio clipped to the chest. Short-cropped hair, a weary, watchful face. Standing on a street corner beside a kopitiam, concrete shophouses rising behind.",
     "description": "Rank-and-file muscle for the Rakan Watch, keeping order in Bandawang Baru under Ketua Bob. Sidearm, old windbreaker, and a radio to call for backup.",
     "notes": "Has 1 attack and 1 move. Rank-and-file street patrol; will call for backup before pressing a fight it can't win.",
     "stats": {
@@ -2065,6 +2093,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "An enormous gorged mutated rat, as big as a goat, with matted grey-brown fur, bald scar patches and a pale, swollen belly. Huge yellow incisors, a thick bare tail coiled behind, a broad regal head with one torn ear and small shrewd eyes. Perched heavy on a heap of torn woven sacks in a ruined market stall.",
     "description": "A rat that has gorged itself over the years on a healthy diet of prey. The apex predator of where it may reside, the Rat Raja exhumes authority and importance. It will rarely venture from its place of comfort without good reason (or tasty morsels), and prefers to stay where it can feast.",
     "notes": "Has 2 attack, 1 small action and 1 move. Miniboss.",
     "stats": {
@@ -2145,6 +2174,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "A soldier ant, slightly bigger than its workers, with a heavy oversized head and a broad armoured thorax in glossy dark red-brown. Short thick mandibles open wide, scarred plating and long spined legs braced. Standing beside a split timber log on a cracked drain edge.",
     "description": "A soldier ant, responsible for protecting and ensuring other ants can accomplish their tasks and objectives. Slightly tougher, slightly stronger.",
     "notes": "Has 1 attack and 1 move.",
     "stats": {
@@ -2209,6 +2239,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "A Sumatran rhinoceros mutated huge: shaggy reddish-brown hide, thick folded skin over the shoulders and legs, a long front horn cracked and bone-bright at the tip, a shorter second horn, and small deep-set eyes under a massive low head. Scarred flanks. Standing on the cracked tarmac shoulder of an empty highway.",
     "description": "A rhino that radiation made bigger, meaner and a great deal harder to stop. It doesn't travel in herds — one is more than enough.",
     "notes": "Has 2 attacks (Charge then Gore) and 1 move per turn. A Charge that hits forces an AG check or the target is Knocked Down.",
     "stats": {
@@ -2281,6 +2312,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "A Fallout super mutant, close to three metres tall, with grey-green hide thick as leather, grotesque asymmetric muscle and one shoulder swollen higher than the other. Heavy jutting brow, small yellow eyes, a wide lipless mouth. Wears ragged work trousers and holds a sledgehammer with a cracked handle. Not a bodybuilder, not a human. Standing beside a flyover pier on a cracked road.",
     "description": "A supermutant labourer, worn down by hard manual work. Hungry and tired. May carry a sledgehammer. Won't fight unless their foreman orders it, and stops once the foreman is down.",
     "notes": "Has 1 attack and 1 move. Not interested in fighting, unless forced.",
     "stats": {
@@ -2369,6 +2401,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Human",
     "icon": "",
+    "image_prompt": "A Malay UCL regular in a patched jungle-camouflage smock and loose trousers, a canvas webbing belt with a machete in its sheath, a sweat-stained cap and a sun-browned farmer's face. Holding a rifle at the shoulder with a bayonet fixed. Standing at a roadside bus shelter with a cracked concrete base.",
     "description": "A UCL Regular is a farmer, a smith, a shopkeep, a vagrant. Regulars are picked up from all over UCL, and form the bulk of the army. With basic training, they rely on their numbers and basic tactics to get the edge over their opponent. Familiar with jungle fighting. UCL doctrine is all about engaging and enveloping the enemy, and charging regulars as cannon fodder under machine gun fire.",
     "notes": "Will work together to suppress targets, will flank around to hit targets. Prefers rifle, will agr. charge targets.",
     "stats": {
@@ -2457,6 +2490,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Mutated Creature",
     "icon": "",
+    "image_prompt": "A kampong pariah dog gone feral, short tawny-brown coat, ribs showing through torn skin, long lean legs, a scarred muzzle, ears pinned back and lips curled from the fangs. Thin and quick-looking, hip bones prominent. Standing on a cracked concrete kampong lane.",
     "description": "A stray gone wrong — feral, fast, and hunting in a pack. Once somebody's kampong dog, now just teeth and hunger.",
     "notes": "Has 1 attack and 1 move. Hunts in packs; will flee if left alone and badly hurt.",
     "stats": {

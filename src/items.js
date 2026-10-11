@@ -1650,8 +1650,8 @@ export const itemDatabase = {
     "id": "rad_x",
     "name": "Rad-X",
     "type": "consumable",
-    "icon": "art/rad_x.jpg",
-    "image_prompt": "A small amber glass pill bottle labelled RAD-X, the tin cap cracked, a faded radiation trefoil printed beneath the text, a few chalky tablets visible through the scratched glass, on a prayer room shelf beside a folded sarong.",
+    "icon": "",
+    "image_prompt": "FALLOUT RAD-X, exactly as the games depict it and recognisable at a glance: a small squat amber-brown plastic pill bottle with a white screw cap and a plain printed paper label reading RAD-X with a radiation trefoil beneath it. Chalky white tablets inside. 1950s pharmacy packaging. On a prayer room shelf beside a folded sarong.",
     "description": "Preventative counterpart to RadAway — buffs rad resistance before exposure, doesn't touch existing accumulated rads. Not in the manual's chem table; sized using the classic Fallout Rad-X convention (a flat percentage rad-resistance buff for a few hours) since the manual doesn't cover it.",
     "effect": "+25% Radiation Resistance for 4 hours",
     "stats": {
@@ -1666,8 +1666,8 @@ export const itemDatabase = {
     "id": "radaway",
     "name": "RadAway",
     "type": "consumable",
-    "icon": "art/radaway.jpg",
-    "image_prompt": "A hanging glass IV bottle of pale yellow fluid attached to a coiled rubber tube and needle, the glass slightly clouded, a faded, illegible printed label near the top seal, on the counter of a shophouse pharmacy.",
+    "icon": "",
+    "image_prompt": "FALLOUT RADAWAY, exactly as the games depict it and recognisable at a glance: a soft translucent IV BAG of thick orange-amber fluid hanging from a hook, a coiled clear tube running from its base to a needle, a printed label band across the bag. Not a glass bottle — a flexible drip bag. Grubby, the fluid slightly settled. On the counter of a shophouse pharmacy.",
     "description": "IV-drip rad cure. Highest value for non-Ghoul races given the Ghoul race's innate 80% RR. Sized against the manual's rad scale (600 = feral-check threshold, 1000 = full feral).",
     "effect": "Removes 300 rads",
     "stats": {
@@ -2657,8 +2657,8 @@ export const itemDatabase = {
     "id": "stimpak",
     "name": "Stimpak",
     "type": "consumable",
-    "icon": "art/stimpak.jpg",
-    "image_prompt": "A chunky handheld medical injector with a translucent barrel of red serum, a broad ridged thumb-plunger cap, a worn red cross painted on the casing, a capped needle at the tip, scuffed metal-and-plastic housing, on a kitchen shelf in a kampong house, tins and jars beside it.",
+    "icon": "",
+    "image_prompt": "A FALLOUT STIMPAK, exactly as the games depict it and recognisable at a glance: a stubby steel-and-glass syringe held upright, a short fat glass ampoule of bright red fluid in a riveted metal collar, a broad ridged thumb-plunger disc on top, a thick exposed needle below, a small gauge or valve fitting on the side. Industrial 1950s medical hardware, not a modern syringe and not a medi-gel pen. Scuffed chrome and worn red. On a kitchen shelf in a kampong house.",
     "description": "Standard pre-war combat medical syringe — mainline 'Stimpak.' Baseline healing item; can_use_stimpaks flag already exists in RACE_RULES (Robots cannot use).",
     "effect": "Heals 1d10+10 HP",
     "stats": {
