@@ -2859,6 +2859,7 @@ export const itemDatabase = {
     "name": "Auto-Doc",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A pre-war automated surgical unit with fifties appliance curves, not modern hospital equipment: a bulbous cream-enamelled cabinet with rounded chrome trim, a row of round dials with cracked glass, and four articulated chrome arms ending in needles and clamps, the enamel chipped to grey metal at every joint. As tall as a man. Standing in a cracked-tile pre-war clinic hall.",
     "description": "From the manual: restores crippled limbs, heals, and performs doctor checks up to 125%.",
     "stats": {
       "doctor_check_cap": 125
@@ -2870,6 +2871,7 @@ export const itemDatabase = {
     "name": "Bandolier",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A cross-body bandolier of worn brown leather with two stitched pouches on a shoulder strap, each pouch holding a loaded box magazine, the straps sweat-darkened and cracked at the buckle and the brass studs gone dull. Laid flat over a wooden crate in a shed.",
     "description": "From the manual: holds 2 reloads, no small action needed to reload while stocked. Must be reloaded during a rest period once used.",
     "stats": {
       "reloads_held": 2
@@ -2881,6 +2883,7 @@ export const itemDatabase = {
     "name": "Electronic Lockpick Mk II",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A larger pre-war spy device in brushed aluminium and black bakelite, its top set with a small amber-glass readout, a needle meter and a row of brass push-keys worn bright, with a cloth-covered cable ending in clip probes. A brass plate stamped MK II is riveted to the case, paint worn away around the keys. Lying on a tarp on a paved loading bay.",
     "description": "From the manual: pre-war spy device for heavily encrypted electronic locks. Grants Science +50.",
     "stats": {
       "science_bonus": 50
@@ -2892,6 +2895,7 @@ export const itemDatabase = {
     "name": "Electronic Lockpick",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A hand-sized pre-war spy device with fifties gadget styling, not a modern gadget: brown bakelite body with a ribbed grip, a brushed-aluminium faceplate carrying two knurled dials and a row of toggle switches, and a coiled cable ending in spring-clip leads. Faceplate scratched and greasy, the cable re-taped with black tape. Sitting on a steel filing cabinet in a pre-war government office.",
     "description": "From the manual: required to open electronic locks. Grants Science +25.",
     "stats": {
       "science_bonus": 25
@@ -2903,6 +2907,7 @@ export const itemDatabase = {
     "name": "Expanded Lockpick Set",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A fitted wooden case of dark teak with brass corner guards and its lid propped open, the faded maroon felt lining cut into slots that hold steel picks of graded sizes, tension wrenches and raking tools. Wood scuffed pale at the edges, one brass latch bent. Sitting on a scuffed wooden table in a kopitiam back room.",
     "description": "From the manual: a full kit for picking non-electronic locks — picks of various sizes, raking tools, and more.",
     "value": "TBA"
   },
@@ -2911,6 +2916,7 @@ export const itemDatabase = {
     "name": "Ez-Injector",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A squat spring-loaded auto-injector in dark bakelite and steel, the size of a fat fountain pen, not a plain syringe: a thumb-plunger cap, a clear cartridge window showing a fill line, and a steel pocket clip worn bright. Grip rubber chipped, a grease smudge on the body. Lying on a glass-topped clinic counter beside a row of brown medicine jars.",
     "description": "From the manual: equip/modify an auto-injecting syringe for drugs needing one (Stimpaks, Psycho, Med-X). Usable once.",
     "stats": {
       "uses": 1
@@ -2922,6 +2928,7 @@ export const itemDatabase = {
     "name": "Geiger Counter",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A 1950s handheld radiation survey meter: a boxy painted-steel case with a leather carrying handle worn dark at the grip, a large analogue dial with a cream face printed in black numerals and a red danger band, the needle resting at zero, and a wand probe on a coiled cable with a cracked rubber tip. Paint chipped at the corners. Resting on a market stall between tins of biscuits.",
     "description": "From the manual: detects radiation on a person and in a surrounding area. Already an established campaign tool alongside the rad-level mechanic.",
     "value": "TBA"
   },
@@ -2930,6 +2937,7 @@ export const itemDatabase = {
     "name": "Grappling Hook",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A forged iron grappling hook with four curved prongs and a rope-eye shackle at the top, its hammered surface streaked with rust, the shackle worn smooth and the points filed bright from years of use on a rope. Hooked over a rusted pipe rail on a concrete overpass.",
     "description": "From the manual: attaches to one end of a Rope.",
     "value": "TBA"
   },
@@ -2938,6 +2946,7 @@ export const itemDatabase = {
     "name": "Gunsmiths Tools",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A battered steel toolbox with its lid propped open, paint chipped to bare metal and the carry handle bound in wire, holding brass punches, a cleaning rod, a tin of grease with a torn Malay label, a folded paper packet of saltpeter and a small brass flask of gunpowder. Everything oil-stained and rust-freckled. Open on a gunsmith's bench in a back room.",
     "description": "From the manual: ingredients and tools to manufacture and repair guns.",
     "value": "TBA"
   },
@@ -2946,6 +2955,7 @@ export const itemDatabase = {
     "name": "Holster",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A belt holster of brown leather with its flap snapped shut over a pistol-sized pocket, the stitching split at the belt loop and the leather creased and darkened by years of sweat. Hung from a nail on a plank wall in a kampong house.",
     "description": "From the manual: allows equipping an additional small pistol. May not be used by mutants.",
     "value": "TBA"
   },
@@ -2954,6 +2964,7 @@ export const itemDatabase = {
     "name": "Lighter",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A pressed-steel petrol lighter with a hinged lid, its chrome scuffed to grey at the thumb, a worn flint wheel, a dented fuel cap and a fine scorch mark on the lid. Sitting on a kitchen shelf beside a blackened kettle.",
     "description": "From the manual: for starting fires.",
     "value": "TBA"
   },
@@ -2962,6 +2973,7 @@ export const itemDatabase = {
     "name": "Lockpick Set",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A rolled canvas wrap of the kind a locksmith carries, tied with cotton tape and opened flat to show slim steel picks, rakes and a short brass torque wrench standing in stitched pockets. Canvas gone grey and oil-darkened along the fold, leather tabs worn smooth. Laid on a stone-topped locksmith's counter in a Bandawang Baru shophouse.",
     "description": "From the manual: gives +50% bonus to lockpicking.",
     "stats": {
       "lockpick_bonus": 50
@@ -2973,6 +2985,7 @@ export const itemDatabase = {
     "name": "Rope",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A coil of thick hemp rope, bleached pale and darkened with sweat at the middle, one working end frayed and a section re-spliced with cord, wound into a loose ring the width of a bicycle wheel. Coiled on a wooden jetty plank beside a kampong stilt house.",
     "description": "From the manual: standard rope, considered 25m long unless specified.",
     "value": "TBA"
   },
@@ -2981,6 +2994,7 @@ export const itemDatabase = {
     "name": "Safecracking Kit",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A flat fold-out case of black leather gone brown at the creases, its snap fastener broken, opened to show a brass combination dial on a short spindle, a coiled stethoscope with cracked tan rubber tubing, and thin steel feelers held in a cloth loop. Leather scuffed and sweat-stained. Lying on a cracked concrete floor in front of a rusted pre-war safe door.",
     "description": "From the manual: +20 to lockpick when trying to open a safe specifically.",
     "stats": {
       "safe_lockpick_bonus": 20
@@ -2992,6 +3006,7 @@ export const itemDatabase = {
     "name": "Stealth Boy",
     "type": "gear",
     "icon": "",
+    "image_prompt": "Fallout's Stealth Boy from the games, not a modern smartwatch: a chunky rectangular wrist-mounted box of scuffed grey-white plastic and pitted metal, a stubby antenna on one end, a small readout panel, and a pop-out arm strap folded flat against its side, corners rubbed to bare metal. Lying on a worn wooden pawnshop shelf in Bandawang Lama.",
     "description": "From the manual: turns the user invisible for 1 hour, granting +100 to Sneak. Must recharge after use. Roll Luck on use — failure causes a malfunction.",
     "stats": {
       "sneak_bonus": 100,
@@ -3004,6 +3019,7 @@ export const itemDatabase = {
     "name": "Tool Set",
     "type": "gear",
     "icon": "",
+    "image_prompt": "A waxed canvas tool bag with a stitched leather top handle and its flap folded back, showing small wrenches, pliers with taped grips and a row of screwdrivers standing in loops. Canvas stained dark with oil at the base, the leather handle polished smooth by use. Set on the back step of a mechanic's shophouse.",
     "description": "From the manual: adds 25% to Repair skill when repairing or crafting.",
     "stats": {
       "repair_bonus": 25
