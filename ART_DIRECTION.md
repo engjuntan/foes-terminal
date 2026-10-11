@@ -233,6 +233,33 @@ reading `FIGHT 1: (Name) vs (Name)`.
 
 ---
 
+## Lifted from Fallout on purpose
+
+A short list must read as **taken straight from the games**, because it
+is. Everything else in this setting is our own invention and the two
+must not blur. Name the game in the prompt and rule out the near-miss —
+the same technique that fixed the weapons.
+
+| Thing | Must look like |
+|---|---|
+| Protectron | Fallout's protectron: squat barrel body, two stubby legs, domed head with one wide visor band. Not a humanoid android. |
+| RobCo Securitron | Fallout's securitron: single wheel, armoured ovoid body, a FACE ON A SCREEN. |
+| Stimpak | The stubby steel-and-glass syringe with the ridged thumb disc. |
+| RadAway | A soft orange DRIP BAG, never a glass bottle. |
+| Rad-X | The squat amber pill bottle with a white cap. |
+| Pip-Boy | The wrist computer: chunky housing, green CRT, dials. |
+| Super mutants (Gergasi) | Fallout 4's mutant: three metres, asymmetric muscle, grey-green hide, jutting brow, small yellow eyes. |
+| Brahmin | The two-headed Fallout cow. |
+| Liberator robots | **Fallout 76's Liberators** — small knee-high hovering communist robots, egg-shaped riveted body, one central camera eye, spindly claw arms, red star. The first enemies outside Vault 76. |
+
+> Why: the GM is explicit that these are lifted and must look lifted. A
+> generic medical syringe is not a stimpak and a hanging glass IV bottle
+> is not RadAway. Written down 11 Oct, after a batch described all three
+> as generic medical kit and after the Liberators were invented from
+> scratch because nobody had recorded where they come from.
+
+---
+
 ## Climate exceptions
 
 **The Chukai Desert** and everything standing in it takes the desert

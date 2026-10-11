@@ -1128,7 +1128,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Robot",
     "icon": "",
-    "image_prompt": "A Fallout-style liberator robot: a waist-high body of riveted steel on a heavy wheeled base, exposed vacuum tubing, a bulbous glass-domed head with a laser lens, a loudspeaker horn bolted to the chest, a claw arm and a second arm with a small emitter. Refurbished, with new rivets among old panels and rust streaks at the seams. Standing beside a kopitiam table.",
+    "image_prompt": "A FALLOUT 76 LIBERATOR, exactly as that game depicts it, in its propaganda-broadcast variant: a small communist robot about knee height that HOVERS just off the ground, a rounded egg-shaped riveted metal body, a single large central camera eye, two short spindly jointed arms with small claws, thruster vents beneath. A battered loudspeaker horn is bolted to the top of its hull in place of the usual antenna, wired crudely along the shell. Drab military green with a red star, paint chipped. Not a humanoid android and not a Mister Handy. Hovering in a village square.",
     "description": "A curious oddity you found. It has been modified to spew UCL propaganda, yet seemingly has a mind of its own. It has been refurbished. May be upgraded with specific parts.",
     "notes": "Can attack and move. NOTE: this description text is identical to 'Monyet Sakai' in the source manual — likely a copy-paste artifact worth checking against the real page.",
     "stats": {
@@ -1209,7 +1209,7 @@ export const bestiaryDatabase = {
     "type": "monster",
     "creature_type": "Robot",
     "icon": "",
-    "image_prompt": "A small, cheap Fallout-style liberator robot: a knee-high tin body of pressed steel panels, a flat bulbous dome head with one glass eye lens, a stubby laser arm and a claw arm, exposed tubing and mismatched paint. Dented and crude, not sleek. Standing on a cracked pavement beside a bus stop bench.",
+    "image_prompt": "A FALLOUT 76 LIBERATOR, exactly as that game depicts it: a small communist robot about knee height that HOVERS just off the ground, a rounded egg-shaped riveted metal body, a single large central camera eye with an iris ring, two short spindly jointed arms ending in small claws, a stubby antenna on top, thruster vents beneath. Painted drab military green with a red star on the hull, paint chipped to bare metal. Not a humanoid android and not a Mister Handy. Hovering above a cracked concrete path.",
     "description": "A small, cheap and ineffective robot. This was once manufactured in large quantities as disruption based machines to distract enemy backlines. Usually where one is found there are more around.",
     "notes": "Can attack and move. Increase stats by 1 per Mk (i.e. Mk2 = these stats +1, Mk3 = +2, etc. — only the Mk1 block is given in the manual). NOTE: description text is identical to 'Ibu Sakai' in the source manual — likely a copy-paste artifact worth checking against the real page.",
     "stats": {
