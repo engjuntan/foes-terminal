@@ -268,6 +268,79 @@ export const bestiaryDatabase = {
       }
     ]
   },
+  brahmin: {
+    "id": "brahmin",
+    "name": "Brahmin",
+    "type": "monster",
+    "creature_type": "Mutated Creature",
+    "icon": "",
+    "image_prompt": "A Fallout brahmin, the two-headed mutated cow: one body with two complete heads on a single thick neck base, both heads carrying horns, a patchy scarred hide in dun and dirty grey with pink scar tissue showing through, ribs visible along the flank, a broken cart harness still buckled across the shoulders. Not a one-headed cow. On a cracked concrete yard in front of a handcart.",
+    "description": "A two-headed mutated cow and the Peninsula's draught beast. It hauls carts, ploughs the padi bunds and drags whatever the caravan cannot carry. Both heads have horns, and both have opinions about which way the cart is going. Brahmin pull the long-haul caravans on the roads between settlements, where a beast that can carry its own water matters; the kerbau stays in the padi and pulls the plough.",
+    "notes": "Not aggressive unless cornered or provoked. Slow to act, and fights only when it has nowhere to go. Usually harnessed to a cart and stands still until its driver is threatened.",
+    "stats": {
+      "hp": 96,
+      "variance_bias": "normal",
+      "sequence": 4,
+      "crit_chance": 3,
+      "ac": 6,
+      "dtdr": {
+        "normal": {
+          "dt": 4,
+          "dr": 25
+        },
+        "laser": {
+          "dt": 0,
+          "dr": 0
+        },
+        "fire": {
+          "dt": 0,
+          "dr": 0
+        },
+        "plasma": {
+          "dt": 0,
+          "dr": 0
+        },
+        "explosive": {
+          "dt": 0,
+          "dr": 0
+        }
+      },
+      "resistances": {
+        "energy": 0,
+        "poison": 20,
+        "rad": 20,
+        "gas": 0,
+        "emp": 0
+      },
+      "special": {
+        "str": 8,
+        "per": 4,
+        "end": 8,
+        "cha": 2,
+        "int": 1,
+        "agi": 2,
+        "luk": 4
+      }
+    },
+    "attacks": [
+      {
+        "name": "Horn Gore",
+        "hit_percent": 50,
+        "action": "Attack",
+        "damage": "2d6+3",
+        "effect": "Used only when cornered or provoked.",
+        "dmgType": "normal"
+      },
+      {
+        "name": "Kick",
+        "hit_percent": 45,
+        "action": "Attack",
+        "damage": "1d10+2",
+        "effect": "Hind-leg kick at anything standing behind it.",
+        "dmgType": "normal"
+      }
+    ]
+  },
   construction_protectron: {
     "id": "construction_protectron",
     "name": "Construction Protectron",
@@ -965,6 +1038,79 @@ export const bestiaryDatabase = {
           "duration_turns": 1,
           "on": "save_failed"
         }
+      }
+    ]
+  },
+  kerbau: {
+    "id": "kerbau",
+    "name": "Kerbau",
+    "type": "monster",
+    "creature_type": "Mutated Creature",
+    "icon": "",
+    "image_prompt": "A Southeast Asian water buffalo, the kerbau: a heavy grey-black body with sparse coarse hide, mud caked to the belly and legs, long horns sweeping back and out over a broad head, one horn grown slightly crooked, a rope tether trailing from a ring through the nose, a notched ear, small watchful eyes and a faint pale scar on the shoulder. Not a bison and not a cow. In a flooded paddy field with young rice stalks standing in the water around its legs.",
+    "description": "The Malaysian water buffalo: heavy, grey-black and mud-caked, with horns that sweep back over the neck. The ordinary farm animal of Bandawang, ploughing the padi fields and wallowing in every ditch, placid until it is not.",
+    "notes": "Placid when left alone: it grazes and wallows in the mud. Startled or provoked, it bolts before it fights, and it only fights when cornered. A loose kerbau running across a paddy is a chase before it is a fight.",
+    "stats": {
+      "hp": 110,
+      "variance_bias": "normal",
+      "sequence": 3,
+      "crit_chance": 3,
+      "ac": 6,
+      "dtdr": {
+        "normal": {
+          "dt": 5,
+          "dr": 25
+        },
+        "laser": {
+          "dt": 0,
+          "dr": 0
+        },
+        "fire": {
+          "dt": 0,
+          "dr": 0
+        },
+        "plasma": {
+          "dt": 0,
+          "dr": 0
+        },
+        "explosive": {
+          "dt": 0,
+          "dr": 0
+        }
+      },
+      "resistances": {
+        "energy": 0,
+        "poison": 10,
+        "rad": 10,
+        "gas": 0,
+        "emp": 0
+      },
+      "special": {
+        "str": 9,
+        "per": 4,
+        "end": 9,
+        "cha": 1,
+        "int": 1,
+        "agi": 2,
+        "luk": 4
+      }
+    },
+    "attacks": [
+      {
+        "name": "Horn Toss",
+        "hit_percent": 50,
+        "action": "Attack",
+        "damage": "2d8+3",
+        "effect": "Used only when provoked or cornered. Forces an AG check on hit or the target is Knocked Down.",
+        "dmgType": "normal"
+      },
+      {
+        "name": "Trample",
+        "hit_percent": 40,
+        "action": "Attack",
+        "damage": "1d10+2",
+        "effect": "Used while bolting. Anything in its path takes the hit.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -2165,6 +2311,79 @@ export const bestiaryDatabase = {
         "damage": "1d6",
         "effect": "Knockdown on hit",
         "dmgType": "normal"
+      }
+    ]
+  },
+  securitron: {
+    "id": "securitron",
+    "name": "RobCo Securitron",
+    "type": "monster",
+    "creature_type": "Robot",
+    "icon": "",
+    "image_prompt": "A Fallout RobCo Securitron, not a Protectron and not a humanoid robot: a single large monowheel under an armoured ovoid body, a rounded head with a cathode-ray screen showing a simple cartoon face of two dot eyes and a flat mouth, one arm holding a stubby submachine gun and the other a Gatling laser barrel cluster, a shoulder rocket pod, a dull grey enamel body chipped to bare steel with rust at the seams, and a speaker grille below the screen. On a rain-darkened concrete walkway outside a shophouse arcade.",
+    "description": "A RobCo Securitron: a pre-War monowheel security robot with an armoured ovoid body, a cathode screen for a face and a weapon on each arm. Most of the ones still running on the Peninsula were left to guard something, and nobody has told them it is over. Warden Robo at Kelam Sungai is one of this make.",
+    "notes": "Serious threat: armoured and armed, and it does not give ground. Slow to flank: a target that moves behind it costs the Securitron its next turn to bring the weapons round. A hacked unit can also carry shoulder rocket pods and a grenade launcher, which are not modelled here.",
+    "stats": {
+      "hp": 110,
+      "variance_bias": "normal",
+      "sequence": 6,
+      "crit_chance": 5,
+      "ac": 16,
+      "dtdr": {
+        "normal": {
+          "dt": 10,
+          "dr": 35
+        },
+        "laser": {
+          "dt": 6,
+          "dr": 25
+        },
+        "fire": {
+          "dt": 0,
+          "dr": 0
+        },
+        "plasma": {
+          "dt": 0,
+          "dr": 0
+        },
+        "explosive": {
+          "dt": 0,
+          "dr": 0
+        }
+      },
+      "resistances": {
+        "energy": -50,
+        "poison": 100,
+        "rad": 100,
+        "gas": 100,
+        "emp": -50
+      },
+      "special": {
+        "str": 8,
+        "per": 7,
+        "end": 7,
+        "cha": 0,
+        "int": 4,
+        "agi": 2,
+        "luk": 5
+      }
+    },
+    "attacks": [
+      {
+        "name": "Submachine Gun",
+        "hit_percent": 65,
+        "action": "Attack",
+        "damage": "2d6+3",
+        "effect": "Close-range burst fire at anything within a few paces.",
+        "dmgType": "normal"
+      },
+      {
+        "name": "Gatling Laser",
+        "hit_percent": 60,
+        "action": "Attack",
+        "damage": "2d8+4",
+        "effect": "Medium-range burst fire.",
+        "dmgType": "laser"
       }
     ]
   },

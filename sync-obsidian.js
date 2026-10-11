@@ -321,7 +321,7 @@ function processFile(filePath) {
         // copied quest file). Refuse the second claim and say so loudly.
         if (!claimId(data.id, filePath)) return;
 
-        if (['weapon', 'armor', 'consumable', 'currency', 'accessory', 'ammo', 'component', 'junk'].includes(data.type)) {
+        if (['weapon', 'armor', 'consumable', 'currency', 'accessory', 'ammo', 'component', 'junk', 'gear'].includes(data.type)) {
           itemsMap[data.id] = data;
           console.log(`[ITEM] Loaded: ${data.name}`);
         } else if (['trait', 'perk'].includes(data.type)) {

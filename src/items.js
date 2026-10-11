@@ -11,6 +11,20 @@ export const itemDatabase = {
     "weight": 0.05,
     "value": 10
   },
+  pip_boy: {
+    "id": "pip_boy",
+    "name": "Pip-Boy",
+    "type": "accessory",
+    "slot": "hand",
+    "icon": "",
+    "image_prompt": "A Fallout Pip-Boy wrist computer: a chunky rectangular housing in scuffed olive-drab metal, a small round green CRT screen in the top face with scratches across the glass, two rotary dials and a toggle switch along the side with one dial knob missing, exposed rivets along the seams, a stubby antenna on the back edge, and a hinged cuff of cracked brown leather with a metal clamp for the forearm. Paint worn through to bare metal at the corners, rivet heads rusted. On a scarred marble kopitiam table.",
+    "description": "A pre-War wrist computer with a map, a geiger counter and a radio in one battered housing. Working units are rare on the Peninsula, and this one has been dropped enough times to show it.",
+    "stats": {
+      "carry_bonus": 1
+    },
+    "weight": 0.5,
+    "value": 250
+  },
   sturdy_backpack: {
     "id": "sturdy_backpack",
     "name": "Sturdy Backpack",
@@ -2839,6 +2853,162 @@ export const itemDatabase = {
     "weight": 0,
     "value": 1,
     "stackable": true
+  },
+  auto_doc: {
+    "id": "auto_doc",
+    "name": "Auto-Doc",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: restores crippled limbs, heals, and performs doctor checks up to 125%.",
+    "stats": {
+      "doctor_check_cap": 125
+    },
+    "value": "TBA"
+  },
+  bandolier: {
+    "id": "bandolier",
+    "name": "Bandolier",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: holds 2 reloads, no small action needed to reload while stocked. Must be reloaded during a rest period once used.",
+    "stats": {
+      "reloads_held": 2
+    },
+    "value": "TBA"
+  },
+  electronic_lockpick_mk2: {
+    "id": "electronic_lockpick_mk2",
+    "name": "Electronic Lockpick Mk II",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: pre-war spy device for heavily encrypted electronic locks. Grants Science +50.",
+    "stats": {
+      "science_bonus": 50
+    },
+    "value": "TBA"
+  },
+  electronic_lockpick: {
+    "id": "electronic_lockpick",
+    "name": "Electronic Lockpick",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: required to open electronic locks. Grants Science +25.",
+    "stats": {
+      "science_bonus": 25
+    },
+    "value": "TBA"
+  },
+  expanded_lockpick_set: {
+    "id": "expanded_lockpick_set",
+    "name": "Expanded Lockpick Set",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: a full kit for picking non-electronic locks — picks of various sizes, raking tools, and more.",
+    "value": "TBA"
+  },
+  ez_injector: {
+    "id": "ez_injector",
+    "name": "Ez-Injector",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: equip/modify an auto-injecting syringe for drugs needing one (Stimpaks, Psycho, Med-X). Usable once.",
+    "stats": {
+      "uses": 1
+    },
+    "value": "TBA"
+  },
+  geiger_counter: {
+    "id": "geiger_counter",
+    "name": "Geiger Counter",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: detects radiation on a person and in a surrounding area. Already an established campaign tool alongside the rad-level mechanic.",
+    "value": "TBA"
+  },
+  grappling_hook: {
+    "id": "grappling_hook",
+    "name": "Grappling Hook",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: attaches to one end of a Rope.",
+    "value": "TBA"
+  },
+  gunsmiths_tools: {
+    "id": "gunsmiths_tools",
+    "name": "Gunsmiths Tools",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: ingredients and tools to manufacture and repair guns.",
+    "value": "TBA"
+  },
+  holster: {
+    "id": "holster",
+    "name": "Holster",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: allows equipping an additional small pistol. May not be used by mutants.",
+    "value": "TBA"
+  },
+  lighter: {
+    "id": "lighter",
+    "name": "Lighter",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: for starting fires.",
+    "value": "TBA"
+  },
+  lockpick_set: {
+    "id": "lockpick_set",
+    "name": "Lockpick Set",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: gives +50% bonus to lockpicking.",
+    "stats": {
+      "lockpick_bonus": 50
+    },
+    "value": "TBA"
+  },
+  rope: {
+    "id": "rope",
+    "name": "Rope",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: standard rope, considered 25m long unless specified.",
+    "value": "TBA"
+  },
+  safecracking_kit: {
+    "id": "safecracking_kit",
+    "name": "Safecracking Kit",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: +20 to lockpick when trying to open a safe specifically.",
+    "stats": {
+      "safe_lockpick_bonus": 20
+    },
+    "value": "TBA"
+  },
+  stealth_boy: {
+    "id": "stealth_boy",
+    "name": "Stealth Boy",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: turns the user invisible for 1 hour, granting +100 to Sneak. Must recharge after use. Roll Luck on use — failure causes a malfunction.",
+    "stats": {
+      "sneak_bonus": 100,
+      "duration": "1 Hour"
+    },
+    "value": "TBA"
+  },
+  tool_set: {
+    "id": "tool_set",
+    "name": "Tool Set",
+    "type": "gear",
+    "icon": "",
+    "description": "From the manual: adds 25% to Repair skill when repairing or crafting.",
+    "stats": {
+      "repair_bonus": 25
+    },
+    "value": "TBA"
   },
   broken_ceiling_fan_blade: {
     "id": "broken_ceiling_fan_blade",

@@ -109,7 +109,9 @@ function allMarkdown(dir, out = []) {
 
 // Items straight from the vault (not src/items.js), so the script always
 // sees the latest prompts/icons, including ones it just wrote.
-const ITEM_TYPES = new Set(['weapon', 'armor', 'consumable', 'currency', 'accessory', 'ammo', 'component', 'junk']);
+// Keep in step with the type list in sync-obsidian.js. 'gear' was in
+// neither, so 17 authored items existed in the vault and nowhere else.
+const ITEM_TYPES = new Set(['weapon', 'armor', 'consumable', 'currency', 'accessory', 'ammo', 'component', 'junk', 'gear']);
 const MONSTER_TYPES = new Set(['monster']);
 function loadItems(types = ITEM_TYPES) {
   const items = [];
