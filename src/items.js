@@ -450,7 +450,7 @@ export const itemDatabase = {
     "type": "armor",
     "slot": "body",
     "size": "medium",
-    "icon": "",
+    "icon": "art/malayan_frontliner_armor.jpg",
     "image_prompt": "Frontliner body armour in SOUTHEAST ASIAN shapes, NOT European: no knight's breastplate, no rounded pauldrons, no fluted or gothic plate, nothing from a European armoury. Its lines come from Nusantara war dress — overlapping lamellar scales of cut and hammered steel laced together with leather cord, a long tapered torso plate shaped like a baju besi, a high standing collar, shoulder pieces hanging in layered rectangular plates rather than rounded cups, a woven sash belt. WELL MAINTAINED AND ROBUST: plates straight, lacing sound, buckles working, cleaned and oiled. Honest rust and scuffing only, no moss. On a wooden stand.",
     "description": "From the manual — imposes -40 to Sneak, Steal, and Engineering while worn.",
     "stats": {
@@ -2671,7 +2671,7 @@ export const itemDatabase = {
     "id": "stimpak",
     "name": "Stimpak",
     "type": "consumable",
-    "icon": "",
+    "icon": "art/stimpak.jpg",
     "image_prompt": "A FALLOUT STIMPAK, copied from the game and instantly recognisable as one. SHORT AND STUBBY — it fits in a closed fist, wider than it is tall, NOT a tall ornate brass instrument and NOT a laboratory syringe. A fat squat glass ampoule of bright red fluid in a plain riveted steel collar, a broad flat ridged thumb-plunger disc capping the top, a thick blunt needle projecting straight down below. Plain utilitarian 1950s medical hardware: no gauges, no dials, no valves, no decorative brass. Scuffed steel and worn red. On a kitchen shelf in a kampong house.",
     "description": "Standard pre-war combat medical syringe — mainline 'Stimpak.' Baseline healing item; can_use_stimpaks flag already exists in RACE_RULES (Robots cannot use).",
     "effect": "Heals 1d10+10 HP",
