@@ -202,7 +202,7 @@ export const peopleDatabase = {
     "id": "niama_choo",
     "name": "Niama Choo",
     "type": "person",
-    "body": "Niama Choo is the patriarch of the Choo Clan.\n\nFaction: 1414 Triad — Choo Clan\n\nBackground: Niama Choo looks like a typical gangster, with a tattoo on his face — a look he cultivates deliberately, so people underestimate his intelligence. \"Niama\" is his nickname; it started as an insult, but he's adopted it as his own.\n\nDescription: Niama has a dragon tattoo on his right cheek, though a scar runs across it. He's chubby, and generally dresses in a mandarin-collared shirt with slacks.\n\nImportance: Choo Clan patriarch.",
+    "body": "Niama Choo is the patriarch of the Choo Clan.\n\nFaction: 1414 Triad — Choo Clan\n\nBackground: Niama Choo looks like a typical gangster, with a tattoo on his face — a look he cultivates deliberately, so people underestimate his intelligence. \"Niama\" is his nickname; it started as an insult, but he's adopted it as his own.\n\nDescription:He's chubby, and generally dresses in a mandarin-collared shirt with slacks.\n\nImportance: Choo Clan patriarch.",
     "category_path": [
       "People"
     ]
