@@ -109,8 +109,9 @@ function allMarkdown(dir, out = []) {
 
 // Items straight from the vault (not src/items.js), so the script always
 // sees the latest prompts/icons, including ones it just wrote.
-function loadItems() {
-  const ITEM_TYPES = new Set(['weapon', 'armor', 'consumable', 'currency', 'accessory', 'ammo', 'component', 'junk']);
+const ITEM_TYPES = new Set(['weapon', 'armor', 'consumable', 'currency', 'accessory', 'ammo', 'component', 'junk']);
+const MONSTER_TYPES = new Set(['monster']);
+function loadItems(types = ITEM_TYPES) {
   const items = [];
   for (const file of allMarkdown(VAULT)) {
     const text = fs.readFileSync(file, 'utf8');
@@ -118,7 +119,7 @@ function loadItems() {
     if (!m) continue;
     let data;
     try { data = JSON.parse(m[1]); } catch { continue; }
-    if (!data.id || !ITEM_TYPES.has(data.type)) continue;
+    if (!data.id || !types.has(data.type)) continue;
     items.push({ ...data, file });
   }
   return items;
@@ -187,6 +188,24 @@ function inboxFileFor(id) {
 // json) and content slots (prompt in art-slots.mjs, `image_url: ""` in a
 // hand-written module). Everything below works on targets, so `sheet`,
 // `generate` and `ingest` cover both without caring which is which.
+// The bestiary had no art and no prompts at all, and the pipeline was not
+// looking at it: loadItems filtered to the carried-item types. Creatures are
+// their own register — a full body on show, not an object centred on a table.
+const monsterStyle = () => `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. A SINGLE CREATURE is the subject, shown FULL BODY and complete within the frame, alert and in a natural stance rather than posed or attacking, sharply lit and filling most of the frame. The setting is simple and thrown well out of focus behind it. ${GRADE} ${CLIMATE} ${SCENE_NEGATIVES}`;
+
+function monsterTargets() {
+  return loadItems(MONSTER_TYPES).map(m => ({
+    id: m.id,
+    name: m.name,
+    kind: 'monster',
+    hasArt: hasArt(m),
+    hasPrompt: !!m.image_prompt,
+    prompt: `${monsterStyle()} Subject: ${(m.image_prompt || '').trim()}`,
+    description: m.description || '',
+    setUrl: url => setVaultField(m.file, 'icon', url)
+  }));
+}
+
 function itemTargets() {
   return loadItems().map(item => ({
     id: item.id,
@@ -396,7 +415,7 @@ function peopleTargets() {
     .filter(Boolean);
 }
 
-function allTargets() { return [...itemTargets(), ...slotTargets(), ...locationTargets(), ...peopleTargets()]; }
+function allTargets() { return [...itemTargets(), ...slotTargets(), ...locationTargets(), ...peopleTargets(), ...monsterTargets()]; }
 
 // ---------- commands ----------
 function status() {
@@ -422,6 +441,7 @@ function status() {
   report('Content slots:', targets.filter(t => t.kind === 'slot'));
   report('Location shots:', targets.filter(t => t.kind === 'location'));
   report('NPC portraits:', targets.filter(t => t.kind === 'person'));
+  report('Bestiary:', targets.filter(t => t.kind === 'monster'));
   const inInbox = fs.existsSync(INBOX) ? fs.readdirSync(INBOX).filter(f => !f.startsWith('.')).length : 0;
   const ledger = readLedger();
   if (skipped.length) console.log(`Skipped (made elsewhere): ${skipped.length}`);
@@ -444,7 +464,7 @@ function sheet() {
 // This was `only.replace(/s$/, '')`, which turns "people" into "peopl" — so
 // `--only people` was rejected and portraits could only be reached through
 // `--match person_`. Spell the mapping out rather than deriving it.
-const ONLY_KINDS = { items: 'item', slots: 'slot', locations: 'location', people: 'person' };
+const ONLY_KINDS = { items: 'item', slots: 'slot', locations: 'location', people: 'person', monsters: 'monster' };
 
 // sitting in the inbox waiting to be ingested. `--only items|slots` narrows it.
 function pendingTargets() {
@@ -569,7 +589,7 @@ async function imgurAccessToken() {
 // a retina screen; cards and location shots are banners and get more.
 // This matters at volume: 279 items shipped at 1400px would be ~130MB of
 // images in the deploy.
-const LOCAL_MAX_DIM = { item: 512, slot: 1000, location: 1000, person: 1000 };
+const LOCAL_MAX_DIM = { item: 512, slot: 1000, location: 1000, person: 1000, monster: 1000 };
 function shipCopy(src, destDir, id, kind = 'item') {
   const srcExt = path.extname(src).toLowerCase() === '.jpeg' ? '.jpg' : path.extname(src).toLowerCase();
   const plain = () => {
@@ -596,7 +616,7 @@ function shipCopy(src, destDir, id, kind = 'item') {
 // Location shots live in their own folder (GM's request, 26 Sep): there
 // are 68 of them at banner size next to ~280 small item icons, and
 // mixing the two made public/art impossible to skim.
-const SHIP_SUBDIR = { location: 'locations', person: 'people' };
+const SHIP_SUBDIR = { location: 'locations', person: 'people', monster: 'bestiary' };
 
 async function ingestLocal(batch) {
   fs.mkdirSync(path.join(ROOT, 'public', 'art'), { recursive: true });
