@@ -12,25 +12,25 @@
 
 export const VIBE_SCENES = [
   {
-    id: "vibe_driving_school",
+    id: "driving_school",
     name: "The Driving School",
     blurb:
       "Learning to drive at the end of the world, with a clipboard and strong opinions.",
-    image_url: ""
+    image_url: "art/vibe_driving_school.jpg"
   },
   {
-    id: "vibe_big_ben_taken_seriously",
+    id: "big_ben_taken_seriously",
     name: "Big Ben, Taken Seriously",
     blurb:
       "Three metres of Gergasi in a homemade clock tower, listening carefully.",
-    image_url: ""
+    image_url: "art/vibe_big_ben_taken_seriously.jpg"
   },
   {
-    id: "vibe_crossing_the_emerald_sea",
+    id: "crossing_the_emerald_sea",
     name: "Crossing the Emerald Sea",
     blurb:
       "Pahlawan on foot across the Chukai at night, and the sand is full of green glass.",
-    image_url: ""
+    image_url: "art/vibe_crossing_the_emerald_sea.jpg"
   }
 ];
 

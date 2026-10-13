@@ -193,7 +193,7 @@ function inboxFileFor(id) {
 // The bestiary had no art and no prompts at all, and the pipeline was not
 // looking at it: loadItems filtered to the carried-item types. Creatures are
 // their own register — a full body on show, not an object centred on a table.
-const monsterStyle = () => `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. A SINGLE CREATURE is the subject, shown FULL BODY and complete within the frame, alert and in a natural stance rather than posed or attacking, sharply lit and filling most of the frame. The setting is simple and thrown well out of focus behind it. ${GRADE} ${CLIMATE} ${SCENE_NEGATIVES}`;
+const monsterStyle = () => `Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. The creature named in the subject is what the frame is for. Unless the subject asks for a group, a swarm or several of them, show ONE, FULL BODY and complete within the frame; where it does ask for more, show the whole group and let the mass be the subject, alert and in a natural stance rather than posed or attacking, sharply lit and filling most of the frame. The setting is simple and thrown well out of focus behind it. ${GRADE} ${CLIMATE} ${SCENE_NEGATIVES}`;
 
 function monsterTargets() {
   return loadItems(MONSTER_TYPES).map(m => ({
