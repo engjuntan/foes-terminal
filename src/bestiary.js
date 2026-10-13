@@ -2846,8 +2846,8 @@ export const bestiaryDatabase = {
     "name": "Swarm of Keluang",
     "type": "monster",
     "creature_type": "Mutated Creature",
-    "icon": "art/bestiary/swarm_of_keluang.jpg",
-    "image_prompt": "A roost of hundreds of flying foxes packed into the bare branches of a dead tree, each the size of a child, with ruddy fox-like faces, leathery wings folded tight around their bodies and the limbs bowing under their weight, and a loose cloud of them lifting off with wings spread wide. A dead tree standing in a flooded padi field under a hazy white dusk sky.",
+    "icon": "",
+    "image_prompt": "A colony of flying foxes, each the size of a small child, hanging in a loose cluster from the bare branches of ONE dead tree. ABOUT TWENTY OF THEM, countable at a glance — not hundreds, not a black mass, not a tree furred over with bodies. Rust-brown fur, leathery folded wings, long hooked claws, fox-like muzzles, several with their heads turned towards the viewer. Three or four are in the air just clear of the branches. A flooded padi field behind.",
     "description": "You hear the roost before you see it: a dry, wet rustle from a dead tree or a ruined hall, like rain that has forgotten how to stop. Wake them with noise, light or a thrown stone and the whole colony comes off the branches at once, a cloud that fills the space and cannot be hit with a single shot. Anyone it touches takes the roost fever home with them, and the advice is the same as it always was: wash, burn the clothes, and do not go back in.",
     "notes": "One creature acting as one unit. It fills a single space (a tree crown, a hall's roof beams) and has no body or face to aim at. Single-target attacks (a bullet, a blade, a laser) run into its high DT and DR and do little. Fire and area effects (grenades, explosives, a torch thrown into the roof) take the full value. Asleep until disturbed by noise, light or fire in the roost; it acts first on the round after it wakes. Has 3 attacks. Below half HP it has thinned out and Swarm Bite drops to 1d4+1.",
     "stats": {

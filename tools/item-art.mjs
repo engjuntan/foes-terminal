@@ -26,6 +26,7 @@ import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { allSlots } from './art-slots.mjs';
+import { expandCharacters } from './art-characters.mjs';
 import { allLocationShots, KEPT_INTERIORS, PAVED_LOCATIONS } from './art-locations.mjs';
 import crypto from 'crypto';
 
@@ -202,10 +203,22 @@ function monsterTargets() {
     kind: 'monster',
     hasArt: hasArt(m),
     hasPrompt: !!m.image_prompt,
-    prompt: `${monsterStyle()} Subject: ${(m.image_prompt || '').trim()}`,
+    prompt: withCharacters(`${monsterStyle()} Subject: ${(m.image_prompt || '').trim()}`),
     description: m.description || '',
     setUrl: url => setVaultField(m.file, 'icon', url)
   }));
+}
+
+
+// A prompt anywhere can write {{big_ben}} or {{federation_soldier}} and get
+// the canonical block from art-characters.mjs. Writing a character out by
+// hand in a second prompt is how Big Ben ended up being two creatures.
+const missingTokens = new Set();
+const withCharacters = p => expandCharacters(p, k => missingTokens.add(k));
+export function reportMissingTokens() {
+  if (missingTokens.size) {
+    console.warn(`  [characters] unknown token(s): ${[...missingTokens].join(', ')} — left as written`);
+  }
 }
 
 function itemTargets() {
@@ -215,7 +228,7 @@ function itemTargets() {
     kind: 'item',
     hasArt: hasArt(item),
     hasPrompt: !!item.image_prompt,
-    prompt: fullPrompt(item),
+    prompt: withCharacters(fullPrompt(item)),
     description: item.description || '',
     setUrl: url => setVaultField(item.file, 'icon', url)
   }));
@@ -246,7 +259,7 @@ function slotTargets() {
       kind: 'slot',
       hasArt: !!(found && isLinked(found.value)),
       hasPrompt: true,
-      prompt: `${slot.style} Subject: ${slot.prompt}`,
+      prompt: withCharacters(`${slot.style} Subject: ${slot.prompt}`),
       description: slot.prompt,
       setUrl: url => {
         const current = fs.readFileSync(full, 'utf8');
@@ -359,7 +372,7 @@ function locationTargets() {
       notePath: shot.notePath,   // lets `queue --match` aim at a district
       hasArt: isLinked(current || ''),
       hasPrompt: !!shot.prompt,
-      prompt: `${locationStyleFor(shot)} Subject: ${shot.prompt}`,
+      prompt: withCharacters(`${locationStyleFor(shot)} Subject: ${shot.prompt}`),
       description: shot.prompt,
       setUrl: url => setFrontmatterValue(file, key, url)
     };
@@ -409,7 +422,7 @@ function peopleTargets() {
         notePath: `People/${f}`,
         hasArt: isLinked(frontmatterValue(text, 'image') || ''),
         hasPrompt: true,
-        prompt: `${PORTRAIT_STYLE}${/ghoul/i.test(prompt) ? ` ${GHOUL_CLAUSE}` : ''} Subject: ${prompt}`,
+        prompt: withCharacters(`${PORTRAIT_STYLE}${/ghoul/i.test(prompt) ? ` ${GHOUL_CLAUSE}` : ''} Subject: ${prompt}`),
         description: prompt,
         setUrl: url => setFrontmatterValue(file, 'image', url)
       };

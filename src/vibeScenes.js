@@ -16,7 +16,7 @@ export const VIBE_SCENES = [
     name: "The Driving School",
     blurb:
       "Learning to drive at the end of the world, with a clipboard and strong opinions.",
-    image_url: "art/vibe_driving_school.jpg"
+    image_url: ""
   },
   {
     id: "big_ben_taken_seriously",
@@ -30,7 +30,7 @@ export const VIBE_SCENES = [
     name: "Crossing the Emerald Sea",
     blurb:
       "Pahlawan on foot across the Chukai at night, and the sand is full of green glass.",
-    image_url: "art/vibe_crossing_the_emerald_sea.jpg"
+    image_url: ""
   }
 ];
 
