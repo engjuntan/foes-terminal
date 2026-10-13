@@ -62,6 +62,18 @@ export const SLOT_GROUPS = {
       the_caliphate: 'Three Caliphate Pahlawan on the sandstone steps of a plain Caliphate hall at the edge of the Chukai Desert: dry ochre stone, arid scrub, low geometric carved screens and a plain domed roof — no jungle, no tiered pagoda roofs, no Balinese or Hindu temple architecture. Modern post-apocalyptic warrior-pilgrims: salvaged modern body armour — a scuffed plate carrier, composite shoulder and shin plates, webbing pouches — worn OVER traditional Malay dress, unbleached linen robes and a samping sash at the waist, a tengkolok headwrap on one and a folded scarf on another. Waxed-cloth-wrapped manuscripts in bandolier satchels, tooled leather straps, a keris at the hip beside a battered rifle. Palette of sand and ochre with turquoise accents. One reading aloud from an open book, one with a hand raised in greeting, one turned alert toward the road.'
     }
   },
+  vibe: {
+    label: 'Vibe scene',
+    file: 'src/vibeScenes.js',
+    anchor: id => new RegExp(`id:\\s*["']${id}["']`),
+    style: CARD_STYLE,
+    slots: {
+      vibe_driving_school: "A post-war Malaysian driving school on a cracked asphalt practice circuit, faded cone markings still visible under the weeds, a wonky concrete hill-start ramp at one end and a row of dented traffic cones. An INSTRUCTOR with a clipboard and strong opinions leans in at the window of a doorless retro-futurist car husk, bulbous fifties styling, rust through the sills, no glass; inside it a TERRIFIED LEARNER grips the wheel at ten and two and stares straight ahead. Four applicants wait on mismatched plastic stools in the shade of a corrugated lean-to, one of them asleep sitting up. On the wall behind them a board of pass photographs gone brown and curling. Comic but played completely straight.",
+      vibe_big_ben_taken_seriously: "A GERGASI \u2014 a Fallout super mutant, close to three metres, mottled grey-green hide, grotesque asymmetric muscle, heavy jutting brow, small yellow eyes \u2014 wearing a HOMEMADE, BADLY MADE costume meant to make him look like a clock tower: scavenged panels and painted board lashed over his shoulders, a crooked clock face on his chest, a lopsided spire strapped to his head. It fits him terribly and reads as poor cosplay, not disguise. He is CROUCHED DOWN on one knee to listen, head tilted, nodding, while a SMALL SERIOUS PERSON of ordinary height stands in front of him explaining something with a hand-drawn diagram held up in both hands. Nobody is laughing. The person is entirely sincere and so is he. A sunlit Bandawang street, out of focus.",
+      vibe_crossing_the_emerald_sea: "Night in the Chukai Desert. A LINE OF CALIPHATE PAHLAWAN on foot, strung out in silhouette across a vast field of sand dunes under a huge moon, walking away from camera towards the horizon \u2014 salvaged plate carriers and composite shoulder plates worn over unbleached linen robes and samping sashes, packs and bedrolls, one with a tengkolok. Scattered across the sand all around them, thousands of TINY GREEN TRINITITE SHARDS catch the moonlight and glitter. ONE FIGURE AT THE FRONT HAS STOPPED AND TURNED, looking back down the line at the others. Cold moonlight, not golden. Enormous scale, silence, no action. Every face Malaysian."
+    }
+  },
+
   special: {
     label: 'SPECIAL card',
     file: 'src/goatContent.js',
