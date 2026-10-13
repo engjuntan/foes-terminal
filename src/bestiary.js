@@ -178,6 +178,79 @@ export const bestiaryDatabase = {
       }
     ]
   },
+  belangkas: {
+    "id": "belangkas",
+    "name": "Belangkas",
+    "type": "monster",
+    "creature_type": "Mutated Creature",
+    "icon": "",
+    "image_prompt": "A horseshoe crab, its domed olive-brown shell shaped like a horseshoe and as wide as a dinner tray, dulled with grey silt and old scratches, a long spiked tail stiff behind it, six pairs of jointed walking legs folded beneath, and a pale greenish-cream underside showing at the edge. A mangrove shoreline of grey-brown mud among exposed roots.",
+    "description": "It was crawling these shallows before there were trees on land, and the war has not changed it much either. It is slow, it does not hunt, and it does not care that you are there, which is the strangest thing about it. The labs pay by the litre for its blue blood, and a mangrove shore littered with drained shells says who has been coming down to take it.",
+    "notes": "Low threat. Has 1 attack and 1 move, both defensive. Moves one space a turn at most and never closes on a foe. It only strikes when handled or stood on. Flipped onto its back, it cannot right itself.",
+    "stats": {
+      "hp": 30,
+      "variance_bias": "normal",
+      "sequence": 2,
+      "crit_chance": 1,
+      "ac": 6,
+      "dtdr": {
+        "normal": {
+          "dt": 4,
+          "dr": 40
+        },
+        "laser": {
+          "dt": 0,
+          "dr": 0
+        },
+        "fire": {
+          "dt": 0,
+          "dr": 0
+        },
+        "plasma": {
+          "dt": 0,
+          "dr": 0
+        },
+        "explosive": {
+          "dt": 0,
+          "dr": 0
+        }
+      },
+      "resistances": {
+        "energy": 0,
+        "poison": 100,
+        "rad": 30,
+        "gas": 0,
+        "emp": 0
+      },
+      "special": {
+        "str": 3,
+        "per": 2,
+        "end": 9,
+        "cha": 1,
+        "int": 1,
+        "agi": 1,
+        "luk": 2
+      }
+    },
+    "attacks": [
+      {
+        "name": "Telson Jab",
+        "hit_percent": 40,
+        "action": "Attack",
+        "damage": "1d4",
+        "effect": "Only when handled or stood on. The spine is blunt and the crab is not trying to hurt you.",
+        "dmgType": "normal"
+      },
+      {
+        "name": "Crawl Away",
+        "hit_percent": 100,
+        "action": "Defend",
+        "damage": "0",
+        "effect": "Moves one space away from the nearest foe. Small action.",
+        "dmgType": "normal"
+      }
+    ]
+  },
   beruk: {
     "id": "beruk",
     "name": "Beruk",
@@ -265,6 +338,87 @@ export const bestiaryDatabase = {
           "duration_turns": 1,
           "on": "save_failed"
         }
+      }
+    ]
+  },
+  biawak_gergasi: {
+    "id": "biawak_gergasi",
+    "name": "Biawak Gergasi",
+    "type": "monster",
+    "creature_type": "Mutated Creature",
+    "icon": "",
+    "image_prompt": "A Malayan water monitor grown well past the size of a dog, olive-black skin barred and speckled with cream-yellow, a ridge of armoured scales down its back, a long neck, a pointed snout with a forked tongue, and a thick flattened tail. Old scars and a torn ear, one flank with a swollen weeping bite wound, claws dug into the lip of a storm-drain grate beside a brown monsoon river.",
+    "description": "A Malayan water monitor grown well past the size of a dog, and it no longer runs from people. It waits on the lip of a storm drain until you are close enough, having worked out that a settlement is a dependable larder, and whatever it takes it drags towards the water. The bite smells sweet and wrong by the next morning.",
+    "notes": "Has 3 attacks and 1 move (crawls up to 3 spaces to reach a foe). Prefers Seize: a seized foe is dragged one space a turn towards the nearest water and cannot take a move action of their own until free. Bold rather than aggressive: once it has its meal, or a foe is in the water, it lets go and leaves. It fights to the end only when cornered. The spine plates are already in its DT and DR.",
+    "stats": {
+      "hp": 85,
+      "variance_bias": "normal",
+      "sequence": 9,
+      "crit_chance": 5,
+      "ac": 12,
+      "dtdr": {
+        "normal": {
+          "dt": 4,
+          "dr": 25
+        },
+        "laser": {
+          "dt": 0,
+          "dr": 0
+        },
+        "fire": {
+          "dt": 0,
+          "dr": 0
+        },
+        "plasma": {
+          "dt": 0,
+          "dr": 0
+        },
+        "explosive": {
+          "dt": 0,
+          "dr": 0
+        }
+      },
+      "resistances": {
+        "energy": 0,
+        "poison": 20,
+        "rad": 30,
+        "gas": 0,
+        "emp": 0
+      },
+      "special": {
+        "str": 6,
+        "per": 5,
+        "end": 6,
+        "cha": 1,
+        "int": 2,
+        "agi": 5,
+        "luk": 4
+      }
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "hit_percent": 70,
+        "action": "Poison",
+        "damage": "2d6+3",
+        "effect": "Septic. Foe makes an EN check or takes 1d4 damage a turn for 3 turns.",
+        "dmgType": "poison"
+      },
+      {
+        "name": "Tail Whip",
+        "hit_percent": 60,
+        "action": "Attack",
+        "damage": "1d8+2",
+        "effect": "Foe makes an AG check or is knocked down.",
+        "dmgType": "normal"
+      },
+      {
+        "name": "Seize",
+        "hit_percent": 60,
+        "action": "SM",
+        "damage": "1d10+2",
+        "effect": "Grabs the foe and drags them one space a turn towards the nearest water. Foe makes a STR check at the start of each of their turns to break free.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -793,6 +947,79 @@ export const bestiaryDatabase = {
         "damage": "1d8+3",
         "effect": "Foe makes an EN check or takes 1d4 damage a turn for 2 turns.",
         "dmgType": "poison"
+      }
+    ]
+  },
+  giant_leeches: {
+    "id": "giant_leeches",
+    "name": "Giant Leeches",
+    "type": "monster",
+    "creature_type": "Mutated Creature",
+    "icon": "",
+    "image_prompt": "A jungle leech as long as a hand, glossy black-brown with a pale yellow-green stripe along its back, its body swollen and segmented, its sucker end clamped to a wet leaf while the front end lifts and feels for the next warm thing. Old dark blood stains at the sucker. On a leaf at the edge of a flooded jungle path.",
+    "description": "You never find them; they find you, and you usually notice by the weight, or the cold, or a sock gone dark and heavy at the top. They go on so quietly that nobody feels them go on, and what they leave keeps bleeding for hours after they have come off. Pull one off and its mouth stays in the wound, so the only clean way is a burning cigarette or a lit match held to its body until it drops away.",
+    "notes": "Hazard, not an encounter. Run it as an environmental complication rather than a fight. Whenever a character wades a flooded jungle floor, a wet drain or standing water in the rain, roll Attach against each character once per scene (or once per hour of travel). Attach is silent. The victim notices only on a PE check, which the GM may call at any point. Drain costs 1 HP a turn while attached. Burning it off makes it let go and it takes fire damage; the wound then bleeds at the minor rate (1 a turn) for several hours. Pulling it off leaves the mouth in, and the wound bleeds at double rate until cauterised or stitched.",
+    "stats": {
+      "hp": 8,
+      "variance_bias": "normal",
+      "sequence": 3,
+      "crit_chance": 1,
+      "ac": 4,
+      "dtdr": {
+        "normal": {
+          "dt": 0,
+          "dr": 0
+        },
+        "laser": {
+          "dt": 0,
+          "dr": 0
+        },
+        "fire": {
+          "dt": 0,
+          "dr": -50
+        },
+        "plasma": {
+          "dt": 0,
+          "dr": 0
+        },
+        "explosive": {
+          "dt": 0,
+          "dr": 0
+        }
+      },
+      "resistances": {
+        "energy": 0,
+        "poison": 50,
+        "rad": 0,
+        "gas": 0,
+        "emp": 0
+      },
+      "special": {
+        "str": 1,
+        "per": 3,
+        "end": 4,
+        "cha": 1,
+        "int": 1,
+        "agi": 4,
+        "luk": 4
+      }
+    },
+    "attacks": [
+      {
+        "name": "Attach",
+        "hit_percent": 60,
+        "action": "Attack",
+        "damage": "0",
+        "effect": "Silent. The victim feels nothing on attaching.",
+        "dmgType": "normal"
+      },
+      {
+        "name": "Drain",
+        "hit_percent": 100,
+        "action": "Attack",
+        "damage": "1",
+        "effect": "Automatic while attached. Costs 1 HP each turn.",
+        "dmgType": "normal"
       }
     ]
   },
@@ -2614,6 +2841,87 @@ export const bestiaryDatabase = {
       }
     ]
   },
+  swarm_of_keluang: {
+    "id": "swarm_of_keluang",
+    "name": "Swarm of Keluang",
+    "type": "monster",
+    "creature_type": "Mutated Creature",
+    "icon": "",
+    "image_prompt": "A roost of hundreds of flying foxes packed into the bare branches of a dead tree, each the size of a child, with ruddy fox-like faces, leathery wings folded tight around their bodies and the limbs bowing under their weight, and a loose cloud of them lifting off with wings spread wide. A dead tree standing in a flooded padi field under a hazy white dusk sky.",
+    "description": "You hear the roost before you see it: a dry, wet rustle from a dead tree or a ruined hall, like rain that has forgotten how to stop. Wake them with noise, light or a thrown stone and the whole colony comes off the branches at once, a cloud that fills the space and cannot be hit with a single shot. Anyone it touches takes the roost fever home with them, and the advice is the same as it always was: wash, burn the clothes, and do not go back in.",
+    "notes": "One creature acting as one unit. It fills a single space (a tree crown, a hall's roof beams) and has no body or face to aim at. Single-target attacks (a bullet, a blade, a laser) run into its high DT and DR and do little. Fire and area effects (grenades, explosives, a torch thrown into the roof) take the full value. Asleep until disturbed by noise, light or fire in the roost; it acts first on the round after it wakes. Has 3 attacks. Below half HP it has thinned out and Swarm Bite drops to 1d4+1.",
+    "stats": {
+      "hp": 120,
+      "variance_bias": "normal",
+      "sequence": 12,
+      "crit_chance": 1,
+      "ac": 8,
+      "dtdr": {
+        "normal": {
+          "dt": 8,
+          "dr": 60
+        },
+        "laser": {
+          "dt": 6,
+          "dr": 50
+        },
+        "fire": {
+          "dt": 0,
+          "dr": -50
+        },
+        "plasma": {
+          "dt": 6,
+          "dr": 50
+        },
+        "explosive": {
+          "dt": 0,
+          "dr": 0
+        }
+      },
+      "resistances": {
+        "energy": 0,
+        "poison": 100,
+        "rad": 0,
+        "gas": 0,
+        "emp": 0
+      },
+      "special": {
+        "str": 2,
+        "per": 7,
+        "end": 8,
+        "cha": 1,
+        "int": 3,
+        "agi": 9,
+        "luk": 3
+      }
+    },
+    "attacks": [
+      {
+        "name": "Swarm Bite",
+        "hit_percent": 75,
+        "action": "Attack",
+        "damage": "2d4+2",
+        "effect": "Hits every foe in the swarm's space. Each foe struck makes an EN check or takes roost fever: 1d4 damage a turn for 3 turns.",
+        "dmgType": "poison"
+      },
+      {
+        "name": "Wing Rush",
+        "hit_percent": 80,
+        "action": "Attack",
+        "damage": "1d6",
+        "effect": "Foe makes an AG check or gains the Blinded status until they clear their eyes.",
+        "dmgType": "normal"
+      },
+      {
+        "name": "Resettle",
+        "hit_percent": 100,
+        "action": "Defend",
+        "damage": "0",
+        "effect": "Moves the swarm up to 3 spaces, over foes and obstacles. Small action.",
+        "dmgType": "normal"
+      }
+    ]
+  },
   ucl_regular: {
     "id": "ucl_regular",
     "name": "UCL Regular",
@@ -2699,6 +3007,87 @@ export const bestiaryDatabase = {
         "action": "SM",
         "damage": "2d6+2",
         "effect": "Must charge into enemy.",
+        "dmgType": "normal"
+      }
+    ]
+  },
+  ular_sawa: {
+    "id": "ular_sawa",
+    "name": "Ular Sawa",
+    "type": "monster",
+    "creature_type": "Mutated Creature",
+    "icon": "",
+    "image_prompt": "A reticulated python as thick through the body as a man's thigh, its skin a net of gold-brown, black and cream diamonds and fine lines, coiled in heavy loops around a rubber-tree trunk with its head drawn back and its jaws parted to show the teeth. Fresh scrapes on the snout. Black canal water and exposed roots at the base of the tree.",
+    "description": "You see the water move before you see the snake, and by the time you see its head it has already wrapped you to the chest. It does not crush you; it waits for you to breathe out, takes up the slack, and each breath in leaves you a little less room than the last. Hacking at it gets you nothing, because the coils only tighten; what loosens them is somebody else's hands working between the coils and you.",
+    "notes": "Has 3 attacks and 1 move (slithers up to 4 spaces through water or undergrowth, unseen until it lunges). Ambush: it waits submerged or hidden and gets the first round. Held: Constrict every round, rising as listed. Hurting the snake does not make it let go. A held foe is freed when an ally next to the snake gets hands between the coils and wins a STR check, or when the snake dies. High threat: do not run it against a lone foe with no ally in reach.",
+    "stats": {
+      "hp": 120,
+      "variance_bias": "normal",
+      "sequence": 8,
+      "crit_chance": 5,
+      "ac": 10,
+      "dtdr": {
+        "normal": {
+          "dt": 3,
+          "dr": 20
+        },
+        "laser": {
+          "dt": 0,
+          "dr": 0
+        },
+        "fire": {
+          "dt": 0,
+          "dr": 0
+        },
+        "plasma": {
+          "dt": 0,
+          "dr": 0
+        },
+        "explosive": {
+          "dt": 0,
+          "dr": 0
+        }
+      },
+      "resistances": {
+        "energy": 0,
+        "poison": 100,
+        "rad": 20,
+        "gas": 0,
+        "emp": 0
+      },
+      "special": {
+        "str": 9,
+        "per": 6,
+        "end": 7,
+        "cha": 1,
+        "int": 2,
+        "agi": 5,
+        "luk": 3
+      }
+    },
+    "attacks": [
+      {
+        "name": "Lunge",
+        "hit_percent": 75,
+        "action": "Attack",
+        "damage": "2d8+4",
+        "effect": "Strikes from water or undergrowth, usually on the first round. Surprise: the foe cannot dodge.",
+        "dmgType": "normal"
+      },
+      {
+        "name": "Coil",
+        "hit_percent": 70,
+        "action": "SM",
+        "damage": "1d10+4",
+        "effect": "Wraps the foe. Foe makes an AG check to avoid it; on a failure the foe is held and cannot move away.",
+        "dmgType": "normal"
+      },
+      {
+        "name": "Constrict",
+        "hit_percent": 100,
+        "action": "Attack",
+        "damage": "1d8+4",
+        "effect": "Automatic against a held foe. Each round after the first, damage rises by 1d4, cumulative. The held foe loses their small action each round to breathing.",
         "dmgType": "normal"
       }
     ]

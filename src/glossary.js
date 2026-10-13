@@ -74,6 +74,19 @@ export const glossaryDatabase = {
       "01_World Details"
     ]
   },
+  kelip_kelip: {
+    "id": "kelip_kelip",
+    "name": "Kelip-Kelip",
+    "aliases": [
+      "Kelip",
+      "Fireflies"
+    ],
+    "strict_aliases": [],
+    "summary": "Kelip-Kelip are the synchronised fireflies of the mangroves at Kuala Selangor, which still gather along the rivers after dark and flash in unison across whole trees.",
+    "category_path": [
+      "01_World Details"
+    ]
+  },
   kerbau: {
     "id": "kerbau",
     "name": "Kerbau",
