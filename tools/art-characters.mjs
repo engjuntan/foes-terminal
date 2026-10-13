@@ -31,6 +31,70 @@ export const CHARACTERS = {
     "head. It reads as poor cosplay, never as a disguise. He is gentle and entirely " +
     "sincere about the costume.",
 
+
+  // ---- the Peng family ----------------------------------------------
+  janson_peng:
+    "JANSON PENG: a short, squat Chinese Malaysian man, barely five feet and built " +
+    "like a barrel, mid-forties, black hair swept back. He wears BRIGHTLY COLOURED " +
+    "GLASSES with orange-tinted lenses and thin metal frames. A pale cream short-sleeved " +
+    "work shirt gone grey with use, sleeves rolled, over a stained canvas apron tied at " +
+    "the waist, and heavy mud-caked work trousers with scuffed boots. Fierce, quick and " +
+    "entirely unbothered. A contortionist, so he moves more easily than his build suggests.",
+
+  orange_peng:
+    "ORANGE PENG: an enormous Chinese Malaysian man, 6\'5\" and chubby rather than " +
+    "muscular though there is real heft under it, with a handsome open face carrying a " +
+    "childlike, innocent sense of wonder. Shirtless, with a dirtied BRIGHT YELLOW boiler " +
+    "suit worn down off the shoulders and its empty sleeves knotted around his waist. " +
+    "Heavy work boots, mud to the knee. Gentle, slow and enormous. Janson\'s brother.",
+
+  farmer_nick_peng:
+    "FARMER NICK PENG: a ghoul \u2014 skin like cracked sun-dried leather in mottled grey " +
+    "and brown, NO NOSE, no hair, a lipless mouth, sunken eyes. He wears a conical woven " +
+    "rice farmer\'s hat, a loose-fitting cream cotton shirt open at the chest, and loose " +
+    "free-flowing cotton trousers in the manner of Thai fisherman pants, cinched and " +
+    "wrapped at the waist. Bright YELLOW RUBBER BOOTS. A rice-paddy stalk in the corner " +
+    "of his mouth.",
+
+  // ---- the triad -----------------------------------------------------
+  slink_tan:
+    "SLINK TAN: a tall Chinese Malaysian man, 6\'5\" and rangy, long dark hair. He WEARS " +
+    "A BLACK EYEPATCH over one eye on a strap across his head \u2014 always, and it must be " +
+    "visible. A dirty white cotton tank top, and a hybrid motorcycle-and-utility jacket " +
+    "in scuffed brown leather worn draped over both shoulders without his arms in the " +
+    "sleeves. Both arms are covered shoulder to wrist in heavily inked dragon tattoos. " +
+    "HIS RIGHT LEG BELOW THE KNEE HAS BEEN REPLACED WITH A MACHINE GUN \u2014 a Type 96 " +
+    "pattern weapon mounted as a prosthetic limb, which he walks on with a crutch.",
+
+  // ---- the player characters ------------------------------------------
+  // Written from the GM\'s own reference art in Media/PCs, not invented.
+  iron_legs:
+    "IRON LEGS: an older Chinese Malaysian man, lean and wiry, late fifties, with short " +
+    "grey-black hair and a grey goatee. He wears a ragged GREY-BLUE martial arts wrap " +
+    "top, cross-fronted like a gi with a patch pocket on the chest, sleeves torn ragged " +
+    "at the elbow, tied with a cloth belt knotted at the waist, over loose grey-blue " +
+    "trousers. FROM THE THIGHS DOWN BOTH LEGS ARE SALVAGED POWER ARMOUR \u2014 rusted " +
+    "steel-plated greaves and huge armoured boots, articulated at the knee, weeping dark " +
+    "oil from the joints. He carries himself like a martial arts master and believes he " +
+    "is one.",
+
+  kong:
+    "KONG: a Gergasi \u2014 a Fallout super mutant, close to three metres, heavy grey-green " +
+    "hide with pink-red scar patches across the arms, shoulders and chest, a bald scarred " +
+    "scalp, a heavy brow. He WEARS SMALL WIRE-RIMMED SPECTACLES, which is the first thing " +
+    "anyone notices. A ragged sleeveless monk\'s robe in faded tan and olive, cross-fronted " +
+    "and torn through in places, with a wide WOVEN RATTAN SASH and hanging rattan apron " +
+    "panels at the waist tied with rope, over torn trousers. Barefoot. He carries a blue " +
+    "hardback book under one arm. Scholarly and self-contained, never aggressive.",
+
+  two:
+    "TWO: a lean Malay man in his thirties, long dark hair worn loose or tied back, a " +
+    "thin moustache and stubble, a hard watchful face. He wears a filthy PALE GREY-BLUE " +
+    "PRISON COVERALL with a chest pocket, the LEFT SLEEVE TORN AWAY AT THE SHOULDER to " +
+    "expose a long sutured wound closed with black stitches, the right sleeve rolled to " +
+    "the elbow. Heavy brown work boots, caked. Carries himself like someone who used to " +
+    "be owed deference and is not any more.",
+
   // ---- the ghoul baseline -------------------------------------------
   // Portraits already get this automatically; a scene or a bestiary entry
   // has to ask for it.

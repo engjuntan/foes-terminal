@@ -19,6 +19,10 @@ const CARD_STYLE = 'Photorealistic photograph, 1:1 square, 1080x1080, 35mm film 
 // setting is named, thrown well out of focus, and kept quiet.
 const FACTION_STYLE = 'Photorealistic photograph, 1:1 square, 1080x1080, 35mm film still, natural light, shallow depth of field, fine grain. Monsoon Gold grade: hazy near-white sky light, hot golden key light, cyan-green bounced shadows, humid equatorial air. Three figures together, full length, clearly separated, in dynamic poses with expressive faces, caught mid-moment rather than lined up for a portrait. EVERY FACE IS MALAYSIAN — Malay, Chinese or Indian, and ideally a mix across the three figures. NO WHITE OR EUROPEAN FACES, whatever the uniform looks like. This holds for the Protectorate and the Caliphate just as much as for anyone else, whatever their tailoring. THE FIGURES ARE THE SUBJECT: sharply lit and in focus, filling most of the frame, their clothing and colours reading instantly. The setting is simple and thrown well out of focus behind them: enough to say where they are, never enough to compete. Keep the background uncluttered and restrained. Weathering and jungle overgrowth stay in the soft background only, never on the figures or across the frame. Malaya 170 years after the bombs, but legible before it is ruined. No text, no lettering, no watermark, no modern plastics, no Bethesda marks.';
 
+// A model sheet is not a scene: no grade, no climate, no weather, no mood.
+// White ground and flat light so the costume reads without interpretation.
+const SHEET_STYLE = "CHARACTER MODEL SHEET / TURNAROUND on a PLAIN PURE WHITE BACKGROUND, nothing else in the frame. THREE FULL-BODY VIEWS OF THE SAME CHARACTER, side by side in one row, left to right: FRONT view facing the viewer, SIDE profile view, and BACK view from behind. All three at IDENTICAL SCALE, standing straight in a neutral relaxed pose with arms at the sides and feet slightly apart, aligned on the same ground line, heads level with each other. Flat even studio lighting from the front, no cast shadows, no ground shadow, no vignette, no background texture, no environment, no props, no text and no labels. Photorealistic, full colour, sharp and evenly detailed. THE COSTUME MUST BE IDENTICAL IN ALL THREE VIEWS \u2014 the same garments, the same colours, the same wear and the same fastenings, shown from the correct angle in each. 1:1 square, 1080x1080.";
+
 export const SLOT_GROUPS = {
   rep: {
     label: 'Reputation tier',
@@ -71,6 +75,23 @@ export const SLOT_GROUPS = {
       driving_school: "A post-war Malaysian driving school on a cracked asphalt practice circuit, faded cone markings under the weeds, a wonky concrete hill-start ramp and dented traffic cones. EVERYBODY'S CLOTHES ARE OLD AND HARD-WORN \u2014 nothing is new, nothing is pressed, nothing matches. Faded and sun-bleached cotton gone shapeless, visible patches and mismatched mending at elbows and knees, frayed collars and cuffs, sweat-marked backs, grubby hems, shoes worn down and dusty. The INSTRUCTOR leans in at the window of a doorless retro-futurist car husk \u2014 bulbous fifties styling, rust through the sills \u2014 in a short-sleeved shirt gone thin and yellowish at the shoulders with a pen in the pocket and a clipboard in one hand. Inside, a TERRIFIED LEARNER grips the wheel at ten and two in a much-mended baju, staring straight ahead. Four applicants wait on mismatched plastic stools under a corrugated lean-to in patched work clothes and sarongs, one asleep sitting up. A board of pass photographs gone brown behind them. Comic but played completely straight.",
       big_ben_taken_seriously: "{{big_ben}} He is CROUCHED DOWN ON ONE KNEE to listen, head tilted, nodding, while a SMALL SERIOUS PERSON of ordinary height stands in front of him in a songkok and sarong, explaining something with a hand-drawn diagram held up in both hands. NOBODY IS LAUGHING and nobody is mugging \u2014 both are entirely sincere. A sunlit Bandawang street, out of focus behind them.",
       crossing_the_emerald_sea: "Night in the Chukai Desert. EXACTLY THREE Caliphate pahlawan on foot \u2014 three figures only, no more \u2014 walking away from camera across a vast field of sand dunes under a huge moon. Salvaged plate carriers and composite shoulder plates worn over unbleached linen robes and samping sashes, packs and bedrolls, one with a tengkolok. They are spread apart with real distance between them, small against the dunes. Scattered across the sand all around, thousands of TINY GREEN TRINITITE SHARDS catch the moonlight and glitter. THE LEAD FIGURE HAS STOPPED AND TURNED, looking back at the other two. Cold blue moonlight, never golden. Enormous scale, emptiness, no action."
+    }
+  },
+
+  sheet: {
+    label: 'Character sheet',
+    file: 'src/characterSheets.js',
+    anchor: id => new RegExp(`id: "${id}"`),
+    style: SHEET_STYLE,
+    slots: {
+      big_ben: "{{big_ben}}",
+      janson_peng: "{{janson_peng}}",
+      orange_peng: "{{orange_peng}}",
+      farmer_nick_peng: "{{farmer_nick_peng}}",
+      slink_tan: "{{slink_tan}} In all three views the eyepatch, the draped jacket and the gun leg must be visible and consistent; the back view shows the jacket from behind and the prosthetic from the rear.",
+      iron_legs: "{{iron_legs}} In all three views the armoured legs are identical and articulated the same way.",
+      kong: "{{kong}} In all three views the spectacles, the rattan sash and the robe's tears are consistent; the back view shows the robe and sash from behind.",
+      two: "{{two}} In all three views the torn-away left sleeve and the sutured shoulder wound are visible from the correct angle \u2014 clearly in front, in profile from the side, and the bare shoulder from behind."
     }
   },
 
